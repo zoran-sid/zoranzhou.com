@@ -1,15 +1,13 @@
 ---
-title: "The Importance of Embracing Change"
-date: 2025-12-07
-author: "Your Name"
+author: "Hugo Authors"
+title: "new world"
+date: "2020-03-10"
+description: "new world"
 tags:
-  - Change
-  - Personal Growth
-  - Life Lessons
-categories:
-  - Essays
-featured_image: "/images/featured-change.jpg"
-draft: false
+  - shortcodes
+  - privacy
+  - example
+ShowToc: true
 ---
 
 ## Introduction
