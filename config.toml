@@ -1,6 +1,0 @@
-baseURL = "https://zoranzhou.com"
-title = "ZORAN PERSON"
-theme = "PaperMod"
-
-[params]
-  author = "ZORAN"
