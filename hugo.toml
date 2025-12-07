@@ -2,7 +2,7 @@
 # Hugo site config
 ##############################
 
-title = "Zoran Person"
+title = "ZORAN PERSON"
 baseURL = 'https://zoranzhou.com/'
 languageCode = 'en-us'
 defaultContentLanguage = "en"
