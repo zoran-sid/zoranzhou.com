@@ -1,57 +1,57 @@
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <style>
-        :root {
-            --accent-color: {{ .Site.Params.AccentColor | default "#FF4D4D" }};
-            --font-size: {{ .Site.Params.FontSize | default "1.1rem" }};
-        }
-    </style>
+    {{- partial "meta/main.html" . }}
+    {{- hugo.Generator }}
 
-    {{ $title := .Title | markdownify | default .Site.Title }}
-    {{ $description := ((.Description | default (.Summary | default .Content) | default .Site.Params.Description) | plainify | truncate 160) }}
-    {{ $image := .Params.image | default (.Scratch.Get "avatarImgSrc") }}
-    {{ $siteKeywords := .Site.Params.MetaKeywords | default (slice) }}
-    {{ $postKeywords := .Params.tags | default (slice) }}
-    {{ $keywords := union $siteKeywords $postKeywords }}
+    {{/* Open Graph tags */}}
+    {{ template "_internal/opengraph.html" . }}
 
-    <!-- SEO titles & descriptions -->
-    <title>{{ $title }}</title>
-    <meta name="description" content="{{ $description }}">
-    <meta name="keywords" content='{{ delimit $keywords ", "}}'>
+    {{/* Twitter Card tags */}}
+    {{ template "_internal/twitter_cards.html" . }}
 
-    <meta property="og:url" content="{{ .Permalink }}">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $title }}">
-    <meta property="og:description" content="{{ $description }}">
-    <meta property="og:image" content="{{ absURL $image }}">
-    <meta property="og:image:secure_url" content="{{ absURL $image }}">
+    {{/* Canonical link, RSS */}}
+	<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $title }}">
-    <meta name="twitter:description" content="{{ $description }}">
-    <meta property="twitter:domain" content="{{ .Permalink }}">
-    <meta property="twitter:url" content="{{ .Permalink }}">
-    <meta name="twitter:image" content="{{ absURL $image }}">
-
-    <!-- SEO canonicals: helps Google understand your site better when using marketing campaign tagging etc -->
     <link rel="canonical" href="{{ .Permalink }}">
+    {{- with .OutputFormats.Get "RSS" }}
+    <link href="{{ .RelPermalink }}" rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}">
+    <link href="{{ .RelPermalink }}" rel="feed" type="application/rss+xml" title="{{ $.Site.Title }}">
+    {{- end }}
 
-    {{ $cssNormalize := resources.Get "css/normalize.min.css" }}
-    <link rel="stylesheet" type="text/css" href="{{ $cssNormalize.RelPermalink }}" media="print">
+    {{- /* Styles */ -}}
 
-    {{ $cssMain := resources.Get "css/main.css" | minify }}
-    <link rel="stylesheet" type="text/css" href="{{ $cssMain.RelPermalink }}">
+    {{- $style := resources.Get "sass/main.scss" | resources.ExecuteAsTemplate "style.scss" . | toCSS (dict "targetPath" "style.css") | minify | fingerprint }}
+    <link href="{{ $style.RelPermalink }}" rel="stylesheet">
+    {{- $code_syntax_highlight_css := resources.Get "code-highlight.css" | minify | fingerprint }}
+    <link href="{{ $code_syntax_highlight_css.RelPermalink }}" rel="stylesheet">
 
-    {{ $cssDark := resources.Get "css/dark.css" | minify }}
-    <link id="dark-theme" rel="stylesheet" href="{{ $cssDark.RelPermalink }}">
+    {{/* Favicons */}}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ (resources.Get "icons/apple-touch-icon.png").RelPermalink }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ (resources.Get "icons/favicon-32x32.png").RelPermalink }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ (resources.Get "icons/favicon-16x16.png").RelPermalink }}">
+    <link rel="mask-icon" href="{{ (resources.Get "icons/safari-pinned-tab.svg").RelPermalink }}">
+    <link rel="shortcut icon" href="{{ (resources.Get "icons/favicon.ico" | resources.Copy "favicon.ico").RelPermalink }}">
 
-    {{ $jsBundle := resources.Match "js/**.js" | resources.Concat "js/bundle.js" | minify | resources.Fingerprint "sha256" }}
-    <script src="{{ $jsBundle.RelPermalink }}" integrity="{{ $jsBundle.Data.Integrity }}"></script>
+    {{- partial "webmanifest.html" . -}}
+    {{- partial "browserconfig.html" . -}}
 
-    <!-- Option for user to inject custom html -->
-    {{ if .Site.Params.CustomHeadHTML }}
-    {{ .Site.Params.CustomHeadHTML | safeHTML }}
+    <meta name="theme-color" content="{{ .Site.Params.webmanifest.theme_color | default "#434648" }}">
+    <meta name="color-scheme" content="light dark">
+
+    {{/* SVG favicon for the modern web */}}
+    <link rel="icon" type="image/svg+xml" href="{{ (resources.Get "icons/favicon.svg").RelPermalink }}">
+
+    {{/* Katex support (enabled on specific pages). See 'helpers/katex.html' for more info. */}}
+
+    {{- if or .Params.math .Site.Params.math }}{{ partial "helpers/katex.html" . -}}{{- end -}}
+
+    {{/* Google analytics script. See hugo.toml to enable/disable this. */}}
+    {{- if hugo.IsProduction | or (eq site.Params.env "production") }}
+    {{ template "_internal/google_analytics.html" . }}
+    {{- end -}}
+
+    {{/* Extend head with user supplied partial */}}
+    {{ if templates.Exists "partials/custom-head.html" }}
+      {{ partial "custom-head.html" . }}
     {{ end }}
 </head>

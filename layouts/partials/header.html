@@ -1,59 +1,72 @@
-<header class="header">
-    <nav class="header-nav">
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="{{ .Site.Home.Permalink }}" class="logo">
+            {{ partial "svgs/home.svg" (dict "height" 25 "width" 25) . }}
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                {{ partial "svgs/menu.svg" (dict "height" 25 "width" 25) . }}
+            </span>
+        </label>
 
-        {{ if isset .Site.Params "avatarurl" }}
-        <div class="avatar">
-            <a href="{{ .Site.BaseURL }}">
-                <img src='{{ .Scratch.Get "avatarImgSrc" }}' alt="{{ .Site.Params.AvatarAltText|default "avatar" }}">
-            </a>
-        </div>
-        {{ end }}
-
-        <div class="nav-title">
-            <a class="nav-brand" href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a>
-        </div>
-
-        <div class="nav-links">
-            {{ range .Site.Menus.main }}
-            <div class="nav-link">
-                <a href="{{ .URL | absURL }}" aria-label="{{ .Identifier }}" {{ if .Params.NewPage -}}target="_blank" {{- end -}}>
-                    {{- .Pre | safeHTML }} {{ .Name }} {{ .Post | safeHTML -}}
-                </a>
-            </div>
-            {{ end }}
-
-            <span class="nav-icons-divider"></span>
-            <div class="nav-link dark-theme-toggle">
-                <span class="sr-only dark-theme-toggle-screen-reader-target">theme</span>
-                <a aria-hidden="true" role="switch">
-                    <span class="theme-toggle-icon" data-feather="moon"></span>
-                </a>
-            </div>
-
-            <div class="nav-link" id="hamburger-menu-toggle">
-                <span class="sr-only hamburger-menu-toggle-screen-reader-target">menu</span>
-                <a aria-checked="false" aria-labelledby="hamburger-menu-toggle" id="hamburger-menu-toggle-target" role="switch">
-                    <span data-feather="menu"></span>
-                </a>
-            </div>
-
-            <!-- For mobile -->
-            <ul class="nav-hamburger-list visibility-hidden">
+        <div class="trigger">
+            <ul class="trigger-container">
+                {{ $currentPage := . }}
                 {{ range .Site.Menus.main }}
-                <li class="nav-item">
-                    <a href="{{ .URL | absURL }}" {{ if .Params.NewPage -}} target="_blank"{{- end -}}>
-                        {{- .Pre | safeHTML }} {{ .Name }} {{ .Post | safeHTML -}}
+                <li>
+                    <a class="menu-link {{ if or ($currentPage.IsMenuCurrent "main" .)
+                        ($currentPage.HasMenuCurrent "main" .) }}active{{ end }}" href="{{ .URL }}">
+                        {{ .Name }}
                     </a>
+                    {{ if .HasChildren }}
+                    <ul>
+                        {{ range .Children }}
+                        <li>
+                            <a class="menu-link {{ if $currentPage.IsMenuCurrent "main" . }}active{{ end }}"
+                                href="{{ .URL }}">
+                                {{ .Name }}
+                            </a>
+                        </li>
+                        {{ end }}
+                    </ul>
+                    {{ end }}
                 </li>
                 {{ end }}
-                <li class="nav-item dark-theme-toggle">
-                    <span class="sr-only dark-theme-toggle-screen-reader-target">theme</span>
-                    <a role="switch">
-                        <span class="theme-toggle-icon" data-feather="moon"></span>
-                    </a>
+                <li class="menu-separator">
+                    <span>|</span>
                 </li>
+                <!-- Language List -->
+                {{ if .IsTranslated }}
+                    <li>
+                        <select aria-label="Select Language" class="lang-list" id="select-language" onchange="location = this.value;">
+                            {{ $siteLanguages := .Site.Languages}}
+                            {{ $pageLang := .Page.Lang}}
+                            {{ range .Page.AllTranslations }}
+                                {{ $translation := .}}
+                                {{ range $siteLanguages }}
+                                    {{ if eq $translation.Lang .Lang }}
+                                        {{ $selected := false }}
+                                        {{ if eq $pageLang .Lang}}
+                                            <option id="{{ $translation.Language }}" value="{{ $translation.Permalink }}" selected>{{ .LanguageCode | upper }}
+                                            </option>
+                                        {{ else }}
+                                            <option id="{{ $translation.Language }}" value="{{ $translation.Permalink }}">{{ .LanguageCode | upper }}</option>
+                                        {{ end }}
+                                    {{ end }}
+                                {{ end }}
+                            {{ end }}
+                        </select>                
+                    </li>
+                    <li class="menu-separator">
+                        <span>|</span>
+                    </li>
+                {{ end }}
             </ul>
-
+            <a id="mode" href="#">
+                {{ partial "svgs/sun.svg" (dict "height" 21 "width" 21 "class" "mode-sunny" "title" "LIGHT") . }}
+                {{ partial "svgs/sun.svg" (dict "height" 21 "width" 21 "class" "mode-moon" "title" "DARK") . }}
+            </a>
         </div>
     </nav>
-</header>
+</div>
