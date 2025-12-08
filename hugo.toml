@@ -16,10 +16,8 @@ pagerSize = 10
 # Params
 ##############################
 [params]
-disableKinds = ["RSS"]
 TocSide = "left"
 EnableInstantClick = false
-disableRSS = true
 # --- Logo ---
 [params.logo] 
 icon = "favicon.png" 
