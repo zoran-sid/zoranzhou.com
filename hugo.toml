@@ -6,6 +6,13 @@ enableEmoji = true
 ignoreErrors = ["additional-script-loading-error"]
 disqusShortname = ""
 
+
+[outputs]
+  home = ["HTML"]      # 默认是 ["HTML","RSS","JSON"]
+  section = ["HTML"]
+  taxonomy = ["HTML"]
+  term = ["HTML"]
+
 ##############################
 # Pagination
 ##############################
@@ -57,8 +64,8 @@ name = "twitter"
 url = "https://x.com/zhouzoran75607"
 
 [[params.social]]
-name = "email"
-url = "zoranzhou28@gmail.com"
+name = "facebook"
+url = "https://www.facebook.com/share/1AQECFT4ui/?mibextid=wwXIfr"
 
 [[params.social]]
 name = "instagram"
