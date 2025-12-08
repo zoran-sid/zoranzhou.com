@@ -34,7 +34,7 @@ EnableInstantClick = true
 
   [[menu.main]]
   name = "Blog"
-  url = "/blog/"
+  url = "/posts/"
   weight = 2
 
   [[menu.main]]
