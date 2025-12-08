@@ -21,7 +21,9 @@
 
   {{- if $pageCommentSystems.disqus -}}
   {{- with .disqus -}}
-    {{- partial "disqus.html" (dict "page" $page "ctx" .) }}
+    {{- if $pageCommentSystems.waline -}}
+  {{- with .waline -}}
+    {{- partial "waline.html" . }}
   {{- end -}}
   {{- end -}}
 {{- end -}}

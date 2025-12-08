@@ -66,3 +66,11 @@ url = "https://x.com/zhouzoran75607"
 [[params.social]]
 name = "email"
 url = "zoranzhou28@gmail.com"
+
+[params.commentSystems.waline]
+serverURL = "https://zoranzhou.cn"
+locale = "en"
+dark = "auto"
+
+[params.defaultCommentSystems]
+waline = true
