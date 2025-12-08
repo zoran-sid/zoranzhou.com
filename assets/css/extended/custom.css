@@ -1,7 +1,27 @@
-/* Logo 样式：圆形和大尺寸 */
+/* 强制 logo 为圆形、限制大小，优先级高，兼容模板内联 height/width */
 .logo img {
-    width: 128px;     /* 调整为128px */
-    height: 128px;    /* 调整为128px */
-    border-radius: 50%; /* 圆形效果 */
-    object-fit: cover;  /* 确保图片不失真 */
+  display: block;                /* 去掉行内间隙 */
+  width: 64px !important;        /* 想要的实际宽度（可改） */
+  height: 64px !important;       /* 想要的实际高度（可改） */
+  max-width: 100%;               /* 防止过宽溢出容器 */
+  border-radius: 50% !important; /* 圆形 */
+  object-fit: cover !important;  /* 保持比例并裁切 */
+  box-sizing: border-box;
+}
+
+/* 保证 header 高度能容纳更大的 logo，且垂直居中 */
+.header .nav {
+  align-items: center;
+  min-height: 72px; /* 根据 logo 大小适当增加 header 最小高度 */
+}
+
+/* 防止在超小屏幕上溢出，手机端自动缩小 */
+@media (max-width: 480px) {
+  .logo img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .header .nav {
+    min-height: 56px;
+  }
 }
