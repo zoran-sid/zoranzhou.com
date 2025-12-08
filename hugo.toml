@@ -46,10 +46,6 @@ EnableInstantClick = true
   name = "Archives"
   url = "/archives/"
   weight = 4
-  
-  [[menu.main]]
-  name = "ZORAN"
-  url = "https://zoranzhou.com"
 
     [menu.main.params]
     external = true
@@ -60,7 +56,11 @@ name = "github"
 url = "https://github.com/zoran-sid"
 
 [[params.social]]
-name = "twitter"
+name = "instgram"
+url = "https://www.instagram.com/zoranzhou"
+
+[[params.social]]
+name = "X"
 url = "https://x.com/zhouzoran75607"
 
 [[params.social]]
