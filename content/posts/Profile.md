@@ -7,9 +7,10 @@ weight: 1
 
 # Resume
 
-  I am ZHOU CHEN. The Website is my personal Blog for recording life and study. I am major in computer science in XINHUA University in 2020 and self-employed in cybersecurity Engineer. The year of 2015 is my GAP year, I focus on study Cisco Enterprise infrastructure, and finally pass CCIE certificate after that I study English in Philippines to improve my language skill. To be honest, life like a competition, I think that life need to be careful to deal with challenges in anytime, which will cause pressure and drawback. I would passionate on life and study, keep going always!
+I am ZHOU CHEN, and this website serves as my personal blog where I record my life and studies. I majored in computer science at XINHUA University starting in 2020, and I am currently a self-employed cybersecurity engineer.
 
-![d63c3f07baefea8dc50fac9494e1f70d](d63c3f07baefea8dc50fac9494e1f70d.jpg)
+In 2015, I took a gap year to focus on studying Cisco Enterprise infrastructure and achieved the prestigious CCIE certification. Afterward, I spent some time in the Philippines improving my English skills.
 
+I think life as a competition that demands careful attention to challenges at every turn, which can lead to pressure and setbacks. However, I remain passionate about life and learning, always striving to move forward!
 
-
+![d63c3f07baefea8dc50fac9494e1f70d](https://raw.githubusercontent.com/zoran-sid/zoranzhou.com/main/static/image/d63c3f07baefea8dc50fac9494e1f70d-1765195009281-2.jpg)
