@@ -81,7 +81,6 @@ url = "https://space.bilibili.com/596163308"
 [params.commentSystems.waline]
 serverURL = "https://zoranzhou.cn"
 locale = "en"
-dark = "auto"
 
 [params.defaultCommentSystems]
 waline = true
