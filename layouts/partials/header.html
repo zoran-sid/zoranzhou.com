@@ -144,5 +144,6 @@ function toggleThemeListener() {
             </li>
             {{- end }}
         </ul>
+		{{ partial "social_icons.html" (dict "icons" site.Params.social "svg" site.Data.svg "Email" site.Params.email ) }}
     </nav>
 </header>
