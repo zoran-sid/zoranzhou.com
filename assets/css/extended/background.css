@@ -1,55 +1,44 @@
+/* 背景 dot-grid 效果 */
 body {
     position: relative;
     background-color: #ffffff;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
-/* 生成层 */
-body::before,
-body::after {
+/* 生成 dot grid */
+body::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
 
-    /* 点阵：点变大（2px），间距减半（12px） */
+    /* 点阵大小与间距（已放大点，缩小间距） */
     background-image:
-        radial-gradient(circle, rgba(0,0,0,0.18) 2px, transparent 2px);
-    background-size: 12px 12px;
+        radial-gradient(circle, rgba(0,0,0,0.10) 2px, transparent 2px);
+    background-size: 15px 15px;  /* ← 原 30px/30px 减半 */
 
-    opacity: 0.33;
-    z-index: -2;
+    opacity: 0.45;
 
-    animation: drift1 13s ease-in-out infinite alternate;
+    /* 微动动画 */
+    animation: dotmove 12s ease-in-out infinite alternate;
 }
 
-/* 第二层 */
-body::after {
-    background-size: 12px 12px;
-    opacity: 0.25;
-    animation: drift2 17s ease-in-out infinite alternate;
+/* 微微流动动画 —— 随机漂移感（保持不变） */
+@keyframes dotmove {
+    0% {
+        transform: translate(0px, 0px);
+    }
+    50% {
+        transform: translate(-12px, -6px);
+    }
+    100% {
+        transform: translate(8px, 10px);
+    }
 }
 
-/* 动画 1 */
-@keyframes drift1 {
-    0% { transform: translate(0px, 0px); }
-    30% { transform: translate(4px, -3px); }
-    60% { transform: translate(-2px, 4px); }
-    100% { transform: translate(3px, 2px); }
-}
-
-/* 动画 2 */
-@keyframes drift2 {
-    0% { transform: translate(0px, 0px); }
-    40% { transform: translate(-3px, 2px); }
-    70% { transform: translate(2px, -4px); }
-    100% { transform: translate(-1px, 3px); }
-}
-
-/* 暗色模式 */
-.dark body::before,
-.dark body::after {
+/* 暗色主题自动适配 */
+.dark body::before {
     background-image:
-        radial-gradient(circle, rgba(255,255,255,0.18) 2px, transparent 2px);
+        radial-gradient(circle, rgba(255,255,255,0.15) 2px, transparent 2px); /* 点大小同步更新 */
     opacity: 0.22;
 }
