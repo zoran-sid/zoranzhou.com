@@ -14,8 +14,8 @@ body::before {
 
     /* 点阵大小与间距 */
     background-image:
-        radial-gradient(circle, rgba(0,0,0,0.25) 1px, transparent 1px);
-    background-size: 24px 24px;
+        radial-gradient(circle, rgba(0,0,0,0.10) 1px, transparent 1px);
+    background-size: 30px 30px;
 
     opacity: 0.45;
 
