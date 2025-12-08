@@ -50,13 +50,13 @@ toc = true
 tocOpen = false
 mainSections = ["posts"]
 defaultColor = "dark" 
-
+comments = false
 # ... 上面是 defaultColor = "dark"
 
 ##############################
 # Waline Comments Config
 ##############################
-
+  
 [[params.socialIcons]]
 name = "github"
 url = "https://github.com/zoran-sid"
