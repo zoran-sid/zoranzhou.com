@@ -1,60 +1,70 @@
 /* 全局背景和字体颜色 */
 body.dark {
-  background-color: #121212;  /* 深色背景 */
-  color: #f8f8f2;  /* 白色字体 */
+  background-color: #121212; /* 深色背景 */
+  color: #f8f8f2; /* 白色字体 */
 }
 
-/* .chroma 设置代码块的背景色和字体颜色 */
-.chroma {
-  color: #f8f8f2;  /* 白色字体 */
-  background-color: #282a36;  /* 深色背景 */
+/* 确保所有文章的背景色和字体颜色 */
+body.dark .post-single {
+  background-color: #282a36; /* 深色背景 */
+  color: #f8f8f2; /* 白色字体 */
 }
 
-/* .chroma .hl 高亮行背景色 */
-.chroma .hl {
-  display: block;
-  width: 100%;
-  background-color: #44475a;  /* 更暗的高亮背景色 */
+/* 针对文章中的代码块 */
+body.dark .chroma {
+  color: #f8f8f2; /* 白色字体 */
+  background-color: #282a36; /* 深色背景 */
 }
 
-/* .chroma .lntd 行表格样式 */
-.chroma .lntd {
-  vertical-align: top;
-  padding: 0;
-  margin: 0;
-  border: 0;
+/* 高亮行背景颜色 */
+body.dark .chroma .hl {
+  background-color: #44475a; /* 更深的高亮背景色 */
 }
 
-/* 代码行号颜色 */
-.chroma .lnt, .chroma .ln {
-  margin-right: 0.4em;
-  padding: 0 0.4em 0 0.4em;
-  color: #7f7f7f;  /* 灰色行号 */
+/* 行号颜色 */
+body.dark .chroma .lnt, .chroma .ln {
+  color: #7f7f7f; /* 灰色行号 */
 }
 
-/* 关键字样式 */
-.chroma .k, .chroma .kc, .chroma .kn, .chroma .kp, .chroma .kr, .chroma .kt {
-  color: #ff79c6;  /* 紫色 */
+/* 代码关键字等 */
+body.dark .chroma .k, .chroma .kc, .chroma .kn, .chroma .kp, .chroma .kr, .chroma .kt {
+  color: #ff79c6; /* 紫色关键字 */
 }
 
-/* 字符串、数值、常量等高亮颜色 */
-.chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .dl, .chroma .sd,
-.chroma .s2, .chroma .se, .chroma .sh, .chroma .si, .chroma .sx, .chroma .sr,
-.chroma .s1, .chroma .ss {
-  color: #f1fa8c;  /* 亮黄色 */
-}
-
-.chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi, .chroma .il,
-.chroma .mo {
-  color: #bd93f9;  /* 紫色数字 */
-}
-
-/* 注释样式 */
-.chroma .c, .chroma .ch, .chroma .cm, .chroma .c1, .chroma .cs, .chroma .cp,
-.chroma .cpf {
-  color: #6272a4;  /* 灰蓝色 */
+/* 注释颜色 */
+body.dark .chroma .c, .chroma .ch, .chroma .cm, .chroma .c1, .chroma .cs, .chroma .cp {
+  color: #6272a4; /* 灰蓝色注释 */
 }
 
 /* 删除和插入的文本 */
-.chroma .gd { color: #ff5555; }  /* 删除文本红色 */
-.chroma .gi { color: #50fa7b; font-weight: bold; }  /* 插入文本绿色 */
+body.dark .chroma .gd {
+  color: #ff5555; /* 删除文本红色 */
+}
+
+body.dark .chroma .gi {
+  color: #50fa7b; /* 插入文本绿色 */
+  font-weight: bold;
+}
+
+/* 修正其他常规颜色 */
+body.dark .chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .dl, .chroma .sd,
+.chroma .s2, .chroma .se, .chroma .sh, .chroma .si, .chroma .sx, .chroma .sr,
+.chroma .s1, .chroma .ss, .chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, 
+.chroma .mi, .chroma .il, .chroma .mo {
+  color: #f1fa8c; /* 亮黄色和紫色 */
+}
+
+/* 文章正文标题 */
+body.dark .post-single h1,
+body.dark .post-single h2,
+body.dark .post-single h3,
+body.dark .post-single h4,
+body.dark .post-single h5,
+body.dark .post-single h6 {
+  color: #ffffff; /* 确保标题为白色 */
+}
+
+/* 其他正文部分 */
+body.dark .post-single p {
+  color: #f8f8f2; /* 正文文字颜色 */
+}
