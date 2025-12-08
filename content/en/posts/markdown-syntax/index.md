@@ -1,17 +1,17 @@
 ---
-title: Markdown 语法指南
+title: Markdown Syntax Guide
 date: 2023-02-11
 author: Hugo Authors
-description: 展示基本 Markdown 语法和 HTML 元素格式化的示例文章。
+description: Sample article showcasing basic Markdown syntax and formatting for HTML elements.
 isStarred: true
 ---
 
-本文提供了 Hugo 内容文件中可以使用的 Markdown 语法示例，同时展示了 Hugo 主题中是否对基本 HTML 元素进行了 CSS 装饰。
+This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.
 <!--more-->
 
-## 标题
+## Headings
 
-以下 HTML `<h1>`—`<h6>` 元素表示六个级别的标题。`<h1>` 是最高级别的标题，而 `<h6>` 是最低级别的标题。
+The following HTML `<h1>`—`<h6>` elements represent six levels of section headings. `<h1>` is the highest section level while `<h6>` is the lowest.
 
 # H1
 
@@ -25,15 +25,15 @@ isStarred: true
 
 ###### H6
 
-## 段落
+## Paragraph
 
 Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur sitiae dolessi aut parist aut dollo enim qui voluptate ma dolestendit peritin re plis aut quas inctum laceat est volestemque commosa as cus endigna tectur, offic to cor sequas etum rerum idem sintibus eiur? Quianimin porecus evelectur, cum que nis nust voloribus ratem aut omnimi, sitatur? Quiatem. Nam, omnis sum am facea corem alique molestrunt et eos evelece arcillit ut aut eos eos nus, sin conecerem erum fuga. Ri oditatquam, ad quibus unda veliamenimin cusam et facea ipsamus es exerum sitate dolores editium rerore eost, temped molorro ratiae volorro te reribus dolorer sperchicium faceata tiustia prat.
 
 Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sapicia is sinveli squiatum, core et que aut hariosam ex eat.
 
-## 图片
+## Image
 
-您可以使用以下语法来包含图片。图片的路径应相对于 `index.md` 文件。
+You can use the following syntax to include an image. Path of the image should be relative to the `index.md` file.
 
 ```markdown
 ![Landscape](1.jpg)
@@ -41,7 +41,7 @@ Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sap
 
 ![Landscape](1.jpg)
 
-您还可以包含来自外部来源的图片。
+You can also include image from external sources.
 
 ```markdown
 ![Image](https://source.unsplash.com/random/600x400/?tech)
@@ -49,39 +49,39 @@ Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sap
 
 ![Image](https://source.unsplash.com/random/600x400/?tech)
 
-## 引用
+## Blockquotes
 
-引用元素表示从其他来源引用的内容，可以选择包含引用来源，引用来源必须位于 `footer` 或 `cite` 元素中，还可以选择包含注释和缩写等内联更改。
+The blockquote element represents content that is quoted from another source, optionally with a citation which must be within a `footer` or `cite` element, and optionally with in-line changes such as annotations and abbreviations.
 
-### 无来源的引用
+### Blockquote without attribution
 
-> 您可以在引用中使用 Markdown 语法，例如 **bold**,  _italics_, [links](https://gohugo.io/), `code`。
+> You can use Markdown syntax within a blockquote, like **bold**,  _italics_, [links](https://gohugo.io/), `code`.
 
-### 带来源的引用
+### Blockquote with attribution
 
 > Don't communicate by sharing memory, share memory by communicating.<br>
 > — <cite>Rob Pike[^1]</cite>
 
-[^1]: 上述引用摘自 Rob Pike 在 2015 年 11 月 18 日 Gopherfest 上的[演讲](https://www.youtube.com/watch?v=PAAkCSZUG1c)。
+[^1]: The above quote is excerpted from Rob Pike's [talk](https://www.youtube.com/watch?v=PAAkCSZUG1c) during Gopherfest, November 18, 2015.
 
-## 表格
+## Tables
 
-表格不是 Markdown 核心规范的一部分，但 Hugo 原生支持它们。
+Tables aren't part of the core Markdown spec, but Hugo supports them out-of-the-box.
 
    Name | Age
 --------|------
-   Bob  | 27
- Alice  | 23
+    Bob | 27
+  Alice | 23
 
-### 表格中的 Markdown
+### Markdown within tables
 
 | Italics   | Bold     | Code   |
 | --------  | -------- | ------ |
 | *italics* | **bold** | `code` |
 
-## 代码块
+## Code Blocks
 
-### 使用反引号的代码块
+### Code block with backticks
 
 ```html
 <!doctype html>
@@ -96,7 +96,7 @@ Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sap
 </html>
 ```
 
-### 缩进四个空格的代码块
+### Code block indented with four spaces
 
     <!doctype html>
     <html lang="en">
@@ -109,7 +109,7 @@ Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sap
     </body>
     </html>
 
-### 使用 Hugo 内置高亮短代码的代码块
+### Code block with Hugo's internal highlight shortcode
 
 {{< highlight html >}}
 <!doctype html>
@@ -124,25 +124,25 @@ Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sap
 </html>
 {{< /highlight >}}
 
-### 内联代码
+### Inline code
 
-使用反引号在句子中引用 `variable`。
+Use the backtick to refer to a `variable` within a sentence.
 
-## 列表类型
+## List Types
 
-### 有序列表
+### Ordered List
 
 1. First item
 2. Second item with some `code` in it
 3. Third item
 
-### 无序列表
+### Unordered List
 
 * List item
 * Another item with some `code` in it
 * And another item
 
-### 嵌套列表
+### Nested list
 
 * Fruit
   * Apple
@@ -152,14 +152,14 @@ Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sap
   * Milk
   * Cheese
 
-## 其他元素 — abbr, sub, sup, kbd, mark
+## Other Elements — abbr, sub, sup, kbd, mark
 
-<abbr title="Graphics Interchange Format">GIF</abbr> 是一种位图图像格式。
+<abbr title="Graphics Interchange Format">GIF</abbr> is a bitmap image format.
 
 H<sub>2</sub>O
 
 X<sup>n</sup> + Y<sup>n</sup> = Z<sup>n</sup>
 
-按下 <kbd>CTRL</kbd>+<kbd>ALT</kbd>+<kbd>Delete</kbd> 结束会话。
+Press <kbd>CTRL</kbd>+<kbd>ALT</kbd>+<kbd>Delete</kbd> to end the session.
 
-大多数 <mark>蝾螈</mark> 是夜行动物，捕食昆虫、蠕虫和其他小生物。
+Most <mark>salamanders</mark> are nocturnal, and hunt for insects, worms, and other small creatures.
