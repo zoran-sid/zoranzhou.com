@@ -1,58 +1,44 @@
+/* 背景 dot-grid 效果 */
 body {
     position: relative;
     background-color: #ffffff;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
-/* 生成层 */
-body::before,
-body::after {
+/* 生成 dot grid */
+body::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
 
-    /* 点阵 */
+    /* 点阵大小与间距 */
     background-image:
-        radial-gradient(circle, rgba(0,0,0,0.18) 1px, transparent 1px);
+        radial-gradient(circle, rgba(0,0,0,0.25) 1px, transparent 1px);
     background-size: 24px 24px;
 
-    opacity: 0.33;
-    z-index: -2;
+    opacity: 0.45;
 
-    /* 关键：不同层不同动画 */
-    animation: drift1 13s ease-in-out infinite alternate;
+    /* 微动动画 */
+    animation: dotmove 12s ease-in-out infinite alternate;
 }
 
-/* 第二层：产生错位与独立漂浮感 */
-body::after {
-    background-size: 24px 24px;
-    opacity: 0.25;
-
-    /* 位移稍不同，制造随机性 */
-    animation: drift2 17s ease-in-out infinite alternate;
+/* 微微流动动画 —— 随机漂移感 */
+@keyframes dotmove {
+    0% {
+        transform: translate(0px, 0px);
+    }
+    50% {
+        transform: translate(-12px, -6px);
+    }
+    100% {
+        transform: translate(8px, 10px);
+    }
 }
 
-/* 动画 1：小幅度平滑漂动 */
-@keyframes drift1 {
-    0% { transform: translate(0px, 0px); }
-    30% { transform: translate(4px, -3px); }
-    60% { transform: translate(-2px, 4px); }
-    100% { transform: translate(3px, 2px); }
-}
-
-/* 动画 2：另一个方向的小随机漂动 */
-@keyframes drift2 {
-    0% { transform: translate(0px, 0px); }
-    40% { transform: translate(-3px, 2px); }
-    70% { transform: translate(2px, -4px); }
-    100% { transform: translate(-1px, 3px); }
-}
-
-/* 暗色模式 */
-.dark body::before,
-.dark body::after {
+/* 暗色主题自动适配 */
+.dark body::before {
     background-image:
-        radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px);
+        radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
     opacity: 0.22;
 }
