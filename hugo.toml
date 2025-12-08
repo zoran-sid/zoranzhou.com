@@ -25,8 +25,8 @@ EnableInstantClick = false
 # --- Logo 配置（新增） ---
 [params.logo]
 icon = "logo.jpg"     # 放在 /assets/logo.png
-iconWidth = 32        # 可自行调整
-iconHeight = 32
+iconWidth = 128        # 可自行调整
+iconHeight = 128
 text = ""             # 不显示“ZORAN PERSON”文字
 
 ##############################
