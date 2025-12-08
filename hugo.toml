@@ -20,7 +20,7 @@ pagerSize = 10
 ##############################
 [params]
 TocSide = "left"
-EnableInstantClick = true
+EnableInstantClick = false
 
 ##############################
 # Menu
@@ -60,7 +60,7 @@ name = "instgram"
 url = "https://www.instagram.com/zoranzhou"
 
 [[params.social]]
-name = "X"
+name = "twitter"
 url = "https://x.com/zhouzoran75607"
 
 [[params.social]]
