@@ -30,6 +30,7 @@
     </div>
     {{- end }}
   </header>
+
   {{- $isHidden := .Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}
   {{- partial "cover.html" (dict "cxt" . "IsHome" false "isHidden" $isHidden) }}
   {{- if (.Param "ShowToc") }}
@@ -74,3 +75,8 @@
 </article>
 
 {{- end }}{{/* end main */}}
+
+<!-- 判断是否为文章页面，不在文章页面时引入 background.css -->
+{{ if not .IsPage }}
+  <link rel="stylesheet" href="/assets/css/extended/background.css">
+{{ end }}
