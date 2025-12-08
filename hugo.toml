@@ -1,171 +1,30 @@
 ##############################
-# Hugo site config
+# Hugo site config (TOML)
 ##############################
-theme = "PaperModX"
 title = "ZORAN PERSON"
-baseURL = 'https://zoranzhou.com/'
-languageCode = 'en-us'
+baseURL = "https://zoranzhou.com/"
+languageCode = "en-us"
 defaultContentLanguage = "en"
 enableEmoji = true
 ignoreErrors = ["additional-script-loading-error"]
 disqusShortname = ""
-[module]
-  [[module.imports]]
-    path = "https://github.com/reorx/hugo-PaperModX"
-
-[services]
-  [services.googleAnalytics]
-    id = '' # optional
-
-[markup]
-  [markup.highlight]
-    noClasses = false
-  [markup.goldmark.renderer]
-    unsafe = true
-  [markup.tableOfContents]
-    startLevel = 2
-    endLevel = 4
-    ordered = false
+paginate = 10
 
 ##############################
-# Security (修复：允许拉取外部资源以支持嵌入式短代码)
-##############################
-[security]
-  [security.http]
-    methods = ["GET"]
-    # 添加必要的外部 URL 到白名单
-    urls = [
-      "^https://publish\\.twitter\\.com/.*",
-      "^https://vimeo\\.com/api/oembed\\.json.*",
-      "^https://www\\.youtube\\.com/oembed/.*"
-    ]
-
-##############################
-# Global params
+# Params
 ##############################
 [params]
-additionalScripts = ["js/custom.js","js/custom-2.js"]
-goToTop = true
-toc = true
-tocOpen = false
-mainSections = ["posts"]
-defaultColor = "dark" 
-comments = false
-# ... 上面是 defaultColor = "dark"
+TocSide = "left"
+EnableInstantClick = true   # 如果你的主题需要布尔值，可改 true/false
 
 ##############################
-# Waline Comments Config
+# Menu
 ##############################
+[menu]
+
+  [[menu.main]]
+  name = "ZORAN"
+  url = "https://zoranzhou.com"
   
-[[params.socialIcons]]
-name = "github"
-url = "https://github.com/zoran-sid"
-
-[[params.socialIcons]]
-name = "twitter"
-url = "https://x.com/zhouzoran75607"
-
-[[params.socialIcons]]
-name = "bilibili"
-url = "https://space.bilibili.com/596163308"
-
-[[params.socialIcons]]
-name = "instagram"
-url = "https://www.instagram.com/zoranzhou/#"
-
-[params.author]
-avatar = "avatar.jpg"
-intro = "Zoran"
-name = "Zoran"
-description = "Passionate about technology, documenting life, and continuously learning!"
-
-##############################
-# Languages config
-##############################
-
-############################## English ################################
-[Languages.en]
-languageName = "English"
-languageCode = "en"
-contentDir = "content/en"
-weight = 1
-
-[Languages.en.menu]
-[[Languages.en.menu.main]]
-pageRef = "/"
-name = "Home"
-url = "/"
-weight = 10
-[[Languages.en.menu.main]]
-pageRef = "posts"
-name = "Posts"
-url = "/posts/"
-weight = 20
-[[Languages.en.menu.main]]
-pageRef = "about"
-name = "About"
-url = "/about/"
-weight = 30
-# 启用语言切换控件
-[[Languages.en.menu.main]]
-name = 'Language'
-identifier = "language_switcher"
-url = '#'
-weight = 50
-
-[Languages.en.params]
-sitename = "Zoran"
-description = "Passionate about technology, documenting life, and continuously learning."
-dateFormat = "2 Jan 2006"
-
-############################## Chinese ################################
-[Languages.zh-cn]
-languageName = "Chinese"
-languageCode = "zh-cn"
-contentDir = "content/zh"
-weight = 2
-
-[Languages.zh-cn.menu]
-[[Languages.zh-cn.menu.main]]
-pageRef = "/"
-name = "首页"
-url = "/"
-weight = 10
-[[Languages.zh-cn.menu.main]]
-pageRef = "posts"
-name = "文章"
-url = "/posts/"
-weight = 20
-[[Languages.zh-cn.menu.main]]
-pageRef = "about"
-name = "关于"
-url = "/about/"
-weight = 30
-# 启用语言切换控件
-[[Languages.zh-cn.menu.main]]
-name = 'Language'
-identifier = "language_switcher"
-url = '#'
-weight = 50
-
-[Languages.zh-cn.params]
-sitename = "Zoran"
-description = "支持亮色和暗色模式的极简 Hugo 博客主题"
-dateFormat = "2006年01月02日"
-
-##############################
-# Webmanifest (common for all languages)
-##############################
-[params.webmanifest]
-name = "Zoran Blog"
-short_name = "Zoran"
-start_url = "/"
-theme_color = "#434648"
-background_color = "#fff"
-display = "standalone"
-
-##############################
-# Browserconfig (Windows tiles)
-##############################
-[params.browserconfig]
-TileColor = "#2d89ef"
+    [menu.main.params]
+    external = true
