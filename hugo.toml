@@ -22,6 +22,13 @@ pagerSize = 10
 TocSide = "left"
 EnableInstantClick = false
 
+# --- Logo 配置（新增） ---
+[params.logo]
+icon = "logo.png"     # 放在 /assets/logo.png
+iconWidth = 32        # 可自行调整
+iconHeight = 32
+text = ""             # 不显示“ZORAN PERSON”文字
+
 ##############################
 # Menu
 ##############################
@@ -41,9 +48,8 @@ EnableInstantClick = false
   name = "Archives"
   url = "/archives/"
   weight = 3
-
     [menu.main.params]
-    external = true
+    external = false
 
 # --- Social Icons ---
 [[params.social]]
@@ -66,6 +72,9 @@ url = "https://www.instagram.com/zoranzhou"
 name = "bilibili"
 url = "https://space.bilibili.com/596163308"
 
+##############################
+# Comments (Waline)
+##############################
 [params.commentSystems.waline]
 serverURL = "https://zoranzhou.cn"
 locale = "en"
