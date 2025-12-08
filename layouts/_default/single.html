@@ -30,8 +30,10 @@
     </div>
     {{- end }}
   </header>
+  
   {{- $isHidden := .Params.cover.hidden | default site.Params.cover.hiddenInSingle | default site.Params.cover.hidden }}
   {{- partial "cover.html" (dict "cxt" . "IsHome" false "isHidden" $isHidden) }}
+  
   {{- if (.Param "ShowToc") }}
   {{- partial "toc.html" . }}
   {{- end }}
@@ -74,3 +76,40 @@
 </article>
 
 {{- end }}{{/* end main */}}
+
+<!-- 添加支持暗黑模式的样式 -->
+<style>
+  /* 暗黑模式全局样式 */
+  body.dark {
+    background-color: #121212; /* 深色背景 */
+    color: #f8f8f2; /* 白色字体 */
+  }
+
+  /* 文章页面背景和字体颜色 */
+  body.dark .post-single {
+    background-color: #282a36; /* 文章背景 */
+    color: #f8f8f2; /* 白色字体 */
+  }
+
+  /* 标题样式 */
+  body.dark .post-header h1 {
+    color: #ffffff; /* 白色标题 */
+  }
+
+  /* 元数据部分 */
+  body.dark .post-meta {
+    color: #7f7f7f; /* 灰色元数据 */
+  }
+
+  /* 正文部分 */
+  body.dark .post-content {
+    color: #f8f8f2; /* 白色正文 */
+    background-color: #282a36; /* 深色背景 */
+  }
+
+  /* 页脚部分 */
+  body.dark .post-footer {
+    background-color: #282a36;
+    color: #f8f8f2;
+  }
+</style>
