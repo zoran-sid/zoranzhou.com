@@ -8,23 +8,27 @@ defaultContentLanguage = "en"
 enableEmoji = true
 ignoreErrors = ["additional-script-loading-error"]
 disqusShortname = ""
-paginate = 10
+
+##############################
+# Pagination (Hugo v0.128+)
+##############################
+[pagination]
+pagerSize = 10
 
 ##############################
 # Params
 ##############################
 [params]
 TocSide = "left"
-EnableInstantClick = true   # 如果你的主题需要布尔值，可改 true/false
+EnableInstantClick = true
 
 ##############################
 # Menu
 ##############################
 [menu]
-
   [[menu.main]]
   name = "ZORAN"
   url = "https://zoranzhou.com"
-  
+
     [menu.main.params]
     external = true
