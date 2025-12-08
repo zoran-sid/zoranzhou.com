@@ -64,11 +64,11 @@ name = "email"
 url = "zoranzhou28@gmail.com"
 
 [[params.social]]
-name = "instagram-simple"
+name = "instagram"
 url = "https://www.instagram.com/zoranzhou"
 
 [[params.social]]
-name = "bilibili-simple"
+name = "bilibili"
 url = "https://space.bilibili.com/596163308"
 
 [params.commentSystems.waline]
