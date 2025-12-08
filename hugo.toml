@@ -26,6 +26,33 @@ EnableInstantClick = true
 # Menu
 ##############################
 [menu]
+
+  [[menu.main]]
+  name = "Home"
+  url = "/"
+  weight = 1
+
+  [[menu.main]]
+  name = "Blog"
+  url = "/blog/"
+  weight = 2
+
+  [[menu.main]]
+  name = "Newsletter"
+  url = "/newsletter/"
+  weight = 3
+  
+  [[menu.main]]
+  name = "Archives"
+  url = "/archives/"
+  weight = 4
+  
+  [[menu.main]]
+  name = "Links"
+  url = "/links/"
+  weight = 4
+  
+  
   [[menu.main]]
   name = "ZORAN"
   url = "https://zoranzhou.com"
