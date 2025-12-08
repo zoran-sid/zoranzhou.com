@@ -9,6 +9,9 @@ defaultContentLanguage = "en"
 enableEmoji = true
 ignoreErrors = ["additional-script-loading-error"]
 disqusShortname = ""
+[module]
+  [[module.imports]]
+    path = "https://github.com/reorx/hugo-PaperModX"
 
 [services]
   [services.googleAnalytics]
