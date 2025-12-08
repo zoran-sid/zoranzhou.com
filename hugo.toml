@@ -18,7 +18,7 @@ pagerSize = 10
 [params]
 TocSide = "left"
 EnableInstantClick = false
-
+disableRSS = true
 # --- Logo ---
 [params.logo] 
 icon = "favicon.png" 
