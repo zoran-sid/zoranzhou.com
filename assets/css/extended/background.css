@@ -12,10 +12,10 @@ body::before {
     inset: 0;
     pointer-events: none;
 
-    /* 点阵大小与间距（已放大点，缩小间距） */
+    /* 点阵大小与间距（密度降低：间距从15px改为30px） */
     background-image:
-        radial-gradient(circle, rgba(0,0,0,0.10) 2px, transparent 2px);
-    background-size: 15px 15px;  /* ← 原 30px/30px 减半 */
+        radial-gradient(circle, rgba(0,0,0,0.7) 2px, transparent 2px);
+    background-size: 30px 30px; /* ← 间距加大，密度降低 */
 
     opacity: 0.45;
 
@@ -23,7 +23,7 @@ body::before {
     animation: dotmove 12s ease-in-out infinite alternate;
 }
 
-/* 微微流动动画 —— 随机漂移感（保持不变） */
+/* 微微流动动画 */
 @keyframes dotmove {
     0% {
         transform: translate(0px, 0px);
@@ -39,6 +39,6 @@ body::before {
 /* 暗色主题自动适配 */
 .dark body::before {
     background-image:
-        radial-gradient(circle, rgba(255,255,255,0.15) 2px, transparent 2px); /* 点大小同步更新 */
+        radial-gradient(circle, rgba(255,255,255,0.15) 2px, transparent 2px);
     opacity: 0.22;
 }
