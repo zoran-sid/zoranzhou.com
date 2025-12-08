@@ -17,4 +17,4 @@ In 2015, I took a gap year to focus on studying Cisco Enterprise infrastructure 
 
 I think life as a competition that demands careful attention to challenges at every turn, which can lead to pressure and setbacks. However, I remain passionate about life and learning, always striving to move forward.
 
-![d63c3f07baefea8dc50fac9494e1f70d](https://raw.githubusercontent.com/zoran-sid/zoranzhou.com/main/images/d63c3f07baefea8dc50fac9494e1f70d-1765197000061-2.jpg)
+![d63c3f07baefea8dc50fac9494e1f70d-1765207303585-11](https://pub-af45dde7bbf3425097542823268ebf5c.r2.dev/d63c3f07baefea8dc50fac9494e1f70d-1765207303585-11.jpg)
