@@ -21,7 +21,7 @@ EnableInstantClick = false
 
 # --- Logo ---
 [params.logo]
-icon = "logo.jpg"     
+icon = "logo.png"     
 iconWidth = 128        
 iconHeight = 128
 text = ""             
