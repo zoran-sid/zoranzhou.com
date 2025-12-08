@@ -8,7 +8,7 @@ languageCode = 'en-us'
 defaultContentLanguage = "en"
 enableEmoji = true
 ignoreErrors = ["additional-script-loading-error"]
-
+disqusShortname = ""
 [module]
   [[module.imports]]
     path = "github.com/hugo-sid/hugo-blog-awesome"
