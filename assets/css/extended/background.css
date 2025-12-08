@@ -1,0 +1,34 @@
+/* 页面背景容器 */
+body {
+  position: relative;
+  background: #0d0d0d; /* dark 基底色 */
+  overflow-x: hidden;
+}
+
+/* 动态光影背景 */
+.bg-glow {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 0, 120, 0.4), transparent 60%),
+              radial-gradient(circle at 70% 70%, rgba(0, 160, 255, 0.4), transparent 60%),
+              radial-gradient(circle at 50% 90%, rgba(255, 200, 0, 0.35), transparent 70%);
+  filter: blur(120px);
+  animation: moveGlow 16s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+/* 动态移动动画 */
+@keyframes moveGlow {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-5%, 8%);
+  }
+  100% {
+    transform: translate(5%, -6%);
+  }
+}
