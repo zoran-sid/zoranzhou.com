@@ -1,7 +1,4 @@
-##############################
-# Hugo site config (TOML)
-##############################
-title = "ZORAN PERSON"
+title = "ZORAN"
 baseURL = "https://zoranzhou.com/"
 languageCode = "en-us"
 defaultContentLanguage = "en"
@@ -10,7 +7,7 @@ ignoreErrors = ["additional-script-loading-error"]
 disqusShortname = ""
 
 ##############################
-# Pagination (Hugo v0.128+)
+# Pagination
 ##############################
 [pagination]
 pagerSize = 10
@@ -22,12 +19,12 @@ pagerSize = 10
 TocSide = "left"
 EnableInstantClick = false
 
-# --- Logo 配置（新增） ---
+# --- Logo ---
 [params.logo]
-icon = "logo.jpg"     # 放在 /assets/logo.png
-iconWidth = 128        # 可自行调整
+icon = "logo.jpg"     
+iconWidth = 128        
 iconHeight = 128
-text = ""             # 不显示“ZORAN PERSON”文字
+text = ""             
 
 ##############################
 # Menu
@@ -73,7 +70,7 @@ name = "bilibili"
 url = "https://space.bilibili.com/596163308"
 
 ##############################
-# Comments (Waline)
+# Comments
 ##############################
 [params.commentSystems.waline]
 serverURL = "https://zoranzhou.cn"
