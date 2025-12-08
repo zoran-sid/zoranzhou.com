@@ -69,35 +69,42 @@ function toggleThemeListener() {
 
 <header class="header">
     <nav class="nav">
-        <div class="logo">
-            {{- $label_text := (site.Params.logo.text | default site.Title) }}
-            {{- if site.Title }}
-            <a href="{{ "" | absURL }}" accesskey="h" title="{{ $label_text }} (Alt + H)">
-                {{- if site.Params.logo.icon }}
-                {{- $img := resources.Get site.Params.logo.icon }}
-                {{- if $img }}
-                    {{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") -}}
-                    {{- if hugo.IsExtended -}}
-                        {{- $processableFormats = $processableFormats | append "webp" -}}
-                    {{- end -}}
-                    {{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
-                    {{- if and (in $processableFormats $img.MediaType.SubType) (eq $prod true)}}
-                        {{- if site.Params.logo.iconHeight }}
-                            {{- $img = $img.Resize (printf "x%d" site.Params.logo.iconHeight) }}
-                        {{ else }}
-                            {{- $img = $img.Resize "x30" }}
+
+        <!-- 左侧：Logo + Theme toggle -->
+        <div class="nav-left">
+            <!-- Logo -->
+            <div class="logo">
+                {{- $label_text := (site.Params.logo.text | default site.Title) }}
+                {{- if site.Title }}
+                <a href="{{ "" | absURL }}" accesskey="h" title="{{ $label_text }} (Alt + H)">
+                    {{- if site.Params.logo.icon }}
+                    {{- $img := resources.Get site.Params.logo.icon }}
+                    {{- if $img }}
+                        {{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") -}}
+                        {{- if hugo.IsExtended -}}
+                            {{- $processableFormats = $processableFormats | append "webp" -}}
+                        {{- end -}}
+                        {{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
+                        {{- if and (in $processableFormats $img.MediaType.SubType) (eq $prod true)}}
+                            {{- if site.Params.logo.iconHeight }}
+                                {{- $img = $img.Resize (printf "x%d" site.Params.logo.iconHeight) }}
+                            {{ else }}
+                                {{- $img = $img.Resize "x30" }}
+                            {{- end }}
                         {{- end }}
-                    {{- end }}
+                        <img src="{{ $img.Permalink }}" alt="logo" aria-label="logo"
+                            height="{{- site.Params.logo.iconHeight | default "30" -}}" width="{{- site.Params.logo.iconWidth | default "30" -}}">
+                    {{- else }}
                     <img src="{{ $img.Permalink }}" alt="logo" aria-label="logo"
                         height="{{- site.Params.logo.iconHeight | default "30" -}}" width="{{- site.Params.logo.iconWidth | default "30" -}}">
-                {{- else }}
-                <img src="{{ $img.Permalink }}" alt="logo" aria-label="logo"
-                    height="{{- site.Params.logo.iconHeight | default "30" -}}" width="{{- site.Params.logo.iconWidth | default "30" -}}">
-                {{- end -}}
-                {{- end -}}
-                {{- $label_text -}}
-            </a>
-            {{- end }}
+                    {{- end -}}
+                    {{- end -}}
+                    {{- $label_text -}}
+                </a>
+                {{- end }}
+            </div>
+
+            <!-- Theme Toggle -->
             <span class="logo-switches">
                 {{- if (not site.Params.disableThemeToggle) }}
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -114,36 +121,31 @@ function toggleThemeListener() {
                         <line x1="12" y1="21" x2="12" y2="23"></line>
                         <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
                         <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
                 </button>
                 {{- end }}
             </span>
         </div>
-        {{- $currentPage := . }}
-        <ul id="menu">
-            {{- range site.Menus.main }}
-            {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL)) | absURL }}
-            {{- $page_url:= $currentPage.Permalink }}
-            {{- $is_search := eq (site.GetPage .KeyName).Layout `search` }}
-            <li>
-                <a href="{{ $menu_item_url }}" title="{{ .Title | default .Name }} {{- cond $is_search (" (Alt + /)" | safeHTMLAttr) ("" | safeHTMLAttr ) }}"
-                {{- if $is_search -}}data-no-instant{{- end -}}
-                {{- cond $is_search (" accesskey=/" | safeHTMLAttr) ("" | safeHTMLAttr ) }}
-                {{- if strings.HasPrefix $page_url $menu_item_url }} class="active" {{- end }}
-                {{- if .Params.External }} target="_blank" {{- end }}
-                >
-                    {{- .Pre }}
-                    {{- .Name -}}
-                    {{ .Post -}}
-                    {{- if .Params.External }}<span class="external-link">{{ safeHTML (index $.Site.Data.svg "external-link") }}</span>{{- end }}
-                </a>
-            </li>
-            {{- end }}
-        </ul>
-		{{ partial "social_icons.html" (dict "icons" site.Params.social "svg" site.Data.svg "Email" site.Params.email ) }}
+
+        <!-- 右侧：菜单 + 社交图标 -->
+        <div class="nav-right">
+            <ul id="menu">
+                {{- $currentPage := . }}
+                {{- range site.Menus.main }}
+                <li>
+                    <a href="{{ .URL | absURL }}"
+                       {{ if .Params.External }} target="_blank" {{ end }}
+                       class="{{ if strings.HasPrefix $currentPage.Permalink (.URL | absURL) }}active{{ end }}">
+                        {{ .Name }}
+                    </a>
+                </li>
+                {{- end }}
+            </ul>
+
+            <!-- 社交图标 -->
+            {{ partial "social_icons.html" (dict "icons" site.Params.social "svg" site.Data.svg "Email" site.Params.email ) }}
+        </div>
+
     </nav>
 </header>
+
