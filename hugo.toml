@@ -16,8 +16,6 @@ ignoreErrors = ["additional-script-loading-error"]
 [services]
   [services.googleAnalytics]
     id = '' # optional
-  [services.disqus]
-    shortname = '' # optional
 
 [markup]
   [markup.highlight]
@@ -58,19 +56,6 @@ defaultColor = "dark"
 ##############################
 # Waline Comments Config
 ##############################
-[params.waline]
-  enable = true
-  # 替换为您在 Vercel 部署获得的地址 (不带最后的斜杠)
-  serverURL = "https://zoranzhou.cn" 
-  placeholder = "请文明评论，留下您的见解..."
-  avatar = "mm"       # 头像风格 (mp, identicon, monsterid, wavatar, retro, robohash, mm)
-  pageSize = 10       # 每页显示的评论数
-  lang = "zh-CN"      # 语言
-  visitor = true      # 是否开启阅读量统计
-  emoji = [
-    "https://unpkg.com/@waline/emojis@1.1.0/weibo",
-    "https://unpkg.com/@waline/emojis@1.1.0/bilibili"
-  ]
 
 [[params.socialIcons]]
 name = "github"
