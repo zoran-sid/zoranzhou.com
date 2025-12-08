@@ -64,6 +64,15 @@ name = "twitter"
 url = "https://x.com/zhouzoran75607"
 
 [[params.social]]
+name = "instagram-simple"
+url = "https://www.instagram.com/zoranzhou"
+
+[[params.social]]
+name = "bilibili-simple"
+url = "https://space.bilibili.com/596163308"
+
+
+[[params.social]]
 name = "email"
 url = "zoranzhou28@gmail.com"
 
