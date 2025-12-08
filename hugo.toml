@@ -48,14 +48,21 @@ EnableInstantClick = true
   weight = 4
   
   [[menu.main]]
-  name = "Links"
-  url = "/links/"
-  weight = 4
-  
-  
-  [[menu.main]]
   name = "ZORAN"
   url = "https://zoranzhou.com"
 
     [menu.main.params]
     external = true
+
+# --- Social Icons ---
+[[params.social]]
+name = "github"
+url = "https://github.com/zoran-sid"
+
+[[params.social]]
+name = "twitter"
+url = "https://x.com/zhouzoran75607"
+
+[[params.social]]
+name = "email"
+url = "zoranzhou28@gmail.com"
