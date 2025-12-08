@@ -56,12 +56,12 @@ name = "github"
 url = "https://github.com/zoran-sid"
 
 [[params.social]]
-name = "instgram"
-url = "https://www.instagram.com/zoranzhou"
-
-[[params.social]]
 name = "twitter"
 url = "https://x.com/zhouzoran75607"
+
+[[params.social]]
+name = "email"
+url = "zoranzhou28@gmail.com"
 
 [[params.social]]
 name = "instagram-simple"
@@ -70,11 +70,6 @@ url = "https://www.instagram.com/zoranzhou"
 [[params.social]]
 name = "bilibili-simple"
 url = "https://space.bilibili.com/596163308"
-
-
-[[params.social]]
-name = "email"
-url = "zoranzhou28@gmail.com"
 
 [params.commentSystems.waline]
 serverURL = "https://zoranzhou.cn"
