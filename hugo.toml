@@ -1,7 +1,7 @@
 ##############################
 # Hugo site config
 ##############################
-
+theme = "PaperModX"
 title = "ZORAN PERSON"
 baseURL = 'https://zoranzhou.com/'
 languageCode = 'en-us'
