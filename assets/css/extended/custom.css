@@ -1,0 +1,45 @@
+/* 顶栏为左右分布 */
+.nav {
+    display: flex;
+    justify-content: space-between;  /* 核心：左右对齐 */
+    align-items: center;
+    width: 100%;
+}
+
+/* 左侧：Logo 区域 */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 右侧：菜单 + 社交图标 */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 24px; /* 菜单与社交图标之间间距 */
+}
+
+/* 菜单横向排列 */
+#menu {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 菜单样式 */
+#menu li {
+    list-style: none;
+}
+
+#menu a {
+    text-decoration: none;
+    font-weight: 500;
+    opacity: 0.75;
+    transition: opacity .2s ease;
+}
+
+#menu a:hover,
+#menu a.active {
+    opacity: 1;
+}
