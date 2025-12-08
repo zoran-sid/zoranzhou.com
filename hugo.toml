@@ -20,8 +20,8 @@ TocSide = "left"
 EnableInstantClick = false
 
 # --- Logo ---
-[params.logo]
-icon = "favicon.png"     
+[params.logo] 
+icon = "favicon.png" 
 iconWidth = 128        
 iconHeight = 128
 text = ""             

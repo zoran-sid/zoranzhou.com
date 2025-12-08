@@ -76,26 +76,14 @@ function toggleThemeListener() {
                 {{- if site.Params.logo.icon }}
                 {{- $img := resources.Get site.Params.logo.icon }}
                 {{- if $img }}
-                    {{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") -}}
-                    {{- if hugo.IsExtended -}}
-                        {{- $processableFormats = $processableFormats | append "webp" -}}
-                    {{- end -}}
-                    {{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
-                    {{- if and (in $processableFormats $img.MediaType.SubType) (eq $prod true)}}
-                        {{- if site.Params.logo.iconHeight }}
-                            {{- $img = $img.Resize (printf "x%d" site.Params.logo.iconHeight) }}
-                        {{ else }}
-                            {{- $img = $img.Resize "x30" }}
-                        {{- end }}
-                    {{- end }}
                     <img src="{{ $img.Permalink }}" alt="logo" aria-label="logo"
                         height="{{- site.Params.logo.iconHeight | default "30" -}}" width="{{- site.Params.logo.iconWidth | default "30" -}}">
                 {{- else }}
-                <img src="{{ $img.Permalink }}" alt="logo" aria-label="logo"
-                    height="{{- site.Params.logo.iconHeight | default "30" -}}" width="{{- site.Params.logo.iconWidth | default "30" -}}">
-                {{- end -}}
-                {{- end -}}
-                {{- $label_text -}}
+                    <img src="/default-logo.png" alt="logo" aria-label="logo">
+                {{- end }}
+                {{- else }}
+                    <img src="/default-logo.png" alt="logo" aria-label="logo">
+                {{- end }}
             </a>
             {{- end }}
             <span class="logo-switches">
@@ -144,6 +132,7 @@ function toggleThemeListener() {
             </li>
             {{- end }}
         </ul>
-		{{ partial "social_icons.html" (dict "icons" site.Params.social "svg" site.Data.svg "Email" site.Params.email ) }}
+        {{ partial "social_icons.html" (dict "icons" site.Params.social "svg" site.Data.svg "Email" site.Params.email ) }}
     </nav>
 </header>
+
