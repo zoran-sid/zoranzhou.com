@@ -1,29 +1,35 @@
-/* 默认情况下（桌面版及更大屏幕） */
+/* 顶栏为左右分布 */
 .nav {
     display: flex;
-    justify-content: space-between;  /* 左右对齐 */
+    justify-content: space-between;  /* 核心：左右对齐 */
     align-items: center;
     width: 100%;
 }
 
-/* 左侧：Logo 和 Theme Toggle */
+/* 左侧：Logo 区域 */
 .nav-left {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
-/* 右侧：菜单和社交图标 */
+/* 右侧：菜单 + 社交图标 */
 .nav-right {
     display: flex;
     align-items: center;
-    gap: 24px;  /* 菜单和社交图标之间的间距 */
+    gap: 24px; /* 菜单与社交图标之间间距 */
 }
 
-/* 菜单项样式 */
+/* 菜单横向排列 */
 #menu {
     display: flex;
+    align-items: center;
     gap: 16px;
+}
+
+/* 菜单样式 */
+#menu li {
+    list-style: none;
 }
 
 #menu a {
@@ -36,63 +42,4 @@
 #menu a:hover,
 #menu a.active {
     opacity: 1;
-}
-
-/* logo 图片样式 */
-.logo img {
-    max-height: 40px;
-    width: auto;
-}
-
-/* logo 切换按钮样式 */
-#theme-toggle {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-/* ------------------------ */
-
-/* 移动端（小屏）布局调整 */
-@media (max-width: 768px) {
-    /* 手机端屏幕小，导航栏应该垂直排列 */
-    .nav {
-        flex-direction: column;
-        align-items: center;  /* 中心对齐 */
-        padding: 10px;
-    }
-
-    /* 左侧部分（logo + 主题切换按钮） */
-    .nav-left {
-        width: 100%;
-        justify-content: center;  /* 居中 */
-        margin-bottom: 10px;
-    }
-
-    /* 右侧部分（菜单和社交图标） */
-    .nav-right {
-        width: 100%;
-        justify-content: center;  /* 居中 */
-        margin-top: 10px;
-    }
-
-    /* 菜单项垂直排列 */
-    #menu {
-        display: block;
-        text-align: center;
-        margin-top: 10px;
-    }
-
-    #menu li {
-        margin-bottom: 10px;  /* 菜单项之间的间距 */
-    }
-
-    #menu a {
-        font-size: 16px;
-    }
-
-    /* 主题切换按钮更大的点击区域 */
-    #theme-toggle {
-        padding: 10px;
-    }
 }
