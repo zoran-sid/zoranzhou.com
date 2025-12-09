@@ -74,6 +74,7 @@
 </script>
 {{- end }}
 
+{{- /* Base64Email */}}
 {{- if (.Param "MaskedEmail") }}
 <script>
   document.querySelectorAll('.masked-email').forEach((el) => {
@@ -115,6 +116,7 @@
 
 {{- else }}
 
+{{- /* InstantClick.js */}}
 {{- if (.Param "EnableInstantClick") }}
 {{- $instantclick := resources.Get "js/instantclick.js" }}
 {{- if hugo.IsProduction }}
