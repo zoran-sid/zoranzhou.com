@@ -37,7 +37,6 @@
     let button = document.getElementById("theme-toggle")
     // remove the listeners first to prevent adding duplicated listener when history goes back and forth
     // listen to toggle button
-    button.addEventListener('click', toggleThemeListener)
   })();
 </script>
 
@@ -58,19 +57,6 @@
       return;
     }
     // only run this code if smooth scroll should be enabled
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener("click", function (e) {
-        e.preventDefault();
-        var id = this.getAttribute("href").substr(1);
-        document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
-          behavior: "smooth"
-        });
-        if (id === "top") {
-          history.replaceState(null, null, " ");
-        } else {
-          history.pushState(null, null, `#${id}`);
-        }
-      });
     });
   })();
 </script>
