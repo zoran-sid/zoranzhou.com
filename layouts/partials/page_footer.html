@@ -15,6 +15,24 @@
       }, 2000);
     }
 
+    copybutton.addEventListener('click', (cb) => {
+      if ('clipboard' in navigator) {
+        navigator.clipboard.writeText(codeblock.textContent);
+        copyingDone();
+        return;
+      }
+
+      const range = document.createRange();
+      range.selectNodeContents(codeblock);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      try {
+        document.execCommand('copy');
+        copyingDone();
+      } catch (e) { };
+      selection.removeRange(range);
+    });
 
     if (container.classList.contains("highlight")) {
       container.appendChild(copybutton);
@@ -86,6 +104,8 @@
       }
       timer = setTimeout(onScroll, 50)
     }
+    window.addEventListener('scroll', scrollListener, false);
+    scrollListeners.push(scrollListener)
 
     function getLinkByHeading(heading) {
       const id = encodeURI(heading.getAttribute('id')).toLowerCase();
