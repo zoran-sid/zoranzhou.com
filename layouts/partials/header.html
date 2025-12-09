@@ -1,60 +1,113 @@
-<script>
-  (function() {
-    // 强制使用浅色模式
-    const defaultTheme = 'light';
-    const prefTheme = getPrefTheme();
-    const theme = prefTheme ? prefTheme : defaultTheme;
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{{- if hugo.IsProduction | or (eq site.Params.env "production") }}
+<meta name="robots" content="index, follow">
+{{- else }}
+<meta name="robots" content="noindex, nofollow">
+{{- end }}
 
-    switchTheme(theme);
-  })();
-</script>
+{{- /* Title */}}
+{{- $pageTitle := site.Title }}
+{{- if (and .Title (not .IsHome)) }}
+  {{- $pageTitle = printf "%s | %s" .Title $pageTitle }}
+{{- end }}
+<title>{{ $pageTitle }}</title>
 
-<header class="header">
-    <nav class="nav">
-        <div class="logo">
-            {{- $label_text := (site.Params.logo.text | default site.Title) }}
-            {{- if site.Title }}
-            <a href="{{ "" | absURL }}" accesskey="h" title="{{ $label_text }} (Alt + H)">
-                {{- if site.Params.logo.icon }}
-                {{- $img := resources.Get site.Params.logo.icon }}
-                {{- if $img }}
-                    <img src="{{ $img.Permalink }}" alt="logo" aria-label="logo"
-                        height="{{- site.Params.logo.iconHeight | default "30" -}}" width="{{- site.Params.logo.iconWidth | default "30" -}}">
-                {{- else }}
-                    <img src="/default-logo.png" alt="logo" aria-label="logo">
-                {{- end }}
-                {{- else }}
-                    <img src="/default-logo.png" alt="logo" aria-label="logo">
-                {{- end }}
-            </a>
-            {{- end }}
-            <span class="logo-switches">
-                <!-- 删除主题切换按钮 -->
-                {{- /* 取消显示主题切换按钮 */}}
-                {{- /* <button id="theme-toggle" accesskey="t" title="(Alt + T)"> ... </button> */}}
-            </span>
-        </div>
-        {{- $currentPage := . }}
-        <ul id="menu">
-            {{- range site.Menus.main }}
-            {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL)) | absURL }}
-            {{- $page_url:= $currentPage.Permalink }}
-            {{- $is_search := eq (site.GetPage .KeyName).Layout `search` }}
-            <li>
-                <a href="{{ $menu_item_url }}" title="{{ .Title | default .Name }} {{- cond $is_search (" (Alt + /)" | safeHTMLAttr) ("" | safeHTMLAttr ) }}"
-                {{- if $is_search -}}data-no-instant{{- end -}}
-                {{- cond $is_search (" accesskey=/" | safeHTMLAttr) ("" | safeHTMLAttr ) }}
-                {{- if strings.HasPrefix $page_url $menu_item_url }} class="active" {{- end }}
-                {{- if .Params.External }} target="_blank" {{- end }}
-                >
-                    {{- .Pre }}
-                    {{- .Name -}}
-                    {{ .Post -}}
-                    {{- if .Params.External }}<span class="external-link">{{ safeHTML (index $.Site.Data.svg "external-link") }}</span>{{- end }}
-                </a>
-            </li>
-            {{- end }}
-        </ul>
-        {{ partial "social_icons.html" (dict "icons" site.Params.social "svg" site.Data.svg "Email" site.Params.email ) }}
-    </nav>
-</header>
+{{- /* Meta */}}
+{{- if .IsHome }}
+{{ with site.Params.keywords -}}<meta name="keywords" content="{{- range $i, $e := . }}{{ if $i }}, {{ end }}{{ $e }}{{ end }}">{{ end }}
+{{- else }}
+<meta name="keywords" content="{{ if .Params.keywords -}}
+    {{- range $i, $e := .Params.keywords }}{{ if $i }}, {{ end }}{{ $e }}{{ end }} {{- else }}
+    {{- range $i, $e := .Params.tags }}{{ if $i }}, {{ end }}{{ $e }}{{ end }} {{- end -}}">
+{{- end }}
+<meta name="description" content="{{- with .Description }}{{ . }}{{- else }}{{- if or .IsPage .IsSection}}
+    {{- .Summary | default (printf "%s - %s" .Title  site.Title) }}{{- else }}
+    {{- with site.Params.description }}{{ . }}{{- end }}{{- end }}{{- end -}}">
+<meta name="author" content="{{ (partial "author.html" . ) }}">
+<link rel="canonical" href="{{ if .Params.canonicalURL -}} {{ trim .Params.canonicalURL " " }} {{- else -}} {{ .Permalink }} {{- end }}">
+{{- if site.Params.analytics.googlesiteVerificationTag }}
+<meta name="google-site-verification" content="{{ site.Params.analytics.googlesiteVerificationTag }}">
+{{- end }}
+{{- if site.Params.analytics.yandexsiteVerificationTag }}
+<meta name="yandex-verification" content="{{ site.Params.analytics.yandexsiteVerificationTag }}">
+{{- end }}
+{{- if site.Params.analytics.bingsiteVerificationTag }}
+<meta name="msvalidate.01" content="{{ site.Params.analytics.bingsiteVerificationTag }}">
+{{- end }}
+
+{{- /* Styles */}}
+{{- $theme_vars := (resources.Get "css/core/theme-vars.css") }}
+{{- $reset := (resources.Get "css/core/reset.css") }}
+{{- $media := (resources.Get "css/core/zmedia.css") }}
+{{- $common := (resources.Match "css/common/*.css") | resources.Concat "assets/css/common.css" }}
+{{- $commonHighlight := (resources.Get "css/common/highlight.scss") | css.Sass }}
+
+{{- /* order is important */}}
+{{- $core := (slice $theme_vars $reset $common $commonHighlight $media) | resources.Concat "assets/css/core.css" }}
+{{- $extended := (resources.Match "css/extended/*.css") | resources.Concat "assets/css/extended.css" }}
+{{- $extendedScss := (resources.Match "css/extended/*.scss") | resources.Concat "assets/css/extended.scss" | css.Sass }}
+
+{{- /* bundle all required css */}}
+{{- /* Add extended css after theme style */ -}}
+{{- $stylesheet := (slice $core $extended $extendedScss) | resources.Concat "assets/css/stylesheet.css" | minify }}
+
+{{- if not site.Params.assets.disableFingerprinting }}
+{{- $stylesheet := $stylesheet | fingerprint }}
+<link crossorigin="anonymous" href="{{ $stylesheet.RelPermalink }}" integrity="{{ $stylesheet.Data.Integrity }}" rel="preload stylesheet" as="style">
+{{- else }}
+<link crossorigin="anonymous" href="{{ $stylesheet.RelPermalink }}" rel="preload stylesheet" as="style">
+{{- end }}
+
+{{- /* Favicons */}}
+<link rel="icon" href="{{ site.Params.favicon | default "favicon.ico" | absURL }}">
+<link rel="apple-touch-icon" href="{{ site.Params.appleTouchIcon | default "apple-touch-icon.png" | absURL }}">
+
+{{- /* RSS */}}
+{{ range .AlternativeOutputFormats -}}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type | html }}" href="{{ .Permalink | safeURL }}">
+{{ end -}}
+{{- range .AllTranslations -}}
+<link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}">
+{{ end -}}
+
+{{- /* Misc */}}
+{{- if hugo.IsProduction | or (eq site.Params.env "production") }}
+  {{- if .Site.Config.Services.GoogleAnalytics.ID }}
+    {{- template "_internal/google_analytics.html" . }}
+  {{- end -}}
+  {{- if site.Params.useCustomAnalytics }}
+    {{- partialCached "custom_analytics.html" . "custom_analytics.html" }}
+  {{- end -}}
+{{- end -}}
+
+{{- /* https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started */}}
+{{- if .Params.cover.image }}
+  <meta name="twitter:card" content="summary_large_image" />
+{{- else }}
+  {{- with site.Params.images -}}
+    <meta name="twitter:card" content="summary" />
+  {{- end }}
+{{- end }}
+<meta name="twitter:title" content="{{ $pageTitle }}" />
+<meta name="twitter:description" content="{{ with .Description }}{{ . }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ else }}{{ with site.Params.description }}{{ . }}{{ end }}{{ end }}{{ end -}}" />
+{{- with site.Params.socialAccounts.twitter }}
+  <meta name="twitter:site" content="@{{ .username }}" />
+  <meta name="twitter:creator" content="@{{ .username }}" />
+{{- end }}
+
+{{- template "partials/templates/opengraph.html" (dict "page" . "pageTitle" $pageTitle) }}
+
+{{- template "partials/templates/schema_json.html" (dict "page" . "pageTitle" $pageTitle) }}
+
+{{- partial "extend_head.html" . }}
+
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+    </style>
+</noscript>
