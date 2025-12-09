@@ -7,6 +7,7 @@ tags:
   - Technology
 ShowToc: true
 TocOpen: true
+
 ---
 
 # 前言
@@ -22,6 +23,96 @@ TocOpen: true
 
 
 **最后我选择 GitHub Pages 配合 Cloudflare 托管的方案实现 BLOG 的搭建。可以解决以上所以问题，重要的是免费！**
+
+
+
+# GitHub + Cloudflare
+
+
+
+## 注册配置 GitHub 仓库
+
+```
+Respsitory name： example.com （自定义填写Blog网站的仓库名）
+```
+
+![image-20251209154251574](https://e5d9f02.webp.fi/image-20251209154251574.png)
+
+## 安装 Git
+
+### 安装 Git
+
+后续为了方便本地化管理 GitHub仓库。
+
+```
+官网地址：https://git-scm.com/
+```
+
+![image-20251209155117127](https://e5d9f02.webp.fi/image-20251209155117127.png)
+
+### 本地 SSH 秘钥
+
+在 Windows 本地使用 cmd 生成本地 SSH 秘钥
+
+![image-20251209155528735](https://e5d9f02.webp.fi/image-20251209155528735.png)
+
+### 设置 SSH keys
+
+在 GitHub 设置的 SSH and GPG keys 中填写生成的秘钥 SSH Keys
+
+![image-20251209155251700](https://e5d9f02.webp.fi/image-20251209155251700.png)
+
+**之后就可以通过 Git 命令，https 上传文件到仓库了~**
+
+
+
+## Hugo 主题
+
+在 Hugo themes 中挑选自己合适的主题，作为BLOG的模版。
+
+```
+https://themes.gohugo.io/
+```
+
+本网站主题如下：
+
+```
+https://github.com/reorx/hugo-PaperModX
+```
+
+### Git 拉取仓库
+
+```
+git clone https://github.com/reorx/hugo-PaperModX.git
+```
+
+文件格式：
+
+---
+author: "Zoran"
+title: "从零开始搭建你的免费 BLOG 博客（Github+Cloudflare）"
+date: "2025-11-25"
+description: "基于 GitHub 与 Cloudflare 的静态站点部署方案（Hugo）"
+tags:
+  - Technology
+ShowToc: true
+TocOpen: true
+
+---
+
+# 前言
+
+由于我是长期 VPS 服务器的持有用户，最开始我尝试使用阿里云的 VPS 服务器作为平台作为Hugo Blog站点，随着部署的过程和最终的效果呈现，我觉得存在以下几方面的问题：
+
+- 性能受限于 VPS 的性能配置；
+- 使用 HTTPS，需要在 WEB 服务上配置 https 证书；
+- 发布内容繁琐复杂，后台数据更新不够及时，依赖于脚本；
+- 网页可靠性较低；
+- 与 VPS 其他部署的服务部分处在冲突。
+
+
+
+最后我选择 GitHub Pages 配合 Cloudflare 托管的方案实现 BLOG 的搭建。可以解决以上所以问题，重要的是免费！
 
 
 
@@ -85,26 +176,21 @@ https://github.com/reorx/hugo-PaperModX
 git clone https://github.com/reorx/hugo-PaperModX.git
 ```
 
-**文件格式：**
+**文件格式**
 
-**content：**存储posts等
-
-**data：**社交媒体的配置
-
-**layouts：**整个静态网页的布局（重要！）
-
-**assets：**存储 css，js 文件，默认 toml 拉取头像
-
-**i18n：**多语言
-
-我这里选择覆盖 Examplesite 和 仓库根目录，具体不同 theme 会有不同的配置方案。该教程不适配任何主题。
+- **content**：存储posts等
+- **data**：社交媒体的配置
+- **layouts**：整个静态网页的布局（重要！）
+- **assets**：存储 css，js 文件，默认 toml 拉取头像
+- **i18n**：多语言
+- 我这里选择覆盖 Examplesite 和 仓库根目录，具体不同 theme 会有不同的配置方案。该教程不适配任何主题。
 
 ### 拉取文件到 GitHub
 
 1. **git init** ：在此文件夹生成一个.git隐藏文件；
 2. **git add .** : 将文件添加到缓存区( 注意这个"."，是有空格的，"."代表这个test这个文件夹下的目录全部都提交，也可以通过git add 文件名 提交指定的文件)；
 3. **git status**：查看现在的状态，也可以不看，随你啦，可以看到picture文件夹里面的内容都提交上去了；
-4. **git commit -m "这里是注释"**：提交添加到缓存区的文件；
+4. **git commit -m** "这里是注释"：提交添加到缓存区的文件；
 5. **git remote add origin remote_url** ： 添加新的git方式的origin, github上创建好的仓库和本地仓库进行关联；
 6. **git push origin main**：推送文件到仓库。
 

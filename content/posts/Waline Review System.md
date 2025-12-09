@@ -23,7 +23,7 @@ Waline 是一个基于 LeanCloud 等后端的无后端评论系统，在 Hugo �
 
 
 
-**我选择此方案原因是支持社交媒体登录，评论区样式美观~**
+我选择此方案原因是支持社交媒体登录，评论区样式美观~
 
 ![image-20251209172100285](https://e5d9f02.webp.fi/image-20251209172100285.png)
 
@@ -44,7 +44,7 @@ MasterKey
 
 **国内版需要完成备案接入：**
 
-如果你正在使用 Leancloud 国内版 ([leancloud.cn](https://leancloud.cn/))，推荐你切换到国际版 ([leancloud.app](https://leancloud.app/))。否则，你需要为应用额外绑定**已备案**的域名，同时购买独立 IP 并完成备案接入:
+如果你正在使用 Leancloud 国内版 ([leancloud.cn](https://leancloud.cn/))，推荐你切换到国际版 ([leancloud.app](https://leancloud.app/))。否则，你需要为应用额外绑定已备案的域名，同时购买独立 IP 并完成备案接入:
 
 - 登录国内版并进入需要使用的应用
 - 选择 `设置` > `域名绑定` > `API 访问域名` > `绑定新域名` > 输入域名 > `确定`。
@@ -87,7 +87,7 @@ MasterKey
 
 
 
-**注：第一个注册的用户默认为管理员！！！**
+注：第一个注册的用户默认为管理员！！！
 
 
 
