@@ -1,11 +1,6 @@
 <script>
   (function() {
-    // 强制使用浅色模式
     const defaultTheme = 'light';
-    const prefTheme = getPrefTheme();
-    const theme = prefTheme ? prefTheme : defaultTheme;
-
-    switchTheme(theme);
   })();
 </script>
 
@@ -29,8 +24,6 @@
             </a>
             {{- end }}
             <span class="logo-switches">
-                <!-- 删除主题切换按钮 -->
-                {{- /* 取消显示主题切换按钮 */}}
                 {{- /* <button id="theme-toggle" accesskey="t" title="(Alt + T)"> ... </button> */}}
             </span>
         </div>
