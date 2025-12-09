@@ -91,4 +91,48 @@ MasterKey
 
 
 
+# 嵌入HTML
+
+```
+嵌入Html文件路径
+创建 waline.html
+/layouts/partials/comments.html  //取决于theme网页结构
+```
+
+## Waline.html
+
+```
+<!-- Waline Comment System -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@waline/client@v3/dist/waline.css"
+/>
+
+<div id="waline"></div>
+
+<script type="module">
+  import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+
+  init({
+    el: '#waline',
+    serverURL: '{{ .serverURL }}',   //从 config.toml 获取
+    locale: '{{ .locale | default "en" }}',
+    dark: '{{ .dark | default "auto" }}',
+  });
+</script>
+
+```
+
+## Comments.html
+
+```
+  {{- if $pageCommentSystems.waline }}
+    {{- with .waline }}
+      {{- partial "waline.html" . }}
+```
+
+
+
+
+
 本教程参考网站：https://waline.js.org/en/guide/get-started/
