@@ -4,10 +4,9 @@ title: "自用 OPENWRT 编译流程分享"
 date: "2025-12-01"
 description: "Ubuntu 虚拟机本地编译 Openwrt 系统"
 tags:
-
   - Technology
-    ShowToc: true
-    TocOpen: true
+ShowToc: true
+TocOpen: true
 ---
 
 # OpenWrt编译
