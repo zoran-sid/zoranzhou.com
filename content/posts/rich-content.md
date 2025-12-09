@@ -1,45 +1,94 @@
 ---
-author: "Hugo Authors"
-title: "Rich Content"
-date: "2019-03-10"
-description: "A brief description of Hugo Shortcodes"
+author: "Zoran"
+title: "基于 Waline 评论区的嵌入 BLOG"
+date: "2025-12-26"
+description: "使用 Waline方案，涉及 Vercel + LeanCloud"
 tags:
-  - shortcodes
-  - privacy
-  - example
+  - Technology
 ShowToc: true
+TocOpen: true
 ---
 
-Hugo ships with several [Built-in Shortcodes](https://gohugo.io/content-management/shortcodes/#use-hugos-built-in-shortcodes) for rich content, along with a [Privacy Config](https://gohugo.io/about/hugo-and-gdpr/) and a set of Simple Shortcodes that enable static and no-JS versions of various social media embeds.
-<!--more-->
----
+# Waline 评论系统
 
-## Image
+Waline 是一个基于 LeanCloud 等后端的无后端评论系统，在 Hugo 等静态站点中非常流行。
 
-third party image:
+优势：
 
-![](https://images.unsplash.com/photo-1662141978148-2eeb2afb3837?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=772&q=80)
+- 前端资源小，加载快；
+- 云端存储，无需部署数据库；
+- 支持托管后台，配合 LeanCloud 效果很好；
+- 支持多种样式；
+- 支持游客或者QQ/微博等登录方式；
 
-internal image:
 
-![](images/regular.jpg)
 
-## YouTube Privacy Enhanced Shortcode
+**我选择此方案原因是支持社交媒体登录，评论区样式美观~**
 
-{{< youtube ZJthWmvUzzc >}}
+![image-20251209172100285](https://e5d9f02.webp.fi/image-20251209172100285.png)
 
-<br>
+# 部署流程
 
----
+## 创造 LeanCloud 账号
 
-## Twitter Simple Shortcode
+![创建应用](https://e5d9f02.webp.fi/leancloud-1-CucZPnJ0.png)
 
-{{< twitter user="SanDiegoZoo" id="1453110110599868418" >}}
+```
+获取三个 API
+AppID
+AppKey
+MasterKey
+```
 
-<br>
+![ID 和 Key](https://e5d9f02.webp.fi/leancloud-2-C9bCeSu_.png)
 
----
+**国内版需要完成备案接入：**
 
-## Vimeo Simple Shortcode
+如果你正在使用 Leancloud 国内版 ([leancloud.cn](https://leancloud.cn/))，推荐你切换到国际版 ([leancloud.app](https://leancloud.app/))。否则，你需要为应用额外绑定**已备案**的域名，同时购买独立 IP 并完成备案接入:
 
-{{< vimeo_simple 48912912 >}}
+- 登录国内版并进入需要使用的应用
+- 选择 `设置` > `域名绑定` > `API 访问域名` > `绑定新域名` > 输入域名 > `确定`。
+- 按照页面上的提示按要求在 DNS 上完成 CNAME 解析。
+- 购买独立 IP 并提交工单完成备案接入。(独立 IP 目前价格为 ￥ 50/个/月)
+
+![域名设置](https://e5d9f02.webp.fi/leancloud-3-CT_lZM0A.png)
+
+
+
+## Vercel部署（服务端）
+
+输入个人喜好的 Vercel 项目名称，并且创建
+
+![image-20251209172854011](https://e5d9f02.webp.fi/image-20251209172854011.png)
+
+点击顶部的 `Settings` - `Environment Variables` 进入环境变量配置页，并配置三个环境变量 `LEAN_ID`, `LEAN_KEY` 和 `LEAN_MASTER_KEY` 。它们的值分别对应上一步在 LeanCloud 中获得的 `APP ID`, `APP KEY`, `Master Key`。
+
+![设置环境变量](https://e5d9f02.webp.fi/vercel-5-CIj2EZQq.png)
+
+环境变量配置完成之后点击顶部的 `Deployments` 点击顶部最新的一次部署右侧的 `Redeploy` 按钮进行重新部署。该步骤是为了让刚才设置的环境变量生效。
+
+![redeploy](https://e5d9f02.webp.fi/vercel-6-CQnJ4Agt.png)
+
+此时会跳转到 `Overview` 界面开始部署，等待片刻后 `STATUS` 会变成 `Ready`。此时请点击 `Visit` ，即可跳转到部署好的网站地址，此地址即为你的服务端地址。
+
+### 绑定域名（可选）
+
+1. 点击顶部的 `Settings` - `Domains` 进入域名配置页
+2. 输入需要绑定的域名并点击 `Add`
+
+![Add domain](https://e5d9f02.webp.fi/vercel-8-BDTeHH3e.png)
+
+
+
+最终可以通过域名访问评论系统和管理系统：
+
+- 评论系统：example.yourdomain.com
+- 评论管理：example.yourdomain.com/ui
+
+
+
+**注：第一个注册的用户默认为管理员！！！**
+
+
+
+本教程参考网站：https://waline.js.org/en/guide/get-started/

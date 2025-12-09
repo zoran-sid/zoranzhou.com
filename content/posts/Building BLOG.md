@@ -1,6 +1,6 @@
 ---
 author: "Zoran"
-title: "从零开始搭建你的免费BLOG博客（Github+Cloudflare）"
+title: "从零开始搭建你的免费 BLOG 博客（Github+Cloudflare）"
 date: "2025-11-25"
 description: "基于 GitHub 与 Cloudflare 的静态站点部署方案（Hugo）"
 tags:
