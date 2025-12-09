@@ -36,7 +36,6 @@
 
     let button = document.getElementById("theme-toggle")
     // remove the listeners first to prevent adding duplicated listener when history goes back and forth
-    button.removeEventListener('click', toggleThemeListener)
     // listen to toggle button
     button.addEventListener('click', toggleThemeListener)
   })();
@@ -104,13 +103,7 @@
 
 {{/* Clear ToC Scroll */}}
 <script>
-  if (window.scrollListeners) {
-    // console.log('disable toc scroll', scrollListeners)
-    for (const listener of scrollListeners) {
-      window.removeEventListener('scroll', listener)
-    }
-  }
-  window.scrollListeners = []
+
 </script>
 
 {{/* Load mediumZoom script */}}
