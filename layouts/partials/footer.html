@@ -27,6 +27,22 @@
 {{- partial "extend_footer.html" . }}
 
 <script>
+  (function() {
+    /* theme toggle */
+    const disableThemeToggle = '{{ if site.Params.disableThemeToggle }}1{{ end }}' == '1';
+    if (disableThemeToggle) {
+      return;
+    }
+
+    let button = document.getElementById("theme-toggle")
+    // remove the listeners first to prevent adding duplicated listener when history goes back and forth
+    button.removeEventListener('click', toggleThemeListener)
+    // listen to toggle button
+    button.addEventListener('click', toggleThemeListener)
+  })();
+</script>
+
+<script>
   (function () {
     let menu = document.getElementById('menu')
     if (menu) {
@@ -42,7 +58,6 @@
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || disableSmoothScroll || enableInstantClick) {
       return;
     }
-
     // only run this code if smooth scroll should be enabled
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener("click", function (e) {
@@ -86,9 +101,11 @@
 </script>
 {{- end -}}
 
+
 {{/* Clear ToC Scroll */}}
 <script>
   if (window.scrollListeners) {
+    // console.log('disable toc scroll', scrollListeners)
     for (const listener of scrollListeners) {
       window.removeEventListener('scroll', listener)
     }
@@ -97,6 +114,7 @@
 </script>
 
 {{/* Load mediumZoom script */}}
+{{/* It has to be loaded here because of the data-no-instant attribute */}}
 {{- $imagezoom := resources.Get "js/medium-zoom.min.js" }}
 <script src="{{ $imagezoom.RelPermalink }}" data-no-instant
   {{- if site.Params.assets.disableFingerprinting }}integrity="{{ $imagezoom.Data.Integrity }}"{{- end }}
@@ -131,6 +149,12 @@
   {{- if site.Params.assets.disableFingerprinting }}integrity="{{ $instantclick.Data.Integrity }}"{{- end }}
 ></script>
 <script data-no-instant>
+  // http://instantclick.io/scripts
+  // InstantClick.on('change', function(isInitialLoad) {
+  //   if (isInitialLoad) {
+  //     return;
+  //   }
+  // });
   InstantClick.init();
 </script>
 {{- end }}
