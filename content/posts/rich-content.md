@@ -1,6 +1,6 @@
 ---
 author: "Zoran"
-title: "基于 Waline 评论区的嵌入 BLOG"
+title: "Waline 评论系统嵌入 BLOG 方案"
 date: "2025-11-24"
 description: "使用 Waline方案，涉及 Vercel + LeanCloud"
 tags:
@@ -135,4 +135,4 @@ MasterKey
 
 
 
-本教程参考网站：https://waline.js.org/en/guide/get-started/
+本教程参考网站：https://waline.js.org/en/guide/get-started
