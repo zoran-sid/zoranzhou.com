@@ -29,7 +29,7 @@ Waline 是一个基于 LeanCloud 等后端的无后端评论系统，在 Hugo �
 
 # 部署流程
 
-## 创造 LeanCloud 账号
+## 创建 LeanCloud 账号
 
 ![创建应用](https://e5d9f02.webp.fi/leancloud-1-CucZPnJ0.png)
 
