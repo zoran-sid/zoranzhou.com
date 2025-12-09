@@ -6,7 +6,14 @@
     {{- block "head" . }}{{ end }}
 </head>
 
-<body class="type-{{ .Type }} kind-{{ .Kind }} layout-{{ .Layout -}}" id="top">
+<body class="
+{{- if (or (ne .Kind `page` ) (eq .Layout `archives`) (eq .Layout `search`)) -}}
+{{- print "list-page" -}}
+{{- end -}}
+{{- if eq site.Params.defaultTheme `dark` -}}
+{{- print " dark" }}
+{{- end }} type-{{ .Type }} kind-{{ .Kind }} layout-{{ .Layout -}}
+" id="top">
 
     <div class="bg-glow"></div>
 
