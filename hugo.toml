@@ -51,12 +51,8 @@ text = ""
   name = "Archives"
   url = "/archives/"
   weight = 3
-  [[menu.main]]
-  name = "Search"
-  url = "/search/"
-  weight = 4
   
-    [menu.main.params]
+  [menu.main.params]
     external = false
 
 # --- Social Icons ---
