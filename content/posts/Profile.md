@@ -1,5 +1,5 @@
 ---
-title: "ZORAN BLOG"
+title: "⚡ZORAN BLOG"
 date: 2025-12-01T12:00:00+08:00
 summary: "I am ZHOU CHEN, and this website serves as my personal blog where I recording my life and studies. I majored in computer science at XINHUA University starting in 2020, and I am currently a self-employed cybersecurity engineer.
 
