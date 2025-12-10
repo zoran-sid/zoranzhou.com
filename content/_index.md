@@ -3,19 +3,21 @@ title: "ZORAN BLOG"
 disableContent: true
 ---
 
-​	I am ZHOU CHEN, and this website serves as my personal blog where I recording my life and studies.
+# My Path to Mastery: A Tech Explorer's Notes on Practice and Life	
 
-**Education**
+Hey, I‘m Chen ZHOU, network engineer & cybersecurity engineer on the internet, I'm a:
 
-- I majored in computer science at XINHUA University starting in 2020, and I am currently a self-employed cybersecurity engineer. 
+- 🎯 **Profession**
 
-**Experience**
+  Between 2023 and 2025, I took on a challenge and secured the Cisco Certified Specialist (Enterprise Infrastructure) certification. For me, it's not just a certificate, it proves my robust ability to build and maintain large-scale network architectures. I through obtain the CISP-PTE (Penetration Testing Engineer) certification, and gaining hands-on network experience have broadened my perspective on traditional networking.
 
-- In 2025, I took a gap year to focus on studying Cisco Enterprise infrastructure and achieved the prestigious CCIE certification. Afterward, I spent some time in the Philippines improving my English skills. 
+- 🛠️ **Practices**
 
-Life as a competition that demands careful attention to challenges at every turn, which can lead to pressure and setbacks. I remain passionate about life and learning, always striving to move forward.
+  I have experience on Offense & Defense (PEN Testing), Emergency Respons (Coordination), Ops & Architecture (Networking). My expertise comes from "combat" experience with leading domestic security firms and national infrastructure units. I served on the emergency team for many times about national cybersecurity defense operation. I believe that the true practices are good ways to improve the foundational ability.
 
+- 💡 **Attitude**
 
+  Continuous learning and challenging myself—that’s the heart of this blog.
 
 ---
 
