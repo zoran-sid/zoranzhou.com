@@ -3,7 +3,9 @@ title: "ZORAN BLOG"
 disableContent: true
 ---
 
-# My Path to Mastery: A Tech Explorer's Notes on Practice and Life	
+# My Path to Mastery: A Tech Explorer's Notes on Practice and Life
+
+
 
 Hey, I‘m Chen ZHOU, network engineer & cybersecurity engineer on the internet, I'm a:
 
