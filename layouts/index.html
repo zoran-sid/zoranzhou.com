@@ -6,8 +6,10 @@
 
 {{ $posts := where .Site.RegularPages "Type" "posts" }}
 
+{{ $sortedPosts := sort $posts "Weight" }}
+
 <div class="post-list">
-  {{ range $posts.ByDate.Reverse }}
+  {{ range $sortedPosts }}
     <article class="post-entry">
 
       {{ partial "cover.html" (dict "cxt" . "IsHome" true) }} 
@@ -17,8 +19,8 @@
       </header>
 
       <section class="entry-content">
-        <!-- 显示文章的 Description -->
-        <p>{{ .Description }}</p> <!-- 这里只显示 description -->
+
+        <p>{{ .Description }}</p> 
       </section>
 
       <footer class="entry-footer">
