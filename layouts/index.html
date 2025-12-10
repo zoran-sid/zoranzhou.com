@@ -3,15 +3,17 @@
 <div class="intro">
   {{ .Content }}
 </div>
+<div class="home-social-icons" style="margin: 2rem 0; text-align: center;">
+  {{ partial "social_icons.html" . }}
+</div>
 
-{{/* 获取posts */}}
 {{ $posts := where .Site.RegularPages "Type" "posts" }}
 
 <div class="post-list">
   {{ range $posts.ByDate.Reverse }}
 
     <article class="post-entry">
-      {{/* 封面图（PaperMod自带） */}}
+
       {{ partial "cover.html" (dict "cxt" . "IsHome" true) }}
 
       <header class="entry-header">
