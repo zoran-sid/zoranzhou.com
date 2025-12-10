@@ -4,12 +4,31 @@
   {{ .Content }}
 </div>
 
+{{/* 获取posts */}}
+{{ $posts := where .Site.RegularPages "Type" "posts" }}
+
 <div class="post-list">
-  {{ range .Site.RegularPages.ByDate.Reverse }}
-    <article class="post-item">
-      <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-      <p>{{ .Summary }}</p>
+  {{ range $posts.ByDate.Reverse }}
+
+    <article class="post-entry">
+      {{/* 封面图（PaperMod自带） */}}
+      {{ partial "cover.html" (dict "cxt" . "IsHome" true) }}
+
+      <header class="entry-header">
+        <h2>{{ .Title }}</h2>
+      </header>
+
+      <section class="entry-content">
+        <p>{{ .Summary }}</p>
+      </section>
+
+      <footer class="entry-footer">
+        {{ partial "post_meta.html" . }}
+      </footer>
+
+      <a class="entry-link" href="{{ .Permalink }}"></a>
     </article>
+
   {{ end }}
 </div>
 
