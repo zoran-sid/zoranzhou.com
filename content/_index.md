@@ -7,7 +7,7 @@ disableContent: true
 
 ---
 
-Hey, I‘m Chen ZHOU, network engineer & cybersecurity engineer on the internet, I'm a:
+Hey, I‘m Chen ZHOU, Network & Cybersecurity Engineer on the internet, I'm a:
 
 - 🎯 **Profession**
 
