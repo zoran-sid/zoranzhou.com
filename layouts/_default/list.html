@@ -1,107 +1,49 @@
-{{- define "main" }}
+{{ define "main" }}
 
-{{- if (and site.Params.profileMode.enabled .IsHome) }}
-{{- partial "index_profile.html" . }}
-{{- else }} {{/* if not profileMode */}}
+  {{/* 如果是首页，就显示 profile 内容 + 文章列表 */}}
+  {{ if .IsHome }}
+    <div class="home-profile">
+      {{/* 假设你把自我介绍放在 content/_index.md 中 */}}
+      {{ .Content }}
+    </div>
+  {{ end }}
 
-{{- if not .IsHome | and .Title }}
-<header class="page-header">
-  {{- partial "breadcrumbs.html" . }}
-  <h1>
-    {{/* see: https://gohugo.io/variables/taxonomy/#taxonomy-terms-page-variables */}}
-    {{- if eq .Kind "term" -}}{{- .Data.Singular }}: {{ end -}}
-    {{ .Title -}}
-  </h1>
-  {{- if .Description }}
-  <div class="post-description">
-    {{ .Description | markdownify }}
-  </div>
-  {{- end }}
-  {{- partial "inline_links.html" . -}}
-</header>
-{{- end }}
+  {{/* 文章列表逻辑 */}}
+  {{ $pages := .Pages }}
+  {{ if .IsHome }}
+    {{ $pages = where site.RegularPages "Section" "in" site.Params.mainSections }}
+  {{ end }}
+  {{ $pages = where $pages "Params.hidden" "!=" true }}
 
-{{- if .Content }}
-<div class="post-content">
-  {{- if not (.Param "disableAnchoredHeadings") }}
-  {{- partial "anchored_headings.html" .Content -}}
-  {{- else }}{{ .Content }}{{ end }}
-</div>
-{{- end }}
+  {{ $paginator := .Paginate $pages (site.Params.paginate | default 10) }}
 
-
-{{- $pages := .Pages }}
-{{- if .IsHome }}
-  {{/* get all regular pages instead of pages in a section */}}
-  {{- $pages = where site.RegularPages "Section" "in" site.Params.mainSections }}
-{{- end }}
-{{- $pages = where $pages "Params.hidden" "!=" true }}
-
-{{/* related issue: https://github.com/gohugoio/hugo/issues/9003 */}}
-{{ $paginator := "" }}
-{{ if (.Param "paginate") }}
-  {{- $paginator = .Paginate $pages (.Param "paginate") }}
-{{ else }}
-  {{- $paginator = .Paginate $pages }}
-{{ end }}
-
-{{- if and .IsHome site.Params.homeInfoParams (eq $paginator.PageNumber 1) }}
-{{- partial "home_info.html" . }}
-{{- end }}
-
-{{- $term := .Data.Term }}
-{{- range $index, $page := $paginator.Pages }}
-
-{{- $class := "post-entry" }}
-
-{{- $user_preferred := or site.Params.disableSpecial1stPost site.Params.homeInfoParams }}
-{{- if (and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) (not $user_preferred)) }}
-{{- $class = "first-entry" }}
-{{- else if $term }}
-{{- $class = "post-entry tag-entry" }}
-{{- end }}
-
-<article class="{{ $class }}">
-  {{- $isHidden := (site.Params.cover.hidden | default site.Params.cover.hiddenInList) }}
-  {{- partial "cover.html" (dict "cxt" . "IsHome" true "isHidden" $isHidden) }}
-  <header class="entry-header">
-    <h2>
-      {{- .Title }}
-      {{- if .Draft }}<sup><span class="entry-isdraft">&nbsp;&nbsp;[Draft]</span></sup>{{- end }}
-      {{- if .Weight }}<sup><span class="entry-isdraft">&nbsp;&nbsp;[Pinned]</span></sup>{{- end }}
-    </h2>
-  </header>
-  {{- if (ne (.Param "hideSummary") true) }}
-  <section class="entry-content">
-    {{ if .Description }}
-      <p>{{ .Description | plainify | htmlUnescape }}</p>
-    {{ else }}
-      <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
+  <div class="post-list">
+    {{ range $page := $paginator.Pages }}
+      <article class="post-item">
+        <header class="post-item-header">
+          <h2><a href="{{ $page.Permalink }}">{{ $page.Title }}</a></h2>
+        </header>
+        <div class="post-item-meta">
+          <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "Jan 2, 2006" }}</time>
+          {{ with $page.Params.tags }}
+            · Tags:
+            {{ range $i, $t := . }}
+              <a href="{{ "/tags/" | relURL }}{{ $t | urlize }}">{{ $t }}</a>{{ if lt (add $i 1) (len .) }}, {{ end }}
+            {{ end }}
+          {{ end }}
+          {{ if $page.ReadingTime }}
+            · {{ $page.ReadingTime }} min read
+          {{ end }}
+        </div>
+      </article>
     {{ end }}
-  </section>
-  {{- end }}
-  {{- if not (.Param "hideMeta") }}
-  <footer class="entry-footer">
-    {{- partial "post_meta.html" . -}}
-  </footer>
-  {{- end }}
-  <a class="entry-link" aria-label="post link to {{ .Title | plainify }}" href="{{ .Permalink }}"></a>
-</article>
-{{- end }}
+  </div>
 
-{{- if gt $paginator.TotalPages 1 }}
-<footer class="page-footer">
-  <nav class="pagination">
-    {{- if $paginator.HasPrev }}
-    <a class="prev" href="{{ $paginator.Prev.URL | absURL }}">« {{ i18n "prev_page" }}</a>
-    {{- end }}
-    {{- if $paginator.HasNext }}
-    <a class="next" href="{{ $paginator.Next.URL | absURL }}">{{ i18n "next_page" }} »</a>
-    {{- end }}
-  </nav>
-</footer>
-{{- end }}
+  {{ if gt $paginator.TotalPages 1 }}
+    <footer class="pagination">
+      {{ if $paginator.HasPrev }}<a class="prev" href="{{ $paginator.Prev.URL | absURL }}">« Prev</a>{{ end }}
+      {{ if $paginator.HasNext }}<a class="next" href="{{ $paginator.Next.URL | absURL }}">Next »</a>{{ end }}
+    </footer>
+  {{ end }}
 
-{{- end }}{{/* end profileMode */}}
-
-{{- end }}{{- /* end main */ -}}
+{{ end }}
