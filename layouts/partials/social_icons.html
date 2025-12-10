@@ -1,5 +1,5 @@
 <div class="social-icons">
-    {{- range .icons }}
+    {{- range .Site.Params.social }}
     {{- $icon_name := ( trim .name " " | lower )}}
 
     {{- if (eq .url "email") }}
