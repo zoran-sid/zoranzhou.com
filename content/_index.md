@@ -1,5 +1,6 @@
 ---
 title: "ZORAN BLOG"
+disableContent: true
 ---
 
 I am ZHOU CHEN, and this website serves as my personal blog where I recording my life and studies.
