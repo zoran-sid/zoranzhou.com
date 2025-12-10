@@ -1,26 +1,26 @@
 {{ define "main" }}
 
-<!-- 显示首页简介 -->
 <div class="intro">
   {{ .Content }}
 </div>
 
 {{ $posts := where .Site.RegularPages "Type" "posts" }}
 
-<!-- 显示文章列表 -->
 <div class="post-list">
   {{ range $posts.ByDate.Reverse }} <!-- 按日期倒序渲染文章 -->
     <article class="post-entry">
-      
+
       <!-- 使用 PaperMod 提供的 cover partial 渲染封面图 -->
       {{ partial "cover.html" (dict "cxt" . "IsHome" true) }} 
 
       <header class="entry-header">
-        <h2>{{ .Title }}</h2> <!-- 显示文章标题 -->
+        <!-- 显示文章标题 -->
+        <h2><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
       </header>
 
       <section class="entry-content">
-        <p>{{ .Summary }}</p> <!-- 显示文章摘要 -->
+        <!-- 显示文章摘要 -->
+        <p>{{ .Summary }}</p>
       </section>
 
       <footer class="entry-footer">
@@ -28,7 +28,8 @@
         {{ partial "post_meta.html" . }} 
       </footer>
 
-      <a class="entry-link" href="{{ .Permalink }}"></a> <!-- 链接到完整文章 -->
+      <!-- 文章链接 -->
+      <a class="entry-link" href="{{ .Permalink }}"></a>
     </article>
   {{ end }}
 </div>
