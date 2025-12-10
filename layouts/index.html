@@ -3,9 +3,6 @@
 <div class="intro">
   {{ .Content }}
 </div>
-<div class="home-social-icons" style="margin: 2rem 0; text-align: center;">
-  {{ partial "social_icons.html" . }}
-</div>
 
 {{ $posts := where .Site.RegularPages "Type" "posts" }}
 
