@@ -7,7 +7,8 @@ tags:
   - Technology
 ShowToc: true
 TocOpen: true
-
+ShowWordCount: true
+ShowReadingTime: true
 ---
 
 # 前言

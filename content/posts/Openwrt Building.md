@@ -7,6 +7,8 @@ tags:
   - Technology
 ShowToc: true
 TocOpen: true
+ShowWordCount: true
+ShowReadingTime: true
 ---
 
 # OpenWrt编译
