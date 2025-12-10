@@ -4,11 +4,11 @@
 
     {{- if (eq .url "email") }}
     <a href="mailto:{{ $.MaskedEmail | default $.Email }}" title="{{ .name | title }}">
-        {{ safeHTML (index $.svg $icon_name | default $.svg.default) }}
+        {{ safeHTML (index .Site.Data.svg $icon_name.icon | default "") }}
     </a>
     {{- else }}
     <a href="{{ trim .url " " }}" target="_blank" rel="noopener noreferrer me" title="{{ .name | title }}">
-        {{ safeHTML (index $.svg $icon_name | default $.svg.default) }}
+        {{ safeHTML (index .Site.Data.svg $icon_name.icon | default "") }}
     </a>
     {{- end }}
 
