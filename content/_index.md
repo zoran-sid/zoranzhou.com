@@ -4,7 +4,7 @@ disableContent: true
 ---
 # My Path: A Tech Explorer's Notes on Practice and Life
 
-<h3></h3>
+---
 
 Hey, I‘m Chen ZHOU, Network & Cybersecurity Engineer on the internet, I'm a:
 
