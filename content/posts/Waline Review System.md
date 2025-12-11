@@ -10,6 +10,7 @@ TocOpen: true
 ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
+ShowShareButtons: true
 ---
 
 # Waline 评论系统

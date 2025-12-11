@@ -10,6 +10,7 @@ TocOpen: true
 ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
+ShowShareButtons: true
 ---
 
 # 前言
@@ -179,6 +180,146 @@ locale = "en"
 
 [params.defaultCommentSystems]
 waline = true
+
+```
+
+
+
+## 其他常用属性
+
+### Theme Switch Toggle (白天夜晚主题相关)
+
+Shows icon besides title of page to change theme
+
+To disable it :
+
+```yml
+disableThemeToggle: true
+```
+
+You can refer following table for better understanding...
+
+| `defaultTheme` | `disableThemeToggle` | checks local storage? | checks system theme? | Info              |
+| -------------- | -------------------- | --------------------- | -------------------- | ----------------- |
+| `auto`         | true                 | No                    | Yes                  | only system theme |
+|                | false                | Yes (if not->2)       | Yes (2)              | _switch present_  |
+| `dark`         | true                 | No                    | No                   | force dark only   |
+|                | false                | Yes                   | No                   | _switch present_  |
+| `light`        | true                 | No                    | No                   | force light only  |
+|                | false                | Yes                   | No                   | _switch present_  |
+
+### Archives Layout（存档页面布局）
+
+Create a page with `archive.md` in `content` directory with following content
+
+```
+.
+├── config.toml
+├── content/
+│   ├── archives.md   <--- Create archive.md here
+│   └── posts/
+ ── static/
+```
+
+and add the following to it
+
+```
+---
+title: "Archive"
+layout: "archives"
+url: "/archives/"
+summary: archives
+---
+```
+
+**注**：Archives 布局不支持多语言月份翻译。
+
+### Search Page （搜索）
+
+PaperModX uses [Fuse.js Basic](https://fusejs.io/getting-started/different-builds.html#explanation-of-different-builds) for seach functionality
+
+Add the following to site config, `config.yml`
+
+```
+[outputs]
+  home = ["HTML", "JSON","RSS"]
+```
+
+Create a page with `search.md` in `content` directory with following content.
+
+```
+---
+title: "Search" # in any language you want
+layout: "search" # is necessary
+# url: "/archive"
+# description: "Description for Search"
+summary: "search"
+---
+```
+
+To hide a particular page from being searched, add it in post's fron't matter
+
+```
+searchHidden: true
+```
+
+### Share Buttons on post （分享按）
+
+Displays Share Buttons at Bottom of each post
+
+to show share buttons add
+
+```yml
+params:
+    ShowShareButtons: true
+```
+
+---
+
+### Show post reading time （显示阅读时间）
+
+Displays Reading Time (the estimated time, in minutes, it takes to read the content.)
+
+To show reading time add
+
+```yml
+Params:
+    ShowReadingTime: true
+```
+
+---
+
+### Show Table of Contents (Toc) on blog post （目录）
+
+Displays ToC on blog-pages
+
+To show ToC add following to page-variables
+
+```yml
+ShowToc: true
+```
+
+To keep Toc Open **by default** on a post add following to page-variables:
+
+```yml
+TocOpen: true
+```
+
+### BreadCrumb Navigation （返回主页）
+
+Adds BreadCrumb Navigation above Post's Title to show subsections and Navigation to Home
+
+```yml
+params:
+    ShowBreadCrumbs: true
+```
+
+Can be diabled for particular page's front-matter
+
+```yml
+---
+ShowBreadCrumbs: false
+---
 
 ```
 
