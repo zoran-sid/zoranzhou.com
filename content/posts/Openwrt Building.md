@@ -9,6 +9,7 @@ ShowToc: true
 TocOpen: true
 ShowWordCount: true
 ShowReadingTime: true
+ShowBreadCrumbs: true
 ---
 
 # OpenWrt编译
