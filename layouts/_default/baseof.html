@@ -8,11 +8,9 @@
 
 <body class="
 {{- if (or (ne .Kind `page` ) (eq .Layout `archives`) (eq .Layout `search`)) -}}
-{{- print "list-page" -}}
+list-page
 {{- end -}}
-{{- if eq site.Params.defaultTheme `dark` -}}
-{{- print " dark" }}
-{{- end }} type-{{ .Type }} kind-{{ .Kind }} layout-{{ .Layout -}}
+type-{{ .Type }} kind-{{ .Kind }} layout-{{ .Layout }}
 " id="top">
     {{- partialCached "header.html" . .Page -}}
     <main class="main {{- if (eq .Kind `page`) -}}{{- print " post" -}}{{- end -}}">
