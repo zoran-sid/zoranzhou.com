@@ -9,6 +9,7 @@ ShowToc: true
 TocOpen: true
 ShowWordCount: true
 ShowReadingTime: true
+ShowBreadCrumbs: true
 ---
 
 # 前言

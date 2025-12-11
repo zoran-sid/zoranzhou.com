@@ -7,12 +7,12 @@ ignoreErrors = ["additional-script-loading-error"]
 disqusShortname = ""
 
 
-[outputs]
-  home = ["HTML"]      # 默认是 ["HTML","RSS","JSON"]
-  section = ["HTML"]
-  taxonomy = ["HTML"]
-  term = ["HTML"]
-
+outputs:
+    home:
+        - HTML
+        - RSS
+        - JSON 
+		
 ##############################
 # Pagination
 ##############################
