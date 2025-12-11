@@ -36,18 +36,18 @@ text = ""
 [menu]
 
   [[menu.main]]
-  name = "Essays"
-  url = "/essays/"
-  weight = 1
-
-  [[menu.main]]
   name = "Blog"
   url = "/posts/"
+  weight = 1
+  
+  [[menu.main]]
+  name = "Essays"
+  url = "/essays/"
   weight = 2
 
   [[menu.main]]
   name = "Search"
-  url = "/archive/"
+  url = "/search/"
   weight = 3 
 
   [[menu.main]]
