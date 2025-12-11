@@ -20,6 +20,3 @@ Hey, I‘m Chen ZHOU, Network & Cybersecurity Engineer on the internet, I'm a:
 - 💡 **Attitude**
 
   Continuous learning and challenging myself—that’s the heart of this blog.
-
----
-
