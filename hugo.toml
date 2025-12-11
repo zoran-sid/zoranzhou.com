@@ -43,14 +43,19 @@ text = ""
   weight = 1
 
   [[menu.main]]
+  name = "Essays"
+  url = "/essays/"
+  weight = 2
+
+  [[menu.main]]
   name = "Blog"
   url = "/posts/"
-  weight = 2
+  weight = 3
   
   [[menu.main]]
   name = "Archives"
   url = "/archives/"
-  weight = 3
+  weight = 4
   
   [menu.main.params]
     external = false
