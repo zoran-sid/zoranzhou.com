@@ -1,10 +1,11 @@
-body {
+/* 仅在 Light 模式下生效 */
+body:not(.dark) {
     position: relative;
     background-color: #ffffff;
     overflow-x: hidden;
 }
 
-body::before {
+body:not(.dark)::before {
     content: "";
     position: fixed;
     inset: 0;
@@ -31,8 +32,10 @@ body::before {
     }
 }
 
-.dark body::before {
-    background-image:
-        radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
-    opacity: 0.22;
+body.dark {
+    background-color: var(--theme) !important; 
+}
+
+body.dark::before {
+    content: none !important;
 }
