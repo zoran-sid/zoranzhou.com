@@ -4,12 +4,11 @@
   {{ .Content }}
 </div>
 
-<div class="home-social-icons" style="margin: 2rem 0; text-align: center;">
+<div class="home-social-icons" style="margin: 2rem 0;">
   {{ partial "social_icons.html" (dict "icons" site.Params.social "svg" site.Data.svg "Email" site.Params.email ) }}
 </div>
 
 {{ $posts := where .Site.RegularPages "Type" "posts" }}
-
 {{ $sortedPosts := sort $posts "Weight" }}
 
 <div class="post-list">
