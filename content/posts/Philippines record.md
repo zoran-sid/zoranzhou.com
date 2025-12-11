@@ -61,3 +61,19 @@ ShowBreadCrumbs: true
 ![1c4319851f1d44afcbd90a33bdadcfe0](https://e5d9f02.webp.fi/1c4319851f1d44afcbd90a33bdadcfe0.jpg)
 
 ⛪ 圣婴圣殿：菲律宾最古老的天主教堂，里面供奉着被称为 “圣婴耶稣像” 的珍宝。
+
+
+
+## 宿务生日篇
+
+当天朋友给了我一个惊喜，定了蛋糕，整整的二个！她的新室友也是第一天才认识我，忙前忙后，全程帮我记录瞬间！感谢她们，让我的生日填上独特的色彩。
+
+![92bd83df98709b22da62221021038cba](https://e5d9f02.webp.fi/92bd83df98709b22da62221021038cba.jpg)
+
+
+
+## 来自越南朋友一封信
+
+`From Safia to Zoran！`
+
+![98034f40ffeecf6adcedde13b4cd62de](https://e5d9f02.webp.fi/98034f40ffeecf6adcedde13b4cd62de.jpg)
