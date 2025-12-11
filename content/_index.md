@@ -2,8 +2,9 @@
 title: "ZORAN BLOG"
 disableContent: true
 ---
-<div style="margin-top: 1rem;"></div>
 # My Path to Mastery: A Tech Explorer's Notes on Practice and Life
+
+<div style="margin-top: 1rem;"></div>
 
 Hey, I‘m Chen ZHOU, Network & Cybersecurity Engineer on the internet, I'm a:
 
