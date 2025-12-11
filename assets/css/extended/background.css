@@ -20,15 +20,19 @@ body:not(.dark)::before {
 }
 
 @keyframes dotmove {
-    0% { transform: translate(0px, 0px); }
-    50% { transform: translate(-12px, -6px); }
-    100% { transform: translate(8px, 10px); }
+    0% {
+        transform: translate(0px, 0px);
+    }
+    50% {
+        transform: translate(-12px, -6px);
+    }
+    100% {
+        transform: translate(8px, 10px);
+    }
 }
 
-
 body.dark {
-    background-color: var(--theme) !important;
-    background-image: none !important;
+    background-color: var(--theme) !important; 
 }
 
 body.dark::before {
