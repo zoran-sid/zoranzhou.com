@@ -9,6 +9,7 @@ disqusShortname = ""
 
 [outputs]
   home = ["HTML", "JSON"]
+  section = ["HTML"]
 
 ##############################
 # Pagination
