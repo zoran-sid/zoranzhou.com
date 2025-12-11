@@ -7,6 +7,9 @@
   object-fit: cover !important;  
   box-sizing: border-box;
 }
+.home .intro {
+    margin-top: 2rem !important;     /* 控制 intro 顶部与标题的距离 */
+}
 
 .header .nav {
   align-items: center;
