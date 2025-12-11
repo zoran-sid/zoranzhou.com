@@ -8,7 +8,7 @@ disqusShortname = ""
 
 
 [outputs]
-  home = ["HTML", "RSS", "JSON"]
+  home = ["HTML", "JSON"]
 
 ##############################
 # Pagination
