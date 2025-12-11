@@ -2,7 +2,7 @@
 title: "ZORAN BLOG"
 disableContent: true
 ---
-# My Path to Mastery: A Tech Explorer's Notes on Practice and Life
+# My Path: A Tech Explorer's Notes on Practice and Life
 
 <div style="margin-top: 1rem;"></div>
 
