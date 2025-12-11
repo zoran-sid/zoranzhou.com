@@ -263,7 +263,7 @@ To hide a particular page from being searched, add it in post's fron't matter
 searchHidden: true
 ```
 
-### Share Buttons on post （分享按）
+### Share Buttons on post （分享按钮）
 
 Displays Share Buttons at Bottom of each post
 
