@@ -7,8 +7,9 @@
   object-fit: cover !important;  
   box-sizing: border-box;
 }
-.home .intro {
-    margin-top: 2rem !important;     /* 控制 intro 顶部与标题的距离 */
+
+.home .intro h1 {
+    margin-bottom: 2rem !important;    /* 你可以改成 1.5rem / 3rem 自由调节 */
 }
 
 .header .nav {
