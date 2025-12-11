@@ -54,11 +54,6 @@ text = ""
   name = "Archives"
   url = "/archives/"
   weight = 4
- 
-  [[menu.main]]
-  name = "Newsletter"
-  url = "/newsletter/"
-  weight = 5
   
   [menu.main.params]
     external = false
