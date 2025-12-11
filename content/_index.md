@@ -5,8 +5,6 @@ disableContent: true
 
 # My Path to Mastery: A Tech Explorer's Notes on Practice and Life
 
----
-
 Hey, I‘m Chen ZHOU, Network & Cybersecurity Engineer on the internet, I'm a:
 
 - 🎯 **Profession**
