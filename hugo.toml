@@ -30,6 +30,7 @@ TocSide = "left"
 EnableInstantClick = false
 defaultTheme = "auto"
 disableThemeToggle = false
+mainSections = ["posts", "essays"]
 favicon = "favicon.ico"
 appleTouchIcon = "favicon.png"
 # --- Logo ---
