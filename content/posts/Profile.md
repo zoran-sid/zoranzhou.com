@@ -1,6 +1,6 @@
 ---
 title: "ZORAN BLOG"
-date: 2025-12-01
+date: 2024-4-17
 description: "Resume"
 weight: -1
 ShowWordCount: true

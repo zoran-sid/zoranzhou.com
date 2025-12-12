@@ -1,7 +1,7 @@
 ---
 author: "Zoran"
 title: "自用 OPENWRT 编译流程分享"
-date: "2025-12-01"
+date: "2025-6-20"
 description: "Ubuntu 虚拟机本地编译 Openwrt 系统"
 tags:
   - Technology

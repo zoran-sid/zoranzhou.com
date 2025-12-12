@@ -1,7 +1,7 @@
 ---
 author: "Zoran"
 title: "Waline 评论系统嵌入 BLOG 方案"
-date: "2025-11-24"
+date: "2024-05-02"
 description: "使用 Waline方案，涉及 Vercel + LeanCloud"
 tags:
   - Technology
