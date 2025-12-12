@@ -16,11 +16,55 @@
 {{- end }}
 
 
-{{ if .Params.ShowWordCount }}
-  {{- $content := .Plain | replaceRE "\\s+" "" -}}
-  {{- $runeCount := len $content -}}
-  <span>{{ $runeCount }} 字</span>
-{{ end }}
+{{/* ---- 干净的字数 & 阅读时间（排除 code blocks 与 inline code） ---- */}}
+{{- if .Params.ShowWordCount }}
+  {{- /* 1) 取出原始 Markdown 内容（包含 code fence） */ -}}
+  {{- $raw := .RawContent -}}
+
+  {{- /* 2) 先去掉三种常见的 code fence：```...``` 和 ~~~...~~~ */ -}}
+  {{- $clean := replaceRE "(?s)```.*?```" "" $raw -}}
+  {{- $clean = replaceRE "(?s)~~~.*?~~~" "" $clean -}}
+
+  {{- /* 3) 去掉 HTML 的 pre/code 块 <pre>...</pre> 或 <code>...</code> */ -}}
+  {{- $clean = replaceRE "(?s)<pre[\\s\\S]*?</pre>" "" $clean -}}
+  {{- $clean = replaceRE "(?s)<code[\\s\\S]*?</code>" "" $clean -}}
+
+  {{- /* 4) 去掉行内代码 `...` */ -}}
+  {{- $clean = replaceRE "`[^`]*`" "" $clean -}}
+
+  {{- /* 5) 去掉 Markdown 图片与链接语法 ![alt](url) 和 [text](url) */ -}}
+  {{- $clean = replaceRE "!\\[[^\\]]*\\]\\([^\\)]*\\)" "" $clean -}}
+  {{- $clean = replaceRE "\\[[^\\]]*\\]\\([^\\)]*\\)" "" $clean -}}
+
+  {{- /* 6) 去掉剩余 HTML 标签（例如 <div>、<a> 等） */ -}}
+  {{- $clean = replaceRE "<[^>]+>" "" $clean -}}
+
+  {{- /* 7) 把连续空白归为单空格，方便英文单词拆分 */ -}}
+  {{- $cleanCompact := replaceRE "\\s+" " " $clean | trim -}}
+
+  {{- /* ----- 英文单词统计（基于清理后的文本） ----- */ -}}
+  {{- /* 只保留 A-Za-z 和空格，用于统计英文词数 */ -}}
+  {{- $engText := trim (replaceRE "[^A-Za-z\\s]" "" $cleanCompact) " " -}}
+  {{- $engCount := cond (eq $engText "") 0 (len (split $engText " ")) -}}
+
+  {{- /* ----- 中文字符统计（清理后的文本） ----- */ -}}
+  {{- /* 删除 ASCII 英文/数字/标点/空格，剩下的基本为 CJK 字符 */ -}}
+  {{- $cnOnly := replaceRE "[A-Za-z0-9[:punct:]\\s]+" "" $clean -}}
+  {{- $cnCount := len $cnOnly -}}
+
+  {{- /* ----- 合并总数（英文词 + 中文字符） ----- */ -}}
+  {{- $total := add $engCount $cnCount -}}
+
+  <span class="post-wordcount">· {{ $total }} 字</span>
+
+  {{- /* ----- 阅读时间：中英文分速计算并向上取整 ----- */ -}}
+  {{- /* 例：中文按 300 字/分钟，英文按 200 词/分钟 */ -}}
+  {{- $cnMin := div (add $cnCount 299) 300 -}}   {{/* ceil(cnCount/300) */}}
+  {{- $engMin := div (add $engCount 199) 200 -}} {{/* ceil(engCount/200) */}}
+  {{- $minutes := add $cnMin $engMin -}}
+  <span class="post-readtime">· 约 {{ $minutes }} 分钟阅读</span>
+{{- end }}
+
 
 
 
