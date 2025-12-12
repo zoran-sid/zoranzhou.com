@@ -1,0 +1,4 @@
+{{/* 中文 + 英文 100% 准确字数统计 */}}
+{{- $plain := .Plain | replaceRE "\\s" "" -}}
+{{- $chars := len (split $plain "") -}}
+{{ return $chars }}
