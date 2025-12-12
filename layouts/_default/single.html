@@ -24,23 +24,6 @@
     {{- if not (.Param "hideMeta") }}
     <div class="post-meta">
       {{- partial "post_meta.html" . -}}
-	<div class="post-meta">
-  {{- partial "post_meta.html" . -}}
-
-  {{/* 中文字数统计（字符计数） */}}
-  {{- $content := .Plain | replaceRE "\\s+" "" -}}
-  {{- $runeCount := len $content -}}
-  <span class="post-wordcount">
-    · {{ $runeCount }} 字
-  </span>
-
-  {{/* 阅读时间（按每分钟 300 汉字） */}}
-  {{- $minutes := div (add $runeCount 299) 300 -}}
-  <span class="post-readtime">
-    · 约 {{ $minutes }} 分钟阅读
-  </span>
-</div>
-
       {{/* TODO move to footer */}}
       {{/* partial "edit_post.html" . */}}
       {{/* partial "post_canonical.html" . */}}
