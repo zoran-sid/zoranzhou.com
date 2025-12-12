@@ -5,8 +5,8 @@ date: "2025-11-24"
 description: "三个月，足以重新定义我的世界。"
 tags:
   - Life
-ShowWordCount: true
-ShowReadingTime: true
+word_count: 1684
+reading_time: 5
 ShowBreadCrumbs: true
 ---
 
