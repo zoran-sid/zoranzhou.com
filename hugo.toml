@@ -33,7 +33,6 @@ disableThemeToggle = false
 # --- Logo ---
 [params.logo] 
 icon = "favicon.png"
-appleTouchIcon = "img/apple-touch-icon.png" 
 iconWidth = 128        
 iconHeight = 128
 text = ""             
