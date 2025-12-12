@@ -2,7 +2,7 @@
 author: "Zoran"
 title: "🇵🇭菲律宾 Philinter 三个月游学体验"
 date: "2025-11-24"
-description: "三个月，足以重新定义你的世界。"
+description: "三个月，足以重新定义我的世界。"
 tags:
   - Life
 ShowWordCount: true
