@@ -30,6 +30,8 @@ TocSide = "left"
 EnableInstantClick = false
 defaultTheme = "auto"
 disableThemeToggle = false
+favicon = "favicon.ico"
+appleTouchIcon = "favicon.png"
 # --- Logo ---
 [params.logo] 
 icon = "favicon.png"
