@@ -1,6 +1,6 @@
 ---
 author: "Zoran"
-title: "杀死一只知更鸟"
+title: "《杀死一只知更鸟》书评"
 date: "2024-02-10"
 description: "You never really understand a person until you climb into his skin and walk around in it."
 tags:

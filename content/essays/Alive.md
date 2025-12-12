@@ -1,8 +1,8 @@
 ---
 author: "Zoran"
-title: "杀死那只知更鸟"
-date: "2024-02-10"
-description: "You never really understand a person until you climb into his skin and walk around in it."
+title: "《活着》书评"
+date: "2024-03-15"
+description: "人是为了活着本身而活着，而不是为了活着之外的任何事物而活着。"
 tags:
   - reading review
 ShowWordCount: true
