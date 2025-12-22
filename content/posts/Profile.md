@@ -13,9 +13,9 @@ ShowReadingTime: true
 
 **T**: +86 19956068808 • **E**: abc1003298731@163.com • **W**: https://zoranzhou.com/
 
----
-
 **EDUCATION**
+
+----
 
 **Anhui Xinhua University**                                                                                                           Sept. 2020 – Jul. 2024
 
@@ -23,9 +23,9 @@ ShowReadingTime: true
 
 **Core Courses**: C Language Programming Methods, Python Language Programming, Computer Network B, Database Principles and Applications, Algorithm Analysis and Design, National Security, and so on.
 
----
-
 **WORK EXPERIENCE**
+
+---
 
 **Huawei Global Training Center** – *Penetration Testing Engineer*                                           Jun. 2025 – Aug. 2025
 
@@ -49,9 +49,9 @@ ShowReadingTime: true
 
 • Designed a network upgrade based on 5-min traffic pattern analysis to support 12+ Gbps throughput, deployed a provincial SDN pilot, standardized firewall policies, and upgraded the enterprise antivirus system.
 
----
-
 **RESEARCH & PROJECTS**
+
+---
 
 **Research Project: \*Network Security Situational Awareness with Traffic Big Data\***    Oct. 2023 – Jun. 2024
 
@@ -73,9 +73,9 @@ ShowReadingTime: true
 
 • Re-designed network topology and VLAN segmentation and completed full stress testing to modernize legacy infrastructure and enhance the zone’s overall security posture.
 
----
-
 **QUALIFICATIONS**
+
+---
 
 **Cisco Certified Internetwork Expert (CCIE) – Enterprise Infrastructure**                                                   2025
 
@@ -83,9 +83,9 @@ ShowReadingTime: true
 
 **Huawei Certified ICT Professional (HCIP) – Datacom, Advanced Routing & Switching Technology**  2022
 
----
-
 **LANGUAGE & SKILLS**
+
+---
 
 **English Proficiency:** IELTS (6.0)
 
