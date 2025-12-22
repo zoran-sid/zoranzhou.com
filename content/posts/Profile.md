@@ -1,6 +1,6 @@
 ---
 title: "Chen ZHOU Curriculum Vitae"
-date: "2024-04-17"
+date: "2025-09-01"
 description: "CV"
 weight: -1
 ShowWordCount: true
