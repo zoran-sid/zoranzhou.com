@@ -1,175 +1,269 @@
-/* ===============================
-   Enhanced layout & readability
-   =============================== */
-
-/* main container */
+/* for home and other pages */
 .main {
-    animation: slide-enter 0.6s ease both;
+    position: relative;
+    min-height: calc(100vh - var(--header-height) - var(--footer-height));
+    max-width: calc(var(--main-width) + var(--gap) * 2);
+    margin: auto;
+    padding: var(--content-gap) var(--gap) 0;
 }
 
-/* page header refinement */
-.page-header h1 {
-    letter-spacing: -0.02em;
+@media screen and (max-width: 500px) {
+    .main {
+        padding-top: 0;
+    }
 }
 
-.dark .page-header h1 {
-    color: #f5f5f5;
+/* same as .post-header */
+.page-header {
+    margin: var(--content-gap) 0 calc(var(--content-gap) * 1.5);
 }
-
-/* ===============================
-   Mark / highlight enhancement
-   =============================== */
 
 .mark-line {
-    transition: background-size 0.3s ease;
+    display: inline-block;
+    background: var(--line-yellow) bottom left/100% 0.3em no-repeat;
 }
-.mark-line:hover {
-    background-size: 100% 100%;
-}
-
-.dark mark {
+mark {
+    margin: 0 -0.4em;
+    padding: 0em 0.4em;
+    border-radius: 0.8em 0.3em;
+    background: transparent;
     background-image: linear-gradient(
-        to right,
-        rgba(255, 200, 0, 0.08),
-        rgba(255, 200, 0, 0.45) 4%,
-        rgba(255, 200, 0, 0.15)
+      to right,
+      rgba(255, 225, 0, 0.1),
+      rgba(255, 225, 0, 0.7) 4%,
+      rgba(255, 225, 0, 0.3)
     );
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 
-/* ===============================
-   First entry (Hero post)
-   =============================== */
-
+/* for home and section page */
 .first-entry {
-    box-shadow: var(--shadow-elevation-low);
-    border-radius: var(--radius);
-    padding: var(--gap);
-    background: color-mix(in srgb, var(--theme) 96%, transparent);
+    position: relative;
+    min-height: 320px;
+    margin: var(--gap) 0 calc(var(--gap) * 2) 0;
 }
 
-.dark .first-entry {
-    background: rgba(255, 255, 255, 0.02);
+.first-entry .entry-header {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    margin: var(--gap) 0 calc(var(--gap) * 2);
 }
 
 .first-entry .entry-header h1 {
-    letter-spacing: -0.015em;
+    font-size: 34px;
+    line-height: 1.3;
+}
+
+.first-entry .entry-content {
+    margin: 14px 0;
+    font-size: 17px;
+    color: var(--primary);
+    line-height: 1.6em;
+    display: block;
+    overflow: initial;  /* fix <mark> edge get cut */
+}
+
+@media screen and (max-width: 500px) {
+    .first-entry .entry-header h1 {
+        font-size: 30px;
+    }
+    .first-entry .entry-content {
+        font-size: 16px;
+    }
+}
+
+.first-entry .entry-content p {
+    margin-bottom: .8em;
+}
+.first-entry .entry-content ul,
+.first-entry .entry-content ol {
+    margin: .8em 0;
+}
+.first-entry .entry-content li p {
+    margin-bottom: .5em;
 }
 
 .first-entry .entry-footer {
-    opacity: 0.75;
+    font-size: 14px;
 }
 
-/* ===============================
-   Inline links polish
-   =============================== */
-
 .inline-links a {
+    font-weight: 500;
+    color: var(--primary);
+    box-shadow: var(--link-underline-shadow);
+    transition: var(--link-transition);
+}
+.inline-links a:hover {
+    color: var(--link-hover-color);
+    box-shadow: var(--link-hover-underline-shadow);
+}
+
+.inline-links span:not(:last-of-type):after {
+    content: "·";
+    margin-inline-start: .5em;
+    margin-inline-end: .5em;
+}
+
+
+/* for post page */
+.main.post {
+    max-width: calc(var(--post-width) + var(--gap) * 2);
+}
+
+.page-header h1 {
+    font-size: 40px;
+    margin-bottom: var(--content-gap);
+    text-transform: capitalize;
+}
+
+.pagination {
+    display: flex;
+}
+
+.pagination a {
+    color: var(--theme);
+    font-size: 13px;
+    line-height: 36px;
+    background: var(--primary);
+    border-radius: calc(36px / 2);
+    padding: 0 16px;
+}
+
+.pagination .next {
+    margin-inline-start: auto;
+}
+
+.social-icons {
+    padding: 12px 0;
+}
+
+.social-icons a {
+    display: inline-block;
+    line-height: 20px;
+    transition: var(--link-transition);
+}
+
+.social-icons a:not(:last-of-type) {
+    margin-right: 12px;
+}
+
+.social-icons a svg {
+    height: 26px;
+    width: 26px;
+}
+.social-icons a:hover {
+    color: var(--link-hover-color);
+    box-shadow: var(--link-hover-underline-shadow);
+}
+
+code {
+    direction: ltr;
+}
+
+div.highlight,
+pre {
     position: relative;
 }
 
-.inline-links a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 100%;
-    height: 1px;
-    background: currentColor;
-    opacity: 0.2;
-    transform: scaleX(0);
-    transition: transform 0.25s ease;
-}
-
-.inline-links a:hover::after {
-    transform: scaleX(1);
-}
-
-/* ===============================
-   Pagination UX
-   =============================== */
-
-.pagination a {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: var(--shadow-elevation-low);
-}
-
-.pagination a:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-elevation-medium);
-}
-
-/* ===============================
-   Social icons refinement
-   =============================== */
-
-.social-icons a {
-    opacity: 0.7;
-}
-
-.social-icons a:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-}
-
-/* ===============================
-   Code block UX
-   =============================== */
-
 .copy-code {
-    backdrop-filter: blur(6px);
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(78, 78, 78, 0.8);
+    border-radius: var(--radius);
+    padding: 0 5px;
+    font-size: 14px;
+    user-select: none;
 }
 
-.dark .copy-code {
-    background: rgba(40, 40, 40, 0.8);
+div.highlight:hover .copy-code,
+pre:hover .copy-code {
+    display: block;
 }
-
-/* ===============================
-   Meta info readability
-   =============================== */
 
 .meta-item {
-    font-size: 13px;
+    display: inline-block;
+}
+.meta-item * {
+    color: var(--secondary);
+}
+
+.meta-item:not(:last-of-type):after {
+    content: "·";
+    margin-inline-start: .5em;
+    margin-inline-end: .5em;
 }
 
 .meta-item svg {
-    opacity: 0.7;
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    vertical-align: -0.15em;
 }
 
-/* ===============================
-   Image polish
-   =============================== */
+.meta-item a {
+    transition: var(--link-transition);
+}
+.meta-item a:hover {
+    color: var(--primary);
+    box-shadow: 0 1px 0 var(--secondary);
+}
+.meta-item .post-tags a:not(:last-of-type) {
+    margin-inline-end: .3em;
+}
+.meta-item .post-tags a:not(:last-of-type):after {
+    content: ",";
+}
+.meta-item .post-tags a:before {
+    content: "#";
+}
 
-.post-content img,
+
+/* images */
+
 figure > img {
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-elevation-low);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    image-rendering: -webkit-optimize-contrast;
 }
 
-.post-content img:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-elevation-medium);
+.post-content img {
+    image-rendering: -webkit-optimize-contrast;
 }
 
-/* ===============================
-   Shortcodes
-   =============================== */
+
+/* effects */
+:root {
+    --shadow-color: 0deg 0% 0%;
+    --shadow-elevation-low:
+      0.6px 0.6px 1px hsl(var(--shadow-color) / 0.1),
+      0.9px 0.9px 1.4px -1.2px hsl(var(--shadow-color) / 0.1),
+      2.2px 2.2px 3.5px -2.5px hsl(var(--shadow-color) / 0.1);
+    --shadow-elevation-medium:
+      0.6px 0.6px 1px hsl(var(--shadow-color) / 0.11),
+      1.8px 1.8px 2.9px -0.8px hsl(var(--shadow-color) / 0.11),
+      4.6px 4.6px 7.3px -1.7px hsl(var(--shadow-color) / 0.11),
+      11.1px 11.1px 17.7px -2.5px hsl(var(--shadow-color) / 0.11);
+
+    --twitter-color: #4a99e9;
+}
+
+
+/* shortcodes */
 
 .standout {
-    font-weight: 600;
-    letter-spacing: -0.02em;
-}
-.social-icons {
-    font-size: 14px;   /* 锁死 em 环境 */
-    line-height: 1;
+    font-size: 24px;
+    padding: .5em;
+    text-align: center;
 }
 
-.dark .standout {
-    color: #f0f0f0;
-}
-
-/* image size control center fix */
 .image-size-control {
-    display: flex;
-    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+.image-size-control > img {
+    width: inherit;
+    height: inherit;
 }
