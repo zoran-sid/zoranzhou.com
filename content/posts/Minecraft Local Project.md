@@ -132,9 +132,15 @@ wget https://github.com/ehang-io/nps/releases/download/v0.26.10/linux_386_client
 ./npc -server={服务端IP/域名}:8024 -vkey={秘钥信息} -type=tcp
 ```
 
+![image-20251223210352889](https://e5d9f02.webp.fi/image-20251223210352889.png)
+
+Ubuntu Terminal 中运行，保持虚拟机后台运行！
+
+![image-20251223210044136](https://e5d9f02.webp.fi/image-20251223210044136.png)
 
 
-# Mincraft 服务端安装
+
+# Minecraft 服务端安装
 
 访问内网 IP:23333，进入 Mincraft 服务器控制面板。创建新实例
 
