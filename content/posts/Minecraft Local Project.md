@@ -33,6 +33,10 @@ ShowShareButtons: true
 
 ![image-20251223184828438](https://e5d9f02.webp.fi/image-20251223184828438.png)
 
+桥接原理：
+
+![image-20251223210655233](https://e5d9f02.webp.fi/image-20251223210655233.png)
+
 之后在 Terminal 中安装控制面板套件：
 
 ```
