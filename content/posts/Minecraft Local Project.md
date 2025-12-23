@@ -21,6 +21,8 @@ ShowShareButtons: true
 
 接下来，我将使用  **VMware Workstation**  搭建一台本地的  **Minecraft**  服务器。
 
+**注：以下配置需要基础的交换网络技术功底！**
+
 
 
 # 安装 Ubuntu 系统
