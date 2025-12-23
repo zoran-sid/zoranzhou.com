@@ -58,7 +58,7 @@ systemctl stop mcsm-daemon.service
 
 ![image-20251223190902081](https://e5d9f02.webp.fi/image-20251223190902081.png)
 
-安装  JAVA JDK 21
+安装 Minecraft 所需的 JAVA JDK 21 环境
 
 ```
 sudo apt install openjdk-21-jdk
@@ -66,13 +66,6 @@ java -version
 ```
 
 ![image-20251223192206195](https://e5d9f02.webp.fi/image-20251223192206195.png)
-
-安装 NPS Client 并按照 NPS Server提示运行内网穿透配置
-
-```
-wget https://github.com/ehang-io/nps/releases/download/v0.26.10/linux_386_client.tar.gz
-./npc -server={服务端IP/域名}:8024 -vkey={秘钥信息} -type=tcp
-```
 
 
 
@@ -130,6 +123,15 @@ Target:{127.0.0.1/内网IP地址}:25565  // 25565 公网端口映射到私网 25
 
 ![image-20251223203109753](https://e5d9f02.webp.fi/image-20251223203109753.png)
 
+## VM Ubuntu NPS 客户端服务
+
+安装 NPS Client ，按照 NPS Server 提示运行内网穿透配置
+
+```
+wget https://github.com/ehang-io/nps/releases/download/v0.26.10/linux_386_client.tar.gz
+./npc -server={服务端IP/域名}:8024 -vkey={秘钥信息} -type=tcp
+```
+
 
 
 # Mincraft 服务端安装
@@ -157,7 +159,7 @@ https://fill-data.papermc.io/v1/objects/cabed3ae77cf55deba7c7d8722bc9cfd5e991201
 
 ![image-20251223203548710](https://e5d9f02.webp.fi/image-20251223203548710.png)
 
-按照需求通用协议：
+按照要求同意通用协议：
 
 **这里只需要在配置服务端配置文件中打开即可！**
 
@@ -172,3 +174,15 @@ https://fill-data.papermc.io/v1/objects/cabed3ae77cf55deba7c7d8722bc9cfd5e991201
 虽然总体上比较复杂，但可以最大化解决服务器配置不足的问题，只需要按需调整公网带宽即可。常规 1M 公网带宽可以支持 2-3 人原生服务器游玩。
 
 ![image-20251223204230564](https://e5d9f02.webp.fi/image-20251223204230564.png)
+
+
+
+# 参考链接
+
+**以下链接为所需要用到的原始下载链接：**
+
+```
+https://github.com/ehang-io/nps
+https://docs.mcsmanager.com/zh_cn/
+https://papermc.io/downloads/paper
+```
