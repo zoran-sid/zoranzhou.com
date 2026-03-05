@@ -1,7 +1,7 @@
 ---
 author: "Zoran"
 title: "OpenClaw 完全安装指南与命令详解"
-date: "2026-03-06"
+date: "2025-03-06"
 description: "基于官方文档的 OpenClaw AI 助手完整安装教程，涵盖多种安装方式、配置详解及常用命令汇总"
 tags:
   - Technology
