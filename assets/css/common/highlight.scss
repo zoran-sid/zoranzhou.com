@@ -1,10 +1,31 @@
 @import '../lib/chroma-light';
 
-// for github theme, add a background color
+// Light mode (default)
 .chroma {
   background-color: #f6f8fa;
+  color: #24292e;  // Dark text for light mode
 }
 
+// Dark mode
 .dark {
   @import '../lib/chroma-dark';
+  
+  .chroma {
+    background-color: #282a36;
+    color: #f8f8f2;  // Light text for dark mode
+  }
+}
+
+// Ensure code blocks inherit proper colors
+.highlight {
+  pre {
+    code {
+      color: inherit;
+    }
+  }
+}
+
+// Additional specificity for dark mode code elements
+.dark .highlight pre code {
+  color: #f8f8f2;
 }

@@ -8,6 +8,30 @@
   box-sizing: border-box;
 }
 
+/* Code block text colors for light/dark mode */
+/* Light mode - dark text */
+.chroma {
+  color: #24292e;
+}
+
+.chroma code {
+  color: #24292e;
+}
+
+/* Dark mode - light text */
+.dark .chroma {
+  color: #f8f8f2;
+}
+
+.dark .chroma code {
+  color: #f8f8f2;
+}
+
+/* Ensure pre code inherits correct colors */
+.highlight pre code {
+  color: inherit;
+}
+
 .home .intro h1 {
     margin-bottom: 2rem !important;    /* 你可以改成 1.5rem / 3rem 自由调节 */
 }
