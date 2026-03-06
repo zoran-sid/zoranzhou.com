@@ -8,6 +8,26 @@
   box-sizing: border-box;
 }
 
+/* 代码块在白天模式下的样式修复 */
+.post-content pre code {
+  color: #24292e !important;
+}
+
+.post-content code {
+  color: #24292e !important;
+}
+
+/* 确保代码块背景色正确 */
+.post-content pre {
+  background-color: #f6f8fa !important;
+}
+
+/* 行内代码样式 */
+.post-content :not(pre) > code {
+  background-color: rgba(175, 184, 193, 0.2) !important;
+  color: #24292e !important;
+}
+
 .home .intro h1 {
     margin-bottom: 2rem !important;    /* 你可以改成 1.5rem / 3rem 自由调节 */
 }
