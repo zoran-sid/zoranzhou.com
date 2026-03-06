@@ -363,3 +363,147 @@ Framework preset：选择Hugo
 
 ---
 
+## Cloudflare R2 对象存储 + WebP Cloud 代理加速
+
+随着博客内容的增加，图片资源的存储和加载速度成为影响用户体验的关键因素。这里介绍一套免费的图片存储与加速方案：**Cloudflare R2** 配合 **WebP Cloud** 代理。
+
+### 为什么需要这套方案？
+
+- **GitHub 仓库限制**：大量图片会增加仓库体积，影响克隆和部署速度
+- **加载速度**：直接从 GitHub 或 Cloudflare Pages 加载图片，跨国访问速度不稳定
+- **格式优化**：现代浏览器支持 WebP 格式，体积更小，加载更快
+- **成本考量**：R2 提供 10GB 免费存储，WebP Cloud 提供免费代理转换服务
+
+### Cloudflare R2 配置
+
+R2 是 Cloudflare 提供的兼容 S3 API 的对象存储服务。
+
+#### 创建 R2 存储桶
+
+1. 登录 Cloudflare Dashboard，进入 **R2** 页面
+2. 点击 **Create bucket**，输入存储桶名称（如 `blog-storage`）
+3. 选择存储桶位置，建议选 **Automatic** 让 Cloudflare 自动优化
+
+#### 配置公开访问
+
+R2 默认是私有的，需要配置公开访问才能通过 URL 直接访问图片：
+
+1. 进入存储桶设置，找到 **Public Access** 选项
+2. 开启 **Allow Public Access**
+3. 绑定自定义域名（推荐）：
+   - 在 **Custom Domains** 中添加你的子域名，如 `images.yourdomain.com`
+   - 或者使用 WebP Cloud 提供的代理域名
+
+#### 获取 API 凭证
+
+用于通过 API 上传图片：
+
+1. 进入 **R2** → **Manage R2 API Tokens**
+2. 点击 **Create API Token**
+3. 选择 **Object Read & Write** 权限
+4. 复制 **Access Key ID** 和 **Secret Access Key**
+
+**API 连接信息示例：**
+
+```
+Account ID: your-account-id
+Access Key ID: your-access-key
+Secret Access Key: your-secret-key
+Bucket: blog-storage
+S3 API Endpoint: https://your-account-id.r2.cloudflarestorage.com
+```
+
+#### 上传图片到 R2
+
+可以使用多种方式上传：
+
+**方式一：Cloudflare Dashboard 网页上传**
+- 适合偶尔上传少量图片
+
+**方式二：AWS CLI / boto3 脚本**
+- 适合批量上传和自动化工作流
+
+```python
+import boto3
+
+s3 = boto3.client(
+    's3',
+    endpoint_url='https://your-account-id.r2.cloudflarestorage.com',
+    aws_access_key_id='your-access-key',
+    aws_secret_access_key='your-secret-key',
+    region_name='auto'
+)
+
+# 上传文件
+s3.upload_file('local-image.jpg', 'blog-storage', 'image-20250101.jpg')
+```
+
+**方式三：第三方工具（如 rclone、Cyberduck）**
+- 图形化界面，操作直观
+
+### WebP Cloud 代理加速
+
+WebP Cloud（webp.fi）是一个免费的图片代理服务，可以自动将图片转换为 WebP 格式，并提供全球 CDN 加速。
+
+#### 配置 WebP Cloud
+
+1. 访问 [WebP Cloud](https://webp.fi) 官网
+2. 注册账号并添加你的 R2 存储桶作为源站
+3. 配置自定义域名（可选）
+
+#### 使用方式
+
+假设你的 R2 图片原始链接是：
+```
+https://your-bucket.your-account-id.r2.cloudflarestorage.com/image.jpg
+```
+
+通过 WebP Cloud 代理后：
+```
+https://your-proxy.webp.fi/image.jpg
+```
+
+WebP Cloud 会自动：
+- 将图片转换为 WebP 格式（浏览器支持时）
+- 压缩图片体积
+- 通过 Cloudflare CDN 全球加速
+
+#### 在博客中使用
+
+在 Hugo 的 Markdown 文章中引用：
+
+```markdown
+![图片描述](https://your-proxy.webp.fi/image-20250101.jpg)
+```
+
+### 完整工作流示例
+
+1. **撰写文章**时，将图片保存到本地
+2. **上传图片**到 R2 存储桶
+3. **获取 WebP Cloud 代理链接**
+4. **在 Markdown 中引用**代理链接
+5. **部署博客**，图片会自动通过 WebP Cloud 加速加载
+
+### 成本与限额
+
+| 服务 | 免费额度 | 超出后 |
+|------|---------|--------|
+| Cloudflare R2 | 10GB 存储/月 | $0.015/GB/月 |
+| Cloudflare R2 | 100 万次请求/月 | $0.36/百万次 |
+| WebP Cloud | 无限（目前免费） | 免费 |
+
+对于个人博客来说，免费额度完全够用。
+
+### 总结
+
+这套方案的优势：
+- ✅ **完全免费**：R2 + WebP Cloud 对个人用户免费
+- ✅ **全球加速**：Cloudflare CDN 覆盖全球
+- ✅ **自动优化**：WebP 格式自动压缩，提升加载速度
+- ✅ **兼容性好**：S3 API 标准，工具生态丰富
+- ✅ **与现有工作流集成**：不影响 Hugo + GitHub + Cloudflare Pages 的部署流程
+
+通过这套方案，你的博客图片可以实现快速、稳定、低成本的全球分发。
+
+---
+
