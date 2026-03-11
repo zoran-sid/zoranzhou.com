@@ -1,0 +1,872 @@
+{{ define "main" }}
+<div class="ai-chat-container">
+    <!-- 设置面板 -->
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-box">
+            <h2>🤖 AI 助手</h2>
+            <p>选择一个 AI 模型开始对话</p>
+            
+            <div class="model-selector">
+                <label>选择模型：</label>
+                <select id="model-select" onchange="onModelChange()">
+                    <optgroup label="OpenAI">
+                        <option value="openai:gpt-5.2">GPT-5.2</option>
+                        <option value="openai:gpt-5.2-mini">gpt-5.2 Mini</option>
+                        <option value="openai:gpt-4-turbo">GPT-4 Turbo</option>
+                        <option value="openai:gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    </optgroup>
+                    <optgroup label="Anthropic">
+                        <option value="anthropic:claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                        <option value="anthropic:claude-3-opus-20240229">Claude 3 Opus</option>
+                    </optgroup>
+                    <optgroup label="Google">
+                        <option value="google:gemini-1.5-pro">Gemini 1.5 Pro</option>
+                        <option value="google:gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </optgroup>
+                    <optgroup label="DeepSeek">
+                        <option value="deepseek:deepseek-chat">DeepSeek V3</option>
+                        <option value="deepseek:deepseek-reasoner">DeepSeek R1</option>
+                    </optgroup>
+                    <optgroup label="Moonshot">
+                        <option value="moonshot:kimi-k2.5">Kimi K2.5</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="api-key-section">
+                <label>API Key：</label>
+                <div class="api-key-input-wrapper">
+                    <input type="password" id="api-key-input" placeholder="输入 API Key">
+                    <button onclick="toggleApiKeyVisibility()" class="toggle-btn">👁</button>
+                </div>
+                <p class="hint">测试版 - API Key 仅存储在本地浏览器中</p>
+            </div>
+
+            <button onclick="startChat()" class="start-btn">开始对话</button>
+            
+            <div class="api-links">
+                <small>
+                    <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a> |
+                    <a href="https://console.anthropic.com/settings/keys" target="_blank">Claude</a> |
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank">Gemini</a> |
+                    <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek</a> |
+                    <a href="https://platform.moonshot.cn/console/api-keys" target="_blank">Kimi</a>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 对话界面 -->
+    <div id="chat-panel" class="chat-panel" style="display: none;">
+        <!-- 顶部工具栏 -->
+        <div class="chat-toolbar">
+            <div class="current-model">
+                <span id="current-model-name">gpt-5.2</span>
+                <button onclick="showSettings()" class="switch-btn">切换</button>
+            </div>
+            <div class="toolbar-actions">
+                <button onclick="clearHistory()" title="清空对话">🗑</button>
+            </div>
+        </div>
+
+        <!-- 消息历史 -->
+        <div id="chat-messages" class="chat-messages">
+            <div class="welcome-message">
+                <h3>👋 你好！</h3>
+                <p>我是多模型 AI 助手，当前使用的是 <span id="welcome-model">gpt-5.2</span>。</p>
+                <p>有什么可以帮助你的吗？</p>
+            </div>
+        </div>
+        
+        <!-- 输入区域 -->
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <textarea id="message-input" placeholder="输入消息... (Shift+Enter 换行)" rows="1" oninput="autoResize(this)" onkeypress="handleKeyPress(event)"></textarea>
+                <button id="send-btn" onclick="sendMessage()" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-footer">
+                <span>AI 回复可能不准确，请核实重要信息</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 配置
+const CONFIG = {
+    STORAGE_KEY: 'ai_chat_config',
+    HISTORY_KEY: 'ai_chat_history',
+    MAX_HISTORY: 50
+};
+
+let currentConfig = {
+    provider: 'openai',
+    model: 'gpt-5.2',
+    apiKey: ''
+};
+
+let messages = [];
+let isProcessing = false;
+
+// 提供商配置
+const PROVIDERS = {
+    openai: {
+        name: 'OpenAI',
+        baseUrl: 'https://api.openai.com/v1/chat/completions',
+        authHeader: 'Authorization',
+        authPrefix: 'Bearer '
+    },
+    anthropic: {
+        name: 'Anthropic',
+        baseUrl: 'https://api.anthropic.com/v1/messages',
+        authHeader: 'x-api-key',
+        authPrefix: ''
+    },
+    google: {
+        name: 'Google',
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+        authHeader: 'key',
+        authPrefix: ''
+    },
+    deepseek: {
+        name: 'DeepSeek',
+        baseUrl: 'https://api.deepseek.com/chat/completions',
+        authHeader: 'Authorization',
+        authPrefix: 'Bearer '
+    },
+    moonshot: {
+        name: 'Moonshot',
+        baseUrl: 'https://api.moonshot.cn/v1/chat/completions',
+        authHeader: 'Authorization',
+        authPrefix: 'Bearer '
+    }
+};
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+    loadConfig();
+    if (currentConfig.apiKey) {
+        showChatPanel();
+    }
+});
+
+// 加载配置
+function loadConfig() {
+    const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
+    if (saved) {
+        currentConfig = { ...currentConfig, ...JSON.parse(saved) };
+        document.getElementById('api-key-input').value = currentConfig.apiKey || '';
+        
+        const modelValue = `${currentConfig.provider}:${currentConfig.model}`;
+        const select = document.getElementById('model-select');
+        for (let option of select.options) {
+            if (option.value === modelValue) {
+                select.value = modelValue;
+                break;
+            }
+        }
+    }
+    loadHistory();
+}
+
+// 保存配置
+function saveConfig() {
+    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(currentConfig));
+}
+
+// 切换模型
+function onModelChange() {
+    const value = document.getElementById('model-select').value;
+    const [provider, model] = value.split(':');
+    currentConfig.provider = provider;
+    currentConfig.model = model;
+}
+
+// 显示/隐藏 API Key
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('api-key-input');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+// 开始对话
+function startChat() {
+    const apiKey = document.getElementById('api-key-input').value.trim();
+    if (!apiKey) {
+        alert('请输入 API Key');
+        return;
+    }
+    
+    onModelChange();
+    currentConfig.apiKey = apiKey;
+    saveConfig();
+    showChatPanel();
+}
+
+// 显示对话面板
+function showChatPanel() {
+    document.getElementById('settings-panel').style.display = 'none';
+    document.getElementById('chat-panel').style.display = 'flex';
+    
+    document.getElementById('current-model-name').textContent = currentConfig.model;
+    document.getElementById('welcome-model').textContent = currentConfig.model;
+    
+    renderHistory();
+    document.getElementById('message-input').focus();
+}
+
+// 显示设置
+function showSettings() {
+    document.getElementById('chat-panel').style.display = 'none';
+    document.getElementById('settings-panel').style.display = 'flex';
+}
+
+// 自动调整输入框
+function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+    document.getElementById('send-btn').disabled = !textarea.value.trim();
+}
+
+// 处理键盘
+function handleKeyPress(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+}
+
+// 发送消息
+async function sendMessage() {
+    if (isProcessing) return;
+    
+    const input = document.getElementById('message-input');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    addMessage('user', text);
+    messages.push({ role: 'user', content: text });
+    saveHistory();
+    
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('send-btn').disabled = true;
+    
+    isProcessing = true;
+    const loadingId = addLoading();
+    
+    try {
+        const reply = await callProviderAPI(text);
+        removeLoading(loadingId);
+        addMessage('ai', reply);
+        messages.push({ role: 'assistant', content: reply });
+        saveHistory();
+    } catch (error) {
+        removeLoading(loadingId);
+        addMessage('ai', '错误：' + error.message, true);
+    } finally {
+        isProcessing = false;
+    }
+}
+
+// 调用 API
+async function callProviderAPI(message) {
+    const provider = PROVIDERS[currentConfig.provider];
+    
+    switch (currentConfig.provider) {
+        case 'openai':
+        case 'deepseek':
+        case 'moonshot':
+            return await callOpenAICompatible(provider, message);
+        case 'anthropic':
+            return await callAnthropic(provider, message);
+        case 'google':
+            return await callGemini(provider, message);
+        default:
+            throw new Error('未知的提供商');
+    }
+}
+
+// OpenAI 兼容格式
+async function callOpenAICompatible(provider, message) {
+    const response = await fetch(provider.baseUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [provider.authHeader]: provider.authPrefix + currentConfig.apiKey
+        },
+        body: JSON.stringify({
+            model: currentConfig.model,
+            messages: [{ role: 'system', content: 'You are a helpful assistant.' },
+                      ...messages.slice(-10)],
+            temperature: 0.7,
+            max_tokens: 4096
+        })
+    });
+    
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error?.message || `HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+}
+
+// Anthropic Claude
+async function callAnthropic(provider, message) {
+    const response = await fetch(provider.baseUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [provider.authHeader]: provider.authPrefix + currentConfig.apiKey,
+            'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+            model: currentConfig.model,
+            max_tokens: 4096,
+            messages: messages.slice(-10).map(m => ({
+                role: m.role === 'assistant' ? 'assistant' : 'user',
+                content: m.content
+            }))
+        })
+    });
+    
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error?.message || `HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.content[0].text;
+}
+
+// Google Gemini
+async function callGemini(provider, message) {
+    const url = `${provider.baseUrl}/${currentConfig.model}:generateContent?key=${currentConfig.apiKey}`;
+    
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            contents: messages.slice(-10).map(m => ({
+                role: m.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: m.content }]
+            }))
+        })
+    });
+    
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error?.message || `HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
+}
+
+// 添加消息
+function addMessage(role, text, isError = false) {
+    const container = document.getElementById('chat-messages');
+    const welcome = container.querySelector('.welcome-message');
+    if (welcome) welcome.remove();
+    
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${role}-message ${isError ? 'error' : ''}`;
+    
+    const avatar = role === 'ai' ? '🤖' : '👤';
+    const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    
+    let formattedText = escapeHtml(text)
+        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+    
+    msgDiv.innerHTML = `
+        <div class="message-avatar">${avatar}</div>
+        <div class="message-content">
+            <div class="message-text">${formattedText}</div>
+            <div class="message-time">${time}</div>
+        </div>
+    `;
+    
+    container.appendChild(msgDiv);
+    scrollToBottom();
+}
+
+function addLoading() {
+    const container = document.getElementById('chat-messages');
+    const id = 'loading-' + Date.now();
+    const div = document.createElement('div');
+    div.id = id;
+    div.className = 'message ai-message loading';
+    div.innerHTML = `
+        <div class="message-avatar">🤖</div>
+        <div class="message-content">
+            <div class="typing-indicator"><span></span><span></span><span></span></div>
+        </div>
+    `;
+    container.appendChild(div);
+    scrollToBottom();
+    return id;
+}
+
+function removeLoading(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+}
+
+function scrollToBottom() {
+    const container = document.getElementById('chat-messages');
+    container.scrollTop = container.scrollHeight;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function saveHistory() {
+    localStorage.setItem(CONFIG.HISTORY_KEY, JSON.stringify(messages.slice(-CONFIG.MAX_HISTORY)));
+}
+
+function loadHistory() {
+    const saved = localStorage.getItem(CONFIG.HISTORY_KEY);
+    if (saved) {
+        messages = JSON.parse(saved);
+    }
+}
+
+function renderHistory() {
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = '';
+    
+    if (messages.length === 0) {
+        container.innerHTML = `
+            <div class="welcome-message">
+                <h3>👋 你好！</h3>
+                <p>我是多模型 AI 助手，当前使用的是 <span id="welcome-model">${currentConfig.model}</span>。</p>
+                <p>有什么可以帮助你的吗？</p>
+            </div>
+        `;
+        return;
+    }
+    
+    messages.forEach(m => addMessage(m.role === 'assistant' ? 'ai' : 'user', m.content));
+}
+
+function clearHistory() {
+    if (confirm('确定要清空对话历史吗？')) {
+        messages = [];
+        saveHistory();
+        renderHistory();
+    }
+}
+</script>
+
+<style>
+.ai-chat-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    height: calc(100vh - 140px);
+    min-height: 500px;
+}
+
+.settings-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+}
+
+.settings-box {
+    width: 100%;
+    max-width: 480px;
+    background: var(--entry);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+
+.settings-box h2 {
+    margin-bottom: 8px;
+    font-size: 1.6rem;
+}
+
+.settings-box > p {
+    color: var(--secondary);
+    margin-bottom: 24px;
+}
+
+.model-selector, .api-key-section {
+    margin-bottom: 20px;
+}
+
+.model-selector label, .api-key-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.model-selector select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    background: var(--theme);
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.model-selector select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.api-key-input-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.api-key-input-wrapper input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    background: var(--theme);
+    color: var(--primary);
+}
+
+.api-key-input-wrapper input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.toggle-btn {
+    padding: 12px;
+    background: var(--tertiary);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.hint {
+    font-size: 12px;
+    color: var(--secondary);
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+.start-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: var(--theme);
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.api-links {
+    text-align: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.api-links a {
+    color: var(--secondary);
+    text-decoration: none;
+    margin: 0 4px;
+}
+
+.api-links a:hover {
+    color: var(--primary);
+}
+
+.chat-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--entry);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.chat-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--theme);
+}
+
+.current-model {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#current-model-name {
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.switch-btn {
+    padding: 4px 12px;
+    background: var(--tertiary);
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+.toolbar-actions button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.toolbar-actions button:hover {
+    background: var(--tertiary);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.welcome-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--secondary);
+}
+
+.welcome-message h3 {
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.message {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.message-content {
+    max-width: calc(100% - 60px);
+}
+
+.message-text {
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 15px;
+    line-height: 1.7;
+    word-wrap: break-word;
+}
+
+.message-text pre {
+    background: var(--code-bg);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.message-text code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.user-message {
+    flex-direction: row-reverse;
+}
+
+.user-message .message-content {
+    margin-left: auto;
+}
+
+.user-message .message-text {
+    background: var(--primary);
+    color: var(--theme);
+    border-bottom-right-radius: 4px;
+}
+
+.ai-message .message-text {
+    background: var(--tertiary);
+    color: var(--primary);
+    border-bottom-left-radius: 4px;
+}
+
+.ai-message.error .message-text {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.dark .ai-message.error .message-text {
+    background: #4a0000;
+    color: #ff8a80;
+}
+
+.message-time {
+    font-size: 11px;
+    color: var(--secondary);
+    margin-top: 4px;
+}
+
+.user-message .message-time {
+    text-align: right;
+}
+
+.typing-indicator {
+    display: flex;
+    gap: 6px;
+    padding: 16px;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: var(--secondary);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); }
+    40% { transform: scale(1); }
+}
+
+.chat-input-container {
+    border-top: 1px solid var(--border);
+    padding: 16px 20px 12px;
+    background: var(--theme);
+}
+
+.chat-input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    background: var(--entry);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 8px 8px 16px;
+}
+
+.chat-input-wrapper:focus-within {
+    border-color: var(--primary);
+}
+
+#message-input {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    background: transparent;
+    color: var(--primary);
+    font-size: 15px;
+    resize: none;
+    max-height: 200px;
+    font-family: inherit;
+}
+
+#message-input:focus {
+    outline: none;
+}
+
+#send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: var(--theme);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+#send-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+#send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+#send-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.input-footer {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--secondary);
+}
+
+@media (max-width: 768px) {
+    .ai-chat-container {
+        height: calc(100vh - 120px);
+        margin: 0 -16px;
+    }
+    
+    .settings-box {
+        padding: 24px 20px;
+        margin: 0 16px;
+    }
+    
+    .chat-panel {
+        border-radius: 0;
+    }
+}
+</style>
+{{ end }}

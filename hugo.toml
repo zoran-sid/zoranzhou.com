@@ -64,6 +64,11 @@ text = ""
   name = "Archives"
   url = "/archives/"
   weight = 4
+
+  [[menu.main]]
+  name = "AI"
+  url = "/ai-chat/"
+  weight = 5
   
   [menu.main.params]
     external = false
