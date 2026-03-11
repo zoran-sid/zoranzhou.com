@@ -8,6 +8,6 @@
   {{- $url := printf "https://twitter.com/%v/status/%v" .user .id -}}
   {{- $query := querify "url" $url "dnt" $dnt -}}
   {{- $request := printf "https://publish.twitter.com/oembed?%s" $query -}}
-  {{- $json := getJSON $request -}}
+  {{- $json := resources.GetRemote $request | transform.Unmarshal -}}
   {{- replaceRE "<script.+/script>" "" $json.html | safeHTML -}}
 </div>
