@@ -28,6 +28,33 @@
   color: #24292e !important;
 }
 
+/* 暗黑模式下的代码块样式 */
+.dark .post-content pre code {
+  color: #f8f8f2 !important;
+}
+
+.dark .post-content code {
+  color: #f8f8f2 !important;
+}
+
+.dark .post-content pre {
+  background-color: #282a36 !important;
+}
+
+.dark .post-content :not(pre) > code {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f8f8f2 !important;
+}
+
+/* Chroma 语法高亮颜色修复 */
+.chroma {
+  color: #24292e;
+}
+
+.dark .chroma {
+  color: #f8f8f2;
+}
+
 .home .intro h1 {
     margin-bottom: 2rem !important;    /* 你可以改成 1.5rem / 3rem 自由调节 */
 }
