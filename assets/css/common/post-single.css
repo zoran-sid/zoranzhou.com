@@ -256,6 +256,8 @@ h6:hover .anchor {
     border-radius: var(--radius);
     word-break: break-all;
     font-family: var(--monospace);
+    font-size: 14px;
+    line-height: 1.6;
 }
 .post-content .chroma code {
     background-color: inherit;
