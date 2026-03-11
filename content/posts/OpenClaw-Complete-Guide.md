@@ -17,18 +17,6 @@ ShowBreadCrumbs: true
 ShowShareButtons: true
 ---
 
-<style>
-.post-content .highlight pre code,
-.post-content pre code {
-    font-size: 14px !important;
-    line-height: 1.6 !important;
-}
-.post-content .chroma .c,
-.post-content .chroma .ch {
-    font-size: 14px !important;
-}
-</style>
-
 # 前言
 
 OpenClaw 是一个强大的 AI 助手平台，支持多代理架构、浏览器自动化、定时任务、跨平台消息推送等丰富功能。本文将基于官方文档，详细介绍 OpenClaw 的完整安装流程、配置方法以及日常使用中的各类命令。
