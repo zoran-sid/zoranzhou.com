@@ -1,0 +1,53 @@
+.post-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.post-card {
+  position: relative;
+  display: flex;
+  gap: 1.2rem;
+
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid rgba(0,0,0,0.05);
+
+  transition: all 0.25s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.post-card-content {
+  padding: 1rem 1.2rem 1.4rem;
+}
+
+.post-title {
+  font-size: 1px;
+  margin-bottom: 0.4rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-desc {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.post-meta {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.post-card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+}
+

@@ -4,35 +4,50 @@
   {{ .Content }}
 </div>
 
-<div class="home-social-icons" style="margin: 2rem 0;">
-  {{ partial "social_icons.html" (dict "icons" site.Params.social "svg" site.Data.svg "Email" site.Params.email ) }}
+{{ if site.Params.social }}
+<div class="home-social-icons">
+  {{ partial "social_icons.html" (dict 
+    "icons" site.Params.social 
+    "svg" site.Data.svg 
+    "Email" site.Params.email ) }}
 </div>
+{{ end }}
 
 {{ $posts := where .Site.RegularPages "Type" "posts" }}
 {{ $sortedPosts := sort $posts "Weight" }}
 
-<div class="post-list">
+<div class="post-grid">
+
   {{ range $sortedPosts }}
-    <article class="post-entry">
+  <article class="post-card">
 
-      {{ partial "cover.html" (dict "cxt" . "IsHome" true) }} 
+    {{ partial "cover.html" (dict "cxt" . "IsHome" true) }}
 
-      <header class="entry-header">
-	  <meta name="baidu-site-verification" content="codeva-poCkz0ZZwF" />
-        <h2><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
-      </header>
+    <div class="post-card-content">
 
-      <section class="entry-content">
-        <p>{{ .Description }}</p> 
-      </section>
+      <h2 class="post-title">
+        <a href="{{ .Permalink }}">{{ .Title }}</a>
+      </h2>
 
-      <footer class="entry-footer">
-        {{ partial "post_meta.html" . }} 
-      </footer>
+      <p class="post-desc">
+        {{ if .Description }}
+          {{ .Description }}
+        {{ else }}
+          {{ .Summary | plainify | truncate 120 }}
+        {{ end }}
+      </p>
 
-      <a class="entry-link" href="{{ .Permalink }}"></a>
-    </article>
+      <div class="post-meta">
+        {{ partial "post_meta.html" . }}
+      </div>
+
+    </div>
+
+    <a class="post-card-link" href="{{ .Permalink }}"></a>
+
+  </article>
   {{ end }}
+
 </div>
 
 {{ end }}
