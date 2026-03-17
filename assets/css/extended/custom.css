@@ -8,7 +8,6 @@
   box-sizing: border-box;
 }
 
-/* 代码块在白天模式下的样式修复 */
 .post-content pre code {
   color: #24292e !important;
 }
@@ -17,18 +16,15 @@
   color: #24292e !important;
 }
 
-/* 确保代码块背景色正确 */
 .post-content pre {
   background-color: #f6f8fa !important;
 }
 
-/* 行内代码样式 */
 .post-content :not(pre) > code {
   background-color: rgba(175, 184, 193, 0.2) !important;
   color: #24292e !important;
 }
 
-/* 暗黑模式下的代码块样式 */
 .dark .post-content pre code {
   color: #f8f8f2 !important;
 }
@@ -46,7 +42,6 @@
   color: #f8f8f2 !important;
 }
 
-/* Chroma 语法高亮颜色修复 */
 .chroma {
   color: #24292e;
 }
@@ -55,8 +50,16 @@
   color: #f8f8f2;
 }
 
-.home .intro h1 {
-    margin-bottom: 2rem !important;    /* 你可以改成 1.5rem / 3rem 自由调节 */
+.home {
+    margin-bottom: 2rem !important; 
+}
+.intro h1 {
+    font-size: 28px !important;
+    text-align: left;
+}
+.intro p {
+    font-size: 18px !important;
+    text-align: left;
 }
 
 .header .nav {
