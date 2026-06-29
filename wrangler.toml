@@ -7,3 +7,8 @@ publish = "dist"
 
 [build.environment]
 NODE_VERSION = "20"
+name = "zoran-zhou-blog"
+compatibility_date = "2026-06-29"
+
+[assets]
+directory = "./dist"
