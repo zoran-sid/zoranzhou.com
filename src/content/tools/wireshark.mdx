@@ -1,0 +1,43 @@
+---
+title: "Wireshark"
+description: "The world's foremost network protocol analyzer. Essential for packet-level debugging and security analysis."
+date: 2026-06-01
+tags: ["networking", "analysis", "security"]
+category: gui
+pricing: open-source
+url: "https://www.wireshark.org"
+---
+
+## Wireshark
+
+Wireshark is the industry-standard network protocol analyzer. It lets you capture and interactively browse the traffic running on a computer network.
+
+### Why I Use It
+
+- **Deep protocol inspection** — Supports thousands of protocols
+- **Live capture and offline analysis**
+- **Powerful display filters** — `tcp.port == 443 && tls.handshake.type == 1`
+- **Follow TCP/UDP streams** to reconstruct conversations
+- **Export objects** from HTTP, SMB, and other protocols
+
+### Essential Filters
+
+| Filter | Purpose |
+|--------|---------|
+| `tcp.flags.syn == 1 && tcp.flags.ack == 0` | SYN scans |
+| `dns.qry.name contains "example"` | DNS queries |
+| `http.request.method == "POST"` | HTTP POST requests |
+| `tls.handshake.extensions_server_name` | SNI inspection |
+| `icmp` | All ICMP traffic |
+
+### Tips
+
+```text
+# Colorize by protocol
+View → Coloring Rules
+
+# Export TLS session keys for decryption
+SSLKEYLOGFILE=/tmp/keys.log firefox
+```
+
+Wireshark is indispensable for understanding network behavior at the packet level.

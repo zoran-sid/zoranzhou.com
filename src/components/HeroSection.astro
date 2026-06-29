@@ -1,0 +1,50 @@
+﻿---
+import { SITE } from "../lib/constants";
+---
+
+<section class="home-section surface-hero section-lighting pt-32 md:pt-44">
+  <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+    <div class="gradient-blob blob-1"></div>
+    <div class="gradient-blob blob-2"></div>
+  </div>
+
+  <div class="page-container relative">
+    <div class="max-w-5xl">
+      <div class="mb-10 inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/70 px-4 py-1.5 text-sm font-medium text-gray-700 shadow-card backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-50"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+        </span>
+        Available for opportunities
+      </div>
+
+      <p class="section-kicker">Network security engineer</p>
+      <h1 class="mt-5 max-w-5xl text-5xl font-extrabold tracking-tight text-gray-950 md:text-7xl lg:text-8xl dark:text-white" style="line-height: 0.98;">
+        {SITE.title}
+      </h1>
+
+      <p class="mt-8 max-w-2xl text-lg leading-relaxed text-gray-600 md:text-xl dark:text-gray-400">
+        Network &amp; cybersecurity engineer. I build resilient infrastructure,
+        hunt threats, and write about what I learn along the way.
+      </p>
+
+      <div class="mt-12 flex flex-wrap gap-4">
+        <a
+          href="/blog"
+          class="group inline-flex items-center gap-2 rounded-xl bg-gray-950 px-6 py-3 text-sm font-semibold text-white no-underline shadow-elevated transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-100"
+        >
+          Read the blog
+          <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+        <a
+          href="#contact"
+          class="inline-flex items-center gap-2 rounded-xl border border-gray-200/90 bg-white/70 px-6 py-3 text-sm font-semibold text-gray-800 no-underline shadow-card backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10"
+        >
+          Get in touch
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

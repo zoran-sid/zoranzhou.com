@@ -1,0 +1,9 @@
+# Cloudflare Pages configuration
+# Build settings are configured in the Cloudflare dashboard
+
+[build]
+command = "npm run build"
+publish = "dist"
+
+[build.environment]
+NODE_VERSION = "20"

@@ -1,0 +1,81 @@
+---
+import { NAV_ITEMS, SITE } from "../lib/constants";
+
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-md"
+>
+  <nav
+    class="page-width-wide flex h-16 items-center justify-between"
+  >
+    <a
+      href="/"
+      class="text-xl font-bold tracking-tight text-[var(--color-text-primary)] no-underline hover:text-[var(--color-accent)] transition-colors"
+    >
+      {SITE.title}
+    </a>
+
+    <div class="flex items-center gap-1">
+      <ul class="hidden items-center gap-1 md:flex">
+        {
+          NAV_ITEMS.map((item) => {
+            const isActive =
+              currentPath === item.href ||
+              currentPath.startsWith(item.href + "/");
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class={`rounded-lg px-3 py-2 text-sm font-medium transition-colors no-underline ${
+                    isActive
+                      ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-text-primary)]"
+                  }`}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+
+      <theme-toggle-client />
+    </div>
+  </nav>
+</header>
+
+<script>
+  import { toggleTheme, getStoredTheme, getSystemTheme } from "../lib/theme";
+
+  class ThemeToggleClient extends HTMLElement {
+    connectedCallback() {
+      this.render();
+    }
+
+    render() {
+      const isDark = document.documentElement.classList.contains("dark");
+      this.innerHTML = `
+        <button
+          class="rounded-lg p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-text-primary)] transition-colors"
+          aria-label="Toggle theme"
+        >
+          <span class="sr-only">Toggle theme</span>
+          <svg class="h-5 w-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg class="h-5 w-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      `;
+      this.querySelector("button")?.addEventListener("click", () => {
+        toggleTheme();
+        this.render();
+      });
+    }
+  }
+  customElements.define("theme-toggle-client", ThemeToggleClient);
+</script>

@@ -1,0 +1,29 @@
+﻿---
+import { SKILLS } from "../lib/constants";
+---
+
+<section class="home-section surface-skills section-lighting">
+  <div class="page-container">
+    <div class="mb-14 reveal">
+      <span class="section-kicker">Expertise</span>
+      <h2 class="section-heading">Skills &amp; technologies</h2>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-3">
+      {SKILLS.map((group) => (
+        <div class="premium-card reveal rounded-2xl p-6">
+          <h3 class="mb-5 text-sm font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">
+            {group.category}
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {group.items.map((skill) => (
+              <span class="skill-chip rounded-lg px-3 py-1.5 text-sm">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
