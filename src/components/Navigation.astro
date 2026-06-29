@@ -9,12 +9,13 @@ const path = Astro.url.pathname;
   <nav class="page-container flex h-16 items-center justify-between">
     <a
       href="/"
-      class="text-base font-semibold tracking-tight text-gray-900 no-underline transition-colors duration-200 hover:text-gray-600 dark:text-gray-100 dark:hover:text-gray-300"
+      class="shrink-0 text-base font-semibold tracking-tight text-gray-900 no-underline transition-colors duration-200 hover:text-gray-600 dark:text-gray-100 dark:hover:text-gray-300"
     >
       ZORAN ZHOU
     </a>
 
-    <div class="flex items-center gap-5">
+    <!-- Desktop nav items -->
+    <div class="hidden items-center gap-5 md:flex">
       {NAV_ITEMS.map((item) => {
         const active = path === item.href || path.startsWith(item.href + "/");
         return (
@@ -46,12 +47,63 @@ const path = Astro.url.pathname;
         </svg>
       </button>
     </div>
+
+    <!-- Mobile: hamburger + theme toggle -->
+    <div class="flex items-center gap-1 md:hidden">
+      <button
+        id="theme-toggle-mobile"
+        class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300"
+        aria-label="Toggle dark mode"
+      >
+        <svg class="h-5 w-5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <svg class="h-5 w-5 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
+      <button
+        id="mobile-menu-toggle"
+        class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300"
+        aria-label="Toggle mobile menu"
+      >
+        <svg id="menu-icon-open" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="menu-icon-close" class="hidden h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
   </nav>
+
+  <!-- Mobile menu panel -->
+  <div id="mobile-menu" class="hidden border-t border-gray-100/60 bg-white/95 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-950/95 md:hidden">
+    <div class="page-container flex flex-col gap-1 py-3">
+      {NAV_ITEMS.map((item) => {
+        const active = path === item.href || path.startsWith(item.href + "/");
+        return (
+          <a
+            href={item.href}
+            class={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 no-underline ${
+              active
+                ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/50 dark:hover:text-gray-200"
+            }`}
+          >
+            {item.label}
+          </a>
+        );
+      })}
+      <div class="pt-1">
+        <SearchModal client:load />
+      </div>
+    </div>
+  </div>
 </header>
 
 <script>
-  const btn = document.getElementById("theme-toggle");
-  btn?.addEventListener("click", () => {
+  function toggleDarkMode() {
     const html = document.documentElement;
     const isDark = html.classList.contains("dark");
     if (isDark) {
@@ -61,5 +113,20 @@ const path = Astro.url.pathname;
       html.classList.add("dark");
       localStorage.setItem("pref-theme", "dark");
     }
+  }
+
+  document.getElementById("theme-toggle")?.addEventListener("click", toggleDarkMode);
+  document.getElementById("theme-toggle-mobile")?.addEventListener("click", toggleDarkMode);
+
+  // Mobile menu toggle
+  const menuToggle = document.getElementById("mobile-menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const menuIconOpen = document.getElementById("menu-icon-open");
+  const menuIconClose = document.getElementById("menu-icon-close");
+
+  menuToggle?.addEventListener("click", () => {
+    const isOpen = mobileMenu?.classList.toggle("hidden");
+    menuIconOpen?.classList.toggle("hidden");
+    menuIconClose?.classList.toggle("hidden");
   });
 </script>
