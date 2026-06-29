@@ -1,6 +1,6 @@
 // ── Site Identity ──
 export const SITE = {
-  title: "ZORAN ZHOU",
+  title: "Coding构筑世界 · 以文字记录一路所学",
   description:
     "Network & cybersecurity engineer. Building resilient systems, sharing what I learn.",
   url: "https://zoranzhou.com",
