@@ -12,6 +12,7 @@ ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
 lang: zh-CN
+translationKey: waline-review-system
 ---
 
 # Waline 评论系统

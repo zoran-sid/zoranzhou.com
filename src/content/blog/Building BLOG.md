@@ -12,6 +12,7 @@ ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
 lang: zh-CN
+translationKey: building-blog
 ---
 
 # 前言

@@ -16,6 +16,7 @@ ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
 lang: zh-CN
+translationKey: openclaw-complete-guide
 ---
 
 # 前言
