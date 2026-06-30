@@ -68,7 +68,7 @@ const canonicalPath = Astro.url.pathname;
     <meta name="twitter:description" content={pageDescription} />
 
     <!-- RSS -->
-    <link rel="alternate" type="application/rss+xml" title="ZORAN ZHOU RSS" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="ZORAN ZHOU RSS" href={localizePath("/rss.xml", locale)} />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
