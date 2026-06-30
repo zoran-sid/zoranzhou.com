@@ -114,7 +114,7 @@
     }
   </style>
   <script>
-    // If user already chose a language, redirect immediately (no flash)
+    // Redirect logic: cookie → browser language → show picker
     (function() {
       var pref = localStorage.getItem("pref-lang");
       if (!pref) {
@@ -122,9 +122,18 @@
         pref = pref ? decodeURIComponent(pref[1]) : null;
       }
       if (pref === "zh-CN" || pref === "en") {
-        var target = "/" + pref + "/";
-        // Preserve any original path the user might have wanted
-        window.location.replace(target);
+        window.location.replace("/" + pref + "/");
+        return;
+      }
+
+      // Auto-detect from browser language (Apple-style)
+      var navLang = navigator.language || navigator.userLanguage || "";
+      var autoLocale = navLang.toLowerCase().startsWith("zh") ? "zh-CN" : null;
+      // Only auto-redirect Chinese; others see the picker
+      if (autoLocale) {
+        localStorage.setItem("pref-lang", autoLocale);
+        document.cookie = "pref-lang=" + autoLocale + ";path=/;max-age=31536000;SameSite=Lax";
+        window.location.replace("/" + autoLocale + "/");
       }
     })();
   </script>
