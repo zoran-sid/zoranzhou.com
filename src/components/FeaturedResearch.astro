@@ -7,6 +7,7 @@ const t = getTranslations(locale);
 
 const research = await getCollection("research", ({ data }) => !data.draft);
 const featured = research
+  .filter((r) => (r.data.lang ?? "zh-CN") === locale)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 ---

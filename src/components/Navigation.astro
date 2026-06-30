@@ -44,13 +44,14 @@ const navItems = [
       <SearchModal client:load />
       <!-- Language Switcher -->
       <div class="relative" id="lang-switcher-desktop">
-        <button
+        <a
+          href={locale === "zh-CN" ? "/en/" : "/zh-CN/"}
           id="lang-toggle-desktop"
-          class="rounded-lg px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300"
+          class="rounded-lg px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300 no-underline"
           aria-label={t.langLabel}
         >
-          {localeLabels[locale]}
-        </button>
+          {localeLabels[locale === "zh-CN" ? "en" : "zh-CN"]}
+        </a>
       </div>
       <button
         id="theme-toggle"
@@ -125,7 +126,7 @@ const navItems = [
         </p>
         {locales.map((altLocale) => (
           <a
-            href={localizePath(path, altLocale)}
+            href={altLocale === "zh-CN" ? "/zh-CN/" : "/en/"}
             class={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors no-underline ${
               altLocale === locale
                 ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
@@ -155,27 +156,6 @@ const navItems = [
 
   document.getElementById("theme-toggle")?.addEventListener("click", toggleDarkMode);
   document.getElementById("theme-toggle-mobile")?.addEventListener("click", toggleDarkMode);
-
-  // Language switcher — desktop
-  const langToggle = document.getElementById("lang-toggle-desktop");
-  langToggle?.addEventListener("click", () => {
-    const currentPath = window.location.pathname;
-    const currentLocale = currentPath.startsWith("/en/") || currentPath === "/en" ? "en" : "zh-CN";
-    const targetLocale = currentLocale === "zh-CN" ? "en" : "zh-CN";
-    // Save preference
-    document.cookie = "pref-lang=" + targetLocale + ";path=/;max-age=31536000;SameSite=Lax";
-    localStorage.setItem("pref-lang", targetLocale);
-    // Build target URL
-    let targetPath = currentPath;
-    if (currentPath.startsWith("/zh-CN/") || currentPath === "/zh-CN") {
-      targetPath = currentPath.replace(/^\/zh-CN/, "/en") || "/en";
-    } else if (currentPath.startsWith("/en/") || currentPath === "/en") {
-      targetPath = currentPath.replace(/^\/en/, "/zh-CN") || "/zh-CN";
-    } else {
-      targetPath = "/" + targetLocale + currentPath;
-    }
-    window.location.href = targetPath;
-  });
 
   // Mobile menu toggle
   const menuToggle = document.getElementById("mobile-menu-toggle");

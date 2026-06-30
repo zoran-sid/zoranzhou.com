@@ -65,7 +65,7 @@ export default function SearchModal() {
   useEffect(() => {
     if (open && allEntries.length === 0) {
       setLoading(true);
-      fetch("/search-index.json")
+      fetch(`/${locale}/search-index.json`)
         .then((r) => r.json())
         .then((data: SearchEntry[]) => {
           setAllEntries(data);

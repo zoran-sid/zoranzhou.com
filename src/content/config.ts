@@ -8,6 +8,8 @@ const baseSchema = z.object({
   tags: z.array(z.string()).default([]),
   draft: z.boolean().default(false),
   author: z.string().default("Zoran"),
+  lang: z.enum(["zh-CN", "en"]).default("zh-CN"),
+  translationKey: z.string().optional(),
   cover: z
     .object({
       src: z.string(),

@@ -7,11 +7,13 @@ const t = getTranslations(locale);
 
 const research = await getCollection("research", ({ data }) => !data.draft);
 const activeResearch = research
+  .filter((r) => (r.data.lang ?? "zh-CN") === locale)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 2);
 
 const projects = await getCollection("projects", ({ data }) => !data.draft);
 const activeProjects = projects
+  .filter((p) => (p.data.lang ?? "zh-CN") === locale)
   .filter((p) => p.data.status === "active")
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 2);

@@ -8,6 +8,7 @@ const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 const latest = posts
+  .filter((p) => (p.data.lang ?? "zh-CN") === locale)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 ---

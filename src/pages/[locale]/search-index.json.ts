@@ -13,6 +13,7 @@ export async function GET(context: { currentLocale?: string }) {
   const locale = (context.currentLocale ?? "zh-CN") as Locale;
 
   const entries = [...blog, ...research, ...projects]
+    .filter((e) => (e.data.lang ?? "zh-CN") === locale)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
     .map((entry) => ({
       title: entry.data.title,

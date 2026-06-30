@@ -12,9 +12,9 @@ const t = getTranslations(locale);
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 
 const tools = await getCollection("tools", ({ data }) => !data.draft);
-const sorted = tools.sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
+const sorted = tools
+  .filter((t) => (t.data.lang ?? "zh-CN") === locale)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const categoryLabel: Record<string, string> = {
   cli: t.toolsCategoryCli,
