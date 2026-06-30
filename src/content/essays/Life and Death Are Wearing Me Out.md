@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "《生死疲劳》书评"
 date: "2025-12-12"
@@ -8,5 +8,6 @@ tags:
 ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
+lang: zh-CN
 ---
 

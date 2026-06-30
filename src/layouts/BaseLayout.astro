@@ -2,7 +2,7 @@
 import ThemeScript from "../components/ThemeScript.astro";
 import Navigation from "../components/Navigation.astro";
 import Footer from "../components/Footer.astro";
-import { SITE } from "../lib/constants";
+import { getTranslations, type Locale, locales, hreflangMap, localizePath } from "../i18n/utils";
 
 interface Props {
   title?: string;
@@ -13,37 +13,59 @@ interface Props {
 
 const {
   title,
-  description = SITE.description,
+  description,
   ogImage,
   article = false,
 } = Astro.props;
 
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+
 const pageTitle = title ? `${title} | ZORAN ZHOU` : "ZORAN ZHOU";
+const pageDescription = description ?? t.siteDescription;
+
+// Current path without locale prefix for canonical
+const canonicalPath = Astro.url.pathname;
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang={locale} class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
 
     <title>{pageTitle}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={new URL(canonicalPath, Astro.site)} />
+
+    <!-- hreflang -->
+    {
+      locales.map((altLocale) => {
+        const altPath = localizePath(Astro.url.pathname, altLocale);
+        return (
+          <link
+            rel="alternate"
+            hreflang={hreflangMap[altLocale]}
+            href={new URL(altPath, Astro.site).href}
+          />
+        );
+      })
+    }
 
     <!-- OpenGraph -->
     <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={pageDescription} />
     <meta property="og:type" content={article ? "article" : "website"} />
-    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:url" content={new URL(canonicalPath, Astro.site)} />
+    <meta property="og:locale" content={locale === "zh-CN" ? "zh_Hans" : "en"} />
     {ogImage && <meta property="og:image" content={ogImage} />}
     <meta property="og:site_name" content="ZORAN ZHOU" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
     <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={pageDescription} />
 
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title="ZORAN ZHOU RSS" href="/rss.xml" />

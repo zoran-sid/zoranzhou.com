@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
+import { getTranslations, localizePath, type Locale } from "../i18n/utils";
 
 type ContentCollection = "blog" | "essays" | "research" | "projects" | "tools";
 
@@ -10,6 +11,8 @@ interface Props {
 
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
 
 // ── Reading time ──
 const wordCount = (entry.body ?? "").trim().split(/\s+/).length;
@@ -41,12 +44,14 @@ const prevEntry = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 const nextEntry = idx > 0 ? sorted[idx - 1] : null;
 
 const labelMap: Record<string, string> = {
-  blog: "Blog",
-  essays: "Essays",
-  research: "Research",
-  projects: "Projects",
-  tools: "Tools",
+  blog: t.navBlog,
+  essays: t.navEssays,
+  research: t.navResearch,
+  projects: t.navProjects,
+  tools: t.navTools,
 };
+
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 ---
 
 <BaseLayout
@@ -58,7 +63,7 @@ const labelMap: Record<string, string> = {
   <article class="content-container py-12 md:py-16">
     <header class="mb-10">
       <a
-        href={`/${entry.collection}`}
+        href={localizePath(`/${entry.collection}`, locale)}
         class="mb-4 inline-block text-sm font-semibold uppercase tracking-widest text-blue-600 no-underline hover:text-blue-700"
       >
         {labelMap[entry.collection] ?? entry.collection}
@@ -77,7 +82,7 @@ const labelMap: Record<string, string> = {
       <div class="mt-6 flex flex-wrap items-center gap-3 text-sm text-gray-400">
         {entry.data.author && <span>{entry.data.author}</span>}
         <time datetime={entry.data.date.toISOString()}>
-          {entry.data.date.toLocaleDateString("en-US", {
+          {entry.data.date.toLocaleDateString(dateLocale, {
             year: "numeric",
             month: "long",
             day: "numeric",
@@ -85,9 +90,9 @@ const labelMap: Record<string, string> = {
         </time>
         {entry.data.updated && (
           <span>
-            · Updated{" "}
+            · {t.postUpdated}{" "}
             <time datetime={entry.data.updated.toISOString()}>
-              {entry.data.updated.toLocaleDateString("en-US", {
+              {entry.data.updated.toLocaleDateString(dateLocale, {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -95,15 +100,15 @@ const labelMap: Record<string, string> = {
             </time>
           </span>
         )}
-        <span>· {minutes} min read</span>
-        <span>· {wordCount} words</span>
+        <span>· {minutes} {t.postMinRead}</span>
+        <span>· {wordCount} {t.postWords}</span>
       </div>
 
       {entry.data.tags.length > 0 && (
         <div class="mt-4 flex flex-wrap gap-2">
           {entry.data.tags.map((tag) => (
             <a
-              href={`/tags/${tag.toLowerCase().replace(/\s+/g, "-")}`}
+              href={localizePath(`/tags/${tag.toLowerCase().replace(/\s+/g, "-")}`, locale)}
               class="rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-500 no-underline transition-colors hover:border-gray-300 hover:text-blue-600"
             >
               {tag}
@@ -115,7 +120,7 @@ const labelMap: Record<string, string> = {
       {tocItems.length > 0 && (
         <nav class="mt-8 rounded-xl border border-gray-100 bg-gray-50/50 p-5">
           <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            Table of Contents
+            {t.postTableOfContents}
           </p>
           <ul class="space-y-1.5">
             {tocItems.map((h) => (
@@ -144,10 +149,10 @@ const labelMap: Record<string, string> = {
         <nav class="mb-12 grid gap-4 sm:grid-cols-2">
           {prevEntry ? (
             <a
-              href={`/${entry.collection}/${prevEntry.slug}`}
+              href={localizePath(`/${entry.collection}/${prevEntry.slug}`, locale)}
               class="group rounded-xl border border-gray-100 p-4 no-underline transition-all hover:border-gray-200 hover:shadow-sm"
             >
-              <span class="text-xs text-gray-400">← Previous</span>
+              <span class="text-xs text-gray-400">{t.postPrevious}</span>
               <p class="mt-1 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors line-clamp-2">
                 {prevEntry.data.title}
               </p>
@@ -157,10 +162,10 @@ const labelMap: Record<string, string> = {
           )}
           {nextEntry ? (
             <a
-              href={`/${entry.collection}/${nextEntry.slug}`}
+              href={localizePath(`/${entry.collection}/${nextEntry.slug}`, locale)}
               class="group rounded-xl border border-gray-100 p-4 text-right no-underline transition-all hover:border-gray-200 hover:shadow-sm"
             >
-              <span class="text-xs text-gray-400">Next →</span>
+              <span class="text-xs text-gray-400">{t.postNext}</span>
               <p class="mt-1 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors line-clamp-2">
                 {nextEntry.data.title}
               </p>
@@ -174,19 +179,19 @@ const labelMap: Record<string, string> = {
       {related.length > 0 && (
         <div>
           <p class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
-            Related Articles
+            {t.postRelatedArticles}
           </p>
           <div class="grid gap-3 sm:grid-cols-3">
             {related.map((r) => (
               <a
-                href={`/${entry.collection}/${r.slug}`}
+                href={localizePath(`/${entry.collection}/${r.slug}`, locale)}
                 class="group rounded-xl border border-gray-100 p-4 no-underline transition-all hover:border-gray-200 hover:shadow-sm"
               >
                 <p class="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors line-clamp-2">
                   {r.data.title}
                 </p>
                 <p class="mt-1 text-xs text-gray-400">
-                  {r.data.date.toLocaleDateString("en-US", {
+                  {r.data.date.toLocaleDateString(dateLocale, {
                     year: "numeric",
                     month: "short",
                     day: "numeric",

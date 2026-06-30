@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "🇵🇭菲律宾 Philinter 三个月游学体验"
 date: "2025-11-24"
@@ -10,6 +10,7 @@ ShowReadingTime: true
 word_count: 1688
 reading_time: 5
 ShowBreadCrumbs: true
+lang: zh-CN
 ---
 
 ## 前言

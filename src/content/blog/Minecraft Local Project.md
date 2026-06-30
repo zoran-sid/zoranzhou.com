@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "Minecraft 本地虚拟化联机进阶玩法"
 date: "2025-12-23"
@@ -11,6 +11,7 @@ ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
+lang: zh-CN
 ---
 
 # 传统方案

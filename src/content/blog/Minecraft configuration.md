@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "Minecraft 服务器调参指南"
 date: "2025-12-23"
@@ -11,6 +11,7 @@ ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
+lang: zh-CN
 ---
 
 

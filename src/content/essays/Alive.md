@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "《活着》书评"
 date: "2024-03-15"
@@ -8,6 +8,7 @@ tags:
 ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
+lang: zh-CN
 ---
 
 # 活着，是对苦难最温柔的反抗

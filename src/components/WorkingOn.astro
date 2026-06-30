@@ -1,5 +1,9 @@
 ﻿---
 import { getCollection } from "astro:content";
+import { getTranslations, localizePath, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
 
 const research = await getCollection("research", ({ data }) => !data.draft);
 const activeResearch = research
@@ -23,10 +27,10 @@ const statusColors: Record<string, string> = {
 <section class="home-section surface-working section-lighting texture-noise">
   <div class="page-container">
     <div class="mb-14 reveal">
-      <span class="section-kicker">What I'm Working On</span>
-      <h2 class="section-heading">Current research &amp; projects</h2>
+      <span class="section-kicker">{t.workingOnLabel}</span>
+      <h2 class="section-heading">{t.workingOnHeading}</h2>
       <p class="section-deck">
-        Active investigations and tools I'm building right now.
+        {t.workingOnDeck}
       </p>
     </div>
 
@@ -37,14 +41,14 @@ const statusColors: Record<string, string> = {
             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-400 opacity-50"></span>
             <span class="relative inline-flex h-2 w-2 rounded-full bg-yellow-500"></span>
           </span>
-          Research Queue
+          {t.workingOnResearchQueue}
         </h3>
         <div class="space-y-4">
           {activeResearch.length === 0 ? (
-            <p class="text-sm text-gray-400 dark:text-gray-500">No active research.</p>
+            <p class="text-sm text-gray-400 dark:text-gray-500">{t.workingOnNoActiveResearch}</p>
           ) : (
             activeResearch.map((entry) => (
-              <a href={`/research/${entry.slug}`} class="group block rounded-xl border border-gray-200/70 bg-white/45 p-5 no-underline transition-all duration-200 hover:border-gray-300 hover:bg-white/80 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]">
+              <a href={localizePath(`/research/${entry.slug}`, locale)} class="group block rounded-xl border border-gray-200/70 bg-white/45 p-5 no-underline transition-all duration-200 hover:border-gray-300 hover:bg-white/80 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]">
                 <div class="mb-2 flex items-center gap-2">
                   <span class={`status-chip rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusColors[entry.data.status ?? "completed"]}`}>
                     {(entry.data.status ?? "completed").replace("-", " ")}
@@ -70,14 +74,14 @@ const statusColors: Record<string, string> = {
             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-400 opacity-50"></span>
             <span class="relative inline-flex h-2 w-2 rounded-full bg-yellow-500"></span>
           </span>
-          Build Queue
+          {t.workingOnBuildQueue}
         </h3>
         <div class="space-y-4">
           {activeProjects.length === 0 ? (
-            <p class="text-sm text-gray-400 dark:text-gray-500">No active projects.</p>
+            <p class="text-sm text-gray-400 dark:text-gray-500">{t.workingOnNoActiveProjects}</p>
           ) : (
             activeProjects.map((entry) => (
-              <a href={`/projects/${entry.slug}`} class="group block rounded-xl border border-gray-200/70 bg-white/45 p-5 no-underline transition-all duration-200 hover:border-gray-300 hover:bg-white/80 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]">
+              <a href={localizePath(`/projects/${entry.slug}`, locale)} class="group block rounded-xl border border-gray-200/70 bg-white/45 p-5 no-underline transition-all duration-200 hover:border-gray-300 hover:bg-white/80 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]">
                 <div class="mb-2 flex items-center gap-2">
                   {entry.data.icon && <span class="text-base">{entry.data.icon}</span>}
                   <span class={`status-chip rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusColors[entry.data.status ?? "active"]}`}>

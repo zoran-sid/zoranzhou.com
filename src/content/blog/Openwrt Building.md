@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "自用 OPENWRT 编译流程分享"
 date: "2025-06-20"
@@ -11,6 +11,7 @@ ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
+lang: zh-CN
 ---
 
 # OpenWrt编译

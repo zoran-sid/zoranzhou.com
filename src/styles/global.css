@@ -98,7 +98,7 @@
 }
 
 /* ── Dark mode surfaces — each section keeps identity ── */
-.dark .surface-hero { background: #09090b; }
+.dark .surface-hero { background: #0f1114; }
 .dark .surface-hero::before {
   background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(37,99,235,0.06) 0%, transparent 60%),
               radial-gradient(ellipse 50% 50% at 85% 20%, rgba(99,102,241,0.04) 0%, transparent 50%);

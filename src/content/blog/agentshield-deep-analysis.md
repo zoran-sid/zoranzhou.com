@@ -1,4 +1,4 @@
----
+﻿---
 title: "AgentShield：基于欺骗行为的工具型 LLM Agent 运行时入侵检测系统深度分析"
 date: 2026-05-26T19:42:00+08:00
 draft: false
@@ -6,6 +6,7 @@ tags: ["LLM安全", "AI Agent", "欺骗防御", "蜜罐", "运行时检测"]
 categories: ["安全研究", "AI安全"]
 author: "Zeran"
 description: "一种面向工具型 LLM Agent 的欺骗式沦陷检测框架。将传统网络安全中的蜜罐、蜜标思想迁移到 Agent 的工具调用链路上，通过三层递进陷阱实现高检测率、零误报的运行时入侵检测。"
+lang: zh-CN
 ---
 
 > **导语：** 与其只问模型有没有被攻击，不如在 Agent 真正动作之前，先看看它是不是已经踩进了陷阱。本文深度拆解 UC Berkeley 与 NVIDIA Research 的最新成果 —— **AgentShield**。

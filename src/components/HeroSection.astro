@@ -1,5 +1,8 @@
 ﻿---
-import { SITE } from "../lib/constants";
+import { getTranslations, localizePath, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
 ---
 
 <section class="home-section surface-hero section-lighting pt-32 md:pt-44">
@@ -8,33 +11,32 @@ import { SITE } from "../lib/constants";
     <div class="gradient-blob blob-2"></div>
   </div>
 
-  <div class="page-container relative">
+  <div class="page-container relative z-10">
     <div class="max-w-5xl">
       <div class="mb-10 inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/70 px-4 py-1.5 text-sm font-medium text-gray-700 shadow-card backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
         <span class="relative flex h-2 w-2">
           <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-50"></span>
           <span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
         </span>
-        Available for opportunities
+        {t.heroBadge}
       </div>
 
-      <p class="section-kicker">Network security engineer</p>
+      <p class="section-kicker">{t.heroKicker}</p>
       <h1 class="mt-5 max-w-5xl text-5xl font-extrabold tracking-tight text-gray-950 md:text-7xl lg:text-8xl dark:text-white" style="line-height: 1.1;">
-        <span class="block">Coding构筑世界</span>
-        <span class="block text-2xl font-semibold tracking-wide text-gray-600 md:text-3xl lg:text-4xl dark:text-gray-400" style="line-height: 1.8;">以文字记录一路所学</span>
+        <span class="block">{t.heroTitleLine1}</span>
+        <span class="block text-2xl font-semibold tracking-wide text-gray-600 md:text-3xl lg:text-4xl dark:text-gray-400" style="line-height: 1.8;">{t.heroTitleLine2}</span>
       </h1>
 
       <p class="mt-8 max-w-2xl text-lg leading-relaxed text-gray-600 md:text-xl dark:text-gray-400">
-        Network &amp; cybersecurity engineer. I build resilient infrastructure,
-        hunt threats, and write about what I learn along the way.
+        {t.heroDescription}
       </p>
 
       <div class="mt-12 flex flex-wrap gap-4">
         <a
-          href="/blog"
+          href={localizePath("/blog", locale)}
           class="group inline-flex items-center gap-2 rounded-xl bg-sky-100 px-6 py-3 text-sm font-semibold text-sky-700 no-underline shadow-elevated transition-all duration-200 hover:-translate-y-0.5 hover:bg-sky-200 dark:bg-sky-900 dark:text-sky-200 dark:hover:bg-sky-800"
         >
-          Read the blog
+          {t.heroReadBlog}
           <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
@@ -43,7 +45,7 @@ import { SITE } from "../lib/constants";
           href="#contact"
           class="inline-flex items-center gap-2 rounded-xl border border-gray-200/90 bg-white/70 px-6 py-3 text-sm font-semibold text-gray-800 no-underline shadow-card backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10"
         >
-          Get in touch
+          {t.heroGetInTouch}
         </a>
       </div>
     </div>

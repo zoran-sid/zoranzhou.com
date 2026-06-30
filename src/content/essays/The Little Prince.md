@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "《小王子》书评"
 date: "2025-06-30"
@@ -8,6 +8,7 @@ tags:
 ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
+lang: zh-CN
 ---
 
 # 在沙漠与星辰间，遇见灵魂深处的自己

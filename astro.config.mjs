@@ -57,8 +57,20 @@ export default defineConfig({
       changefreq: "weekly",
       priority: 0.7,
       lastmod: new Date(),
+      i18n: {
+        defaultLocale: "zh-CN",
+        locales: {
+          "zh-CN": "zh-Hans",
+          en: "en",
+        },
+      },
     }),
   ],
+
+  i18n: {
+    defaultLocale: "zh-CN",
+    locales: ["zh-CN", "en"],
+  },
 
   vite: {
     plugins: [tailwindcss()],

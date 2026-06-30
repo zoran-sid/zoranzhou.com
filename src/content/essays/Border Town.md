@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "《边城》书评"
 date: "2025-04-12"
@@ -8,6 +8,7 @@ tags:
 ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
+lang: zh-CN
 ---
 
 # 茶峒清风里，藏着最纯粹的等待

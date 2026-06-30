@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "从零开始搭建你的免费 BLOG 博客（Github+Cloudflare）"
 date: "2024-05-01"
@@ -11,6 +11,7 @@ ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
+lang: zh-CN
 ---
 
 # 前言

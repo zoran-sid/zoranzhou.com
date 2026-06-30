@@ -1,20 +1,23 @@
 ﻿---
-import { ABOUT } from "../lib/constants";
+import { getTranslations, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
 ---
 
 <section class="home-section surface-about section-lighting texture-dots">
   <div class="page-container">
     <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-24">
       <div class="reveal">
-        <span class="section-kicker">About</span>
+        <span class="section-kicker">{t.aboutLabel}</span>
         <h2 class="section-heading md:max-w-xl">
-          {ABOUT.headline}
+          {t.aboutHeadline}
         </h2>
       </div>
 
       <div class="reveal premium-card rounded-2xl p-6 md:p-8">
         <div class="space-y-5">
-          {ABOUT.paragraphs.map((p) => (
+          {t.aboutParagraphs.map((p) => (
             <p class="text-base leading-relaxed text-gray-600 md:text-lg dark:text-gray-400">
               {p}
             </p>

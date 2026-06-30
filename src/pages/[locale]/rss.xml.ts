@@ -1,8 +1,12 @@
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
-import { SITE } from "../lib/constants";
+import { getTranslations, localizePath, type Locale, locales } from "../../i18n/utils";
 
-export async function GET() {
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+export async function GET(context: { site: URL; currentLocale?: string }) {
   const blog = await getCollection("blog", ({ data }) => !data.draft);
   const essays = await getCollection("essays", ({ data }) => !data.draft);
   const research = await getCollection("research", ({ data }) => !data.draft);
@@ -10,17 +14,20 @@ export async function GET() {
     (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
   );
 
+  const locale = (context.currentLocale ?? "zh-CN") as Locale;
+  const t = getTranslations(locale);
+
   return rss({
-    title: SITE.title,
-    description: SITE.description,
-    site: SITE.url,
+    title: t.siteTitle,
+    description: t.siteDescription,
+    site: context.site,
     items: all.map((entry) => ({
       title: entry.data.title,
       description: entry.data.description ?? "",
       pubDate: entry.data.date,
-      link: `/${entry.collection}/${entry.slug}`,
+      link: localizePath(`/${entry.collection}/${entry.slug}`, locale),
       categories: entry.data.tags,
     })),
-    customData: `<language>en-us</language>`,
+    customData: `<language>${locale === "zh-CN" ? "zh-Hans" : "en-us"}</language>`,
   });
 }

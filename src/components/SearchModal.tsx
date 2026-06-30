@@ -9,10 +9,43 @@ interface SearchEntry {
   date: string;
 }
 
-const COLLECTION_LABELS: Record<string, string> = {
+function getCurrentLocale(): string {
+  if (typeof window === "undefined") return "zh-CN";
+  const path = window.location.pathname;
+  if (path.startsWith("/en/") || path === "/en") return "en";
+  return "zh-CN";
+}
+
+const COLLECTION_LABELS_ZH: Record<string, string> = {
+  blog: "博客",
+  research: "研究",
+  projects: "项目",
+};
+
+const COLLECTION_LABELS_EN: Record<string, string> = {
   blog: "Blog",
   research: "Research",
   projects: "Projects",
+};
+
+const UI_ZH = {
+  search: "搜索",
+  placeholder: "搜索文章...",
+  loading: "加载中...",
+  noResults: '未找到与 "{query}" 相关的结果',
+  typePrompt: "输入标题搜索",
+  navigate: "导航",
+  open: "打开",
+};
+
+const UI_EN = {
+  search: "Search",
+  placeholder: "Search articles...",
+  loading: "Loading...",
+  noResults: 'No results for "{query}"',
+  typePrompt: "Type to search by title",
+  navigate: "Navigate",
+  open: "Open",
 };
 
 export default function SearchModal() {
@@ -24,6 +57,10 @@ export default function SearchModal() {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const fuseRef = useRef<Fuse<SearchEntry> | null>(null);
+
+  const locale = getCurrentLocale();
+  const ui = locale === "zh-CN" ? UI_ZH : UI_EN;
+  const collectionLabels = locale === "zh-CN" ? COLLECTION_LABELS_ZH : COLLECTION_LABELS_EN;
 
   useEffect(() => {
     if (open && allEntries.length === 0) {
@@ -106,12 +143,12 @@ export default function SearchModal() {
       <button
         onClick={() => setOpen(true)}
         className="group inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-400 transition-all hover:border-gray-300 hover:text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500 dark:hover:border-gray-600 dark:hover:text-gray-300"
-        aria-label="Search (Ctrl+K)"
+        aria-label={`${ui.search} (Ctrl+K)`}
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
         </svg>
-        <span className="hidden sm:inline">Search</span>
+        <span className="hidden sm:inline">{ui.search}</span>
         <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-xs text-gray-400 group-hover:border-gray-400">
           <span className="text-[10px]">⌘</span>K
         </kbd>
@@ -135,7 +172,7 @@ export default function SearchModal() {
                 value={query}
                 onChange={(e) => handleSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search articles..."
+                placeholder={ui.placeholder}
                 className="search-modal-input flex-1 bg-transparent py-4 text-base text-gray-900 placeholder:text-gray-400 outline-none focus:outline-none focus-visible:outline-none dark:text-gray-100 dark:placeholder:text-gray-500"
               />
               {query && (
@@ -150,14 +187,14 @@ export default function SearchModal() {
 
             {/* Results */}
             <div className="max-h-80 overflow-y-auto border-t border-gray-100 dark:border-gray-700">
-              {loading && <p className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">Loading...</p>}
+              {loading && <p className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">{ui.loading}</p>}
 
               {!loading && query && results.length === 0 && (
-                <p className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">No results for "{query}"</p>
+                <p className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">{ui.noResults.replace("{query}", query)}</p>
               )}
 
               {!loading && !query && (
-                <p className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">Type to search by title</p>
+                <p className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">{ui.typePrompt}</p>
               )}
 
               {results.map((entry, idx) => (
@@ -170,7 +207,7 @@ export default function SearchModal() {
                   onMouseEnter={() => setSelectedIdx(idx)}
                 >
                   <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-gray-500 dark:bg-gray-600 dark:text-gray-300">
-                    {COLLECTION_LABELS[entry.collection] ?? entry.collection}
+                    {collectionLabels[entry.collection] ?? entry.collection}
                   </span>
                   <span className="flex-1 truncate text-sm font-medium text-gray-700 dark:text-gray-200">{entry.title}</span>
                   <span className="shrink-0 text-xs text-gray-400 dark:text-gray-500">{entry.date}</span>
@@ -180,8 +217,8 @@ export default function SearchModal() {
 
             {/* Footer */}
             <div className="flex items-center gap-4 border-t border-gray-100 px-4 py-2.5 text-xs text-gray-400 dark:border-gray-700 dark:text-gray-500">
-              <span className="flex items-center gap-1"><kbd className="rounded border border-gray-200 bg-gray-50 px-1 py-0.5 font-mono text-[10px] dark:border-gray-600 dark:bg-gray-700">↑↓</kbd> Navigate</span>
-              <span className="flex items-center gap-1"><kbd className="rounded border border-gray-200 bg-gray-50 px-1 py-0.5 font-mono text-[10px] dark:border-gray-600 dark:bg-gray-700">↵</kbd> Open</span>
+              <span className="flex items-center gap-1"><kbd className="rounded border border-gray-200 bg-gray-50 px-1 py-0.5 font-mono text-[10px] dark:border-gray-600 dark:bg-gray-700">↑↓</kbd> {ui.navigate}</span>
+              <span className="flex items-center gap-1"><kbd className="rounded border border-gray-200 bg-gray-50 px-1 py-0.5 font-mono text-[10px] dark:border-gray-600 dark:bg-gray-700">↵</kbd> {ui.open}</span>
             </div>
           </div>
         </div>

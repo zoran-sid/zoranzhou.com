@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "《杀死一只知更鸟》书评"
 date: "2024-02-10"
@@ -8,6 +8,7 @@ tags:
 ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
+lang: zh-CN
 ---
 
 ![image-20251212134259328](https://e5d9f02.webp.fi/image-20251212134259328.png)

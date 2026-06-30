@@ -1,6 +1,7 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import { getTranslations, localizePath, type Locale, locales } from "../../../i18n/utils";
 
 export async function getStaticPaths() {
   const allContent = [
@@ -18,10 +19,16 @@ export async function getStaticPaths() {
     }
   }
 
-  return [...tagSet].map((tag) => ({ params: { tag } }));
+  const tags = [...tagSet];
+  return tags.flatMap((tag) =>
+    locales.map((locale) => ({ params: { locale, tag } }))
+  );
 }
 
 const { tag } = Astro.params;
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 
 const allContent = [
   ...(await getCollection("blog", ({ data }) => !data.draft)),
@@ -49,18 +56,18 @@ const displayTag = tag.replace(/-/g, " ");
         <span class="text-blue-600 dark:text-blue-400">#</span> {displayTag}
       </h1>
       <p class="mt-3 text-lg text-gray-400 dark:text-gray-500">
-        {filtered.length} {filtered.length === 1 ? "post" : "posts"}
+        {t.tagsPostCount(filtered.length)}
       </p>
     </header>
 
     {
       filtered.length === 0 ? (
-        <p class="text-gray-400 dark:text-gray-500">No posts found.</p>
+        <p class="text-gray-400 dark:text-gray-500">{t.tagsNoPosts}</p>
       ) : (
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((entry) => (
             <a
-              href={`/${entry.collection}/${entry.slug}`}
+              href={localizePath(`/${entry.collection}/${entry.slug}`, locale)}
               class="group flex flex-col rounded-xl border border-gray-100 bg-white p-6 no-underline shadow-card transition-all duration-200 hover:border-gray-200 hover:shadow-card-hover dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
             >
               <div class="mb-3">
@@ -78,7 +85,7 @@ const displayTag = tag.replace(/-/g, " ");
               )}
               <div class="mt-4 text-xs text-gray-400">
                 <time datetime={entry.data.date.toISOString()}>
-                  {entry.data.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                  {entry.data.date.toLocaleDateString(dateLocale, { year: "numeric", month: "long", day: "numeric" })}
                 </time>
               </div>
             </a>

@@ -1,5 +1,9 @@
 ﻿---
 import { getCollection } from "astro:content";
+import { getTranslations, localizePath, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
 
 const research = await getCollection("research", ({ data }) => !data.draft);
 const featured = research
@@ -11,14 +15,14 @@ const featured = research
   <div class="page-container">
     <div class="mb-14 flex items-end justify-between gap-8">
       <div class="reveal">
-        <span class="section-kicker">Research</span>
-        <h2 class="section-heading">Deep dives &amp; analysis</h2>
+        <span class="section-kicker">{t.researchLabel}</span>
+        <h2 class="section-heading">{t.researchHeading}</h2>
         <p class="section-deck">
-          In-depth technical investigations, architecture reviews, and security research.
+          {t.researchDeck}
         </p>
       </div>
-      <a href="/research" class="premium-link hidden sm:inline-flex">
-        View all research
+      <a href={localizePath("/research", locale)} class="premium-link hidden sm:inline-flex">
+        {t.researchViewAll}
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
@@ -27,11 +31,11 @@ const featured = research
 
     {
       featured.length === 0 ? (
-        <p class="text-gray-400 dark:text-gray-500">No research published yet.</p>
+        <p class="text-gray-400 dark:text-gray-500">{t.researchEmpty}</p>
       ) : (
         <div class="grid gap-6 md:grid-cols-3">
           {featured.map((entry) => (
-            <a href={`/research/${entry.slug}`} class="premium-card reveal group block rounded-2xl p-6 no-underline">
+            <a href={localizePath(`/research/${entry.slug}`, locale)} class="premium-card reveal group block rounded-2xl p-6 no-underline">
               <div class="mb-6 flex items-center justify-between gap-3">
                 <span class="status-chip rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]">
                   {entry.data.status?.replace("-", " ") ?? "Completed"}

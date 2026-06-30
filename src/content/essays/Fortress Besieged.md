@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "《围城》书评"
 date: "2025-05-20"
@@ -8,6 +8,7 @@ tags:
 ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
+lang: zh-CN
 ---
 
 # 围城内外皆人生，心态自定悲与欢

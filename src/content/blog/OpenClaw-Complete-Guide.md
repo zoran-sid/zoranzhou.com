@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "OpenClaw 完全安装指南与命令详解"
 date: "2026-03-05"
@@ -15,6 +15,7 @@ ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
+lang: zh-CN
 ---
 
 # 前言

@@ -1,21 +1,9 @@
-// ── Site Identity ──
+// ── Site Identity (non-translatable) ──
 export const SITE = {
-  title: "Coding构筑世界 · 以文字记录一路所学",
-  description:
-    "Network & cybersecurity engineer. Building resilient systems, sharing what I learn.",
   url: "https://zoranzhou.com",
   author: "Zoran Zhou",
-  locale: "en-US",
   since: 2024,
 } as const;
-
-// ── Navigation ──
-export const NAV_ITEMS = [
-  { label: "Blog", href: "/blog" },
-  { label: "Essays", href: "/essays" },
-  { label: "Research", href: "/research" },
-  { label: "Projects", href: "/projects" },
-] as const;
 
 // ── Social ──
 export const SOCIAL_LINKS = [
@@ -31,16 +19,6 @@ export const PAGINATION = { pageSize: 10 } as const;
 export const COPYRIGHT = {
   license: "CC BY-SA 4.0",
   licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
-} as const;
-
-// ── Homepage: About ──
-export const ABOUT = {
-  headline: "Network & Security Engineer",
-  paragraphs: [
-    "I design and operate secure, resilient network architectures for large-scale enterprise environments. With Cisco Enterprise and CISP-PTE certifications, I focus on the intersection of infrastructure reliability and offensive security.",
-    "Beyond day-to-day operations, I've contributed to several national-level cybersecurity initiatives — hunting threats, hardening systems, and building tooling that makes defense practical at scale.",
-    "This site is where I document technical deep-dives, share hard-won lessons, and explore ideas at the boundary of networking, security, and systems engineering.",
-  ],
 } as const;
 
 // ── Homepage: Timeline ──
@@ -107,13 +85,6 @@ export const SKILLS = [
     ],
   },
 ] as const;
-
-// ── Homepage: Contact ──
-export const CONTACT = {
-  headline: "Let's work together.",
-  subtext:
-    "Open to collaboration, consulting, and interesting conversations. Reach out via email or find me on any platform below.",
-} as const;
 
 // ── Social SVG Icons ──
 export const SOCIAL_ICONS: Record<string, string> = {

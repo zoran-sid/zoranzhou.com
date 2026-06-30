@@ -1,8 +1,18 @@
 ---
-import { NAV_ITEMS, SITE } from "../lib/constants";
 import SearchModal from "../components/SearchModal.tsx";
+import { getTranslations, type Locale, localeLabels, locales, localizePath } from "../i18n/utils";
 
 const path = Astro.url.pathname;
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+
+// Translated navigation items
+const navItems = [
+  { label: t.navBlog, href: localizePath("/blog", locale) },
+  { label: t.navEssays, href: localizePath("/essays", locale) },
+  { label: t.navResearch, href: localizePath("/research", locale) },
+  { label: t.navProjects, href: localizePath("/projects", locale) },
+];
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 border-b border-gray-100/60 bg-white/75 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-950/75">
@@ -16,7 +26,7 @@ const path = Astro.url.pathname;
 
     <!-- Desktop nav items -->
     <div class="hidden items-center gap-5 md:flex">
-      {NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const active = path === item.href || path.startsWith(item.href + "/");
         return (
           <a
@@ -32,6 +42,16 @@ const path = Astro.url.pathname;
         );
       })}
       <SearchModal client:load />
+      <!-- Language Switcher -->
+      <div class="relative" id="lang-switcher-desktop">
+        <button
+          id="lang-toggle-desktop"
+          class="rounded-lg px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300"
+          aria-label={t.langLabel}
+        >
+          {localeLabels[locale]}
+        </button>
+      </div>
       <button
         id="theme-toggle"
         class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300"
@@ -80,7 +100,7 @@ const path = Astro.url.pathname;
   <!-- Mobile menu panel -->
   <div id="mobile-menu" class="hidden border-t border-gray-100/60 bg-white/95 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-950/95 md:hidden">
     <div class="page-container flex flex-col gap-1 py-3">
-      {NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const active = path === item.href || path.startsWith(item.href + "/");
         return (
           <a
@@ -97,6 +117,24 @@ const path = Astro.url.pathname;
       })}
       <div class="pt-1">
         <SearchModal client:load />
+      </div>
+      <!-- Mobile language switcher -->
+      <div class="mt-2 border-t border-gray-100/60 pt-2 dark:border-gray-800/50">
+        <p class="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          {t.langLabel}
+        </p>
+        {locales.map((altLocale) => (
+          <a
+            href={localizePath(path, altLocale)}
+            class={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors no-underline ${
+              altLocale === locale
+                ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/50 dark:hover:text-gray-200"
+            }`}
+          >
+            {localeLabels[altLocale]}
+          </a>
+        ))}
       </div>
     </div>
   </div>
@@ -117,6 +155,27 @@ const path = Astro.url.pathname;
 
   document.getElementById("theme-toggle")?.addEventListener("click", toggleDarkMode);
   document.getElementById("theme-toggle-mobile")?.addEventListener("click", toggleDarkMode);
+
+  // Language switcher — desktop
+  const langToggle = document.getElementById("lang-toggle-desktop");
+  langToggle?.addEventListener("click", () => {
+    const currentPath = window.location.pathname;
+    const currentLocale = currentPath.startsWith("/en/") || currentPath === "/en" ? "en" : "zh-CN";
+    const targetLocale = currentLocale === "zh-CN" ? "en" : "zh-CN";
+    // Save preference
+    document.cookie = "pref-lang=" + targetLocale + ";path=/;max-age=31536000;SameSite=Lax";
+    localStorage.setItem("pref-lang", targetLocale);
+    // Build target URL
+    let targetPath = currentPath;
+    if (currentPath.startsWith("/zh-CN/") || currentPath === "/zh-CN") {
+      targetPath = currentPath.replace(/^\/zh-CN/, "/en") || "/en";
+    } else if (currentPath.startsWith("/en/") || currentPath === "/en") {
+      targetPath = currentPath.replace(/^\/en/, "/zh-CN") || "/zh-CN";
+    } else {
+      targetPath = "/" + targetLocale + currentPath;
+    }
+    window.location.href = targetPath;
+  });
 
   // Mobile menu toggle
   const menuToggle = document.getElementById("mobile-menu-toggle");

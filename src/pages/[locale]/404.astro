@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getTranslations, localizePath, type Locale, locales } from "../../i18n/utils";
+
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+---
+
+<BaseLayout title={t.notFoundTitle}>
+  <div class="content-container flex flex-col items-center justify-center py-32 text-center">
+    <p class="text-8xl font-bold text-gray-200">404</p>
+    <p class="mt-4 text-lg text-gray-500">{t.notFoundHeading}</p>
+    <a
+      href={localizePath("/", locale)}
+      class="mt-8 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-medium text-white no-underline transition-colors hover:bg-gray-800"
+    >
+      {t.notFoundBackHome}
+    </a>
+  </div>
+</BaseLayout>

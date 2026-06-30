@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HeroSection from "../../components/HeroSection.astro";
+import AboutSection from "../../components/AboutSection.astro";
+import LatestArticles from "../../components/LatestArticles.astro";
+import FeaturedResearch from "../../components/FeaturedResearch.astro";
+import WorkingOn from "../../components/WorkingOn.astro";
+import ProjectsGrid from "../../components/ProjectsGrid.astro";
+import Skills from "../../components/Skills.astro";
+import ContactSection from "../../components/ContactSection.astro";
+import { locales } from "../../i18n/utils";
+
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+---
+
+<BaseLayout>
+  <HeroSection />
+  <AboutSection />
+  <LatestArticles />
+  <FeaturedResearch />
+  <WorkingOn />
+  <ProjectsGrid />
+  <Skills />
+  <ContactSection />
+</BaseLayout>

@@ -1,4 +1,4 @@
----
+﻿---
 author: "Zoran"
 title: "Waline 评论系统嵌入 BLOG 方案"
 date: "2024-05-02"
@@ -11,6 +11,7 @@ ShowWordCount: true
 ShowReadingTime: true
 ShowBreadCrumbs: true
 ShowShareButtons: true
+lang: zh-CN
 ---
 
 # Waline 评论系统

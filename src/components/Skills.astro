@@ -1,12 +1,16 @@
 ﻿---
 import { SKILLS } from "../lib/constants";
+import { getTranslations, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
 ---
 
 <section class="home-section surface-skills section-lighting">
   <div class="page-container">
     <div class="mb-14 reveal">
-      <span class="section-kicker">Expertise</span>
-      <h2 class="section-heading">Skills &amp; technologies</h2>
+      <span class="section-kicker">{t.skillsLabel}</span>
+      <h2 class="section-heading">{t.skillsHeading}</h2>
     </div>
 
     <div class="grid gap-6 md:grid-cols-3">

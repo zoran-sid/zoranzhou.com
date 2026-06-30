@@ -1,16 +1,20 @@
 ﻿---
-import { CONTACT, SOCIAL_LINKS, SOCIAL_ICONS } from "../lib/constants";
+import { SOCIAL_LINKS, SOCIAL_ICONS } from "../lib/constants";
+import { getTranslations, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
 ---
 
 <section id="contact" class="home-section surface-contact section-lighting texture-noise">
   <div class="page-container">
     <div class="max-w-3xl reveal">
-      <span class="section-kicker">Contact</span>
+      <span class="section-kicker">{t.contactLabel}</span>
       <h2 class="section-heading">
-        {CONTACT.headline}
+        {t.contactHeadline}
       </h2>
       <p class="section-deck text-lg">
-        {CONTACT.subtext}
+        {t.contactSubtext}
       </p>
 
       <div class="mt-9 flex flex-wrap gap-4">
