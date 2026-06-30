@@ -1,14 +1,4 @@
 # Cloudflare Pages configuration
 name = "zoran-zhou-blog"
 compatibility_date = "2026-06-29"
-
 pages_build_output_dir = "dist"
-
-[build]
-command = "npm run build"
-
-[build.environment]
-NODE_VERSION = "20"
-
-[assets]
-directory = "./dist"
