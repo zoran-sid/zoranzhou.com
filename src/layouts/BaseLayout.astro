@@ -95,6 +95,31 @@ const canonicalPath = Astro.url.pathname;
     </style>
 
     <ThemeScript />
+
+    <!-- Auto-detect language on first visit (Apple-style) -->
+    <script>
+      (function() {
+        var cookie = document.cookie.match(/(?:^|;\s*)pref-lang=([^;]*)/);
+        if (cookie) return; // User already chose
+        var navLang = (navigator.language || "").toLowerCase();
+        var isZh = navLang.startsWith("zh");
+        var currentPath = window.location.pathname;
+        var onEn = currentPath === "/en" || currentPath.startsWith("/en/");
+        var onZh = !onEn; // assume zh-CN
+        if (isZh && onEn) {
+          document.cookie = "pref-lang=zh-CN;path=/;max-age=31536000;SameSite=Lax";
+          try { localStorage.setItem("pref-lang", "zh-CN"); } catch(e) {}
+          window.location.replace(currentPath.replace(/^\/en/, "/zh-CN") || "/zh-CN/");
+        } else if (!isZh && onZh) {
+          document.cookie = "pref-lang=en;path=/;max-age=31536000;SameSite=Lax";
+          try { localStorage.setItem("pref-lang", "en"); } catch(e) {}
+          window.location.replace(currentPath.replace(/^\/zh-CN/, "/en") || "/en/");
+        } else {
+          // Language matches, just remember it
+          document.cookie = "pref-lang=" + (onEn ? "en" : "zh-CN") + ";path=/;max-age=31536000;SameSite=Lax";
+        }
+      })();
+    </script>
   </head>
   <body class="bg-white text-gray-900 antialiased dark:bg-[#0a0a0b] dark:text-gray-200">
     <!-- Scroll progress bar -->

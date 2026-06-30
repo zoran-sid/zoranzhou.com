@@ -12,17 +12,24 @@ export async function getStaticPaths() {
     ...(await getCollection("tools", ({ data }) => !data.draft)),
   ];
 
-  const tagSet = new Set<string>();
+  // Build per-locale tag sets
+  const tagsByLocale: Record<string, Set<string>> = {};
+  for (const locale of locales) tagsByLocale[locale] = new Set();
+
   for (const entry of allContent) {
+    const entryLocale = entry.data.lang ?? "zh-CN";
     for (const t of entry.data.tags) {
-      tagSet.add(t.toLowerCase().trim().replace(/\s+/g, "-"));
+      tagsByLocale[entryLocale].add(t.toLowerCase().trim().replace(/\s+/g, "-"));
     }
   }
 
-  const tags = [...tagSet];
-  return tags.flatMap((tag) =>
-    locales.map((locale) => ({ params: { locale, tag } }))
-  );
+  const result: any[] = [];
+  for (const locale of locales) {
+    for (const tag of tagsByLocale[locale]) {
+      result.push({ params: { locale, tag } });
+    }
+  }
+  return result;
 }
 
 const { tag } = Astro.params;
@@ -39,6 +46,7 @@ const allContent = [
 ];
 
 const filtered = allContent
+  .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
   .filter((entry) =>
     entry.data.tags.some(
       (t) => t.toLowerCase().trim().replace(/\s+/g, "-") === tag,

@@ -75,6 +75,7 @@ const en: UIStrings = {
   projectsLabel: "Projects",
   projectsHeading: "Things I've built",
   projectsEmpty: "No projects yet.",
+  projectsViewAll: "View all projects",
 
   // ── Homepage: Skills ──
   skillsLabel: "Expertise",

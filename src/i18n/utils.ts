@@ -61,6 +61,7 @@ export interface UIStrings {
   projectsLabel: string;
   projectsHeading: string;
   projectsEmpty: string;
+  projectsViewAll: string;
   skillsLabel: string;
   skillsHeading: string;
   timelineLabel: string;

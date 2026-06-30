@@ -56,7 +56,9 @@ export default defineConfig({
     sitemap({
       filter: (page) =>
         !page.includes("/404") &&
-        !page.endsWith("/404/"),
+        !page.endsWith("/404/") &&
+        // Exclude root redirect page
+        page !== "https://zoranzhou.com/",
       serialize(item) {
         const path = item.url.replace(/^https:\/\/zoranzhou\.com/, "") || "/";
         let priority = 0.7;
@@ -108,6 +110,9 @@ export default defineConfig({
   i18n: {
     defaultLocale: "zh-CN",
     locales: ["zh-CN", "en"],
+    routing: {
+      redirectToDefaultLocale: false,
+    },
   },
 
   vite: {

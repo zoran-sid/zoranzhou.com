@@ -72,6 +72,7 @@ const zhCN: UIStrings = {
   projectsLabel: "项目",
   projectsHeading: "我构建的东西",
   projectsEmpty: "暂无项目。",
+  projectsViewAll: "查看全部项目",
 
   // ── Homepage: Skills ──
   skillsLabel: "专业技能",
