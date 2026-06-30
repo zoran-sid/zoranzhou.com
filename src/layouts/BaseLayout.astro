@@ -9,6 +9,7 @@ interface Props {
   description?: string;
   ogImage?: string;
   article?: boolean;
+  jsonld?: Record<string, unknown>;
 }
 
 const {
@@ -16,6 +17,7 @@ const {
   description,
   ogImage,
   article = false,
+  jsonld,
 } = Astro.props;
 
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
@@ -66,9 +68,15 @@ const canonicalPath = Astro.url.pathname;
     <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={pageDescription} />
+    {ogImage && <meta name="twitter:image" content={new URL(ogImage, Astro.site).href} />}
 
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title="ZORAN ZHOU RSS" href={localizePath("/rss.xml", locale)} />
+
+    <!-- JSON-LD Structured Data -->
+    {jsonld && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+    )}
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

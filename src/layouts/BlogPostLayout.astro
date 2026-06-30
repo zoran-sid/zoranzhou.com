@@ -52,6 +52,21 @@ const labelMap: Record<string, string> = {
 };
 
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+
+// ── JSON-LD Article schema ──
+const articleUrl = new URL(localizePath(`/${entry.collection}/${entry.slug}`, locale), Astro.site).href;
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: entry.data.title,
+  description: entry.data.description ?? "",
+  author: { "@type": "Person", name: entry.data.author ?? "Zoran Zhou" },
+  datePublished: entry.data.date.toISOString(),
+  dateModified: entry.data.updated?.toISOString() ?? entry.data.date.toISOString(),
+  url: articleUrl,
+  ...(entry.data.cover?.src ? { image: new URL(entry.data.cover.src, Astro.site).href } : {}),
+  ...(entry.data.tags.length > 0 ? { keywords: entry.data.tags.join(", ") } : {}),
+};
 ---
 
 <BaseLayout
@@ -59,6 +74,7 @@ const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
   description={entry.data.description}
   ogImage={entry.data.cover?.src}
   article={true}
+  jsonld={jsonld}
 >
   <article class="content-container py-12 md:py-16">
     <header class="mb-10">

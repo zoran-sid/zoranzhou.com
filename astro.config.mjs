@@ -54,9 +54,47 @@ export default defineConfig({
     }),
     react(),
     sitemap({
-      changefreq: "weekly",
-      priority: 0.7,
-      lastmod: new Date(),
+      filter: (page) =>
+        !page.includes("/404") &&
+        !page.endsWith("/404/"),
+      serialize(item) {
+        const path = item.url.replace(/^https:\/\/zoranzhou\.com/, "") || "/";
+        let priority = 0.7;
+        let changefreq = "weekly";
+
+        // Homepage: highest priority
+        if (path.match(/^\/(zh-CN|en)\/?$/)) {
+          priority = 1.0;
+          changefreq = "daily";
+        }
+        // Blog/research/essays listing pages
+        else if (path.match(/^\/(zh-CN|en)\/(blog|essays|research)\/?$/)) {
+          priority = 0.8;
+          changefreq = "daily";
+        }
+        // Individual articles
+        else if (path.match(/^\/(zh-CN|en)\/(blog|essays|research|projects|tools)\/.+/)) {
+          priority = 0.6;
+          changefreq = "monthly";
+        }
+        // Tags, projects, tools listing
+        else if (path.match(/^\/(zh-CN|en)\/(tags|projects|tools)\/?$/)) {
+          priority = 0.5;
+          changefreq = "weekly";
+        }
+        // Tag pages
+        else if (path.match(/^\/(zh-CN|en)\/tags\/.+/)) {
+          priority = 0.4;
+          changefreq = "weekly";
+        }
+
+        return {
+          url: item.url,
+          lastmod: item.lastmod ?? new Date(),
+          changefreq,
+          priority,
+        };
+      },
       i18n: {
         defaultLocale: "zh-CN",
         locales: {
