@@ -1,14 +1,14 @@
 # Cloudflare Pages configuration
-# Build settings are configured in the Cloudflare dashboard
+name = "zoran-zhou-blog"
+compatibility_date = "2026-06-29"
+
+pages_build_output_dir = "dist"
 
 [build]
 command = "npm run build"
-publish = "dist"
 
 [build.environment]
 NODE_VERSION = "20"
-name = "zoran-zhou-blog"
-compatibility_date = "2026-06-29"
 
 [assets]
 directory = "./dist"
