@@ -1,14 +1,12 @@
 ---
-title: City Walk
-description: A small photo set from an ordinary walk through the city.
-date: 2026-07-02
-tags: ["Photography", "Street"]
+title: Minya Konka
+description: The King of Sichuan Mountains.
+date: 2025-09-02
+tags: ["Photography", "Mountain"]
 lang: en
 location: City
-camera: Daily Camera
-gallery: []
+camera: A7C2 F2.8 35mm
+gallery:
+  - src: https://e5d9f02.webp.fi/_20260702223108_5_35.jpg
+    alt: Mountain explore
 ---
-
-## Notes
-
-Add photos to `gallery` or set a `cover` image in the frontmatter when you have images ready.
