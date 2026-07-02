@@ -3,7 +3,16 @@ import BaseLayout from "./BaseLayout.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getTranslations, localizePath, type Locale } from "../i18n/utils";
 
-type ContentCollection = "blog" | "essays" | "research" | "projects" | "tools";
+type ContentCollection =
+  | "blog"
+  | "essays"
+  | "research"
+  | "projects"
+  | "tools"
+  | "homelab"
+  | "gear"
+  | "photos"
+  | "map";
 
 interface Props {
   entry: CollectionEntry<ContentCollection>;
@@ -24,7 +33,7 @@ const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
 // ── Related articles ──
 const allInCollection = await getCollection(
   entry.collection as ContentCollection,
-  ({ data }) => !data.draft,
+  ({ data }) => !data.draft && (data.lang ?? "zh-CN") === locale,
 );
 const related = allInCollection
   .filter(
@@ -49,6 +58,10 @@ const labelMap: Record<string, string> = {
   research: t.navResearch,
   projects: t.navProjects,
   tools: t.navTools,
+  homelab: t.navHomelab,
+  gear: t.navGear,
+  photos: t.navPhotos,
+  map: t.navMap,
 };
 
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";

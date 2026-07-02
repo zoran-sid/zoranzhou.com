@@ -9,10 +9,14 @@ export async function GET(context: { currentLocale?: string }) {
   const blog = await getCollection("blog", ({ data }) => !data.draft);
   const research = await getCollection("research", ({ data }) => !data.draft);
   const projects = await getCollection("projects", ({ data }) => !data.draft);
+  const homelab = await getCollection("homelab", ({ data }) => !data.draft);
+  const gear = await getCollection("gear", ({ data }) => !data.draft);
+  const photos = await getCollection("photos", ({ data }) => !data.draft);
+  const map = await getCollection("map", ({ data }) => !data.draft);
 
   const locale = (context.currentLocale ?? "zh-CN") as Locale;
 
-  const entries = [...blog, ...research, ...projects]
+  const entries = [...blog, ...research, ...projects, ...homelab, ...gear, ...photos, ...map]
     .filter((e) => (e.data.lang ?? "zh-CN") === locale)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
     .map((entry) => ({

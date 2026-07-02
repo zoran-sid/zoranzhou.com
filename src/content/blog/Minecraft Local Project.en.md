@@ -1,13 +1,10 @@
 ---
 author: "Zoran"
-title: "Advanced Minecraft Local Virtualization Multiplayer Setup"
+title: "Minecraft Local Server Deployment Tutorial"
 date: "2025-12-23"
 description: "Virtualized Minecraft multiplayer control panel with NAT traversal"
 tags:
   - Technology
-  - Gaming
-  - Minecraft
-  - Networking
 ShowToc: true
 TocOpen: true
 ShowWordCount: true
@@ -29,142 +26,178 @@ In this guide, I'll use **VMware Workstation** to set up a local **Minecraft** s
 
 **Note: The following setup requires foundational networking knowledge!**
 
----
+
 
 # Installing Ubuntu
 
-## VM Configuration
+Deploy Ubuntu system on VMware Workstation.
 
-| Setting | Value |
-| :--- | :--- |
-| OS | Ubuntu Server 22.04 LTS |
-| CPU | 4 cores |
-| RAM | 8 GB |
-| Disk | 50 GB |
-| Network | Bridged |
+![image-20251223184012710](https://e5d9f02.webp.fi/image-20251223184012710.png)
 
-After installation, update the system:
+For convenient NAT traversal later, choose bridged mode for the VM (this mode allows the virtual machine to directly connect to the network card, with the card connected to the router via wired network). The end result is that Ubuntu directly connects to the router. Then modify the IP address in Ubuntu's GUI to be on the same subnet as the router.
 
-```bash
-sudo apt update && sudo apt upgrade -y
+![image-20251223184828438](https://e5d9f02.webp.fi/image-20251223184828438.png)
+
+Bridging principle:
+
+![image-20251223210655233](https://e5d9f02.webp.fi/image-20251223210655233.png)
+
+Then install the control panel suite in Terminal:
+
+```
+sudo su -c "wget -qO- https://script.mcsmanager.com/setup_cn.sh | bash"
+
+# Start the panel daemon process first.
+# This is the service process for process control and terminal management.
+systemctl start mcsm-daemon.service
+# Then start the panel web service.
+# This is the service that enables web access and user management.
+systemctl start mcsm-web.service
+
+# Restart panel commands
+systemctl restart mcsm-daemon.service
+systemctl restart mcsm-web.service
+
+# Stop panel commands
+systemctl stop mcsm-web.service
+systemctl stop mcsm-daemon.service
 ```
 
----
+Then access the control panel via `{IP}:23333` and do initial configuration.
 
-# Installing the Minecraft Server
+![image-20251223190902081](https://e5d9f02.webp.fi/image-20251223190902081.png)
 
-## Install Java
+Install the Java JDK 21 environment required by Minecraft:
 
-```bash
-sudo apt install openjdk-21-jre-headless -y
+```
+sudo apt install openjdk-21-jdk
 java -version
 ```
 
-## Download and Set Up PaperMC
+![image-20251223192206195](https://e5d9f02.webp.fi/image-20251223192206195.png)
 
-```bash
-mkdir ~/minecraft && cd ~/minecraft
-wget https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/latest/downloads/paper-1.21.4-latest.jar
-echo "java -Xms4G -Xmx4G -jar paper-1.21.4-latest.jar nogui" > start.sh
-chmod +x start.sh
+
+
+# NPS Server Configuration
+
+Open ports 80/443/8080/8024 on the VPS firewall for NAT traversal mapping.
+
+```
+sudo ./nps install
+The default configuration file of nps use 80，443，8080，8024 ports
+80 and 443 ports for host mode default ports
+8080 for web management access port
+8024 for net bridge port, to communicate between server and client
+
+Configure conf/nps.conf
+#web
+web_username=xxx           // Username
+web_password=xxx           // Password
+web_port = 8080         // Default 8080 port for login
+web_ip=0.0.0.0
 ```
 
-Accept the EULA:
+NPS auto-start on boot:
 
-```bash
-echo "eula=true" > eula.txt
-./start.sh
+```
+systemctl enable Nps
 ```
 
----
+![image-20251223201913781](https://e5d9f02.webp.fi/image-20251223201913781.png)
 
-# NAT Traversal Setup
+Open firewall ports — here using Alibaba Cloud as an example:
 
-Since we're running on a local machine behind NAT, external players need a way to connect. We'll use **frp** (Fast Reverse Proxy).
+![image-20251223201618757](https://e5d9f02.webp.fi/image-20251223201618757.png)
 
-## Server Side (VPS with Public IP)
+Access the server control panel via {IP/domain}:8080:
 
-```bash
-# Download frp
-wget https://github.com/fatedier/frp/releases/download/v0.61.0/frp_0.61.0_linux_amd64.tar.gz
-tar -xzf frp_0.61.0_linux_amd64.tar.gz
-cd frp_0.61.0_linux_amd64
+![image-20251223202018281](https://e5d9f02.webp.fi/image-20251223202018281.png)
+
+Create client list:
+
+![image-20251223202632165](https://e5d9f02.webp.fi/image-20251223202632165.png)
+
+Create client tunnel to port 25565 (game default port is 25565, can be modified as needed):
+
+**Note**: Remember to allow port 25565 in firewall rules.
+
+![image-20251223202859258](https://e5d9f02.webp.fi/image-20251223202859258.png)
+
+Configure Server Port:
+
+```
+Server port: 25565
+Target:{127.0.0.1/intranet IP}:25565  // Map public port 25565 to private port 25565
 ```
 
-Configure `frps.toml`:
+![image-20251223203109753](https://e5d9f02.webp.fi/image-20251223203109753.png)
 
-```toml
-bindPort = 7000
-vhostHTTPPort = 8080
+## VM Ubuntu NPS Client Service
+
+Install NPS Client, run NAT traversal configuration according to NPS Server prompts:
+
+```
+wget https://github.com/ehang-io/nps/releases/download/v0.26.10/linux_386_client.tar.gz
+./npc -server={server IP/domain}:8024 -vkey={secret key} -type=tcp
 ```
 
-Run:
-```bash
-./frps -c frps.toml
+![image-20251223210352889](https://e5d9f02.webp.fi/image-20251223210352889.png)
+
+Run in Ubuntu Terminal, keep the virtual machine running in the background!
+
+![image-20251223210044136](https://e5d9f02.webp.fi/image-20251223210044136.png)
+
+
+
+# Minecraft Server Installation
+
+Access intranet IP:23333, enter the Minecraft server control panel. Create a new instance:
+
+```
+Startup command:
+java -jar xxx.jar   // Fill in according to the server file name
 ```
 
-## Client Side (Local Minecraft Server)
+![image-20251223203352299](https://e5d9f02.webp.fi/image-20251223203352299.png)
 
-Configure `frpc.toml`:
+Upload server files:
 
-```toml
-serverAddr = "YOUR_VPS_IP"
-serverPort = 7000
+Here using Paper Server 1.20.4 as an example:
 
-[[proxies]]
-name = "minecraft"
-type = "tcp"
-localIP = "127.0.0.1"
-localPort = 25565
-remotePort = 25565
+**Download URL:**
+
+```
+https://fill-data.papermc.io/v1/objects/cabed3ae77cf55deba7c7d8722bc9cfd5e991201c211665f9265616d9fe5c77b/paper-1.20.4-499.jar
 ```
 
-Run:
-```bash
-./frpc -c frpc.toml
+Upload to the server file root directory and start the service:
+
+![image-20251223203548710](https://e5d9f02.webp.fi/image-20251223203548710.png)
+
+Accept the EULA as required:
+
+**Just enable it in the server configuration file!**
+
+![image-20251223203805442](https://e5d9f02.webp.fi/image-20251223203805442.png)
+
+
+
+# Summary
+
+Finally, you can connect via the Minecraft multiplayer server!
+
+Although the overall process is relatively complex, it maximizes the solution to insufficient server configuration — you only need to adjust public bandwidth as needed. A typical 1M public bandwidth can support 2-3 players on a vanilla server.
+
+![image-20251223204230564](https://e5d9f02.webp.fi/image-20251223204230564.png)
+
+
+
+# Reference Links
+
+**The following links are the original download URLs needed:**
+
 ```
-
-Now players can connect via `YOUR_VPS_IP:25565`.
-
----
-
-# Web Control Panel
-
-## Install Crafty Controller
-
-Crafty provides a web-based management panel:
-
-```bash
-sudo apt install python3 python3-pip -y
-cd ~
-git clone https://gitlab.com/crafty-controller/crafty-4.git
-cd crafty-4
-python3 install.py
+https://github.com/ehang-io/nps
+https://docs.mcsmanager.com/zh_cn/
+https://papermc.io/downloads/paper
 ```
-
-Access the panel at `https://localhost:8443`.
-
----
-
-# Performance Tips
-
-| Optimization | Impact |
-| :--- | :--- |
-| Use Paper/Purpur instead of Vanilla | 🔴 High |
-| Pre-generate chunks with Chunky | 🟡 Medium |
-| Limit entity spawns in bukkit.yml | 🟡 Medium |
-| Use Aikar's JVM flags | 🔴 High |
-| Schedule restarts for memory cleanup | 🟢 Low |
-
----
-
-# Conclusion
-
-This setup gives you:
-
-✅ **Local hardware performance** — no budget VPS bottleneck  
-✅ **Full control** — web panel for management  
-✅ **NAT traversal** — friends can join from anywhere  
-✅ **Cost-effective** — minimal VPS only for the proxy  
-
-The only ongoing cost is the minimal VPS for the frp server, which doesn't need much CPU/RAM since it only handles network traffic.

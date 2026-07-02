@@ -1,0 +1,96 @@
+---
+interface Props {
+  categories: { key: string; label: string; count?: number }[];
+  activeCategory: string;
+}
+
+const { categories, activeCategory } = Astro.props;
+---
+
+<div id="media-grid-root" data-active={activeCategory}>
+  <div class="flex flex-wrap items-center gap-2" role="tablist" aria-label="Media categories">
+    {
+      categories.map((cat) => (
+        <button
+          type="button"
+          role="tab"
+          aria-selected={cat.key === activeCategory ? "true" : "false"}
+          data-cat={cat.key}
+          class="cat-tab inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-500 transition-colors hover:border-gray-300 hover:text-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:text-gray-100"
+        >
+          <span>{cat.label}</span>
+          {typeof cat.count === "number" && (
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 text-[11px] leading-none text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+              {cat.count}
+            </span>
+          )}
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .cat-tab[aria-selected="true"] {
+    border-color: rgb(17 24 39);
+    background: rgb(17 24 39);
+    color: white;
+  }
+
+  :global(.dark) .cat-tab[aria-selected="true"] {
+    border-color: rgb(243 244 246);
+    background: rgb(243 244 246);
+    color: rgb(17 24 39);
+  }
+</style>
+
+<script>
+  function setActiveTab(btn: HTMLButtonElement) {
+    document.querySelectorAll<HTMLButtonElement>(".cat-tab").forEach((tab) => {
+      tab.setAttribute("aria-selected", "false");
+    });
+    btn.setAttribute("aria-selected", "true");
+  }
+
+  function filterItems(cat: string) {
+    const rows = document.querySelectorAll<HTMLElement>("[data-category]");
+    let visibleCount = 0;
+
+    rows.forEach((el) => {
+      const isVisible = cat === "all" || el.dataset.category === cat;
+      el.classList.toggle("hidden", !isVisible);
+      if (isVisible) visibleCount++;
+    });
+
+    const emptyEl = document.getElementById("media-empty");
+    if (emptyEl) emptyEl.classList.toggle("hidden", visibleCount > 0);
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const initialCat = params.get("category") ?? "all";
+  const root = document.getElementById("media-grid-root");
+
+  if (initialCat !== "all") {
+    const targetBtn = document.querySelector<HTMLButtonElement>(`.cat-tab[data-cat="${initialCat}"]`);
+    if (targetBtn) {
+      setActiveTab(targetBtn);
+      filterItems(initialCat);
+    }
+  }
+
+  if (root) root.dataset.active = initialCat;
+
+  document.querySelectorAll<HTMLButtonElement>(".cat-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const cat = btn.dataset.cat!;
+      setActiveTab(btn);
+      filterItems(cat);
+      if (root) root.dataset.active = cat;
+
+      const url = new URL(window.location.href);
+      if (cat === "all") url.searchParams.delete("category");
+      else url.searchParams.set("category", cat);
+      window.history.replaceState({}, "", url.toString());
+    });
+  });
+</script>

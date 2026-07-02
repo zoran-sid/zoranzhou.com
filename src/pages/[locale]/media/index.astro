@@ -1,0 +1,190 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import CategoryTabs from "../../../components/media/CategoryTabs.astro";
+import { getTranslations, localizePath, type Locale, locales } from "../../../i18n/utils";
+import mediaListSource from "../../../content/media.md?raw";
+import { parseMediaList, type MediaCategory, type MediaListItem } from "../../../lib/media/list";
+
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+
+const allItems = parseMediaList(mediaListSource);
+
+const statusLabelMap: Record<string, string> = {
+  watched: t.mediaStatusWatched,
+  watching: t.mediaStatusWatching,
+  "want-to-watch": t.mediaStatusWantToWatch,
+  completed: t.mediaStatusCompleted,
+  playing: t.mediaStatusPlaying,
+  "want-to-play": t.mediaStatusWantToPlay,
+  read: t.mediaStatusRead,
+  reading: t.mediaStatusReading,
+  "want-to-read": t.mediaStatusWantToRead,
+  dropped: t.mediaStatusDropped,
+  "on-hold": t.mediaStatusOnHold,
+};
+
+const categoryLabelMap: Record<MediaCategory, string> = {
+  movies: t.mediaCategoryMovies,
+  tv: t.mediaCategoryTV,
+  books: t.mediaCategoryBooks,
+  games: t.mediaCategoryGames,
+};
+
+const categoryOrder: MediaCategory[] = ["movies", "tv", "books", "games"];
+const countByCategory = categoryOrder.reduce(
+  (counts, category) => ({
+    ...counts,
+    [category]: allItems.filter((item) => item.category === category).length,
+  }),
+  {} as Record<MediaCategory, number>,
+);
+
+const categories = [
+  { key: "all", label: t.mediaAll, count: allItems.length },
+  ...categoryOrder.map((category) => ({
+    key: category,
+    label: categoryLabelMap[category],
+    count: countByCategory[category],
+  })),
+];
+
+const categoryAccent: Record<MediaCategory, string> = {
+  movies: "bg-sky-500",
+  tv: "bg-violet-500",
+  books: "bg-emerald-500",
+  games: "bg-amber-500",
+};
+
+function renderRating(rating: number) {
+  const rounded = Math.round(rating);
+  return "★".repeat(rounded) + "☆".repeat(Math.max(0, 5 - rounded));
+}
+
+function formatTotal(count: number) {
+  return t.mediaTotal.replace("{count}", String(count));
+}
+
+const mediaPageUrl = new URL(localizePath("/media", locale), Astro.site).href;
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: t.mediaTitle,
+  description: t.mediaDescription,
+  url: mediaPageUrl,
+  mainEntity: {
+    "@type": "ItemList",
+    itemListElement: allItems.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "CreativeWork",
+        name: item.name,
+        ...(item.year ? { dateCreated: String(item.year) } : {}),
+      },
+    })),
+  },
+};
+---
+
+<BaseLayout title={t.mediaTitle} description={t.mediaDescription} jsonld={jsonld}>
+  <main class="page-container py-14 md:py-20">
+    <header class="max-w-3xl">
+      <p class="text-sm font-medium uppercase text-gray-500 dark:text-gray-400">{t.navMedia}</p>
+      <h1 class="mt-3 text-4xl font-bold text-gray-950 dark:text-gray-50 md:text-5xl">
+        {t.mediaTitle}
+      </h1>
+      <p class="mt-5 max-w-2xl text-base leading-8 text-gray-600 dark:text-gray-300">
+        {t.mediaIntro}
+      </p>
+    </header>
+
+    <section class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label={t.mediaType}>
+      {categoryOrder.map((category) => (
+        <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <span class={`h-2.5 w-2.5 rounded-full ${categoryAccent[category]}`}></span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                {categoryLabelMap[category]}
+              </span>
+            </div>
+            <span class="text-2xl font-semibold text-gray-950 dark:text-gray-50">
+              {countByCategory[category]}
+            </span>
+          </div>
+        </div>
+      ))}
+    </section>
+
+    <section class="mt-10">
+      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <CategoryTabs categories={categories} activeCategory="all" />
+        <p class="text-sm text-gray-500 dark:text-gray-400">{formatTotal(allItems.length)}</p>
+      </div>
+
+      {allItems.length === 0 ? (
+        <p id="media-empty" class="rounded-lg border border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-800 dark:text-gray-500">
+          {t.mediaEmpty}
+        </p>
+      ) : (
+        <>
+          <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+            <table class="w-full table-fixed text-left">
+              <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:bg-gray-900/60 dark:text-gray-400">
+                <tr>
+                  <th class="w-28 px-4 py-3">{t.mediaType}</th>
+                  <th class="px-4 py-3">{t.mediaName}</th>
+                  <th class="w-20 px-4 py-3 text-center">{t.mediaYear}</th>
+                  <th class="hidden w-36 px-4 py-3 text-center sm:table-cell">{t.mediaRating}</th>
+                  <th class="w-28 px-4 py-3 text-right">{t.mediaStatus}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-sm dark:divide-gray-800">
+                {allItems.map((item: MediaListItem) => (
+                  <tr data-category={item.category} class="transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-900/50">
+                    <td class="px-4 py-4">
+                      <span class="inline-flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                        <span class={`h-2 w-2 rounded-full ${categoryAccent[item.category]}`}></span>
+                        {categoryLabelMap[item.category]}
+                      </span>
+                    </td>
+                    <td class="px-4 py-4">
+                      <div class="min-w-0">
+                        <p class="truncate text-base font-medium text-gray-950 dark:text-gray-50">
+                          {item.name}
+                        </p>
+                        <p class="mt-1 text-xs text-yellow-600 dark:text-yellow-400 sm:hidden" aria-label={`${t.mediaRating}: ${item.rating}`}>
+                          {item.rating > 0 ? renderRating(item.rating) : "-"}
+                        </p>
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 text-center text-sm tabular-nums text-gray-500 dark:text-gray-400">
+                      {item.year ?? "-"}
+                    </td>
+                    <td class="hidden px-4 py-4 text-center text-sm tracking-wide text-yellow-600 dark:text-yellow-400 sm:table-cell" aria-label={`${t.mediaRating}: ${item.rating}`}>
+                      {item.rating > 0 ? renderRating(item.rating) : "-"}
+                    </td>
+                    <td class="px-4 py-4 text-right">
+                      <span class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        {statusLabelMap[item.status] ?? item.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p id="media-empty" class="hidden rounded-lg border border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-800 dark:text-gray-500">
+            {t.mediaEmpty}
+          </p>
+        </>
+      )}
+    </section>
+  </main>
+</BaseLayout>

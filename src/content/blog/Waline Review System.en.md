@@ -5,8 +5,6 @@ date: "2024-05-02"
 description: "Using Waline as a commenting solution with Vercel + LeanCloud"
 tags:
   - Technology
-  - Tutorial
-  - Blog
 ShowToc: true
 TocOpen: true
 ShowWordCount: true
@@ -22,203 +20,124 @@ slug: waline-review-system-en
 
 Waline is a serverless commenting system backed by LeanCloud and other backends, extremely popular for Hugo and other static site generators.
 
-## Why Waline?
+Advantages:
 
-| Feature | Waline | Disqus | Giscus |
-| :--- | :--- | :--- | :--- |
-| Self-hosted | ✅ | ❌ | ✅ (GitHub) |
-| No ads | ✅ | ❌ (Pro only) | ✅ |
-| Data ownership | ✅ | ❌ | ✅ |
-| Login options | Multiple | Multiple | GitHub only |
-| Markdown support | ✅ | ✅ | ✅ |
-| Email notifications | ✅ | ✅ | ❌ |
-| Free | ✅ | ✅ (with ads) | ✅ |
+- Small frontend resources, fast loading;
+- Cloud storage, no need to deploy a database;
+- Supports managed backend, works great with LeanCloud;
+- Supports multiple styles;
+- Supports guest login or QQ/Weibo login methods;
 
----
+I chose this solution because it supports social media login and the comment section looks great~
 
-## Architecture
+![image-20251209172100285](https://e5d9f02.webp.fi/image-20251209172100285.png)
+
+# Deployment Process
+
+## Create LeanCloud Account
+
+![Create Application](https://e5d9f02.webp.fi/leancloud-1-CucZPnJ0.png)
 
 ```
-[Visitor] → [Vercel (Waline server)] → [LeanCloud (Database)]
-                                              ↓
-                                     [Email Notification]
+Obtain three API keys:
+AppID
+AppKey
+MasterKey
 ```
 
----
+![ID and Key](https://e5d9f02.webp.fi/leancloud-2-C9bCeSu_.png)
 
-## Step 1: Set Up LeanCloud
+**China edition requires ICP filing:**
 
-### Create an Account
+If you are using the LeanCloud China edition ([leancloud.cn](https://leancloud.cn/)), it is recommended to switch to the international edition ([leancloud.app](https://leancloud.app/)). Otherwise, you need to bind an ICP-filed domain for the application, purchase an independent IP, and complete the filing process:
 
-1. Go to [leancloud.app](https://www.leancloud.app/) (International) or [leancloud.cn](https://www.leancloud.cn/) (China)
-2. Create a new application
-3. Go to **Settings** → **App Keys**
-4. Note down: `AppID`, `AppKey`, `MasterKey`
+- Log into the China edition and enter the application you need to use
+- Select `Settings` > `Domain Binding` > `API Access Domain` > `Bind New Domain` > Enter domain > `Confirm`.
+- Follow the on-page instructions to complete the CNAME resolution in DNS.
+- Purchase an independent IP and submit a ticket to complete the ICP filing. (Independent IP is currently priced at ¥50/unit/month)
 
-### Create the Comment Table
+![Domain Settings](https://e5d9f02.webp.fi/leancloud-3-CT_lZM0A.png)
 
-In LeanCloud dashboard:
-1. Go to **Storage** → **Create Class**
-2. Name it `Comment`
-3. Add columns: `nick`, `mail`, `link`, `comment`, `ua`, `url`, `ip`, `insertedAt`
 
----
 
-## Step 2: Deploy Waline to Vercel
+## Vercel Deployment (Server Side)
 
-### One-Click Deploy
+Enter your preferred Vercel project name and create it.
 
-Click the deploy button on the [Waline documentation](https://waline.js.org/guide/get-started.html) or:
+![image-20251209172854011](https://e5d9f02.webp.fi/image-20251209172854011.png)
 
-1. Fork/clone [github.com/walinejs/waline](https://github.com/walinejs/waline)
-2. Import to Vercel
-3. Set environment variables:
+Click `Settings` - `Environment Variables` at the top to enter the environment variable configuration page, and configure three environment variables: `LEAN_ID`, `LEAN_KEY`, and `LEAN_MASTER_KEY`. Their values correspond respectively to the `APP ID`, `APP KEY`, and `Master Key` obtained in the previous step from LeanCloud.
 
-| Variable | Value |
-| :--- | :--- |
-| `LEAN_ID` | Your LeanCloud AppID |
-| `LEAN_KEY` | Your LeanCloud AppKey |
-| `LEAN_MASTER_KEY` | Your LeanCloud MasterKey |
-| `SITE_NAME` | Your blog name |
-| `SITE_URL` | Your blog URL |
-| `SMTP_SERVICE` | (Optional) For email notifications |
-| `AUTHOR_EMAIL` | (Optional) Your email |
+![Set Environment Variables](https://e5d9f02.webp.fi/vercel-5-CIj2EZQq.png)
 
-4. Deploy!
+After configuring environment variables, click `Deployments` at the top, then click the `Redeploy` button on the right side of the latest deployment. This step is to make the environment variables you just set take effect.
 
-After deployment, you'll get a URL like `https://waline-xxxxx.vercel.app`.
+![Redeploy](https://e5d9f02.webp.fi/vercel-6-CQnJ4Agt.png)
 
----
+This will redirect to the `Overview` page where deployment begins. Wait a moment until `STATUS` becomes `Ready`. At this point, click `Visit` to go to the deployed website address — this address is your server-side address.
 
-## Step 3: Integrate with Your Blog
+### Bind Domain (Optional)
 
-### Hugo (PaperMod Theme)
+1. Click `Settings` - `Domains` at the top to enter the domain configuration page
+2. Enter the domain you want to bind and click `Add`
 
-Add to `config.toml`:
+![Add domain](https://e5d9f02.webp.fi/vercel-8-BDTeHH3e.png)
 
-```toml
-[params]
-  [params.waline]
-    serverURL = "https://waline-xxxxx.vercel.app"
-    lang = "en"
-    visitor = true
-    emoji = [
-      "https://unpkg.com/@waline/emojis@1.1.0/weibo",
-      "https://unpkg.com/@waline/emojis@1.1.0/bilibili"
-    ]
+
+
+Finally, you can access the comment system and management system via your domain:
+
+- Comment system: example.yourdomain.com
+- Comment management: example.yourdomain.com/ui
+
+
+
+Note: The first registered user is the administrator by default!!!
+
+
+
+# Embed HTML
+
+```
+Embed HTML file path:
+Create waline.html
+/layouts/partials/comments.html  // Depends on the theme's web page structure
 ```
 
-### Astro
+## Waline.html
 
-Install the Waline client:
-
-```bash
-npm install @waline/client
 ```
-
-Add to your post layout:
-
-```astro
----
-import { init } from '@waline/client';
----
+<!-- Waline Comment System -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@waline/client@v3/dist/waline.css"
+/>
 
 <div id="waline"></div>
 
-<script>
-  init({
-    el: '#waline',
-    serverURL: 'https://waline-xxxxx.vercel.app',
-    lang: 'en',
-    dark: 'auto',
-    emoji: [
-      'https://unpkg.com/@waline/emojis@1.1.0/weibo',
-    ],
-  });
-</script>
-```
-
-### Generic HTML
-
-Add to any page:
-
-```html
-<div id="waline"></div>
-<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
 <script type="module">
   import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+
   init({
     el: '#waline',
-    serverURL: 'https://waline-xxxxx.vercel.app',
+    serverURL: '{{ .serverURL }}',   // Retrieved from config.toml
+    locale: '{{ .locale | default "en" }}',
+    dark: '{{ .dark | default "auto" }}',
   });
 </script>
+
 ```
 
----
+## Comments.html
 
-## Step 4: Configure Waline
-
-### Admin Management
-
-Visit `https://waline-xxxxx.vercel.app/ui` to manage comments:
-- Approve/delete comments
-- Pin important comments
-- View visitor statistics
-- Configure spam filtering
-
-### Akismet Spam Protection
-
-Add to Vercel environment variables:
-
-```env
-AKISMET_KEY=your_akismet_api_key
+```
+  {{- if $pageCommentSystems.waline }}
+    {{- with .waline }}
+      {{- partial "waline.html" . }}
 ```
 
-### Email Notifications
 
-Configure SMTP in Vercel environment:
 
-```env
-SMTP_SERVICE=QQ         # or Gmail, 163, etc.
-SMTP_USER=your@email.com
-SMTP_PASS=your_password
-SITE_NAME=My Blog
-```
 
----
 
-## Migration from Other Systems
-
-### From Disqus
-
-Waline provides an import tool at `https://waline-xxxxx.vercel.app/ui/migration`.
-
-### From Giscus/GitHub Issues
-
-Export GitHub issues as JSON, then use the Waline import API.
-
----
-
-## Troubleshooting
-
-| Issue | Solution |
-| :--- | :--- |
-| Comments not loading | Check browser console for CORS errors; verify Vercel URL |
-| 401 Unauthorized | Check LeanCloud keys in Vercel env vars |
-| 500 Server Error | Check Vercel function logs |
-| Chinese characters garbled | Set `lang: 'zh-CN'` in Waline config |
-| IP not recorded | Enable `recordIP: true` in server config |
-
----
-
-## Conclusion
-
-Waline provides a complete, self-hosted commenting solution:
-
-✅ **Free** — Vercel free tier + LeanCloud free tier  
-✅ **Data ownership** — You own all comment data  
-✅ **No ads** — Unlike Disqus free plan  
-✅ **Customizable** — Full control over UI and features  
-✅ **Multi-platform** — Works with any static site generator  
-
-It's the ideal commenting solution for personal blogs and documentation sites.
+This tutorial references: https://waline.js.org/en/guide/get-started

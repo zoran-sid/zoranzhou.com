@@ -1,6 +1,6 @@
 ﻿---
 author: "Zoran"
-title: "Minecraft 本地虚拟化联机进阶玩法"
+title: "Minecraft 本地服务器部署教程"
 date: "2025-12-23"
 description: "虚拟化 Minecraft 联机控制面板及其内网穿透"
 tags:

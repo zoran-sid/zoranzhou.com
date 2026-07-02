@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { getTranslations, localizePath, type Locale, locales } from "../../../i18n/utils";
+
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+
+const entries = (await getCollection("homelab", ({ data }) => !data.draft))
+  .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const areaLabel: Record<string, string> = {
+  network: t.homelabAreaNetwork,
+  server: t.homelabAreaServer,
+  security: t.homelabAreaSecurity,
+  automation: t.homelabAreaAutomation,
+  storage: t.homelabAreaStorage,
+  observability: t.homelabAreaObservability,
+};
+
+const statusLabel: Record<string, string> = {
+  planned: t.homelabStatusPlanned,
+  building: t.homelabStatusBuilding,
+  running: t.homelabStatusRunning,
+  retired: t.homelabStatusRetired,
+};
+---
+
+<BaseLayout title={t.homelabPageTitle} description={t.homelabPageDescription}>
+  <div class="page-container py-16 md:py-24">
+    <header class="mb-12 max-w-3xl">
+      <p class="text-sm font-medium uppercase text-gray-500 dark:text-gray-400">{t.navHomelab}</p>
+      <h1 class="mt-3 text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 md:text-5xl">
+        {t.homelabPageTitle}
+      </h1>
+      <p class="mt-4 text-lg leading-8 text-gray-500 dark:text-gray-400">{t.homelabPageDescription}</p>
+    </header>
+
+    {entries.length === 0 ? (
+      <p class="text-gray-400">{t.homelabEmpty}</p>
+    ) : (
+      <div class="grid gap-4 md:grid-cols-2">
+        {entries.map((entry) => (
+          <a href={localizePath(`/homelab/${entry.slug}`, locale)} class="group rounded-lg border border-gray-200 p-5 no-underline transition-colors hover:border-gray-300 hover:bg-gray-50/70 dark:border-gray-800 dark:hover:border-gray-700 dark:hover:bg-gray-900/50">
+            <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <span class="rounded-md bg-blue-50 px-2 py-1 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">{areaLabel[entry.data.area]}</span>
+              <span class="rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-800">{statusLabel[entry.data.status]}</span>
+              <time datetime={entry.data.date.toISOString()}>{entry.data.date.toLocaleDateString(dateLocale, { year: "numeric", month: "short", day: "numeric" })}</time>
+            </div>
+            <h2 class="mt-4 text-xl font-semibold text-gray-900 transition-colors group-hover:text-blue-600 dark:text-gray-100">
+              {entry.data.title}
+            </h2>
+            {entry.data.description && <p class="mt-2 line-clamp-2 text-sm leading-6 text-gray-500 dark:text-gray-400">{entry.data.description}</p>}
+            {entry.data.tech.length > 0 && (
+              <div class="mt-4 flex flex-wrap gap-1.5">
+                {entry.data.tech.slice(0, 6).map((item) => (
+                  <span class="rounded-md border border-gray-200 px-2 py-0.5 text-xs text-gray-500 dark:border-gray-800 dark:text-gray-400">{item}</span>
+                ))}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>

@@ -10,6 +10,10 @@ export async function getStaticPaths() {
     ...(await getCollection("research", ({ data }) => !data.draft)),
     ...(await getCollection("projects", ({ data }) => !data.draft)),
     ...(await getCollection("tools", ({ data }) => !data.draft)),
+    ...(await getCollection("homelab", ({ data }) => !data.draft)),
+    ...(await getCollection("gear", ({ data }) => !data.draft)),
+    ...(await getCollection("photos", ({ data }) => !data.draft)),
+    ...(await getCollection("map", ({ data }) => !data.draft)),
   ];
 
   // Build per-locale tag sets
@@ -43,6 +47,10 @@ const allContent = [
   ...(await getCollection("research", ({ data }) => !data.draft)),
   ...(await getCollection("projects", ({ data }) => !data.draft)),
   ...(await getCollection("tools", ({ data }) => !data.draft)),
+  ...(await getCollection("homelab", ({ data }) => !data.draft)),
+  ...(await getCollection("gear", ({ data }) => !data.draft)),
+  ...(await getCollection("photos", ({ data }) => !data.draft)),
+  ...(await getCollection("map", ({ data }) => !data.draft)),
 ];
 
 const filtered = allContent
