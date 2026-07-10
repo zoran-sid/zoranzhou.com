@@ -1,7 +1,9 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
-import { getTranslations, localizePath, type Locale, locales } from "../../../i18n/utils";
+import { Image } from "astro:assets";
+import { getLocalPhotoAlbums, type PhotoAlbum } from "../../../lib/photos";
+import { legacyAlbums, type LegacyAlbum } from "../../../data/legacy-photos";
+import { getTranslations, type Locale, locales } from "../../../i18n/utils";
 
 export async function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
@@ -10,44 +12,183 @@ export async function getStaticPaths() {
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
 
-const entries = (await getCollection("photos", ({ data }) => !data.draft))
-  .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const localAlbums = getLocalPhotoAlbums();
+
+interface UnifiedAlbum {
+  slug: string;
+  title: string;
+  description: string | null;
+  date: string;
+  location?: string;
+  camera?: string;
+  isLocal: boolean;
+  photos: { id: string; src: string; alt: string }[];
+}
+
+const unifiedAlbums: UnifiedAlbum[] = [
+  ...localAlbums.map((a: PhotoAlbum) => ({
+    slug: a.slug,
+    title: a.title,
+    description: null,
+    date: a.date ?? "",
+    isLocal: true,
+    photos: a.photos.map((p) => ({
+      id: p.id,
+      src: p.image.src,
+      alt: p.alt,
+    })),
+  })),
+  ...legacyAlbums.map((a: LegacyAlbum) => ({
+    slug: a.slug,
+    title: a.title[locale] ?? a.title.en,
+    description: a.description?.[locale] ?? a.description?.en ?? null,
+    date: a.date,
+    location: a.location,
+    camera: a.camera,
+    isLocal: false,
+    photos: a.photos.map((p, i) => ({
+      id: `${a.slug}-${i}`,
+      src: p.src,
+      alt: p.alt,
+    })),
+  })),
+].sort((a, b) => b.date.localeCompare(a.date));
+
+const allPhotos = unifiedAlbums.flatMap((album) =>
+  album.photos.map((p) => ({ ...p, albumTitle: album.title })),
+);
 ---
 
 <BaseLayout title={t.photosPageTitle} description={t.photosPageDescription}>
-  <div class="page-container py-16 md:py-24">
-    <header class="mb-12 max-w-3xl">
-      <p class="text-sm font-medium uppercase text-gray-500 dark:text-gray-400">{t.navPhotos}</p>
-      <h1 class="mt-3 text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 md:text-5xl">
-        {t.photosPageTitle}
-      </h1>
-      <p class="mt-4 text-lg leading-8 text-gray-500 dark:text-gray-400">{t.photosPageDescription}</p>
+  <main class="photo-page">
+    <header class="photo-page__header">
+      <p class="section-kicker">{t.navPhotos}</p>
+      <h1 class="photo-page__title">{t.photosPageTitle}</h1>
     </header>
 
-    {entries.length === 0 ? (
-      <p class="text-gray-400">{t.photosEmpty}</p>
-    ) : (
-      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {entries.map((entry) => {
-          const image = entry.data.cover?.src ?? entry.data.gallery[0]?.src;
-          return (
-            <a href={localizePath(`/photos/${entry.slug}`, locale)} class="group overflow-hidden rounded-lg border border-gray-200 bg-white no-underline transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700">
-              <div class="aspect-[4/3] bg-gray-100 dark:bg-gray-900">
-                {image ? <img src={image} alt={entry.data.cover?.alt ?? entry.data.title} loading="lazy" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /> : null}
-              </div>
-              <div class="p-4">
-                <h2 class="text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600 dark:text-gray-100">{entry.data.title}</h2>
-                {entry.data.description && <p class="mt-2 line-clamp-2 text-sm leading-6 text-gray-500 dark:text-gray-400">{entry.data.description}</p>}
-                <div class="mt-4 flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  {entry.data.location && <span>{t.photosLocation}: {entry.data.location}</span>}
-                  {entry.data.camera && <span>{t.photosCamera}: {entry.data.camera}</span>}
+    {
+      unifiedAlbums.length === 0 ? (
+        <p class="photo-empty">{t.photosEmpty}</p>
+      ) : (
+        <div class="photo-albums">
+          {unifiedAlbums.map((album) => (
+            <section class="photo-album" aria-labelledby={`album-${album.slug}`}>
+              <header class="photo-album__header">
+                <div>
+                  <h2 id={`album-${album.slug}`} class="photo-album__title">{album.title}</h2>
+                  {album.description && <p class="photo-album__desc">{album.description}</p>}
                 </div>
+                <div class="photo-album__meta">
+                  {album.location && <span>{t.photosLocation}: {album.location}</span>}
+                  {album.camera && <span>{t.photosCamera}: {album.camera}</span>}
+                  {album.date && <time datetime={album.date}>{album.date}</time>}
+                </div>
+              </header>
+              <div class="photo-grid">
+                {album.photos.map((photo, index) => {
+                  const globalIndex = allPhotos.findIndex((p) => p.id === photo.id);
+                  return (
+                    <button
+                      type="button"
+                      class="photo-card"
+                      data-photo-button
+                      data-index={String(globalIndex)}
+                      data-src={photo.src}
+                      data-alt={photo.alt}
+                      aria-label={photo.alt}
+                    >
+                      {album.isLocal ? (
+                        <Image
+                          src={photo.src}
+                          alt={photo.alt}
+                          widths={[360, 640, 960]}
+                          sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                          loading={index < 4 ? "eager" : "lazy"}
+                          decoding="async"
+                        />
+                      ) : (
+                        <img src={photo.src} alt={photo.alt} loading={index < 4 ? "eager" : "lazy"} decoding="async" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-            </a>
-          );
-        })}
-      </div>
-    )}
-  </div>
+            </section>
+          ))}
+        </div>
+      )
+    }
+
+    <dialog class="photo-lightbox" data-photo-lightbox aria-label={t.photosPageTitle}>
+      <button type="button" class="photo-lightbox__close" data-lightbox-close aria-label={locale === "zh-CN" ? "关闭" : "Close"}>&times;</button>
+      <button type="button" class="photo-lightbox__prev" data-lightbox-prev aria-label={locale === "zh-CN" ? "上一张" : "Previous"}>&lsaquo;</button>
+      <figure class="photo-lightbox__figure">
+        <img data-lightbox-image src="" alt="" />
+      </figure>
+      <button type="button" class="photo-lightbox__next" data-lightbox-next aria-label={locale === "zh-CN" ? "下一张" : "Next"}>&rsaquo;</button>
+    </dialog>
+  </main>
 </BaseLayout>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-photo-button]"));
+  const dialog = document.querySelector<HTMLDialogElement>("[data-photo-lightbox]");
+  const image = dialog?.querySelector<HTMLImageElement>("[data-lightbox-image]");
+  const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-close]");
+  const prevBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-prev]");
+  const nextBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-next]");
+
+  let activeIndex = 0;
+
+  function showPhoto(index: number) {
+    if (!dialog || !image || buttons.length === 0) return;
+    activeIndex = (index + buttons.length) % buttons.length;
+    const btn = buttons[activeIndex];
+    image.src = btn.dataset.src ?? "";
+    image.alt = btn.dataset.alt ?? "";
+    if (!dialog.open) dialog.showModal();
+  }
+
+  buttons.forEach((btn, i) => { btn.addEventListener("click", () => showPhoto(i)); });
+  closeBtn?.addEventListener("click", () => dialog?.close());
+  prevBtn?.addEventListener("click", () => showPhoto(activeIndex - 1));
+  nextBtn?.addEventListener("click", () => showPhoto(activeIndex + 1));
+  dialog?.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
+  document.addEventListener("keydown", (e) => {
+    if (!dialog?.open) return;
+    if (e.key === "ArrowLeft") showPhoto(activeIndex - 1);
+    if (e.key === "ArrowRight") showPhoto(activeIndex + 1);
+    if (e.key === "Escape") dialog.close();
+  });
+</script>
+
+<style>
+  .photo-page { width: min(100%, 1600px); margin-inline: auto; padding: clamp(16px, 3vw, 40px); }
+  .photo-page__header { margin-bottom: 28px; }
+  .photo-page__title { margin: 0.5rem 0 0; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 680; letter-spacing: -0.04em; line-height: 1; }
+  .photo-albums { display: grid; gap: clamp(40px, 7vw, 80px); }
+  .photo-album__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .photo-album__title { margin: 0; font-size: clamp(1.3rem, 3vw, 2rem); }
+  .photo-album__desc { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
+  .photo-album__meta { display: flex; flex-wrap: wrap; gap: 12px; color: var(--faint); font-size: 0.78rem; }
+  .photo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(6px, 1.5vw, 14px); }
+  .photo-card { display: block; min-width: 0; padding: 0; overflow: hidden; border: 0; border-radius: 12px; background: #e6e9ed; cursor: zoom-in; }
+  .dark .photo-card { background: #1a1f2a; }
+  .photo-card img { display: block; width: 100%; height: auto; transition: transform 240ms ease; }
+  .photo-card:hover img { transform: scale(1.025); }
+  .photo-card:focus-visible { outline: 3px solid rgb(37 201 149 / 0.45); outline-offset: 4px; }
+  .photo-lightbox { width: min(96vw, 1400px); max-width: none; height: min(92dvh, 1000px); max-height: none; padding: 0; overflow: hidden; border: 0; border-radius: 18px; background: rgb(10 14 20 / 0.96); }
+  .photo-lightbox::backdrop { background: rgb(3 6 10 / 0.82); backdrop-filter: blur(10px); }
+  .photo-lightbox[open] { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; align-items: center; }
+  .photo-lightbox__figure { display: grid; place-items: center; width: 100%; height: 100%; min-width: 0; min-height: 0; margin: 0; padding: 20px; }
+  .photo-lightbox__figure img { display: block; max-width: 100%; max-height: calc(92dvh - 40px); object-fit: contain; }
+  .photo-lightbox__close, .photo-lightbox__prev, .photo-lightbox__next { min-width: 44px; min-height: 44px; border: 0; border-radius: 999px; background: rgb(255 255 255 / 0.1); color: #fff; font: inherit; font-size: 1.8rem; cursor: pointer; transition: background 0.16s ease; }
+  .photo-lightbox__close:hover, .photo-lightbox__prev:hover, .photo-lightbox__next:hover { background: rgb(255 255 255 / 0.2); }
+  .photo-lightbox__close { position: absolute; top: 14px; right: 14px; z-index: 10; }
+  .photo-lightbox__prev, .photo-lightbox__next { justify-self: center; }
+  .photo-empty { padding: 60px 20px; color: var(--faint); text-align: center; }
+  @media (max-width: 1100px) { .photo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 720px) { .photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .photo-lightbox[open] { grid-template-columns: 44px minmax(0, 1fr) 44px; } .photo-lightbox__figure { padding: 10px; } }
+  @media (max-width: 380px) { .photo-grid { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .photo-card img { transition: none; } }
+</style>
