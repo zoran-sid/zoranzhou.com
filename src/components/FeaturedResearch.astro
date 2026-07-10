@@ -22,10 +22,22 @@ const featured = research
           {t.researchDeck}
         </p>
       </div>
-      <a href={localizePath("/research", locale)} class="premium-link hidden sm:inline-flex">
+      <a
+        href={localizePath("/research", locale)}
+        class="premium-link hidden sm:inline-flex"
+      >
         {t.researchViewAll}
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
         </svg>
       </a>
     </div>
@@ -36,12 +48,15 @@ const featured = research
       ) : (
         <div class="grid gap-6 md:grid-cols-3">
           {featured.map((entry) => (
-            <a href={localizePath(`/research/${entry.slug}`, locale)} class="premium-card reveal group block rounded-2xl p-6 no-underline">
+            <a
+              href={localizePath(`/research/${entry.slug}`, locale)}
+              class="premium-card reveal group block rounded-2xl p-6 no-underline"
+            >
               <div class="mb-6 flex items-center justify-between gap-3">
                 <span class="status-chip rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]">
                   {entry.data.status?.replace("-", " ") ?? "Completed"}
                 </span>
-                <span class="h-px flex-1 bg-gray-200/80 dark:bg-white/10"></span>
+                <span class="h-px flex-1 bg-gray-200/80 dark:bg-white/10" />
               </div>
               <h3 class="text-lg font-semibold tracking-tight text-gray-950 transition-colors group-hover:text-gray-700 dark:text-gray-100 dark:group-hover:text-white">
                 {entry.data.title}

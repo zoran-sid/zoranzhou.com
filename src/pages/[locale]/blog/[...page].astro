@@ -68,8 +68,8 @@ const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 ---
 
 <BaseLayout title={t.blogTitle} description={t.blogDescription}>
-  <div class="page-container py-16 md:py-24">
-    <header class="mb-12">
+  <div class="system-index page-container py-16 md:py-24">
+    <header class="system-index__header mb-12">
       <h1
         class="text-4xl font-bold tracking-tight text-gray-900 md:text-5xl dark:text-gray-100"
       >
@@ -84,13 +84,13 @@ const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
       page.data.length === 0 ? (
         <p class="text-gray-400 dark:text-gray-500">{t.blogEmpty}</p>
       ) : (
-        <div class="divide-y divide-gray-100 dark:divide-gray-800">
+        <div class="system-index__list divide-y divide-gray-100 dark:divide-gray-800">
           {page.data.map((post) => (
             <a
               href={localizePath(`/blog/${post.slug}`, locale)}
-              class="group flex flex-col gap-3 py-6 no-underline transition-all duration-200 hover:bg-gray-50/40 dark:hover:bg-gray-800/30 -mx-4 px-4 rounded-xl sm:flex-row sm:items-baseline sm:gap-8"
+              class="system-index__item group flex flex-col gap-3 py-6 no-underline transition-all duration-200 sm:flex-row sm:items-baseline sm:gap-8"
             >
-              <div class="flex shrink-0 items-center gap-3 sm:w-44 sm:flex-col sm:items-start sm:gap-1">
+              <div class="system-index__meta flex shrink-0 items-center gap-3 sm:w-44 sm:flex-col sm:items-start sm:gap-1">
                 <time
                   datetime={post.data.date.toISOString()}
                   class="text-sm font-medium text-gray-900 dark:text-gray-200"
@@ -106,7 +106,7 @@ const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
                 </span>
               </div>
 
-              <div class="min-w-0 flex-1">
+              <div class="system-index__body min-w-0 flex-1">
                 <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors dark:text-gray-100 dark:group-hover:text-blue-400">
                   {post.data.title}
                 </h2>

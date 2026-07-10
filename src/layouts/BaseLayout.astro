@@ -29,6 +29,7 @@ const pageDescription = description ?? t.siteDescription;
 
 // Current path without locale prefix for canonical
 const canonicalPath = Astro.url.pathname;
+const isHome = /^\/(?:zh-CN|en)\/?$/.test(canonicalPath);
 ---
 
 <!doctype html>
@@ -100,8 +101,8 @@ const canonicalPath = Astro.url.pathname;
     }
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -114,16 +115,22 @@ const canonicalPath = Astro.url.pathname;
     <ThemeScript />
   </head>
   <body
-    class="bg-white text-gray-900 antialiased dark:bg-[#0a0a0b] dark:text-gray-200"
+    class="site-body bg-white text-gray-900 antialiased dark:bg-[#0a0a0b] dark:text-gray-200"
   >
+    <div class="site-backdrop" aria-hidden="true">
+      <span class="site-backdrop__grid"></span>
+      <span class="site-backdrop__glow glow-a"></span>
+      <span class="site-backdrop__glow glow-b"></span>
+    </div>
+
     <!-- Scroll progress bar -->
     <div id="progress-bar" class="scroll-progress" style="width: 0%"></div>
 
     <Navigation />
-    <main class="min-h-screen pt-16 relative z-[1]">
+    <main class="site-main min-h-screen relative z-[1]">
       <slot />
     </main>
-    <Footer />
+    {!isHome && <Footer />}
 
     <!-- Back to top -->
     <button id="back-to-top" class="back-to-top" aria-label="Back to top">
@@ -145,6 +152,9 @@ const canonicalPath = Astro.url.pathname;
     const backToTop = document.getElementById("back-to-top");
     const homeSections =
       document.querySelectorAll<HTMLElement>(".home-section");
+    const homeExperience = document.querySelector<HTMLElement>(
+      "[data-home-experience]",
+    );
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -158,6 +168,16 @@ const canonicalPath = Astro.url.pathname;
       if (progressBar) progressBar.style.width = progress + "%";
 
       backToTop?.classList.toggle("visible", scrollTop > 500);
+
+      if (homeExperience) {
+        const rect = homeExperience.getBoundingClientRect();
+        const travel = Math.max(1, rect.height - window.innerHeight);
+        const journeyProgress = Math.min(1, Math.max(0, -rect.top / travel));
+        homeExperience.style.setProperty(
+          "--journey-progress",
+          journeyProgress.toFixed(4),
+        );
+      }
 
       if (!reduceMotion) {
         const viewportHeight = window.innerHeight;

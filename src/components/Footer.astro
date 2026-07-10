@@ -1,47 +1,22 @@
-﻿---
-import { SOCIAL_LINKS, SOCIAL_ICONS, COPYRIGHT } from "../lib/constants";
-import { getTranslations, localizePath, type Locale } from "../i18n/utils";
-
-const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
-const t = getTranslations(locale);
+---
+import { COPYRIGHT } from "../lib/constants";
 ---
 
-<footer class="surface-footer border-t border-gray-200/70 dark:border-white/10">
-  <div class="page-container py-16 md:py-20">
-    <div class="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-      <div>
-        <p class="text-sm font-semibold tracking-tight text-gray-900 dark:text-gray-100">ZORAN ZHOU</p>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-500">{t.siteTagline}</p>
-      </div>
-      <div class="flex items-center gap-5">
-        {SOCIAL_LINKS.map((link) => (
-          <a
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-gray-400 transition-colors duration-200 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300"
-            aria-label={link.label}
-          >
-            <Fragment set:html={SOCIAL_ICONS[link.name] ?? ""} />
-          </a>
-        ))}
-        <a
-          href={localizePath("/rss.xml", locale)}
-          class="text-gray-400 transition-colors duration-200 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300"
-          aria-label={t.footerRss}
-        >
-          <Fragment set:html={SOCIAL_ICONS.rss} />
-        </a>
-      </div>
+<footer class="site-footer">
+  <div class="page-container">
+    <div class="site-footer__signal" aria-hidden="true">
+      <i></i><span></span>
     </div>
-    <div class="mt-10 flex flex-col gap-2 border-t border-gray-200/70 pt-6 text-sm text-gray-400 dark:border-white/10 dark:text-gray-500 sm:flex-row sm:items-center sm:justify-between">
+
+    <div class="site-footer__identity">
+      <p class="site-footer__eyebrow"><span></span>SYSTEM / ENDPOINT</p>
+      <strong>ZORAN ZHOU</strong>
+    </div>
+
+    <div class="site-footer__bottom">
       <span>&copy; {new Date().getFullYear()} ZORAN ZHOU</span>
-      <a
-        href={COPYRIGHT.licenseUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-gray-400 transition-colors duration-200 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-      >
+      <span class="site-footer__status"><i></i>ALL SYSTEMS NOMINAL</span>
+      <a href={COPYRIGHT.licenseUrl} target="_blank" rel="noopener noreferrer">
         {COPYRIGHT.license}
       </a>
     </div>

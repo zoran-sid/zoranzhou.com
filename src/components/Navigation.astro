@@ -20,17 +20,13 @@ const primaryNavItems = [
   { label: t.navEssays, href: localizePath("/essays", locale) },
 ];
 
-const iconNavItems = [
+const personalNavItems = [
   { label: t.navPhotos, href: localizePath("/photos", locale), icon: "photos" },
   { label: t.navMap, href: localizePath("/map", locale), icon: "map" },
 ];
-
-const mobileNavGroups = [{ items: primaryNavItems }, { items: iconNavItems }];
 ---
 
-<header
-  class="fixed top-0 left-0 right-0 z-50 border-b border-gray-100/60 bg-white/75 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-950/75"
->
+<header class="site-header" data-site-header>
   <svg aria-hidden="true" class="hidden">
     <symbol id="nav-icon-photos" viewBox="0 0 24 24">
       <path
@@ -49,260 +45,196 @@ const mobileNavGroups = [{ items: primaryNavItems }, { items: iconNavItems }];
     </symbol>
   </svg>
 
-  <nav class="page-container flex h-16 items-center justify-between">
-    <a
-      href={localizePath("/", locale)}
-      class="shrink-0 text-base font-semibold tracking-tight text-gray-900 no-underline transition-colors duration-200 hover:text-gray-600 dark:text-gray-100 dark:hover:text-gray-300"
-    >
-      ZORAN ZHOU
-    </a>
-
-    <!-- Desktop nav items -->
-    <div class="hidden items-center gap-4 lg:flex">
-      {
-        primaryNavItems.map((item) => {
-          const active = path === item.href || path.startsWith(item.href + "/");
-          return (
-            <a
-              href={item.href}
-              class={`text-sm font-medium transition-colors duration-200 no-underline ${
-                active
-                  ? "text-gray-900 dark:text-gray-100"
-                  : "text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300"
-              }`}
-            >
-              {item.label}
-            </a>
-          );
-        })
-      }
-
-      <div
-        class="mx-1 h-5 w-px bg-gray-200 dark:bg-gray-800"
-        aria-hidden="true"
+  <div class="site-header__frame page-container">
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a
+        href={localizePath("/", locale)}
+        class="site-brand"
+        aria-label="Zoran Zhou home"
       >
-      </div>
+        <span class="site-brand__mark" aria-hidden="true">
+          <img
+            src="/images/zoran-portrait.webp"
+            alt=""
+            width="512"
+            height="512"
+            decoding="async"
+          />
+        </span>
+        <span class="site-brand__copy">
+          <strong>ZORAN ZHOU</strong>
+          <small>NETWORK / SECURITY</small>
+        </span>
+      </a>
 
-      <div class="flex items-center gap-1" aria-label="Personal sections">
+      <div class="site-nav__links">
         {
-          iconNavItems.map((item) => {
+          primaryNavItems.map((item) => {
             const active =
               path === item.href || path.startsWith(item.href + "/");
             return (
               <a
                 href={item.href}
-                aria-label={item.label}
-                title={item.label}
-                class={`group relative inline-flex h-9 w-9 items-center justify-center rounded-lg no-underline transition-all duration-200 ${
-                  active
-                    ? "bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-950"
-                    : "text-gray-400 hover:bg-gray-100/70 hover:text-gray-800 dark:text-gray-500 dark:hover:bg-gray-800/70 dark:hover:text-gray-200"
-                }`}
+                class:list={["site-nav__link", { active }]}
+                aria-current={active ? "page" : undefined}
               >
-                <svg
-                  class="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.8"
-                >
-                  <use href={`#nav-icon-${item.icon}`} />
-                </svg>
-                <span class="pointer-events-none absolute top-11 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white shadow-lg group-hover:block dark:bg-gray-100 dark:text-gray-950">
-                  {item.label}
-                </span>
+                {item.label}
               </a>
             );
           })
         }
       </div>
 
-      <SearchModal client:load locale={locale} />
-      <!-- Language Switcher -->
-      <div class="relative" id="lang-switcher-desktop">
-        <a
-          href={locale === "zh-CN" ? "/en/" : "/zh-CN/"}
-          id="lang-toggle-desktop"
-          class="rounded-lg px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300 no-underline"
-          aria-label={t.langLabel}
-        >
-          {localeLabels[locale === "zh-CN" ? "en" : "zh-CN"]}
-        </a>
-      </div>
-      <button
-        id="theme-toggle"
-        class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300"
-        aria-label="Toggle dark mode"
-      >
-        <!-- sun icon (shown in dark mode) -->
-        <svg
-          class="h-5 w-5 hidden dark:block"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-          ></path>
-        </svg>
-        <!-- moon icon (shown in light mode) -->
-        <svg
-          class="h-5 w-5 block dark:hidden"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-          ></path>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Mobile: hamburger + theme toggle -->
-    <div class="flex items-center gap-1 lg:hidden">
-      <button
-        id="theme-toggle-mobile"
-        class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300"
-        aria-label="Toggle dark mode"
-      >
-        <svg
-          class="h-5 w-5 hidden dark:block"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-          ></path>
-        </svg>
-        <svg
-          class="h-5 w-5 block dark:hidden"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-          ></path>
-        </svg>
-      </button>
-      <button
-        id="mobile-menu-toggle"
-        class="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100/60 hover:text-gray-600 transition-all duration-200 dark:text-gray-500 dark:hover:bg-gray-800/60 dark:hover:text-gray-300"
-        aria-label="Toggle mobile menu"
-      >
-        <svg
-          id="menu-icon-open"
-          class="h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-        <svg
-          id="menu-icon-close"
-          class="hidden h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-  </nav>
-
-  <!-- Mobile menu panel -->
-  <div
-    id="mobile-menu"
-    class="hidden border-t border-gray-100/60 bg-white/95 backdrop-blur-xl dark:border-gray-800/50 dark:bg-gray-950/95 lg:hidden"
-  >
-    <div class="page-container flex flex-col gap-1 py-3">
-      {
-        mobileNavGroups.map((group, groupIndex) => (
-          <div
-            class={
-              groupIndex > 0
-                ? "mt-2 grid grid-cols-2 gap-1 border-t border-gray-100/60 pt-2 dark:border-gray-800/50"
-                : "flex flex-col gap-1"
-            }
-          >
-            {group.items.map((item) => {
+      <div class="site-nav__tools">
+        <div class="site-nav__personal" aria-label="Personal sections">
+          {
+            personalNavItems.map((item) => {
               const active =
                 path === item.href || path.startsWith(item.href + "/");
               return (
                 <a
                   href={item.href}
-                  class={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 no-underline ${
-                    active
-                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/50 dark:hover:text-gray-200"
-                  }`}
+                  class:list={["site-nav__icon", { active }]}
+                  aria-label={item.label}
+                  title={item.label}
+                  aria-current={active ? "page" : undefined}
                 >
-                  {"icon" in item && (
-                    <svg
-                      class="h-5 w-5 shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="1.8"
-                      aria-hidden="true"
-                    >
-                      <use href={`#nav-icon-${item.icon}`} />
-                    </svg>
-                  )}
-                  <span>{item.label}</span>
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.7"
+                  >
+                    <use href={`#nav-icon-${item.icon}`} />
+                  </svg>
                 </a>
               );
-            })}
-          </div>
-        ))
-      }
-      <div class="pt-1">
-        <SearchModal client:load locale={locale} />
-      </div>
-      <!-- Mobile language switcher -->
-      <div
-        class="mt-2 border-t border-gray-100/60 pt-2 dark:border-gray-800/50"
-      >
-        <p
-          class="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
+            })
+          }
+        </div>
+
+        <div class="site-search">
+          <SearchModal client:load locale={locale} />
+        </div>
+
+        <a
+          href={locale === "zh-CN" ? "/en/" : "/zh-CN/"}
+          class="site-nav__language"
+          aria-label={t.langLabel}
         >
-          {t.langLabel}
-        </p>
+          {localeLabels[locale === "zh-CN" ? "en" : "zh-CN"]}
+        </a>
+
+        <button
+          id="theme-toggle"
+          class="site-nav__control"
+          aria-label="Toggle dark mode"
+        >
+          <svg
+            class="hidden dark:block"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="12" cy="12" r="3.5"></circle>
+            <path
+              stroke-linecap="round"
+              d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7 5.3 5.3"
+            ></path>
+          </svg>
+          <svg
+            class="block dark:hidden"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M20.2 15.5A8.8 8.8 0 0 1 8.5 3.8 8.8 8.8 0 1 0 20.2 15.5Z"
+            ></path>
+          </svg>
+        </button>
+
+        <button
+          id="mobile-menu-toggle"
+          class="site-nav__control site-nav__menu"
+          aria-label="Toggle mobile menu"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <svg
+            id="menu-icon-open"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            viewBox="0 0 24 24"
+            ><path stroke-linecap="round" d="M5 8h14M5 16h14"></path></svg
+          >
+          <svg
+            id="menu-icon-close"
+            class="hidden"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            viewBox="0 0 24 24"
+            ><path stroke-linecap="round" d="m7 7 10 10M17 7 7 17"></path></svg
+          >
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <div id="mobile-menu" class="site-mobile-menu" hidden>
+    <div class="page-container site-mobile-menu__inner">
+      <div class="site-mobile-menu__status"><span></span>SYSTEM NAVIGATION</div>
+      <div class="site-mobile-menu__links">
+        {
+          primaryNavItems.map((item) => {
+            const active =
+              path === item.href || path.startsWith(item.href + "/");
+            return (
+              <a
+                href={item.href}
+                class:list={["site-mobile-menu__link", { active }]}
+                aria-current={active ? "page" : undefined}
+              >
+                <>
+                  <strong>{item.label}</strong>
+                  <i>↗</i>
+                </>
+              </a>
+            );
+          })
+        }
+        {
+          personalNavItems.map((item) => {
+            const active =
+              path === item.href || path.startsWith(item.href + "/");
+            return (
+              <a
+                href={item.href}
+                class:list={["site-mobile-menu__link", { active }]}
+                aria-current={active ? "page" : undefined}
+              >
+                <>
+                  <strong>{item.label}</strong>
+                  <i>↗</i>
+                </>
+              </a>
+            );
+          })
+        }
+      </div>
+      <div class="site-mobile-menu__languages">
         {
           locales.map((altLocale) => (
             <a
               href={altLocale === "zh-CN" ? "/zh-CN/" : "/en/"}
-              class={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors no-underline ${
-                altLocale === locale
-                  ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/50 dark:hover:text-gray-200"
-              }`}
+              class:list={{ active: altLocale === locale }}
             >
               {localeLabels[altLocale]}
             </a>
@@ -316,32 +248,41 @@ const mobileNavGroups = [{ items: primaryNavItems }, { items: iconNavItems }];
 <script>
   function toggleDarkMode() {
     const html = document.documentElement;
-    const isDark = html.classList.contains("dark");
-    if (isDark) {
-      html.classList.remove("dark");
-      localStorage.setItem("pref-theme", "light");
-    } else {
-      html.classList.add("dark");
-      localStorage.setItem("pref-theme", "dark");
-    }
+    const nextTheme = html.classList.contains("dark") ? "light" : "dark";
+    html.classList.toggle("dark", nextTheme === "dark");
+    localStorage.setItem("pref-theme", nextTheme);
   }
 
   document
     .getElementById("theme-toggle")
     ?.addEventListener("click", toggleDarkMode);
-  document
-    .getElementById("theme-toggle-mobile")
-    ?.addEventListener("click", toggleDarkMode);
 
-  // Mobile menu toggle
   const menuToggle = document.getElementById("mobile-menu-toggle");
   const mobileMenu = document.getElementById("mobile-menu");
   const menuIconOpen = document.getElementById("menu-icon-open");
   const menuIconClose = document.getElementById("menu-icon-close");
 
-  menuToggle?.addEventListener("click", () => {
-    mobileMenu?.classList.toggle("hidden");
-    menuIconOpen?.classList.toggle("hidden");
-    menuIconClose?.classList.toggle("hidden");
+  function setMenu(open: boolean) {
+    if (mobileMenu) mobileMenu.hidden = !open;
+    menuToggle?.setAttribute("aria-expanded", String(open));
+    menuIconOpen?.classList.toggle("hidden", open);
+    menuIconClose?.classList.toggle("hidden", !open);
+    document.body.classList.toggle("menu-open", open);
+  }
+
+  menuToggle?.addEventListener("click", () =>
+    setMenu(mobileMenu?.hidden ?? true),
+  );
+  mobileMenu
+    ?.querySelectorAll("a")
+    .forEach((link) => link.addEventListener("click", () => setMenu(false)));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setMenu(false);
   });
+
+  const siteHeader = document.querySelector<HTMLElement>("[data-site-header]");
+  const updateHeaderState = () =>
+    siteHeader?.classList.toggle("is-scrolled", window.scrollY > 12);
+  window.addEventListener("scroll", updateHeaderState, { passive: true });
+  updateHeaderState();
 </script>

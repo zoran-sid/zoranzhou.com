@@ -5,7 +5,10 @@ import { getCollection } from "astro:content";
 export async function getStaticPaths() {
   const entries = await getCollection("photos", ({ data }) => !data.draft);
   return entries.map((entry) => ({
-    params: { locale: entry.data.lang ?? "zh-CN", slug: entry.slug },
+    params: {
+      locale: entry.data.lang ?? "zh-CN",
+      slug: entry.id.replace(/\.md$/, "").replace(/\.(zh-CN|en)$/i, ""),
+    },
     props: { entry },
   }));
 }

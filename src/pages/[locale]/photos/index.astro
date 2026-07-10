@@ -1,8 +1,8 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
-import { getLocalPhotoAlbums, type PhotoAlbum } from "../../../lib/photos";
-import { legacyAlbums, type LegacyAlbum } from "../../../data/legacy-photos";
+import { getCollection } from "astro:content";
+import { getLocalPhotoAlbums } from "../../../lib/photos";
 import { getTranslations, type Locale, locales } from "../../../i18n/utils";
 
 export async function getStaticPaths() {
@@ -12,183 +12,622 @@ export async function getStaticPaths() {
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
 
-const localAlbums = getLocalPhotoAlbums();
-
-interface UnifiedAlbum {
-  slug: string;
-  title: string;
-  description: string | null;
-  date: string;
-  location?: string;
-  camera?: string;
-  isLocal: boolean;
-  photos: { id: string; src: string; alt: string }[];
-}
-
-const unifiedAlbums: UnifiedAlbum[] = [
-  ...localAlbums.map((a: PhotoAlbum) => ({
-    slug: a.slug,
-    title: a.title,
-    description: null,
-    date: a.date ?? "",
-    isLocal: true,
-    photos: a.photos.map((p) => ({
-      id: p.id,
-      src: p.image.src,
-      alt: p.alt,
-    })),
-  })),
-  ...legacyAlbums.map((a: LegacyAlbum) => ({
-    slug: a.slug,
-    title: a.title[locale] ?? a.title.en,
-    description: a.description?.[locale] ?? a.description?.en ?? null,
-    date: a.date,
-    location: a.location,
-    camera: a.camera,
-    isLocal: false,
-    photos: a.photos.map((p, i) => ({
-      id: `${a.slug}-${i}`,
-      src: p.src,
-      alt: p.alt,
-    })),
-  })),
-].sort((a, b) => b.date.localeCompare(a.date));
-
-const allPhotos = unifiedAlbums.flatMap((album) =>
-  album.photos.map((p) => ({ ...p, albumTitle: album.title })),
+const photoEntries = await getCollection(
+  "photos",
+  ({ data }) => !data.draft && data.lang === locale,
 );
+
+const markdownAlbums = photoEntries
+  .map((entry) => ({
+    slug: entry.id.replace(/\.md$/, "").replace(/\.(zh-CN|en)$/i, ""),
+    title: entry.data.title,
+    description: entry.data.description,
+    date: entry.data.date.toISOString().slice(0, 10),
+    location: entry.data.location,
+    camera: entry.data.camera,
+    photos: entry.data.gallery.map((photo, index) => ({
+      id: `${entry.id}-${index}`,
+      src: photo.src,
+      alt: photo.alt || entry.data.title,
+      caption: photo.caption,
+      image: null,
+    })),
+  }))
+  .filter((album) => album.photos.length > 0);
+
+const localAlbums = getLocalPhotoAlbums().map((album) => ({
+  slug: album.slug,
+  title: album.title,
+  description: undefined,
+  date: album.date ?? "",
+  location: undefined,
+  camera: undefined,
+  photos: album.photos.map((photo) => ({
+    id: photo.id,
+    src: photo.image.src,
+    alt: photo.alt,
+    caption: undefined,
+    image: photo.image,
+  })),
+}));
+
+const albums = [...markdownAlbums, ...localAlbums].sort((a, b) =>
+  b.date.localeCompare(a.date),
+);
+
+const photos = albums.flatMap((album) =>
+  album.photos.map((photo) => ({
+    ...photo,
+    albumTitle: album.title,
+    albumDescription: album.description,
+    date: album.date,
+    location: album.location,
+    camera: album.camera,
+  })),
+);
+
+const copy =
+  locale === "zh-CN"
+    ? {
+        library: "照片资料库",
+        photos: "张照片",
+        albums: "组记录",
+        hint: "轻触照片查看完整画面",
+        close: "关闭",
+        previous: "上一张",
+        next: "下一张",
+      }
+    : {
+        library: "Photo library",
+        photos: "photos",
+        albums: "stories",
+        hint: "Open a photo to see the full frame",
+        close: "Close",
+        previous: "Previous",
+        next: "Next",
+      };
 ---
 
 <BaseLayout title={t.photosPageTitle} description={t.photosPageDescription}>
   <main class="photo-page">
     <header class="photo-page__header">
-      <p class="section-kicker">{t.navPhotos}</p>
-      <h1 class="photo-page__title">{t.photosPageTitle}</h1>
+      <div>
+        <p class="section-kicker">{copy.library}</p>
+        <h1 class="photo-page__title">{t.photosPageTitle}</h1>
+        <p class="photo-page__description">{t.photosPageDescription}</p>
+      </div>
+      <div
+        class="photo-page__summary"
+        aria-label={`${photos.length} ${copy.photos}`}
+      >
+        <span class="photo-page__count"
+          >{String(photos.length).padStart(2, "0")}</span
+        >
+        <span>{copy.photos} · {albums.length} {copy.albums}</span>
+        <small>{copy.hint}</small>
+      </div>
     </header>
 
     {
-      unifiedAlbums.length === 0 ? (
+      photos.length === 0 ? (
         <p class="photo-empty">{t.photosEmpty}</p>
       ) : (
-        <div class="photo-albums">
-          {unifiedAlbums.map((album) => (
-            <section class="photo-album" aria-labelledby={`album-${album.slug}`}>
-              <header class="photo-album__header">
-                <div>
-                  <h2 id={`album-${album.slug}`} class="photo-album__title">{album.title}</h2>
-                  {album.description && <p class="photo-album__desc">{album.description}</p>}
-                </div>
-                <div class="photo-album__meta">
-                  {album.location && <span>{t.photosLocation}: {album.location}</span>}
-                  {album.camera && <span>{t.photosCamera}: {album.camera}</span>}
-                  {album.date && <time datetime={album.date}>{album.date}</time>}
-                </div>
-              </header>
-              <div class="photo-grid">
-                {album.photos.map((photo, index) => {
-                  const globalIndex = allPhotos.findIndex((p) => p.id === photo.id);
-                  return (
-                    <button
-                      type="button"
-                      class="photo-card"
-                      data-photo-button
-                      data-index={String(globalIndex)}
-                      data-src={photo.src}
-                      data-alt={photo.alt}
-                      aria-label={photo.alt}
-                    >
-                      {album.isLocal ? (
-                        <Image
-                          src={photo.src}
-                          alt={photo.alt}
-                          widths={[360, 640, 960]}
-                          sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                          loading={index < 4 ? "eager" : "lazy"}
-                          decoding="async"
-                        />
-                      ) : (
-                        <img src={photo.src} alt={photo.alt} loading={index < 4 ? "eager" : "lazy"} decoding="async" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
+        <div class="photo-grid" aria-label={copy.library}>
+          {photos.map((photo, index) => (
+            <button
+              type="button"
+              class="photo-tile"
+              data-photo-button
+              data-index={String(index)}
+              data-src={photo.src}
+              data-alt={photo.alt}
+              data-title={photo.albumTitle}
+              data-caption={photo.caption || photo.albumDescription || ""}
+              data-date={photo.date}
+              data-location={photo.location || ""}
+              data-camera={photo.camera || ""}
+              aria-label={`${photo.albumTitle}: ${photo.alt}`}
+            >
+              {photo.image ? (
+                <Image
+                  src={photo.image}
+                  alt={photo.alt}
+                  widths={[240, 400, 640]}
+                  sizes="(max-width: 640px) 33vw, (max-width: 1100px) 20vw, 16vw"
+                  loading={index < 6 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              ) : (
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  loading={index < 6 ? "eager" : "lazy"}
+                  decoding="async"
+                  fetchpriority={index === 0 ? "high" : "auto"}
+                />
+              )}
+              <span class="photo-tile__shade" aria-hidden="true">
+                <strong>{photo.albumTitle}</strong>
+                {photo.date && <time datetime={photo.date}>{photo.date}</time>}
+              </span>
+            </button>
           ))}
         </div>
       )
     }
 
-    <dialog class="photo-lightbox" data-photo-lightbox aria-label={t.photosPageTitle}>
-      <button type="button" class="photo-lightbox__close" data-lightbox-close aria-label={locale === "zh-CN" ? "关闭" : "Close"}>&times;</button>
-      <button type="button" class="photo-lightbox__prev" data-lightbox-prev aria-label={locale === "zh-CN" ? "上一张" : "Previous"}>&lsaquo;</button>
+    <dialog
+      class="photo-lightbox"
+      data-photo-lightbox
+      aria-label={t.photosPageTitle}
+    >
+      <div class="photo-lightbox__topbar">
+        <span data-lightbox-count></span>
+        <button
+          type="button"
+          class="photo-lightbox__close"
+          data-lightbox-close
+          aria-label={copy.close}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true"
+            ><path d="M6 6l12 12M18 6 6 18"></path></svg
+          >
+        </button>
+      </div>
+      <button
+        type="button"
+        class="photo-lightbox__nav photo-lightbox__prev"
+        data-lightbox-prev
+        aria-label={copy.previous}>&lsaquo;</button
+      >
       <figure class="photo-lightbox__figure">
         <img data-lightbox-image src="" alt="" />
+        <figcaption class="photo-lightbox__caption">
+          <div>
+            <strong data-lightbox-title></strong>
+            <p data-lightbox-caption></p>
+          </div>
+          <div class="photo-lightbox__meta" data-lightbox-meta></div>
+        </figcaption>
       </figure>
-      <button type="button" class="photo-lightbox__next" data-lightbox-next aria-label={locale === "zh-CN" ? "下一张" : "Next"}>&rsaquo;</button>
+      <button
+        type="button"
+        class="photo-lightbox__nav photo-lightbox__next"
+        data-lightbox-next
+        aria-label={copy.next}>&rsaquo;</button
+      >
     </dialog>
   </main>
 </BaseLayout>
 
 <script>
-  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-photo-button]"));
-  const dialog = document.querySelector<HTMLDialogElement>("[data-photo-lightbox]");
-  const image = dialog?.querySelector<HTMLImageElement>("[data-lightbox-image]");
-  const closeBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-close]");
-  const prevBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-prev]");
-  const nextBtn = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-next]");
-
+  const buttons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("[data-photo-button]"),
+  );
+  const dialog = document.querySelector<HTMLDialogElement>(
+    "[data-photo-lightbox]",
+  );
+  const image = dialog?.querySelector<HTMLImageElement>(
+    "[data-lightbox-image]",
+  );
+  const count = dialog?.querySelector<HTMLElement>("[data-lightbox-count]");
+  const title = dialog?.querySelector<HTMLElement>("[data-lightbox-title]");
+  const caption = dialog?.querySelector<HTMLElement>("[data-lightbox-caption]");
+  const meta = dialog?.querySelector<HTMLElement>("[data-lightbox-meta]");
+  const closeBtn = dialog?.querySelector<HTMLButtonElement>(
+    "[data-lightbox-close]",
+  );
+  const prevBtn = dialog?.querySelector<HTMLButtonElement>(
+    "[data-lightbox-prev]",
+  );
+  const nextBtn = dialog?.querySelector<HTMLButtonElement>(
+    "[data-lightbox-next]",
+  );
   let activeIndex = 0;
+  let touchStartX = 0;
 
   function showPhoto(index: number) {
     if (!dialog || !image || buttons.length === 0) return;
     activeIndex = (index + buttons.length) % buttons.length;
-    const btn = buttons[activeIndex];
-    image.src = btn.dataset.src ?? "";
-    image.alt = btn.dataset.alt ?? "";
+    const item = buttons[activeIndex];
+    image.src = item.dataset.src ?? "";
+    image.alt = item.dataset.alt ?? "";
+    if (count) count.textContent = `${activeIndex + 1} / ${buttons.length}`;
+    if (title) title.textContent = item.dataset.title ?? "";
+    if (caption) {
+      caption.textContent = item.dataset.caption ?? "";
+      caption.hidden = !caption.textContent;
+    }
+    if (meta) {
+      meta.textContent = [
+        item.dataset.date,
+        item.dataset.location,
+        item.dataset.camera,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+    }
     if (!dialog.open) dialog.showModal();
   }
 
-  buttons.forEach((btn, i) => { btn.addEventListener("click", () => showPhoto(i)); });
+  buttons.forEach((button, index) =>
+    button.addEventListener("click", () => showPhoto(index)),
+  );
   closeBtn?.addEventListener("click", () => dialog?.close());
   prevBtn?.addEventListener("click", () => showPhoto(activeIndex - 1));
   nextBtn?.addEventListener("click", () => showPhoto(activeIndex + 1));
-  dialog?.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
-  document.addEventListener("keydown", (e) => {
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog?.addEventListener(
+    "touchstart",
+    (event) => {
+      touchStartX = event.changedTouches[0]?.clientX ?? 0;
+    },
+    { passive: true },
+  );
+  dialog?.addEventListener(
+    "touchend",
+    (event) => {
+      const distance = (event.changedTouches[0]?.clientX ?? 0) - touchStartX;
+      if (Math.abs(distance) < 50) return;
+      showPhoto(activeIndex + (distance < 0 ? 1 : -1));
+    },
+    { passive: true },
+  );
+  document.addEventListener("keydown", (event) => {
     if (!dialog?.open) return;
-    if (e.key === "ArrowLeft") showPhoto(activeIndex - 1);
-    if (e.key === "ArrowRight") showPhoto(activeIndex + 1);
-    if (e.key === "Escape") dialog.close();
+    if (event.key === "ArrowLeft") showPhoto(activeIndex - 1);
+    if (event.key === "ArrowRight") showPhoto(activeIndex + 1);
   });
 </script>
 
 <style>
-  .photo-page { width: min(100%, 1600px); margin-inline: auto; padding: clamp(16px, 3vw, 40px); }
-  .photo-page__header { margin-bottom: 28px; }
-  .photo-page__title { margin: 0.5rem 0 0; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 680; letter-spacing: -0.04em; line-height: 1; }
-  .photo-albums { display: grid; gap: clamp(40px, 7vw, 80px); }
-  .photo-album__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
-  .photo-album__title { margin: 0; font-size: clamp(1.3rem, 3vw, 2rem); }
-  .photo-album__desc { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
-  .photo-album__meta { display: flex; flex-wrap: wrap; gap: 12px; color: var(--faint); font-size: 0.78rem; }
-  .photo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(6px, 1.5vw, 14px); }
-  .photo-card { display: block; min-width: 0; padding: 0; overflow: hidden; border: 0; border-radius: 12px; background: #e6e9ed; cursor: zoom-in; }
-  .dark .photo-card { background: #1a1f2a; }
-  .photo-card img { display: block; width: 100%; height: auto; transition: transform 240ms ease; }
-  .photo-card:hover img { transform: scale(1.025); }
-  .photo-card:focus-visible { outline: 3px solid rgb(37 201 149 / 0.45); outline-offset: 4px; }
-  .photo-lightbox { width: min(96vw, 1400px); max-width: none; height: min(92dvh, 1000px); max-height: none; padding: 0; overflow: hidden; border: 0; border-radius: 18px; background: rgb(10 14 20 / 0.96); }
-  .photo-lightbox::backdrop { background: rgb(3 6 10 / 0.82); backdrop-filter: blur(10px); }
-  .photo-lightbox[open] { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; align-items: center; }
-  .photo-lightbox__figure { display: grid; place-items: center; width: 100%; height: 100%; min-width: 0; min-height: 0; margin: 0; padding: 20px; }
-  .photo-lightbox__figure img { display: block; max-width: 100%; max-height: calc(92dvh - 40px); object-fit: contain; }
-  .photo-lightbox__close, .photo-lightbox__prev, .photo-lightbox__next { min-width: 44px; min-height: 44px; border: 0; border-radius: 999px; background: rgb(255 255 255 / 0.1); color: #fff; font: inherit; font-size: 1.8rem; cursor: pointer; transition: background 0.16s ease; }
-  .photo-lightbox__close:hover, .photo-lightbox__prev:hover, .photo-lightbox__next:hover { background: rgb(255 255 255 / 0.2); }
-  .photo-lightbox__close { position: absolute; top: 14px; right: 14px; z-index: 10; }
-  .photo-lightbox__prev, .photo-lightbox__next { justify-self: center; }
-  .photo-empty { padding: 60px 20px; color: var(--faint); text-align: center; }
-  @media (max-width: 1100px) { .photo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (max-width: 720px) { .photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .photo-lightbox[open] { grid-template-columns: 44px minmax(0, 1fr) 44px; } .photo-lightbox__figure { padding: 10px; } }
-  @media (max-width: 380px) { .photo-grid { grid-template-columns: minmax(0, 1fr); } }
-  @media (prefers-reduced-motion: reduce) { .photo-card img { transition: none; } }
+  .photo-page {
+    width: min(100%, 1920px);
+    margin-inline: auto;
+    padding: clamp(1rem, 3vw, 3.5rem);
+  }
+  .photo-page__header {
+    position: relative;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: clamp(2.5rem, 7vw, 6.5rem) clamp(0.25rem, 2vw, 2rem)
+      clamp(2rem, 5vw, 4.5rem);
+    border-bottom: 1px solid rgb(var(--accent-rgb) / 0.15);
+  }
+  .photo-page__header::before {
+    position: absolute;
+    top: 1.5rem;
+    right: clamp(0.25rem, 2vw, 2rem);
+    color: var(--faint);
+    content: "VISUAL ARCHIVE / GRID MODE";
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.14em;
+  }
+  .photo-page__title {
+    margin: 0.7rem 0 0;
+    padding-right: 0.08em;
+    padding-bottom: 0.05em;
+    background: linear-gradient(
+      105deg,
+      var(--ink),
+      var(--accent) 72%,
+      var(--signal)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    font-size: clamp(3.2rem, 9vw, 8.8rem);
+    font-weight: 650;
+    letter-spacing: -0.075em;
+    line-height: 0.85;
+  }
+  .photo-page__description {
+    max-width: 42rem;
+    margin: 1.5rem 0 0;
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  }
+  .photo-page__summary {
+    display: grid;
+    min-width: 12rem;
+    padding: 1rem;
+    justify-items: end;
+    border: 1px solid rgb(var(--accent-rgb) / 0.14);
+    border-radius: 0.65rem;
+    background: var(--surface-raised);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .photo-page__summary small {
+    margin-top: 0.45rem;
+    color: var(--faint);
+    font: inherit;
+    font-size: 0.58rem;
+  }
+  .photo-page__count {
+    color: var(--accent);
+    font-size: clamp(2.4rem, 5vw, 4.8rem);
+    font-weight: 500;
+    letter-spacing: -0.08em;
+    line-height: 1;
+  }
+  .photo-grid {
+    display: grid;
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    overflow: visible;
+    border-radius: 0;
+    background: transparent;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 3px;
+  }
+  .photo-tile {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid rgb(var(--accent-rgb) / 0.1);
+    border-radius: 0.28rem;
+    background: var(--surface-soft);
+    cursor: zoom-in;
+  }
+  .photo-tile img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.002);
+    transition:
+      transform 500ms var(--ease-out),
+      filter 300ms ease;
+  }
+  .photo-tile__shade {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 0.15rem;
+    padding: 2.5rem 0.8rem 0.7rem;
+    background: linear-gradient(transparent, rgb(2 6 18 / 0.72));
+    color: white;
+    opacity: 0;
+    transform: translateY(0.5rem);
+    transition:
+      opacity 220ms ease,
+      transform 350ms var(--ease-out);
+  }
+  .photo-tile__shade strong {
+    overflow: hidden;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .photo-tile__shade time {
+    color: rgb(255 255 255 / 0.66);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+  }
+  .photo-tile:hover img {
+    filter: saturate(1.08) contrast(1.03);
+    transform: scale(1.055);
+  }
+  .photo-tile:hover {
+    z-index: 2;
+    border-color: rgb(var(--accent-rgb) / 0.45);
+    box-shadow: 0 14px 38px rgb(var(--accent-rgb) / 0.16);
+  }
+  .photo-tile:hover .photo-tile__shade,
+  .photo-tile:focus-visible .photo-tile__shade {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .photo-tile:focus-visible {
+    z-index: 2;
+    outline: 3px solid var(--signal);
+    outline-offset: -3px;
+  }
+  .photo-lightbox {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: rgb(4 7 13 / 0.97);
+    color: white;
+  }
+  .photo-lightbox::backdrop {
+    background: rgb(2 4 8 / 0.9);
+    backdrop-filter: blur(12px);
+  }
+  .photo-lightbox[open] {
+    display: grid;
+    grid-template-columns: clamp(3.25rem, 6vw, 5.5rem) minmax(0, 1fr) clamp(
+        3.25rem,
+        6vw,
+        5.5rem
+      );
+    align-items: center;
+  }
+  .photo-lightbox__topbar {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: max(0.8rem, env(safe-area-inset-top))
+      max(0.8rem, env(safe-area-inset-right)) 0.8rem
+      max(0.8rem, env(safe-area-inset-left));
+    background: linear-gradient(rgb(2 4 9 / 0.72), transparent);
+    color: rgb(255 255 255 / 0.68);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+  .photo-lightbox__close,
+  .photo-lightbox__nav {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 0.12);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.08);
+    color: #fff;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    transition:
+      background 160ms ease,
+      transform 250ms var(--ease-out);
+  }
+  .photo-lightbox__close:hover,
+  .photo-lightbox__nav:hover {
+    background: rgb(255 255 255 / 0.17);
+    transform: scale(1.05);
+  }
+  .photo-lightbox__close svg {
+    width: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.8;
+  }
+  .photo-lightbox__nav {
+    z-index: 2;
+    justify-self: center;
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .photo-lightbox__figure {
+    display: grid;
+    width: 100%;
+    height: 100dvh;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 4.5rem 1rem 1rem;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .photo-lightbox__figure > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: contain;
+  }
+  .photo-lightbox__caption {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 2rem;
+    min-height: 4rem;
+    padding: 1rem 0.25rem 0.25rem;
+    color: rgb(255 255 255 / 0.72);
+  }
+  .photo-lightbox__caption strong {
+    color: white;
+    font-size: 0.9rem;
+  }
+  .photo-lightbox__caption p {
+    max-width: 40rem;
+    margin: 0.2rem 0 0;
+    color: rgb(255 255 255 / 0.58);
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+  .photo-lightbox__meta {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+  }
+  .photo-empty {
+    padding: 6rem 1.25rem;
+    color: var(--faint);
+    text-align: center;
+  }
+  @media (max-width: 1100px) {
+    .photo-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 720px) {
+    .photo-page {
+      padding-inline: 3px;
+    }
+    .photo-page__header {
+      align-items: flex-start;
+      flex-direction: column;
+      padding-inline: 1.25rem;
+    }
+    .photo-page__header::before {
+      right: 1.25rem;
+    }
+    .photo-page__summary {
+      min-width: 0;
+      justify-items: start;
+    }
+    .photo-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2px;
+    }
+    .photo-tile {
+      border-radius: 0.16rem;
+    }
+    .photo-tile__shade {
+      display: none;
+    }
+    .photo-lightbox[open] {
+      grid-template-columns: 0 minmax(0, 1fr) 0;
+    }
+    .photo-lightbox__nav {
+      position: absolute;
+      z-index: 4;
+      top: 50%;
+    }
+    .photo-lightbox__prev {
+      left: 0.6rem;
+    }
+    .photo-lightbox__next {
+      right: 0.6rem;
+    }
+    .photo-lightbox__figure {
+      padding-inline: 0;
+    }
+    .photo-lightbox__caption {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding-inline: 1rem;
+    }
+    .photo-lightbox__meta {
+      text-align: left;
+    }
+  }
+  @media (hover: none) {
+    .photo-tile:hover img {
+      filter: none;
+      transform: scale(1.002);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .photo-tile img,
+    .photo-tile__shade,
+    .photo-lightbox__close,
+    .photo-lightbox__nav {
+      transition: none;
+    }
+  }
 </style>

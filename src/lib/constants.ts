@@ -8,9 +8,18 @@ export const SITE = {
 // ── Social ──
 export const SOCIAL_LINKS = [
   { name: "github", url: "https://github.com/zoran-sid", label: "GitHub" },
-  { name: "twitter", url: "https://x.com/zhouzoran75607", label: "X / Twitter" },
+  {
+    name: "twitter",
+    url: "https://x.com/zhouzoran75607",
+    label: "X / Twitter",
+  },
   { name: "linkedin", url: "#", label: "LinkedIn" },
   { name: "email", url: "mailto:zoranzhou28@gmail.com", label: "Email" },
+  {
+    name: "bilibili",
+    url: "https://space.bilibili.com/596163308",
+    label: "Bilibili",
+  },
 ] as const;
 
 // ── Pagination ──
@@ -92,5 +101,6 @@ export const SOCIAL_ICONS: Record<string, string> = {
   twitter: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
   linkedin: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
   email: `<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
+  bilibili: `<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="6.5" width="18" height="13" rx="3"/><path stroke-linecap="round" d="m8 3 2.5 3.5M16 3l-2.5 3.5M8 12v2M16 12v2"/></svg>`,
   rss: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6.18 15.64a2.18 2.18 0 010 4.36 2.18 2.18 0 010-4.36M4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27z"/></svg>`,
 };

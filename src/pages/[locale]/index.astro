@@ -16,7 +16,10 @@ export async function getStaticPaths() {
 
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
-const siteUrl = new URL(Astro.site ?? "https://zoranzhou.com").href.replace(/\/$/, "");
+const siteUrl = new URL(Astro.site ?? "https://zoranzhou.com").href.replace(
+  /\/$/,
+  "",
+);
 
 const jsonld = {
   "@context": "https://schema.org",
@@ -30,12 +33,45 @@ const jsonld = {
 ---
 
 <BaseLayout jsonld={jsonld}>
-  <HeroSection />
-  <AboutSection />
-  <LatestArticles />
-  <FeaturedResearch />
-  <WorkingOn />
-  <ProjectsGrid />
-  <Skills />
-  <ContactSection />
+  <div class="home-experience" data-home-experience>
+    <svg
+      class="home-journey"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="journey-gradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="var(--signal)"></stop>
+          <stop offset="0.48" stop-color="var(--accent)"></stop>
+          <stop offset="1" stop-color="var(--accent-soft)"></stop>
+        </linearGradient>
+      </defs>
+      <path
+        class="home-journey__rail"
+        d="M78 0 C82 7 84 10 67 15 S18 20 24 29 S82 34 73 42 S20 48 29 57 S85 62 70 71 S18 77 27 86 S76 91 63 100"
+        pathLength="1"></path>
+      <path
+        class="home-journey__progress"
+        d="M78 0 C82 7 84 10 67 15 S18 20 24 29 S82 34 73 42 S20 48 29 57 S85 62 70 71 S18 77 27 86 S76 91 63 100"
+        pathLength="1"></path>
+    </svg>
+    <div class="home-journey__beacons" aria-hidden="true">
+      <i class="beacon-a"></i>
+      <i class="beacon-b"></i>
+      <i class="beacon-c"></i>
+      <i class="beacon-d"></i>
+      <i class="beacon-e"></i>
+      <i class="beacon-f"></i>
+    </div>
+
+    <HeroSection />
+    <AboutSection />
+    <LatestArticles />
+    <FeaturedResearch />
+    <WorkingOn />
+    <ProjectsGrid />
+    <Skills />
+    <ContactSection />
+  </div>
 </BaseLayout>
