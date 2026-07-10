@@ -41,6 +41,9 @@ interface Props {
 
 const { items, locale, labels } = Astro.props;
 const kinds = [...new Set(items.map((item) => item.kind))];
+const mappedCount = items.filter(
+  (item) => item.coordinates || item.routeFile,
+).length;
 ---
 
 <section
@@ -49,16 +52,11 @@ const kinds = [...new Set(items.map((item) => item.kind))];
   data-items={JSON.stringify(items)}
   data-locale={locale}
 >
-  <div id="journey-map" class="journey-map" aria-label={labels.explore}></div>
-
+  <!-- Top bar: stats + filters -->
   <div class="map-topbar">
-    <div>
+    <div class="map-topbar-stats">
       <span class="map-eyebrow">{labels.explore}</span>
-      <strong
-        >{
-          items.filter((item) => item.coordinates || item.routeFile).length
-        }</strong
-      >
+      <strong>{mappedCount}</strong>
       <span>{labels.mapped}</span>
     </div>
     <div class="map-filters" role="group" aria-label={labels.explore}>
@@ -78,66 +76,72 @@ const kinds = [...new Set(items.map((item) => item.kind))];
     </div>
   </div>
 
-  <aside class="map-index" aria-label={labels.explore}>
-    <div class="map-index-heading">
-      <span>{labels.explore}</span>
-      <span>{String(items.length).padStart(2, "0")}</span>
-    </div>
-    <div class="map-index-list">
-      {
-        items.map((item, index) => (
-          <button
-            type="button"
-            class="map-index-item"
-            data-map-item={item.slug}
-            data-map-kind={item.kind}
-            disabled={!item.coordinates && !item.routeFile}
-          >
-            <span class="map-index-number">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span class="map-index-copy">
-              <strong>{item.title}</strong>
-              <small>
-                {item.location} · {item.dateLabel}
-              </small>
-            </span>
-            <i style={`--marker-accent: ${item.accent}`} />
-          </button>
-        ))
-      }
-    </div>
-  </aside>
+  <!-- Main: sidebar + map -->
+  <div class="map-main">
+    <!-- Left: Journey sidebar -->
+    <aside class="map-sidebar" aria-label={labels.explore}>
+      <div class="map-sidebar-heading">
+        <span>{labels.explore}</span>
+        <span>{String(items.length).padStart(2, "0")}</span>
+      </div>
+      <div class="map-sidebar-list">
+        {
+          items.map((item, index) => (
+            <button
+              type="button"
+              class="map-index-item"
+              data-map-item={item.slug}
+              data-map-kind={item.kind}
+              disabled={!item.coordinates && !item.routeFile}
+            >
+              <span class="map-index-number">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span class="map-index-copy">
+                <strong>{item.title}</strong>
+                <small>
+                  {item.location} · {item.dateLabel}
+                </small>
+              </span>
+              <i style={`--marker-accent: ${item.accent}`} />
+            </button>
+          ))
+        }
+      </div>
+    </aside>
 
-  <article class="map-detail" data-map-detail aria-live="polite">
-    <button
-      type="button"
-      class="map-detail-close"
-      data-map-detail-close
-      aria-label="Close">×</button
-    >
-    <span class="map-detail-kind" data-map-detail-kind></span>
-    <h2 data-map-detail-title></h2>
-    <p data-map-detail-description></p>
-    <dl>
-      <div data-map-detail-distance-row>
-        <dt>{labels.distance}</dt>
-        <dd data-map-detail-distance></dd>
-      </div>
-      <div data-map-detail-duration-row>
-        <dt>{labels.duration}</dt>
-        <dd data-map-detail-duration></dd>
-      </div>
-    </dl>
-    <a href="#" data-map-detail-link
-      >{labels.details}<span aria-hidden="true">↗</span></a
-    >
-  </article>
+    <!-- Right: Map area -->
+    <div class="map-area">
+      <div
+        id="journey-map"
+        class="journey-map"
+        aria-label={labels.explore}
+      ></div>
+
+      <!-- Detail card overlay within map area -->
+      <article class="map-detail" data-map-detail aria-live="polite">
+        <span class="map-detail-kind" data-map-detail-kind></span>
+        <h2 data-map-detail-title></h2>
+        <p data-map-detail-description></p>
+        <dl>
+          <div data-map-detail-distance-row>
+            <dt>{labels.distance}</dt>
+            <dd data-map-detail-distance></dd>
+          </div>
+          <div data-map-detail-duration-row>
+            <dt>{labels.duration}</dt>
+            <dd data-map-detail-duration></dd>
+          </div>
+        </dl>
+        <a href="#" data-map-detail-link
+          >{labels.details}<span aria-hidden="true">↗</span></a
+        >
+      </article>
+    </div>
+  </div>
 
   {
-    items.filter((item) => item.coordinates || item.routeFile).length === 0 && (
-      <div class="map-empty">{labels.empty}</div>
-    )
+    mappedCount === 0 && <div class="map-empty">{labels.empty}</div>
   }
 </section>
 
@@ -202,6 +206,7 @@ const kinds = [...new Set(items.map((item) => item.kind))];
 
     const markers = new Map<string, Marker>();
     let activeKind = "all";
+    let selectedSlug: string | null = null;
 
     // ── Parse raw GPX / GeoJSON text into points ──
     function parseRoutePoints(
@@ -304,9 +309,23 @@ const kinds = [...new Set(items.map((item) => item.kind))];
       items.forEach((item) => addRouteForItem(item));
     }
 
+    // ── Compute adaptive map padding based on sidebar & detail card ──
+    function getMapPadding() {
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        // Mobile: sidebar is horizontal at bottom, detail card above it
+        return { top: 70, bottom: 220, left: 50, right: 50 };
+      }
+      // Desktop: sidebar on left (~21rem), detail card at bottom-right (~24rem wide)
+      return { top: 30, bottom: 190, left: 30, right: 350 };
+    }
+
     function showDetail(item: Journey) {
       const detail = root.querySelector<HTMLElement>("[data-map-detail]");
       if (!detail) return;
+
+      selectedSlug = item.slug;
+
       detail.querySelector<HTMLElement>("[data-map-detail-kind]")!.textContent =
         `${item.kindLabel} · ${item.location}`;
       detail.querySelector<HTMLElement>(
@@ -333,6 +352,8 @@ const kinds = [...new Set(items.map((item) => item.kind))];
         item.url;
       detail.style.setProperty("--detail-accent", item.accent);
       detail.classList.add("visible");
+
+      // Highlight active item in sidebar
       root
         .querySelectorAll("[data-map-item]")
         .forEach((button) =>
@@ -348,7 +369,7 @@ const kinds = [...new Set(items.map((item) => item.kind))];
           const bounds = new LngLatBounds();
           item.route.forEach((point) => bounds.extend([point.lng, point.lat]));
           map.fitBounds(bounds, {
-            padding: window.innerWidth < 768 ? 70 : 180,
+            padding: getMapPadding(),
             maxZoom: 14,
             duration: 1200,
           });
@@ -403,11 +424,11 @@ const kinds = [...new Set(items.map((item) => item.kind))];
           map!.fitBounds(bounds, { padding: 120, maxZoom: 6, duration: 0 });
         }
 
-        // Auto-show the first (or only) mapped item after routes load
+        // Auto-select the first mapped journey so the map is never blank
         const mapped = items.filter(
           (item) => item.coordinates || item.routeFile,
         );
-        if (mapped.length === 1) {
+        if (mapped.length > 0) {
           showDetail(mapped[0]);
         }
       });
@@ -417,7 +438,7 @@ const kinds = [...new Set(items.map((item) => item.kind))];
         const mapped = items.filter(
           (item) => item.coordinates || item.routeFile,
         );
-        if (mapped.length === 1) showDetail(mapped[0]);
+        if (mapped.length > 0) showDetail(mapped[0]);
       });
     }
 
@@ -448,6 +469,22 @@ const kinds = [...new Set(items.map((item) => item.kind))];
               entry.hidden =
                 activeKind !== "all" && entry.dataset.mapKind !== activeKind;
             });
+
+          // If the selected item is now hidden, select the first visible one
+          if (selectedSlug) {
+            const selectedItem = items.find((it) => it.slug === selectedSlug);
+            const isVisible =
+              activeKind === "all" || selectedItem?.kind === activeKind;
+            if (!isVisible) {
+              const firstVisible = items.find(
+                (it) =>
+                  (activeKind === "all" || it.kind === activeKind) &&
+                  (it.coordinates || it.routeFile),
+              );
+              if (firstVisible) showDetail(firstVisible);
+            }
+          }
+
           items.forEach((item) => {
             const visible = activeKind === "all" || item.kind === activeKind;
             markers
@@ -469,15 +506,6 @@ const kinds = [...new Set(items.map((item) => item.kind))];
         });
       });
 
-    root
-      .querySelector("[data-map-detail-close]")
-      ?.addEventListener("click", () => {
-        root.querySelector("[data-map-detail]")?.classList.remove("visible");
-        root
-          .querySelectorAll("[data-map-item]")
-          .forEach((button) => button.classList.remove("active"));
-      });
-
     if (map) {
       const themeObserver = new MutationObserver(() => {
         const nextDark = document.documentElement.classList.contains("dark");
@@ -489,5 +517,19 @@ const kinds = [...new Set(items.map((item) => item.kind))];
         attributeFilter: ["class"],
       });
     }
+
+    // Recalculate padding on resize
+    window.addEventListener("resize", () => {
+      if (!selectedSlug || !map) return;
+      const item = items.find((it) => it.slug === selectedSlug);
+      if (!item || item.route.length < 2) return;
+      const bounds = new LngLatBounds();
+      item.route.forEach((point) => bounds.extend([point.lng, point.lat]));
+      map.fitBounds(bounds, {
+        padding: getMapPadding(),
+        maxZoom: 14,
+        duration: 0,
+      });
+    });
   }
 </script>
