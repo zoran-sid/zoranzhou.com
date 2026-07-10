@@ -1,0 +1,123 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { PAGINATION } from "../../../lib/constants";
+import { getTranslations, localizePath, type Locale, locales } from "../../../i18n/utils";
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("research", ({ data }) => !data.draft);
+  const pageSize = PAGINATION.pageSize;
+  const result: any[] = [];
+
+  for (const locale of locales) {
+    const posts = allPosts
+      .filter((p) => (p.data.lang ?? "zh-CN") === locale)
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+    const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
+
+    for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+      const slice = posts.slice(pageNum * pageSize, (pageNum + 1) * pageSize);
+      const pageData = {
+        data: slice,
+        start: pageNum * pageSize,
+        end: Math.min((pageNum + 1) * pageSize, posts.length),
+        size: pageSize,
+        total: posts.length,
+        currentPage: pageNum + 1,
+        lastPage: totalPages,
+        url: {
+          current: pageNum > 0 ? `/research/${pageNum + 1}` : "/research",
+          prev: pageNum > 1 ? `/research/${pageNum}` : pageNum === 1 ? "/research" : undefined,
+          next: pageNum < totalPages - 1 ? `/research/${pageNum + 2}` : undefined,
+        },
+      };
+      const params: Record<string, string | undefined> = { locale };
+      if (pageNum > 0) params.page = String(pageNum + 1);
+      result.push({ params, props: { page: pageData } });
+    }
+  }
+  return result;
+}
+
+const { page } = Astro.props;
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+---
+
+<BaseLayout
+  title={t.researchPageTitle}
+  description={t.researchPageDescription}
+>
+  <div class="page-container py-16 md:py-24">
+    <header class="mb-12">
+      <h1 class="text-4xl font-bold tracking-tight text-gray-900 md:text-5xl">{t.researchPageTitle}</h1>
+      <p class="mt-3 text-lg text-gray-500">{t.researchPageDescription}</p>
+    </header>
+
+    {
+      page.data.length === 0 ? (
+        <p class="text-gray-400">{t.researchPageEmpty}</p>
+      ) : (
+        <div class="divide-y divide-gray-100 dark:divide-gray-800">
+          {page.data.map((entry) => (
+            <a
+              href={localizePath(`/research/${entry.slug}`, locale)}
+              class="group flex flex-col gap-3 py-6 no-underline transition-colors hover:bg-gray-50/50 -mx-4 px-4 rounded-lg sm:flex-row sm:items-baseline sm:gap-8"
+            >
+              <div class="flex shrink-0 items-center gap-3 sm:w-44 sm:flex-col sm:items-start sm:gap-1">
+                <time datetime={entry.data.date.toISOString()} class="text-sm font-medium text-gray-900">
+                  {entry.data.date.toLocaleDateString(dateLocale, { year: "numeric", month: "short", day: "numeric" })}
+                </time>
+                <span class={`rounded-md px-2 py-0.5 text-xs font-medium ${
+                  entry.data.status === "in-progress"
+                    ? "bg-amber-50 text-amber-700"
+                    : entry.data.status === "archived"
+                    ? "bg-gray-100 text-gray-500"
+                    : "bg-green-50 text-green-700"
+                }`}>
+                  {(entry.data.status ?? "completed").replace("-", " ")}
+                </span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  {entry.data.title}
+                </h2>
+                {entry.data.description && (
+                  <p class="mt-1 text-sm text-gray-500 line-clamp-2">
+                    {entry.data.description}
+                  </p>
+                )}
+                {entry.data.tags.length > 0 && (
+                  <div class="mt-2 flex flex-wrap gap-1.5">
+                    {entry.data.tags.slice(0, 4).map((tag) => (
+                      <span class="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      )
+    }
+
+    {page.lastPage > 1 && (
+      <nav class="mt-14 flex items-center justify-between">
+        {page.url.prev ? (
+          <a href={localizePath(page.url.prev, locale)} class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:border-blue-300 hover:text-blue-600 transition-colors no-underline">
+            {t.paginationPrev}
+          </a>
+        ) : <div />}
+        <span class="text-sm text-gray-400">{t.paginationPage.replace("{current}", String(page.currentPage)).replace("{total}", String(page.total))}</span>
+        {page.url.next ? (
+          <a href={localizePath(page.url.next, locale)} class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:border-blue-300 hover:text-blue-600 transition-colors no-underline">
+            {t.paginationNext}
+          </a>
+        ) : <div />}
+      </nav>
+    )}
+  </div>
+</BaseLayout>

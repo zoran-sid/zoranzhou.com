@@ -1,0 +1,94 @@
+﻿---
+import { getCollection } from "astro:content";
+import { getTranslations, localizePath, type Locale } from "../i18n/utils";
+import { readingTime } from "../lib/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+const latest = posts
+  .filter((p) => (p.data.lang ?? "zh-CN") === locale)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<section class="home-section surface-writing section-lighting texture-dots">
+  <div class="page-container">
+    <div class="mb-14 flex items-end justify-between gap-8">
+      <div class="reveal">
+        <span class="section-kicker">{t.latestArticlesLabel}</span>
+        <h2 class="section-heading">{t.latestArticlesHeading}</h2>
+      </div>
+      <a
+        href={localizePath("/blog", locale)}
+        class="premium-link hidden sm:inline-flex"
+      >
+        {t.latestArticlesViewAll}
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+        </svg>
+      </a>
+    </div>
+
+    {
+      latest.length === 0 ? (
+        <p class="text-gray-400 dark:text-gray-500">{t.latestArticlesEmpty}</p>
+      ) : (
+        <div class="premium-card reveal overflow-hidden rounded-2xl">
+          {latest.map((post, index) => (
+            <a
+              href={localizePath(`/blog/${post.slug}`, locale)}
+              class={`group grid gap-4 p-6 no-underline transition-colors duration-200 hover:bg-white/70 dark:hover:bg-white/5 sm:grid-cols-[11rem_1fr] sm:gap-8 ${index > 0 ? "border-t border-gray-200/70 dark:border-white/10" : ""}`}
+            >
+              <div class="flex shrink-0 items-center gap-3 sm:flex-col sm:items-start sm:gap-1">
+                <time
+                  datetime={post.data.date.toISOString()}
+                  class="text-sm font-semibold text-gray-900 dark:text-gray-200"
+                >
+                  {post.data.date.toLocaleDateString(dateLocale, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </time>
+                <span class="text-xs text-gray-400 dark:text-gray-500">
+                  {readingTime(post.body ?? "")} {t.latestArticlesMinRead}
+                </span>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-xl font-semibold tracking-tight text-gray-950 transition-colors group-hover:text-gray-700 dark:text-gray-100 dark:group-hover:text-white">
+                  {post.data.title}
+                </h3>
+                {post.data.description && (
+                  <p class="mt-2 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
+                    {post.data.description}
+                  </p>
+                )}
+                {post.data.tags.length > 0 && (
+                  <div class="mt-4 flex flex-wrap gap-1.5">
+                    {post.data.tags.slice(0, 4).map((tag) => (
+                      <span class="status-chip rounded-md px-2 py-0.5 text-xs">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>

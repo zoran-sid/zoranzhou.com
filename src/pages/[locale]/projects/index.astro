@@ -1,0 +1,69 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { getTranslations, localizePath, type Locale, locales } from "../../../i18n/utils";
+
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+
+const projects = await getCollection("projects", ({ data }) => !data.draft);
+const sorted = projects
+  .filter((p) => (p.data.lang ?? "zh-CN") === locale)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout
+  title={t.projectsPageTitle}
+  description={t.projectsPageDescription}
+>
+  <div class="page-container py-16 md:py-24">
+    <header class="mb-12">
+      <h1 class="text-4xl font-bold tracking-tight text-gray-900 md:text-5xl">{t.projectsPageTitle}</h1>
+      <p class="mt-3 text-lg text-gray-500">{t.projectsPageDescription}</p>
+    </header>
+
+    {
+      sorted.length === 0 ? (
+        <p class="text-gray-400">{t.projectsEmpty}</p>
+      ) : (
+        <div class="divide-y divide-gray-100 dark:divide-gray-800">
+          {sorted.map((project) => (
+            <a
+              href={localizePath(`/projects/${project.slug}`, locale)}
+              class="group flex flex-col gap-3 py-6 no-underline transition-colors hover:bg-gray-50/50 -mx-4 px-4 rounded-lg sm:flex-row sm:items-baseline sm:gap-8"
+            >
+              <div class="flex shrink-0 items-center gap-3 sm:w-44 sm:flex-col sm:items-start sm:gap-1">
+                <time datetime={project.data.date.toISOString()} class="text-sm font-medium text-gray-900">
+                  {project.data.date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                </time>
+                {project.data.icon && <span class="text-lg">{project.data.icon}</span>}
+              </div>
+              <div class="min-w-0 flex-1">
+                <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  {project.data.title}
+                </h2>
+                {project.data.description && (
+                  <p class="mt-1 text-sm text-gray-500 line-clamp-2">{project.data.description}</p>
+                )}
+                {project.data.tech.length > 0 && (
+                  <div class="mt-2 flex flex-wrap gap-1.5">
+                    {project.data.tech.slice(0, 5).map((t) => (
+                      <span class="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-500">{t}</span>
+                    ))}
+                    {project.data.tech.length > 5 && (
+                      <span class="text-xs text-gray-400">+{project.data.tech.length - 5}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      )
+    }
+</BaseLayout>

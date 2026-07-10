@@ -1,0 +1,210 @@
+---
+import "../styles/global.css";
+import ThemeScript from "../components/ThemeScript.astro";
+import Navigation from "../components/Navigation.astro";
+import Footer from "../components/Footer.astro";
+import {
+  getTranslations,
+  type Locale,
+  locales,
+  hreflangMap,
+  localizePath,
+} from "../i18n/utils";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  article?: boolean;
+  jsonld?: Record<string, unknown>;
+}
+
+const { title, description, ogImage, article = false, jsonld } = Astro.props;
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+
+const pageTitle = title ? `${title} | ZORAN ZHOU` : "ZORAN ZHOU";
+const pageDescription = description ?? t.siteDescription;
+
+// Current path without locale prefix for canonical
+const canonicalPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang={locale} class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={new URL(canonicalPath, Astro.site)} />
+
+    <!-- hreflang -->
+    {
+      locales.map((altLocale) => {
+        const altPath = localizePath(Astro.url.pathname, altLocale);
+        return (
+          <link
+            rel="alternate"
+            hreflang={hreflangMap[altLocale]}
+            href={new URL(altPath, Astro.site).href}
+          />
+        );
+      })
+    }
+
+    <!-- OpenGraph -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content={article ? "article" : "website"} />
+    <meta property="og:url" content={new URL(canonicalPath, Astro.site)} />
+    <meta
+      property="og:locale"
+      content={locale === "zh-CN" ? "zh_Hans" : "en"}
+    />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:site_name" content="ZORAN ZHOU" />
+
+    <!-- Twitter -->
+    <meta
+      name="twitter:card"
+      content={ogImage ? "summary_large_image" : "summary"}
+    />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    {
+      ogImage && (
+        <meta
+          name="twitter:image"
+          content={new URL(ogImage, Astro.site).href}
+        />
+      )
+    }
+
+    <!-- RSS -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="ZORAN ZHOU RSS"
+      href={localizePath("/rss.xml", locale)}
+    />
+
+    <!-- JSON-LD Structured Data -->
+    {
+      jsonld && (
+        <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+      )
+    }
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <ThemeScript />
+  </head>
+  <body
+    class="bg-white text-gray-900 antialiased dark:bg-[#0a0a0b] dark:text-gray-200"
+  >
+    <!-- Scroll progress bar -->
+    <div id="progress-bar" class="scroll-progress" style="width: 0%"></div>
+
+    <Navigation />
+    <main class="min-h-screen pt-16 relative z-[1]">
+      <slot />
+    </main>
+    <Footer />
+
+    <!-- Back to top -->
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+      <svg
+        class="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+      </svg>
+    </button>
+  </body><script>
+    const progressBar = document.getElementById("progress-bar");
+    const backToTop = document.getElementById("back-to-top");
+    const homeSections =
+      document.querySelectorAll<HTMLElement>(".home-section");
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    let animationFrame = 0;
+
+    function updateScrollEffects() {
+      const scrollTop = window.scrollY;
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (progressBar) progressBar.style.width = progress + "%";
+
+      backToTop?.classList.toggle("visible", scrollTop > 500);
+
+      if (!reduceMotion) {
+        const viewportHeight = window.innerHeight;
+        homeSections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          const sectionProgress = Math.min(
+            1,
+            Math.max(
+              0,
+              (viewportHeight - rect.top) / (viewportHeight + rect.height),
+            ),
+          );
+          section.style.setProperty(
+            "--section-progress",
+            sectionProgress.toFixed(3),
+          );
+        });
+      }
+
+      animationFrame = 0;
+    }
+
+    function requestScrollUpdate() {
+      if (animationFrame) return;
+      animationFrame = window.requestAnimationFrame(updateScrollEffects);
+    }
+
+    window.addEventListener("scroll", requestScrollUpdate, { passive: true });
+    window.addEventListener("resize", requestScrollUpdate, { passive: true });
+    updateScrollEffects();
+
+    backToTop?.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    const revealElements = document.querySelectorAll(".reveal");
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -7% 0px" },
+    );
+    revealElements.forEach((el) => revealObserver.observe(el));
+  </script>
+</html>

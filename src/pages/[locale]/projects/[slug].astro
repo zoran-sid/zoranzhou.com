@@ -1,0 +1,17 @@
+---
+import BlogPostLayout from "../../../layouts/BlogPostLayout.astro";
+import { getCollection } from "astro:content";
+import { locales } from "../../../i18n/utils";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("projects", ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { locale: entry.data.lang ?? "zh-CN", slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+---
+
+<BlogPostLayout entry={entry} />

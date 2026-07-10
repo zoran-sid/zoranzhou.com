@@ -1,0 +1,51 @@
+{
+  "name": "zoran-zhou-blog",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/run-astro.mjs dev",
+    "start": "node scripts/run-astro.mjs dev",
+    "build": "npm run enrich && astro build",
+    "prebuild": "npx tsx scripts/enrich-media.ts",
+    "preview": "astro preview",
+    "astro": "astro",
+    "lint": "astro check",
+    "format": "prettier --write .",
+    "enrich": "npx tsx scripts/enrich-media.ts",
+    "restore-media": "npx tsx scripts/restore-media.ts"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/react": "^4.0.0",
+    "@astrojs/rss": "^4.0.0",
+    "@astrojs/sitemap": "^3.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "astro": "^5.0.0",
+    "fuse.js": "^7.0.0",
+    "maplibre-gl": "^5.24.0",
+    "medium-zoom": "^1.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rehype-autolink-headings": "^7.0.0",
+    "rehype-pretty-code": "^0.14.0",
+    "rehype-slug": "^6.0.0",
+    "shiki": "^2.0.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "prettier": "^3.0.0",
+    "prettier-plugin-astro": "^0.14.0",
+    "prettier-plugin-tailwindcss": "^0.6.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.0.0"
+  },
+  "allowScripts": {
+    "esbuild@0.27.7": true,
+    "esbuild@0.25.12": true,
+    "sharp@0.34.5": true
+  }
+}

@@ -1,0 +1,51 @@
+﻿---
+title: "NetGuard"
+description: "A lightweight network traffic analyzer built with Rust and eBPF for real-time packet inspection."
+date: 2026-05-20
+tags: ["rust", "ebpf", "networking", "security"]
+tech: ["Rust", "eBPF", "Linux", "BPF"]
+status: active
+icon: "🔍"
+repo: "https://github.com/zoran-sid/netguard"
+lang: zh-CN
+---
+
+## NetGuard
+
+NetGuard is a lightweight network traffic analyzer that leverages eBPF (Extended Berkeley Packet Filter) for kernel-level packet inspection with minimal overhead.
+
+### Features
+
+- **Real-time packet capture** at the kernel level using eBPF kprobes
+- **Protocol analysis** for TCP, UDP, ICMP, and HTTP
+- **Anomaly detection** using statistical models
+- **Prometheus metrics export** for Grafana dashboards
+- **BPF CO-RE** for portability across kernel versions
+
+### Architecture
+
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│  eBPF Probe │ ──▶ │  Ring Buffer  │ ──▶ │  Userspace  │
+│  (Kernel)   │     │               │     │  Analyzer   │
+└─────────────┘     └──────────────┘     └─────────────┘
+                                               │
+                                               ▼
+                                        ┌─────────────┐
+                                        │  Prometheus  │
+                                        │  /metrics    │
+                                        └─────────────┘
+```
+
+### Usage
+
+```bash
+# Compile and load the eBPF program
+cargo build --release
+sudo ./target/release/netguard --interface eth0
+
+# Available flags
+--interface    Network interface to monitor
+--prometheus   Enable metrics export (default: 9090)
+--log-level    Set verbosity (trace, debug, info, warn)
+```

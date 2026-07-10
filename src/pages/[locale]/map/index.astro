@@ -1,0 +1,86 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import MapExplorer from "../../../components/MapExplorer.astro";
+import { getCollection } from "astro:content";
+import {
+  getTranslations,
+  localizePath,
+  type Locale,
+  locales,
+} from "../../../i18n/utils";
+
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+
+const entries = (await getCollection("map", ({ data }) => !data.draft))
+  .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const kindLabel: Record<string, string> = {
+  run: t.mapKindRun,
+  hike: t.mapKindHike,
+  ride: t.mapKindRide,
+  travel: t.mapKindTravel,
+  "photo-walk": t.mapKindPhotoWalk,
+};
+
+const kindAccent: Record<string, string> = {
+  run: "#ff5d8f",
+  hike: "#36d399",
+  ride: "#4ca9ff",
+  travel: "#8b6cff",
+  "photo-walk": "#ff9d4d",
+};
+
+const items = entries.map((entry) => ({
+  slug: entry.slug,
+  title: entry.data.title,
+  description: entry.data.description,
+  date: entry.data.date.toISOString(),
+  dateLabel: entry.data.date.toLocaleDateString(dateLocale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }),
+  kind: entry.data.kind,
+  kindLabel: kindLabel[entry.data.kind] ?? entry.data.kind,
+  location: entry.data.location,
+  distance: entry.data.distance,
+  duration: entry.data.duration,
+  coordinates: entry.data.coordinates,
+  route: entry.data.route,
+  routeFile: entry.data.routeFile,
+  mapZoom: entry.data.mapZoom,
+  accent: entry.data.accent ?? kindAccent[entry.data.kind] ?? "#5271ff",
+  url: localizePath(`/map/${entry.slug}`, locale),
+}));
+---
+
+<BaseLayout title={t.mapPageTitle} description={t.mapPageDescription}>
+  <div class="map-page">
+    <header class="map-page-header page-container">
+      <span class="section-kicker">{t.navMap}</span>
+      <h1>{t.mapPageTitle}</h1>
+      <p>{t.mapPageDescription}</p>
+    </header>
+
+    <MapExplorer
+      items={items}
+      locale={locale}
+      labels={{
+        all: locale === "zh-CN" ? "全部" : "All",
+        explore: locale === "zh-CN" ? "探索足迹" : "Explore journeys",
+        empty: t.mapEmpty,
+        details: locale === "zh-CN" ? "查看完整记录" : "View full story",
+        distance: t.mapDistance,
+        duration: t.mapDuration,
+        mapped: locale === "zh-CN" ? "个已标记地点" : "mapped places",
+      }}
+    />
+  </div>
+</BaseLayout>

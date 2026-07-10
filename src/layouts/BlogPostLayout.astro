@@ -1,0 +1,385 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+import { getTranslations, localizePath, type Locale } from "../i18n/utils";
+import { readingTime, wordCount as countWords } from "../lib/utils";
+
+type ContentCollection =
+  | "blog"
+  | "essays"
+  | "research"
+  | "projects"
+  | "tools"
+  | "homelab"
+  | "gear"
+  | "photos"
+  | "map";
+
+interface Props {
+  entry: CollectionEntry<ContentCollection>;
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await entry.render();
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+
+// ── Reading time ──
+const wordCount = countWords(entry.body ?? "");
+const minutes = readingTime(entry.body ?? "");
+
+// ── TOC from headings (h2 + h3) ──
+const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+// ── Related articles ──
+const allInCollection = await getCollection(
+  entry.collection as ContentCollection,
+  ({ data }) => !data.draft && (data.lang ?? "zh-CN") === locale,
+);
+const related = allInCollection
+  .filter(
+    (e) =>
+      e.slug !== entry.slug &&
+      e.data.tags.some((t: string) => entry.data.tags.includes(t)),
+  )
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+// ── Prev / Next ──
+const sorted = allInCollection.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const idx = sorted.findIndex((e) => e.slug === entry.slug);
+const prevEntry = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+const nextEntry = idx > 0 ? sorted[idx - 1] : null;
+
+const labelMap: Record<string, string> = {
+  blog: t.navBlog,
+  essays: t.navEssays,
+  research: t.navResearch,
+  projects: t.navProjects,
+  tools: t.navTools,
+  homelab: t.navHomelab,
+  gear: t.navGear,
+  photos: t.navPhotos,
+  map: t.navMap,
+};
+
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+
+// ── JSON-LD Article + BreadcrumbList schema ──
+const articleUrl = new URL(
+  localizePath(`/${entry.collection}/${entry.slug}`, locale),
+  Astro.site,
+).href;
+const collectionUrl = new URL(
+  localizePath(`/${entry.collection}`, locale),
+  Astro.site,
+).href;
+const homeUrl = new URL(localizePath("/", locale), Astro.site).href;
+const jsonld = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      headline: entry.data.title,
+      description: entry.data.description ?? "",
+      author: { "@type": "Person", name: entry.data.author ?? "Zoran Zhou" },
+      datePublished: entry.data.date.toISOString(),
+      dateModified:
+        entry.data.updated?.toISOString() ?? entry.data.date.toISOString(),
+      url: articleUrl,
+      ...(entry.data.cover?.src
+        ? { image: new URL(entry.data.cover.src, Astro.site).href }
+        : {}),
+      ...(entry.data.tags.length > 0
+        ? { keywords: entry.data.tags.join(", ") }
+        : {}),
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "ZORAN ZHOU", item: homeUrl },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: labelMap[entry.collection] ?? entry.collection,
+          item: collectionUrl,
+        },
+        { "@type": "ListItem", position: 3, name: entry.data.title },
+      ],
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  ogImage={entry.data.cover?.src}
+  article={true}
+  jsonld={jsonld}
+>
+  {
+    Astro.slots.has("pre-content") && (
+      <slot name="pre-content" />
+    )
+  }
+
+  <div class="article-shell py-12 md:py-20">
+    <article
+      class="article-main"
+      data-article-content
+      data-copy-label={locale === "zh-CN" ? "复制" : "Copy"}
+      data-copied-label={locale === "zh-CN" ? "已复制" : "Copied"}
+    >
+      <header class="article-header mb-12">
+        <!-- Breadcrumb -->
+        <nav
+          class="mb-4 flex items-center gap-1.5 text-sm text-gray-400"
+          aria-label="Breadcrumb"
+        >
+          <a
+            href={localizePath("/", locale)}
+            class="no-underline hover:text-blue-600 transition-colors"
+            >ZORAN ZHOU</a
+          >
+          <span class="text-gray-300 dark:text-gray-600">/</span>
+          <a
+            href={localizePath(`/${entry.collection}`, locale)}
+            class="font-medium text-blue-600 no-underline hover:text-blue-700"
+          >
+            {labelMap[entry.collection] ?? entry.collection}
+          </a>
+        </nav>
+
+        <h1 class="article-title">
+          {entry.data.title}
+        </h1>
+
+        {
+          entry.data.description && (
+            <p class="article-description mt-5">{entry.data.description}</p>
+          )
+        }
+
+        <div
+          class="article-meta mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm"
+        >
+          {entry.data.author && <span>{entry.data.author}</span>}
+          <time datetime={entry.data.date.toISOString()}>
+            {
+              entry.data.date.toLocaleDateString(dateLocale, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+          </time>
+          {
+            entry.data.updated && (
+              <span>
+                · {t.postUpdated}{" "}
+                <time datetime={entry.data.updated.toISOString()}>
+                  {entry.data.updated.toLocaleDateString(dateLocale, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              </span>
+            )
+          }
+          <span>· {minutes} {t.postMinRead}</span>
+          <span>· {wordCount} {t.postWords}</span>
+        </div>
+
+        {
+          entry.data.tags.length > 0 && (
+            <div class="mt-4 flex flex-wrap gap-2">
+              {entry.data.tags.map((tag) => (
+                <a
+                  href={localizePath(
+                    `/tags/${tag.toLowerCase().replace(/\s+/g, "-")}`,
+                    locale,
+                  )}
+                  class="article-tag rounded-full px-3 py-1 text-xs font-medium no-underline"
+                >
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )
+        }
+
+        {
+          tocItems.length > 0 && (
+            <details class="article-mobile-toc mt-9 xl:hidden">
+              <summary>
+                {t.postTableOfContents}
+                <span aria-hidden="true">⌄</span>
+              </summary>
+              <ul>
+                {tocItems.map((h) => (
+                  <li class={h.depth === 3 ? "toc-depth-3" : ""}>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )
+        }
+      </header>
+
+      <div class="prose article-prose">
+        <Content />
+      </div>
+
+      <footer class="article-footer mt-20 border-t pt-10">
+        {
+          (prevEntry || nextEntry) && (
+            <nav class="mb-12 grid gap-4 sm:grid-cols-2">
+              {prevEntry ? (
+                <a
+                  href={localizePath(
+                    `/${entry.collection}/${prevEntry.slug}`,
+                    locale,
+                  )}
+                  class="article-nav-card group rounded-2xl p-5 no-underline"
+                >
+                  <span class="text-xs text-gray-400">{t.postPrevious}</span>
+                  <p class="mt-1 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors line-clamp-2">
+                    {prevEntry.data.title}
+                  </p>
+                </a>
+              ) : (
+                <div />
+              )}
+              {nextEntry ? (
+                <a
+                  href={localizePath(
+                    `/${entry.collection}/${nextEntry.slug}`,
+                    locale,
+                  )}
+                  class="article-nav-card group rounded-2xl p-5 text-right no-underline"
+                >
+                  <span class="text-xs text-gray-400">{t.postNext}</span>
+                  <p class="mt-1 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors line-clamp-2">
+                    {nextEntry.data.title}
+                  </p>
+                </a>
+              ) : (
+                <div />
+              )}
+            </nav>
+          )
+        }
+
+        {
+          related.length > 0 && (
+            <div>
+              <p class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+                {t.postRelatedArticles}
+              </p>
+              <div class="grid gap-3 sm:grid-cols-3">
+                {related.map((r) => (
+                  <a
+                    href={localizePath(
+                      `/${entry.collection}/${r.slug}`,
+                      locale,
+                    )}
+                    class="article-nav-card group rounded-2xl p-4 no-underline"
+                  >
+                    <p class="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors line-clamp-2">
+                      {r.data.title}
+                    </p>
+                    <p class="mt-1 text-xs text-gray-400">
+                      {r.data.date.toLocaleDateString(dateLocale, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </footer>
+    </article>
+
+    {
+      tocItems.length > 0 && (
+        <aside class="article-toc hidden xl:block">
+          <nav aria-label={t.postTableOfContents}>
+            <p>{t.postTableOfContents}</p>
+            <ol>
+              {tocItems.map((h) => (
+                <li class={h.depth === 3 ? "toc-depth-3" : ""}>
+                  <a href={`#${h.slug}`} data-toc-link={h.slug}>
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </aside>
+      )
+    }
+  </div>
+
+  <script>
+    const article = document.querySelector<HTMLElement>(
+      "[data-article-content]",
+    );
+    const copyLabel = article?.dataset.copyLabel ?? "Copy";
+    const copiedLabel = article?.dataset.copiedLabel ?? "Copied";
+
+    article?.querySelectorAll("pre").forEach((pre) => {
+      if (pre.querySelector(".code-copy-button")) return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "code-copy-button";
+      button.textContent = copyLabel;
+      button.setAttribute("aria-label", copyLabel);
+      button.addEventListener("click", async () => {
+        const code = pre.querySelector("code")?.textContent ?? "";
+        await navigator.clipboard.writeText(code);
+        button.textContent = copiedLabel;
+        button.classList.add("copied");
+        window.setTimeout(() => {
+          button.textContent = copyLabel;
+          button.classList.remove("copied");
+        }, 1600);
+      });
+      pre.appendChild(button);
+    });
+
+    const headings =
+      article?.querySelectorAll<HTMLElement>(
+        ".article-prose h2[id], .article-prose h3[id]",
+      ) ?? [];
+    const tocLinks = document.querySelectorAll<HTMLAnchorElement>(
+      ".article-toc a[href^='#'], .article-mobile-toc a[href^='#']",
+    );
+    const headingObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
+          )[0];
+        if (!visible) return;
+        tocLinks.forEach((link) =>
+          link.classList.toggle(
+            "active",
+            link.hash === `#${visible.target.id}`,
+          ),
+        );
+      },
+      { rootMargin: "-15% 0px -72% 0px", threshold: [0, 1] },
+    );
+    headings.forEach((heading) => headingObserver.observe(heading));
+  </script>
+</BaseLayout>

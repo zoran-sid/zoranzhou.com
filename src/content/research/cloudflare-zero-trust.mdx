@@ -1,0 +1,44 @@
+﻿---
+title: "Cloudflare Zero Trust Security Model"
+description: "Analyzing Cloudflare's Zero Trust architecture and its implications for enterprise security."
+date: 2026-06-15
+tags: ["security", "cloudflare", "zero-trust"]
+status: completed
+lang: zh-CN
+---
+
+## Overview
+
+Cloudflare's Zero Trust platform replaces the traditional perimeter-based security model with identity-aware access controls.
+
+### Architecture
+
+The Zero Trust model operates on three core principles:
+
+1. **Verify Explicitly** — Authenticate and authorize based on all available data points
+2. **Use Least Privilege** — Limit user access with Just-In-Time and Just-Enough-Access
+3. **Assume Breach** — Minimize blast radius and segment access
+
+### Key Components
+
+```mermaid
+graph TD
+    A[User Device] --> B[Cloudflare WARP]
+    B --> C[Access Gateway]
+    C --> D{Identity Provider}
+    D --> E[Application]
+    C --> F[Gateway Policies]
+    F --> G[DNS Filtering]
+    F --> H[Browser Isolation]
+```
+
+### DNS Filtering
+
+Cloudflare Gateway provides DNS-layer security that blocks:
+
+- Malware domains
+- Phishing sites
+- Command & control servers
+- Content categories
+
+This operates at the DNS resolution level, meaning protection applies before any connection is established.

@@ -1,0 +1,37 @@
+﻿---
+import { SOCIAL_LINKS, SOCIAL_ICONS } from "../lib/constants";
+import { getTranslations, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+---
+
+<section id="contact" class="home-section surface-contact section-lighting texture-noise">
+  <div class="page-container">
+    <div class="max-w-3xl reveal">
+      <span class="section-kicker">{t.contactLabel}</span>
+      <h2 class="section-heading">
+        {t.contactHeadline}
+      </h2>
+      <p class="section-deck text-lg">
+        {t.contactSubtext}
+      </p>
+
+      <div class="mt-9 flex flex-wrap gap-4">
+        {SOCIAL_LINKS.map((link) => (
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="premium-card inline-flex items-center gap-2.5 rounded-xl px-5 py-3 text-sm font-semibold text-gray-800 no-underline dark:text-gray-200"
+          >
+            <span class="text-gray-400 dark:text-gray-500">
+              <Fragment set:html={SOCIAL_ICONS[link.name] ?? ""} />
+            </span>
+            {link.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

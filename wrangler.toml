@@ -1,0 +1,4 @@
+# Cloudflare Pages configuration
+name = "zoran-zhou-blog"
+compatibility_date = "2026-06-29"
+pages_build_output_dir = "dist"

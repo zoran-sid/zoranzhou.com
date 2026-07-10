@@ -1,0 +1,64 @@
+﻿---
+import { getCollection } from "astro:content";
+import { getTranslations, localizePath, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+
+const projects = await getCollection("projects", ({ data }) => !data.draft);
+const sorted = projects
+  .filter((p) => (p.data.lang ?? "zh-CN") === locale)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 4);
+---
+
+<section class="home-section surface-projects section-lighting texture-dots">
+  <div class="page-container">
+    <div class="mb-14 reveal">
+      <span class="section-kicker">{t.projectsLabel}</span>
+      <h2 class="section-heading">{t.projectsHeading}</h2>
+    </div>
+
+    {
+      sorted.length === 0 ? (
+        <p class="text-gray-400 dark:text-gray-500">{t.projectsEmpty}</p>
+      ) : (
+        <div class="grid gap-6 md:grid-cols-2">
+          {sorted.map((project) => (
+            <a href={localizePath(`/projects/${project.slug}`, locale)} class="premium-card reveal group block rounded-2xl p-6 no-underline md:p-7">
+              <div class="mb-5 flex items-start justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  {project.data.icon && (
+                    <span class="grid h-10 w-10 place-items-center rounded-xl border border-gray-200/80 bg-white/70 text-xl dark:border-white/10 dark:bg-white/5">
+                      {project.data.icon}
+                    </span>
+                  )}
+                  <h3 class="text-lg font-semibold tracking-tight text-gray-950 transition-colors group-hover:text-gray-700 dark:text-gray-100 dark:group-hover:text-white">
+                    {project.data.title}
+                  </h3>
+                </div>
+              </div>
+              {project.data.description && (
+                <p class="line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
+                  {project.data.description}
+                </p>
+              )}
+              <div class="mt-5 flex flex-wrap gap-2">
+                {project.data.tech.slice(0, 4).map((t) => (
+                  <span class="skill-chip rounded-md px-2 py-0.5 text-xs">
+                    {t}
+                  </span>
+                ))}
+                {project.data.tech.length > 4 && (
+                  <span class="text-xs text-gray-400 dark:text-gray-500">
+                    +{project.data.tech.length - 4}
+                  </span>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>

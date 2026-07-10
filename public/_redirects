@@ -1,0 +1,8 @@
+/zh-CN/homelab /zh-CN/blog 301
+/zh-CN/homelab/* /zh-CN/blog 301
+/en/homelab /en/blog 301
+/en/homelab/* /en/blog 301
+/zh-CN/gear /zh-CN/blog 301
+/zh-CN/gear/* /zh-CN/blog 301
+/en/gear /en/blog 301
+/en/gear/* /en/blog 301

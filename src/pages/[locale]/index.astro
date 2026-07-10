@@ -1,0 +1,41 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HeroSection from "../../components/HeroSection.astro";
+import AboutSection from "../../components/AboutSection.astro";
+import LatestArticles from "../../components/LatestArticles.astro";
+import FeaturedResearch from "../../components/FeaturedResearch.astro";
+import WorkingOn from "../../components/WorkingOn.astro";
+import ProjectsGrid from "../../components/ProjectsGrid.astro";
+import Skills from "../../components/Skills.astro";
+import ContactSection from "../../components/ContactSection.astro";
+import { locales, getTranslations, type Locale } from "../../i18n/utils";
+
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const t = getTranslations(locale);
+const siteUrl = new URL(Astro.site ?? "https://zoranzhou.com").href.replace(/\/$/, "");
+
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "ZORAN ZHOU",
+  url: siteUrl,
+  description: t.siteDescription,
+  inLanguage: locale === "zh-CN" ? "zh-Hans" : "en",
+  author: { "@type": "Person", name: "Zoran Zhou" },
+};
+---
+
+<BaseLayout jsonld={jsonld}>
+  <HeroSection />
+  <AboutSection />
+  <LatestArticles />
+  <FeaturedResearch />
+  <WorkingOn />
+  <ProjectsGrid />
+  <Skills />
+  <ContactSection />
+</BaseLayout>

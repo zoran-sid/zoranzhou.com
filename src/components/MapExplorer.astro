@@ -1,0 +1,482 @@
+---
+import "maplibre-gl/dist/maplibre-gl.css";
+
+interface MapPoint {
+  lat: number;
+  lng: number;
+}
+
+interface MapItem {
+  slug: string;
+  title: string;
+  description?: string;
+  date: string;
+  dateLabel: string;
+  kind: string;
+  kindLabel: string;
+  location: string;
+  distance?: string;
+  duration?: string;
+  coordinates?: MapPoint;
+  route: MapPoint[];
+  routeFile?: string;
+  mapZoom?: number;
+  accent: string;
+  url: string;
+}
+
+interface Props {
+  items: MapItem[];
+  locale: "zh-CN" | "en";
+  labels: {
+    all: string;
+    explore: string;
+    empty: string;
+    details: string;
+    distance: string;
+    duration: string;
+    mapped: string;
+  };
+}
+
+const { items, locale, labels } = Astro.props;
+const kinds = [...new Set(items.map((item) => item.kind))];
+---
+
+<section
+  class="map-explorer"
+  data-map-explorer
+  data-items={JSON.stringify(items)}
+  data-locale={locale}
+>
+  <div id="journey-map" class="journey-map" aria-label={labels.explore}></div>
+
+  <div class="map-topbar">
+    <div>
+      <span class="map-eyebrow">{labels.explore}</span>
+      <strong
+        >{
+          items.filter((item) => item.coordinates || item.routeFile).length
+        }</strong
+      >
+      <span>{labels.mapped}</span>
+    </div>
+    <div class="map-filters" role="group" aria-label={labels.explore}>
+      <button type="button" class="active" data-map-filter="all"
+        >{labels.all}</button
+      >
+      {
+        kinds.map((kind) => {
+          const item = items.find((entry) => entry.kind === kind);
+          return (
+            <button type="button" data-map-filter={kind}>
+              {item?.kindLabel ?? kind}
+            </button>
+          );
+        })
+      }
+    </div>
+  </div>
+
+  <aside class="map-index" aria-label={labels.explore}>
+    <div class="map-index-heading">
+      <span>{labels.explore}</span>
+      <span>{String(items.length).padStart(2, "0")}</span>
+    </div>
+    <div class="map-index-list">
+      {
+        items.map((item, index) => (
+          <button
+            type="button"
+            class="map-index-item"
+            data-map-item={item.slug}
+            data-map-kind={item.kind}
+            disabled={!item.coordinates && !item.routeFile}
+          >
+            <span class="map-index-number">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span class="map-index-copy">
+              <strong>{item.title}</strong>
+              <small>
+                {item.location} · {item.dateLabel}
+              </small>
+            </span>
+            <i style={`--marker-accent: ${item.accent}`} />
+          </button>
+        ))
+      }
+    </div>
+  </aside>
+
+  <article class="map-detail" data-map-detail aria-live="polite">
+    <button
+      type="button"
+      class="map-detail-close"
+      data-map-detail-close
+      aria-label="Close">×</button
+    >
+    <span class="map-detail-kind" data-map-detail-kind></span>
+    <h2 data-map-detail-title></h2>
+    <p data-map-detail-description></p>
+    <dl>
+      <div data-map-detail-distance-row>
+        <dt>{labels.distance}</dt>
+        <dd data-map-detail-distance></dd>
+      </div>
+      <div data-map-detail-duration-row>
+        <dt>{labels.duration}</dt>
+        <dd data-map-detail-duration></dd>
+      </div>
+    </dl>
+    <a href="#" data-map-detail-link
+      >{labels.details}<span aria-hidden="true">↗</span></a
+    >
+  </article>
+
+  {
+    items.filter((item) => item.coordinates || item.routeFile).length === 0 && (
+      <div class="map-empty">{labels.empty}</div>
+    )
+  }
+</section>
+
+<script>
+  import maplibregl, {
+    LngLatBounds,
+    type Map as MapLibreMap,
+    type Marker,
+  } from "maplibre-gl";
+
+  type Point = { lat: number; lng: number };
+  type Journey = {
+    slug: string;
+    title: string;
+    description?: string;
+    kind: string;
+    kindLabel: string;
+    location: string;
+    distance?: string;
+    duration?: string;
+    coordinates?: Point;
+    route: Point[];
+    routeFile?: string;
+    accent: string;
+    url: string;
+    mapZoom?: number;
+  };
+
+  const root = document.querySelector<HTMLElement>("[data-map-explorer]");
+  if (root) {
+    const items = JSON.parse(root.dataset.items ?? "[]") as Journey[];
+    const isDark = document.documentElement.classList.contains("dark");
+    const lightStyle =
+      "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+    const darkStyle =
+      "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+    const map = new maplibregl.Map({
+      container: "journey-map",
+      style: isDark ? darkStyle : lightStyle,
+      center: [104.2, 35.8],
+      zoom: 2.6,
+      minZoom: 1.6,
+      maxZoom: 16,
+      attributionControl: false,
+    });
+
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      "bottom-right",
+    );
+    map.addControl(
+      new maplibregl.AttributionControl({ compact: true }),
+      "bottom-right",
+    );
+
+    const markers = new Map<string, Marker>();
+    let activeKind = "all";
+
+    // ── Parse raw GPX / GeoJSON text into points ──
+    function parseRoutePoints(
+      text: string,
+      routeFile: string,
+    ): Point[] {
+      if (routeFile.toLowerCase().endsWith(".gpx")) {
+        const xml = new DOMParser().parseFromString(text, "application/xml");
+        return [...xml.querySelectorAll("trkpt, rtept")]
+          .map((point) => ({
+            lat: Number(point.getAttribute("lat")),
+            lng: Number(point.getAttribute("lon")),
+          }))
+          .filter(
+            (point) =>
+              Number.isFinite(point.lat) && Number.isFinite(point.lng),
+          );
+      }
+      const geojson = JSON.parse(text);
+      const geometry =
+        geojson.type === "FeatureCollection"
+          ? geojson.features?.find(
+              (feature: { geometry?: { type?: string } }) =>
+                feature.geometry?.type === "LineString",
+            )?.geometry
+          : geojson.type === "Feature"
+            ? geojson.geometry
+            : geojson;
+      if (geometry?.type === "LineString") {
+        return geometry.coordinates.map(
+          ([lng, lat]: [number, number]) => ({ lat, lng }),
+        );
+      }
+      return [];
+    }
+
+    // ── Fetch + parse a single route, mutate item in-place ──
+    async function ensureRouteLoaded(item: Journey): Promise<boolean> {
+      if (item.route.length > 1) return true;
+      if (!item.routeFile) return false;
+      try {
+        const response = await fetch(item.routeFile);
+        if (!response.ok) return false;
+        const text = await response.text();
+        const points = parseRoutePoints(text, item.routeFile);
+        if (points.length > 1) {
+          item.route = points;
+          item.coordinates ??= points[Math.floor(points.length / 2)];
+          return true;
+        }
+      } catch (error) {
+        console.warn(`Unable to load route file: ${item.routeFile}`, error);
+      }
+      return false;
+    }
+
+    // ── Add route source + layers for a single item ──
+    function addRouteForItem(item: Journey) {
+      if (item.route.length < 2 || map.getSource(`route-${item.slug}`)) return;
+      map.addSource(`route-${item.slug}`, {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: item.route.map((point) => [point.lng, point.lat]),
+          },
+        },
+      });
+      map.addLayer({
+        id: `route-glow-${item.slug}`,
+        type: "line",
+        source: `route-${item.slug}`,
+        paint: {
+          "line-color": item.accent,
+          "line-width": 10,
+          "line-opacity": 0.13,
+          "line-blur": 5,
+        },
+      });
+      map.addLayer({
+        id: `route-${item.slug}`,
+        type: "line",
+        source: `route-${item.slug}`,
+        paint: {
+          "line-color": item.accent,
+          "line-width": 3.5,
+          "line-opacity": 0.9,
+        },
+      });
+    }
+
+    async function loadExternalRoutes() {
+      await Promise.all(items.map((item) => ensureRouteLoaded(item)));
+    }
+
+    function addRoutes(_targetMap: MapLibreMap) {
+      items.forEach((item) => addRouteForItem(item));
+    }
+
+    function showDetail(item: Journey) {
+      const detail = root.querySelector<HTMLElement>("[data-map-detail]");
+      if (!detail) return;
+      detail.querySelector<HTMLElement>("[data-map-detail-kind]")!.textContent =
+        `${item.kindLabel} · ${item.location}`;
+      detail.querySelector<HTMLElement>(
+        "[data-map-detail-title]",
+      )!.textContent = item.title;
+      detail.querySelector<HTMLElement>(
+        "[data-map-detail-description]",
+      )!.textContent = item.description ?? "";
+      const distanceRow = detail.querySelector<HTMLElement>(
+        "[data-map-detail-distance-row]",
+      )!;
+      const durationRow = detail.querySelector<HTMLElement>(
+        "[data-map-detail-duration-row]",
+      )!;
+      distanceRow.hidden = !item.distance;
+      durationRow.hidden = !item.duration;
+      detail.querySelector<HTMLElement>(
+        "[data-map-detail-distance]",
+      )!.textContent = item.distance ?? "";
+      detail.querySelector<HTMLElement>(
+        "[data-map-detail-duration]",
+      )!.textContent = item.duration ?? "";
+      detail.querySelector<HTMLAnchorElement>("[data-map-detail-link]")!.href =
+        item.url;
+      detail.style.setProperty("--detail-accent", item.accent);
+      detail.classList.add("visible");
+      root
+        .querySelectorAll("[data-map-item]")
+        .forEach((button) =>
+          button.classList.toggle(
+            "active",
+            button.getAttribute("data-map-item") === item.slug,
+          ),
+        );
+
+      if (item.route.length > 1) {
+        const bounds = new LngLatBounds();
+        item.route.forEach((point) => bounds.extend([point.lng, point.lat]));
+        map.fitBounds(bounds, {
+          padding: window.innerWidth < 768 ? 70 : 180,
+          maxZoom: 14,
+          duration: 1200,
+        });
+      } else if (item.coordinates) {
+        map.flyTo({
+          center: [item.coordinates.lng, item.coordinates.lat],
+          zoom: item.mapZoom ?? 11,
+          duration: 1200,
+        });
+      } else if (item.routeFile) {
+        // Route not loaded yet — load on demand, then fly
+        ensureRouteLoaded(item).then((loaded) => {
+          if (loaded) {
+            addRouteForItem(item);
+            if (item.route.length > 1) {
+              const bounds = new LngLatBounds();
+              item.route.forEach((point) =>
+                bounds.extend([point.lng, point.lat]),
+              );
+              map.fitBounds(bounds, {
+                padding: window.innerWidth < 768 ? 70 : 180,
+                maxZoom: 14,
+                duration: 1200,
+              });
+            } else if (item.coordinates) {
+              map.flyTo({
+                center: [item.coordinates.lng, item.coordinates.lat],
+                zoom: item.mapZoom ?? 11,
+                duration: 1200,
+              });
+            }
+          }
+        });
+      }
+    }
+
+    map.on("load", async () => {
+      await loadExternalRoutes();
+      addRoutes(map);
+      const bounds = new LngLatBounds();
+      items
+        .filter((item) => item.coordinates)
+        .forEach((item) => {
+          if (!item.coordinates) return;
+          bounds.extend([item.coordinates.lng, item.coordinates.lat]);
+          const marker = document.createElement("button");
+          marker.type = "button";
+          marker.className = "journey-marker";
+          marker.dataset.kind = item.kind;
+          marker.setAttribute("aria-label", item.title);
+          marker.style.setProperty("--marker-accent", item.accent);
+          marker.innerHTML = "<span></span>";
+          marker.addEventListener("click", () => showDetail(item));
+          markers.set(
+            item.slug,
+            new maplibregl.Marker({ element: marker })
+              .setLngLat([item.coordinates.lng, item.coordinates.lat])
+              .addTo(map),
+          );
+        });
+      if (!bounds.isEmpty()) {
+        map.fitBounds(bounds, { padding: 120, maxZoom: 6, duration: 0 });
+      }
+
+      // Auto-show the first (or only) mapped item after routes load
+      const mapped = items.filter(
+        (item) => item.coordinates || item.routeFile,
+      );
+      if (mapped.length === 1) {
+        showDetail(mapped[0]);
+      }
+    });
+
+    root
+      .querySelectorAll<HTMLButtonElement>("[data-map-item]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          const item = items.find(
+            (entry) => entry.slug === button.dataset.mapItem,
+          );
+          if (item && (item.coordinates || item.routeFile)) showDetail(item);
+        });
+      });
+
+    root
+      .querySelectorAll<HTMLButtonElement>("[data-map-filter]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          activeKind = button.dataset.mapFilter ?? "all";
+          root
+            .querySelectorAll("[data-map-filter]")
+            .forEach((filter) =>
+              filter.classList.toggle("active", filter === button),
+            );
+          root
+            .querySelectorAll<HTMLElement>("[data-map-item]")
+            .forEach((entry) => {
+              entry.hidden =
+                activeKind !== "all" && entry.dataset.mapKind !== activeKind;
+            });
+          items.forEach((item) => {
+            const visible = activeKind === "all" || item.kind === activeKind;
+            markers
+              .get(item.slug)
+              ?.getElement()
+              .classList.toggle("filtered", !visible);
+            for (const layer of [
+              `route-${item.slug}`,
+              `route-glow-${item.slug}`,
+            ]) {
+              if (map.getLayer(layer))
+                map.setLayoutProperty(
+                  layer,
+                  "visibility",
+                  visible ? "visible" : "none",
+                );
+            }
+          });
+        });
+      });
+
+    root
+      .querySelector("[data-map-detail-close]")
+      ?.addEventListener("click", () => {
+        root.querySelector("[data-map-detail]")?.classList.remove("visible");
+        root
+          .querySelectorAll("[data-map-item]")
+          .forEach((button) => button.classList.remove("active"));
+      });
+
+    const themeObserver = new MutationObserver(() => {
+      const nextDark = document.documentElement.classList.contains("dark");
+      map.setStyle(nextDark ? darkStyle : lightStyle);
+      map.once("styledata", () => addRoutes(map));
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+</script>
