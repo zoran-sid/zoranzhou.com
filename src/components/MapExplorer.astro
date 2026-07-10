@@ -174,24 +174,31 @@ const kinds = [...new Set(items.map((item) => item.kind))];
       "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
     const darkStyle =
       "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
-    const map = new maplibregl.Map({
-      container: "journey-map",
-      style: isDark ? darkStyle : lightStyle,
-      center: [104.2, 35.8],
-      zoom: 2.6,
-      minZoom: 1.6,
-      maxZoom: 16,
-      attributionControl: false,
-    });
 
-    map.addControl(
-      new maplibregl.NavigationControl({ showCompass: false }),
-      "bottom-right",
-    );
-    map.addControl(
-      new maplibregl.AttributionControl({ compact: true }),
-      "bottom-right",
-    );
+    // ── Safe map creation (falls back if WebGL unavailable) ──
+    let map: MapLibreMap | null = null;
+    try {
+      map = new maplibregl.Map({
+        container: "journey-map",
+        style: isDark ? darkStyle : lightStyle,
+        center: [120.15, 30.25],
+        zoom: 12,
+        minZoom: 1.6,
+        maxZoom: 16,
+        attributionControl: false,
+      });
+      map.addControl(
+        new maplibregl.NavigationControl({ showCompass: false }),
+        "bottom-right",
+      );
+      map.addControl(
+        new maplibregl.AttributionControl({ compact: true }),
+        "bottom-right",
+      );
+    } catch (e) {
+      console.warn("MapLibre GL initialization failed:", e);
+      root.classList.add("map-fallback");
+    }
 
     const markers = new Map<string, Marker>();
     let activeKind = "all";
@@ -253,6 +260,7 @@ const kinds = [...new Set(items.map((item) => item.kind))];
 
     // ── Add route source + layers for a single item ──
     function addRouteForItem(item: Journey) {
+      if (!map) return;
       if (item.route.length < 2 || map.getSource(`route-${item.slug}`)) return;
       map.addSource(`route-${item.slug}`, {
         type: "geojson",
@@ -334,83 +342,84 @@ const kinds = [...new Set(items.map((item) => item.kind))];
           ),
         );
 
-      if (item.route.length > 1) {
-        const bounds = new LngLatBounds();
-        item.route.forEach((point) => bounds.extend([point.lng, point.lat]));
-        map.fitBounds(bounds, {
-          padding: window.innerWidth < 768 ? 70 : 180,
-          maxZoom: 14,
-          duration: 1200,
-        });
-      } else if (item.coordinates) {
-        map.flyTo({
-          center: [item.coordinates.lng, item.coordinates.lat],
-          zoom: item.mapZoom ?? 11,
-          duration: 1200,
-        });
+      const flyToRoute = () => {
+        if (!map) return;
+        if (item.route.length > 1) {
+          const bounds = new LngLatBounds();
+          item.route.forEach((point) => bounds.extend([point.lng, point.lat]));
+          map.fitBounds(bounds, {
+            padding: window.innerWidth < 768 ? 70 : 180,
+            maxZoom: 14,
+            duration: 1200,
+          });
+        } else if (item.coordinates) {
+          map.flyTo({
+            center: [item.coordinates.lng, item.coordinates.lat],
+            zoom: item.mapZoom ?? 12,
+            duration: 1200,
+          });
+        }
+      };
+
+      if (item.route.length > 1 || item.coordinates) {
+        flyToRoute();
       } else if (item.routeFile) {
         // Route not loaded yet — load on demand, then fly
         ensureRouteLoaded(item).then((loaded) => {
           if (loaded) {
             addRouteForItem(item);
-            if (item.route.length > 1) {
-              const bounds = new LngLatBounds();
-              item.route.forEach((point) =>
-                bounds.extend([point.lng, point.lat]),
-              );
-              map.fitBounds(bounds, {
-                padding: window.innerWidth < 768 ? 70 : 180,
-                maxZoom: 14,
-                duration: 1200,
-              });
-            } else if (item.coordinates) {
-              map.flyTo({
-                center: [item.coordinates.lng, item.coordinates.lat],
-                zoom: item.mapZoom ?? 11,
-                duration: 1200,
-              });
-            }
+            flyToRoute();
           }
         });
       }
     }
 
-    map.on("load", async () => {
-      await loadExternalRoutes();
-      addRoutes(map);
-      const bounds = new LngLatBounds();
-      items
-        .filter((item) => item.coordinates)
-        .forEach((item) => {
-          if (!item.coordinates) return;
-          bounds.extend([item.coordinates.lng, item.coordinates.lat]);
-          const marker = document.createElement("button");
-          marker.type = "button";
-          marker.className = "journey-marker";
-          marker.dataset.kind = item.kind;
-          marker.setAttribute("aria-label", item.title);
-          marker.style.setProperty("--marker-accent", item.accent);
-          marker.innerHTML = "<span></span>";
-          marker.addEventListener("click", () => showDetail(item));
-          markers.set(
-            item.slug,
-            new maplibregl.Marker({ element: marker })
-              .setLngLat([item.coordinates.lng, item.coordinates.lat])
-              .addTo(map),
-          );
-        });
-      if (!bounds.isEmpty()) {
-        map.fitBounds(bounds, { padding: 120, maxZoom: 6, duration: 0 });
-      }
+    if (map) {
+      map.on("load", async () => {
+        await loadExternalRoutes();
+        addRoutes(map!);
+        const bounds = new LngLatBounds();
+        items
+          .filter((item) => item.coordinates)
+          .forEach((item) => {
+            if (!item.coordinates) return;
+            bounds.extend([item.coordinates.lng, item.coordinates.lat]);
+            const marker = document.createElement("button");
+            marker.type = "button";
+            marker.className = "journey-marker";
+            marker.dataset.kind = item.kind;
+            marker.setAttribute("aria-label", item.title);
+            marker.style.setProperty("--marker-accent", item.accent);
+            marker.innerHTML = "<span></span>";
+            marker.addEventListener("click", () => showDetail(item));
+            markers.set(
+              item.slug,
+              new maplibregl.Marker({ element: marker })
+                .setLngLat([item.coordinates.lng, item.coordinates.lat])
+                .addTo(map!),
+            );
+          });
+        if (!bounds.isEmpty()) {
+          map!.fitBounds(bounds, { padding: 120, maxZoom: 6, duration: 0 });
+        }
 
-      // Auto-show the first (or only) mapped item after routes load
-      const mapped = items.filter(
-        (item) => item.coordinates || item.routeFile,
-      );
-      if (mapped.length === 1) {
-        showDetail(mapped[0]);
-      }
-    });
+        // Auto-show the first (or only) mapped item after routes load
+        const mapped = items.filter(
+          (item) => item.coordinates || item.routeFile,
+        );
+        if (mapped.length === 1) {
+          showDetail(mapped[0]);
+        }
+      });
+    } else {
+      // Map unavailable — still load routes and auto-show detail
+      loadExternalRoutes().then(() => {
+        const mapped = items.filter(
+          (item) => item.coordinates || item.routeFile,
+        );
+        if (mapped.length === 1) showDetail(mapped[0]);
+      });
+    }
 
     root
       .querySelectorAll<HTMLButtonElement>("[data-map-item]")
@@ -449,7 +458,7 @@ const kinds = [...new Set(items.map((item) => item.kind))];
               `route-${item.slug}`,
               `route-glow-${item.slug}`,
             ]) {
-              if (map.getLayer(layer))
+              if (map?.getLayer(layer))
                 map.setLayoutProperty(
                   layer,
                   "visibility",
@@ -469,14 +478,16 @@ const kinds = [...new Set(items.map((item) => item.kind))];
           .forEach((button) => button.classList.remove("active"));
       });
 
-    const themeObserver = new MutationObserver(() => {
-      const nextDark = document.documentElement.classList.contains("dark");
-      map.setStyle(nextDark ? darkStyle : lightStyle);
-      map.once("styledata", () => addRoutes(map));
-    });
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
+    if (map) {
+      const themeObserver = new MutationObserver(() => {
+        const nextDark = document.documentElement.classList.contains("dark");
+        map!.setStyle(nextDark ? darkStyle : lightStyle);
+        map!.once("styledata", () => addRoutes(map!));
+      });
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    }
   }
 </script>
