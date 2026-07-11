@@ -48,8 +48,12 @@ const mappedCount = items.filter(
 const pageUrl = Astro.url;
 const initialSlug =
   pageUrl.searchParams.get("journey") ??
-  items.find((i) => i.coordinates || i.routeFile)?.slug ??
+  items.find((item) => item.coordinates || item.routeFile)?.slug ??
   "";
+const initialItem =
+  items.find((item) => item.slug === initialSlug) ??
+  items.find((item) => item.coordinates || item.routeFile) ??
+  items[0];
 ---
 
 <section
@@ -103,11 +107,14 @@ const initialSlug =
           items.map((item, index) => (
             <button
               type="button"
-              class="journey-card"
+              class:list={[
+                "journey-card",
+                { active: item.slug === initialItem?.slug },
+              ]}
               data-map-item={item.slug}
               data-map-kind={item.kind}
               disabled={!item.coordinates && !item.routeFile}
-              aria-pressed="false"
+              aria-pressed={String(item.slug === initialItem?.slug)}
             >
               <span class="journey-card__index">
                 {String(index + 1).padStart(2, "0")}
@@ -136,23 +143,40 @@ const initialSlug =
       <header class="journey-detail__header">
         <div class="journey-detail__text">
           <div class="journey-detail__meta">
-            <span class="journey-detail__kind" data-map-detail-kind></span>
-            <time class="journey-detail__date" data-map-detail-date></time>
+            <span class="journey-detail__kind" data-map-detail-kind>
+              {initialItem?.kindLabel.toUpperCase() ?? ""}
+            </span>
+            <time
+              class="journey-detail__date"
+              data-map-detail-date
+              datetime={initialItem?.date}
+            >
+              {initialItem?.dateLabel ?? ""}
+            </time>
           </div>
-          <h1 class="journey-detail__title" data-map-detail-title></h1>
-          <p class="journey-detail__summary" data-map-detail-description></p>
+          <h1 class="journey-detail__title" data-map-detail-title>
+            {initialItem?.title ?? ""}
+          </h1>
+          <p class="journey-detail__summary" data-map-detail-description>
+            {initialItem?.description ?? ""}
+          </p>
           <dl class="journey-detail__stats">
-            <div data-map-detail-distance-row hidden>
+            <div data-map-detail-distance-row hidden={!initialItem?.distance}>
               <dt>{labels.distance}</dt>
-              <dd data-map-detail-distance></dd>
+              <dd data-map-detail-distance>{initialItem?.distance ?? ""}</dd>
             </div>
-            <div data-map-detail-duration-row hidden>
+            <div data-map-detail-duration-row hidden={!initialItem?.duration}>
               <dt>{labels.duration}</dt>
-              <dd data-map-detail-duration></dd>
+              <dd data-map-detail-duration>{initialItem?.duration ?? ""}</dd>
             </div>
           </dl>
         </div>
-        <a class="journey-detail__link" href="#" data-map-detail-link>
+        <a
+          class="journey-detail__link"
+          href={initialItem?.url ?? "#"}
+          aria-disabled={!initialItem}
+          data-map-detail-link
+        >
           {labels.details}<span aria-hidden="true">↗</span>
         </a>
       </header>
@@ -164,7 +188,13 @@ const initialSlug =
             aria-label={labels.explore}
           >
           </div>
-          <div class="journey-map-empty" data-map-empty-msg hidden>
+          <div
+            class="journey-map-empty"
+            data-map-empty-msg
+            hidden={Boolean(
+              initialItem?.routeFile || initialItem?.route.length,
+            )}
+          >
             {
               locale === "zh-CN"
                 ? "该旅程暂时没有可用的路线数据。"
@@ -405,6 +435,18 @@ const initialSlug =
     });
   }
 
+  const initialJourney =
+    items.find((item) => item.slug === initialSlug) ??
+    items.find((item) => item.coordinates || item.routeFile) ??
+    items[0];
+
+  // Render useful route information immediately. The page must remain usable
+  // even when the external basemap style is slow or unavailable.
+  if (initialJourney) {
+    selectedSlug = initialJourney.slug;
+    updateDetailUI(initialJourney);
+  }
+
   // ── Init map (once) ──
   try {
     map = new maplibregl.Map({
@@ -430,7 +472,20 @@ const initialSlug =
   }
 
   if (map) {
+    let mapLoaded = false;
+    const mapLoadTimeout = window.setTimeout(() => {
+      if (!mapLoaded) {
+        root.classList.add("map-fallback");
+        console.warn(
+          "Map basemap load timed out; route details remain available.",
+        );
+      }
+    }, 10_000);
+
     map.on("load", async () => {
+      mapLoaded = true;
+      window.clearTimeout(mapLoadTimeout);
+      root.classList.remove("map-fallback");
       await Promise.all(
         items
           .filter((item) => !item.coordinates && item.routeFile)
@@ -457,11 +512,11 @@ const initialSlug =
           );
         });
 
-      const firstMapped = items.find((i) => i.coordinates || i.routeFile);
-      const target = initialSlug
-        ? (items.find((i) => i.slug === initialSlug) ?? firstMapped)
-        : firstMapped;
-      if (target) await showJourney(target);
+      if (initialJourney) await showJourney(initialJourney);
+    });
+
+    map.on("error", () => {
+      if (!mapLoaded) root.classList.add("map-fallback");
     });
 
     const themeObs = new MutationObserver(() => {
@@ -476,9 +531,6 @@ const initialSlug =
       attributes: true,
       attributeFilter: ["class"],
     });
-  } else {
-    const firstMapped = items.find((i) => i.coordinates || i.routeFile);
-    if (firstMapped) updateDetailUI(firstMapped);
   }
 
   // ── Event binding ──
