@@ -1,270 +1,57 @@
 ---
-import "maplibre-gl/dist/maplibre-gl.css";
-import BlogPostLayout from "../../../layouts/BlogPostLayout.astro";
 import { getCollection } from "astro:content";
+import RouteMap from "../../../components/RouteMap.astro";
+import RoutePostLayout from "../../../layouts/RoutePostLayout.astro";
+import {
+  getRouteCoordinates,
+  getRouteEnd,
+  getRouteFile,
+  getRouteStart,
+  isRouteVisible,
+  normalizeRouteEntries,
+  type RouteContentEntry,
+} from "../../../lib/routes/content";
 
 export async function getStaticPaths() {
-  const entries = await getCollection("map", ({ data }) => !data.draft);
-  return entries.map((entry) => ({
+  const [routes, legacyRoutes] = await Promise.all([
+    getCollection("routes", ({ data }) => isRouteVisible(data)),
+    getCollection("map", ({ data }) => isRouteVisible(data)),
+  ]);
+  return normalizeRouteEntries([...routes, ...legacyRoutes]).map((entry) => ({
     params: { locale: entry.data.lang ?? "zh-CN", slug: entry.slug },
     props: { entry },
   }));
 }
 
-const { entry } = Astro.props;
-const { routeFile, coordinates, accent, kind } = entry.data;
-const locale = entry.data.lang ?? "zh-CN";
-const routeAccent = accent ?? ({ run: "#ff5d8f", hike: "#36d399", ride: "#4ca9ff", travel: "#8b6cff", "photo-walk": "#ff9d4d" }[kind] ?? "#36d399");
-const labels = locale === "zh-CN"
-  ? { start: "起点", finish: "终点", elevation: "海拔变化", gain: "累计爬升", loss: "累计下降", range: "海拔范围", noElevation: "该轨迹暂时没有海拔数据" }
-  : { start: "Start", finish: "Finish", elevation: "Elevation profile", gain: "Elevation gain", loss: "Elevation loss", range: "Elevation range", noElevation: "Elevation data is not available for this route" };
+const { entry } = Astro.props as { entry: RouteContentEntry };
+const data = entry.data as RouteContentEntry["data"] & Record<string, unknown>;
+const routeFile = getRouteFile(data);
+const coordinates = getRouteCoordinates(data);
+const start = getRouteStart(data);
+const end = getRouteEnd(data);
+const route = data.route ?? [];
+const locale = (data.lang ?? "zh-CN") as "zh-CN" | "en";
+const accentByKind: Record<string, string> = {
+  run: "#ff5d8f",
+  hike: "#36d399",
+  ride: "#4ca9ff",
+  travel: "#8b6cff",
+  "photo-walk": "#ff9d4d",
+};
+const routeAccent =
+  data.accent ?? accentByKind[data.kind ?? "travel"] ?? "#36d399";
 ---
 
-<BlogPostLayout entry={entry}>
-  {routeFile && (
-    <section slot="pre-content" class="route-detail" data-route-detail data-route-file={routeFile} data-coordinates={coordinates ? JSON.stringify(coordinates) : ""} data-accent={routeAccent} data-labels={JSON.stringify(labels)}>
-      <div class="route-detail__map-wrap">
-        <div id="map-detail" class="route-detail__map" aria-label={entry.data.title}></div>
-        <div class="route-detail__legend" aria-hidden="true">
-          <span><i class="route-dot route-dot--start"></i>{labels.start}</span>
-          <span><i class="route-dot route-dot--finish"></i>{labels.finish}</span>
-        </div>
-      </div>
-
-      <section class="elevation-card" data-elevation-card hidden>
-        <header class="elevation-card__header">
-          <div>
-            <span class="elevation-card__eyebrow">ROUTE PROFILE</span>
-            <h2>{labels.elevation}</h2>
-          </div>
-          <dl class="elevation-card__stats">
-            <div><dt>{labels.gain}</dt><dd data-elevation-gain>—</dd></div>
-            <div><dt>{labels.loss}</dt><dd data-elevation-loss>—</dd></div>
-            <div><dt>{labels.range}</dt><dd data-elevation-range>—</dd></div>
-          </dl>
-        </header>
-        <div class="elevation-chart" data-elevation-chart role="img" aria-label={labels.elevation}></div>
-      </section>
-      <p class="elevation-empty" data-elevation-empty hidden>{labels.noElevation}</p>
-    </section>
-  )}
-</BlogPostLayout>
-
-<script>
-  import maplibregl, { LngLatBounds, type Marker } from "maplibre-gl";
-
-  type TrackPoint = { lat: number; lng: number; elevation?: number; time?: string; distance?: number };
-  type Waypoint = { lat: number; lng: number; name?: string };
-  type ParsedTrack = { points: TrackPoint[]; waypoints: Waypoint[] };
-  const container = document.querySelector<HTMLElement>("[data-route-detail]");
-
-  function haversine(a: TrackPoint, b: TrackPoint) {
-    const toRad = (v: number) => v * Math.PI / 180;
-    const earth = 6371000;
-    const dLat = toRad(b.lat - a.lat);
-    const dLng = toRad(b.lng - a.lng);
-    const q = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
-    return 2 * earth * Math.atan2(Math.sqrt(q), Math.sqrt(1 - q));
-  }
-
-  function addDistances(points: TrackPoint[]) {
-    let total = 0;
-    return points.map((point, index) => {
-      if (index > 0) total += haversine(points[index - 1], point);
-      return { ...point, distance: total };
-    });
-  }
-
-  function parseTrack(text: string, file: string): ParsedTrack {
-    if (file.toLowerCase().endsWith(".gpx")) {
-      const xml = new DOMParser().parseFromString(text, "application/xml");
-      const points = addDistances([...xml.querySelectorAll("trkpt, rtept")].map((node) => {
-        const elevationText = node.querySelector("ele")?.textContent;
-        const elevation = elevationText == null ? undefined : Number(elevationText);
-        return {
-          lat: Number(node.getAttribute("lat")),
-          lng: Number(node.getAttribute("lon")),
-          elevation: Number.isFinite(elevation) ? elevation : undefined,
-          time: node.querySelector("time")?.textContent ?? undefined,
-        };
-      }).filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng)));
-      const waypoints = [...xml.querySelectorAll("wpt")].map((node) => ({
-        lat: Number(node.getAttribute("lat")),
-        lng: Number(node.getAttribute("lon")),
-        name: node.querySelector("name")?.textContent ?? undefined,
-      })).filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
-      return { points, waypoints };
-    }
-
-    const geojson = JSON.parse(text);
-    const geometry = geojson.type === "FeatureCollection"
-      ? geojson.features?.find((f: any) => f.geometry?.type === "LineString")?.geometry
-      : geojson.type === "Feature" ? geojson.geometry : geojson;
-    if (geometry?.type !== "LineString") return { points: [], waypoints: [] };
-    return { points: addDistances(geometry.coordinates.map(([lng, lat, elevation]: [number, number, number?]) => ({
-      lat,
-      lng,
-      elevation: Number.isFinite(elevation) ? elevation : undefined,
-    }))), waypoints: [] };
-  }
-
-  function endpointElement(kind: "start" | "finish", label: string) {
-    const el = document.createElement("div");
-    el.className = `route-endpoint route-endpoint--${kind}`;
-    el.setAttribute("aria-label", label);
-    el.innerHTML = `<span>${kind === "start" ? "S" : "F"}</span>`;
-    return el;
-  }
-
-  function renderElevation(points: TrackPoint[], accent: string, labels: any) {
-    const card = container?.querySelector<HTMLElement>("[data-elevation-card]");
-    const empty = container?.querySelector<HTMLElement>("[data-elevation-empty]");
-    const chart = container?.querySelector<HTMLElement>("[data-elevation-chart]");
-    const samples = points.filter((p) => Number.isFinite(p.elevation));
-    if (!card || !empty || !chart || samples.length < 2) {
-      if (empty) empty.hidden = false;
-      return;
-    }
-
-    let gain = 0;
-    let loss = 0;
-    for (let i = 1; i < samples.length; i++) {
-      const delta = samples[i].elevation! - samples[i - 1].elevation!;
-      if (delta > 0) gain += delta; else loss += Math.abs(delta);
-    }
-    const elevations = samples.map((p) => p.elevation!);
-    const min = Math.min(...elevations);
-    const max = Math.max(...elevations);
-    const totalDistance = samples.at(-1)?.distance ?? 0;
-    const width = 900;
-    const height = 260;
-    const pad = { top: 22, right: 18, bottom: 38, left: 54 };
-    const plotW = width - pad.left - pad.right;
-    const plotH = height - pad.top - pad.bottom;
-    const range = Math.max(1, max - min);
-    const x = (p: TrackPoint) => pad.left + ((p.distance ?? 0) / Math.max(1, totalDistance)) * plotW;
-    const y = (p: TrackPoint) => pad.top + (1 - ((p.elevation! - min) / range)) * plotH;
-    const line = samples.map((p, i) => `${i ? "L" : "M"}${x(p).toFixed(1)},${y(p).toFixed(1)}`).join(" ");
-    const area = `${line} L${x(samples.at(-1)!).toFixed(1)},${pad.top + plotH} L${x(samples[0]).toFixed(1)},${pad.top + plotH} Z`;
-    const km = totalDistance / 1000;
-
-    chart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">
-      <defs><linearGradient id="elevation-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${accent}" stop-opacity=".32"/><stop offset="1" stop-color="${accent}" stop-opacity=".03"/></linearGradient></defs>
-      <line class="elevation-grid" x1="${pad.left}" y1="${pad.top}" x2="${pad.left + plotW}" y2="${pad.top}"/>
-      <line class="elevation-grid" x1="${pad.left}" y1="${pad.top + plotH / 2}" x2="${pad.left + plotW}" y2="${pad.top + plotH / 2}"/>
-      <line class="elevation-grid" x1="${pad.left}" y1="${pad.top + plotH}" x2="${pad.left + plotW}" y2="${pad.top + plotH}"/>
-      <path d="${area}" fill="url(#elevation-fill)"/>
-      <path d="${line}" fill="none" stroke="${accent}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/>
-      <text class="elevation-axis" x="${pad.left - 8}" y="${pad.top + 4}" text-anchor="end">${Math.round(max)} m</text>
-      <text class="elevation-axis" x="${pad.left - 8}" y="${pad.top + plotH + 4}" text-anchor="end">${Math.round(min)} m</text>
-      <text class="elevation-axis" x="${pad.left}" y="${height - 10}" text-anchor="start">0 km</text>
-      <text class="elevation-axis" x="${pad.left + plotW}" y="${height - 10}" text-anchor="end">${km.toFixed(1)} km</text>
-    </svg>`;
-    const gainEl = container?.querySelector<HTMLElement>("[data-elevation-gain]");
-    const lossEl = container?.querySelector<HTMLElement>("[data-elevation-loss]");
-    const rangeEl = container?.querySelector<HTMLElement>("[data-elevation-range]");
-    if (gainEl) gainEl.textContent = `${Math.round(gain)} m`;
-    if (lossEl) lossEl.textContent = `${Math.round(loss)} m`;
-    if (rangeEl) rangeEl.textContent = `${Math.round(min)}–${Math.round(max)} m`;
-    card.hidden = false;
-  }
-
-  if (container) {
-    const mapContainer = document.getElementById("map-detail");
-    const routeFile = container.dataset.routeFile;
-    const coordinates = container.dataset.coordinates ? JSON.parse(container.dataset.coordinates) : null;
-    const accent = container.dataset.accent ?? "#36d399";
-    const labels = JSON.parse(container.dataset.labels ?? "{}");
-    const lightStyle = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
-    const darkStyle = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
-    let endpointMarkers: Marker[] = [];
-    let waypointMarkers: Marker[] = [];
-
-    const map = new maplibregl.Map({
-      container: mapContainer!,
-      style: document.documentElement.classList.contains("dark") ? darkStyle : lightStyle,
-      center: coordinates ? [coordinates.lng, coordinates.lat] : [120.15, 30.27],
-      zoom: 13,
-      attributionControl: false,
-    });
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
-
-    async function drawRoute() {
-      if (!routeFile) return;
-      const response = await fetch(routeFile);
-      if (!response.ok) return;
-      const parsed = parseTrack(await response.text(), routeFile);
-      const points = parsed.points;
-      if (points.length < 2) return;
-
-      if (map.getLayer("route-line")) map.removeLayer("route-line");
-      if (map.getLayer("route-glow")) map.removeLayer("route-glow");
-      if (map.getSource("route")) map.removeSource("route");
-      endpointMarkers.forEach((marker) => marker.remove());
-      waypointMarkers.forEach((marker) => marker.remove());
-      endpointMarkers = [];
-      waypointMarkers = [];
-
-      map.addSource("route", { type: "geojson", data: { type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: points.map((p) => [p.lng, p.lat]) } } });
-      map.addLayer({ id: "route-glow", type: "line", source: "route", paint: { "line-color": accent, "line-width": 11, "line-opacity": .14, "line-blur": 5 } });
-      map.addLayer({ id: "route-line", type: "line", source: "route", paint: { "line-color": accent, "line-width": 4, "line-opacity": .94 } });
-
-      const start = points[0];
-      const finish = points.at(-1)!;
-      endpointMarkers = [
-        new maplibregl.Marker({ element: endpointElement("start", labels.start), anchor: "center" }).setLngLat([start.lng, start.lat]).addTo(map),
-        new maplibregl.Marker({ element: endpointElement("finish", labels.finish), anchor: "center" }).setLngLat([finish.lng, finish.lat]).addTo(map),
-      ];
-      waypointMarkers = parsed.waypoints.map((waypoint, index) => {
-        const el = document.createElement("div");
-        el.className = "route-waypoint";
-        el.textContent = String(index + 1);
-        el.setAttribute("aria-label", waypoint.name ?? `Waypoint ${index + 1}`);
-        const marker = new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([waypoint.lng, waypoint.lat]);
-        if (waypoint.name) marker.setPopup(new maplibregl.Popup({ offset: 18 }).setText(waypoint.name));
-        return marker.addTo(map);
-      });
-      const bounds = new LngLatBounds();
-      points.forEach((p) => bounds.extend([p.lng, p.lat]));
-      map.fitBounds(bounds, { padding: { top: 55, right: 55, bottom: 55, left: 55 }, maxZoom: 15, duration: 900 });
-      renderElevation(points, accent, labels);
-    }
-
-    map.on("load", () => drawRoute().catch((error) => console.warn("Failed to load route:", error)));
-    new MutationObserver(() => {
-      map.setStyle(document.documentElement.classList.contains("dark") ? darkStyle : lightStyle);
-      map.once("styledata", () => drawRoute().catch(() => undefined));
-    }).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-  }
-</script>
-
-<style>
-  .route-detail { width: min(100%, 980px); margin: 0 auto 2.5rem; padding: 0 1rem; }
-  .route-detail__map-wrap { position: relative; overflow: hidden; border: 1px solid var(--border-color); border-radius: 1.25rem; background: var(--surface-color); box-shadow: 0 18px 55px rgb(15 23 42 / .09); }
-  .route-detail__map { width: 100%; height: clamp(420px, 56vw, 610px); }
-  .route-detail__legend { position: absolute; z-index: 2; top: 1rem; left: 1rem; display: flex; gap: .8rem; padding: .58rem .76rem; border: 1px solid rgb(255 255 255 / .34); border-radius: 999px; background: rgb(255 255 255 / .84); box-shadow: 0 8px 28px rgb(15 23 42 / .12); backdrop-filter: blur(14px); color: #243041; font-size: .72rem; font-weight: 700; }
-  :global(.dark) .route-detail__legend { background: rgb(15 20 28 / .82); color: #eef4fb; }
-  .route-detail__legend span { display: inline-flex; align-items: center; gap: .35rem; }
-  .route-dot { width: .55rem; height: .55rem; border-radius: 50%; }
-  .route-dot--start { background: #17a673; }
-  .route-dot--finish { background: #ee4f67; }
-  :global(.route-endpoint) { display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 6px 18px rgb(15 23 42 / .28); color: #fff; font-size: .72rem; font-weight: 850; }
-  :global(.route-endpoint--start) { background: #17a673; }
-  :global(.route-endpoint--finish) { background: #ee4f67; }
-  :global(.route-waypoint) { display: grid; width: 1.65rem; height: 1.65rem; place-items: center; border: 2px solid #fff; border-radius: 50%; background: #334155; box-shadow: 0 4px 12px rgb(15 23 42 / .25); color: #fff; font-size: .65rem; font-weight: 800; }
-  .elevation-card { margin-top: 1rem; padding: clamp(1rem, 3vw, 1.45rem); border: 1px solid var(--border-color); border-radius: 1.25rem; background: var(--surface-color); }
-  .elevation-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; margin-bottom: 1rem; }
-  .elevation-card__eyebrow { color: var(--text-muted); font-size: .66rem; font-weight: 800; letter-spacing: .12em; }
-  .elevation-card h2 { margin: .25rem 0 0; font-size: clamp(1.1rem, 3vw, 1.45rem); }
-  .elevation-card__stats { display: flex; flex-wrap: wrap; gap: 1.35rem; margin: 0; }
-  .elevation-card__stats div { display: grid; gap: .2rem; }
-  .elevation-card__stats dt { color: var(--text-muted); font-size: .66rem; }
-  .elevation-card__stats dd { margin: 0; font-size: .86rem; font-weight: 750; }
-  .elevation-chart { width: 100%; min-height: 220px; overflow: hidden; border-radius: .8rem; background: color-mix(in srgb, var(--surface-color) 86%, var(--border-color)); }
-  .elevation-chart :global(svg) { display: block; width: 100%; height: 260px; }
-  .elevation-chart :global(.elevation-grid) { stroke: currentColor; stroke-opacity: .12; stroke-dasharray: 4 6; }
-  .elevation-chart :global(.elevation-axis) { fill: currentColor; opacity: .58; font-size: 12px; font-family: system-ui, sans-serif; }
-  .elevation-empty { margin: 1rem 0 0; padding: 1rem; border: 1px dashed var(--border-color); border-radius: 1rem; color: var(--text-muted); text-align: center; }
-  @media (max-width: 700px) { .route-detail { padding: 0 .75rem; } .route-detail__map { height: 430px; } .elevation-card__header { display: grid; } .elevation-card__stats { gap: 1rem; } .route-detail__legend { top: .7rem; left: .7rem; } }
-</style>
+<RoutePostLayout entry={entry}>
+  <RouteMap
+    slot="route-visual"
+    title={data.title}
+    routeFile={routeFile}
+    coordinates={coordinates}
+    route={route}
+    start={start}
+    end={end}
+    accent={routeAccent}
+    locale={locale}
+  />
+</RoutePostLayout>

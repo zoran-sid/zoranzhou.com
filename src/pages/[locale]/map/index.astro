@@ -8,6 +8,15 @@ import {
   type Locale,
   locales,
 } from "../../../i18n/utils";
+import {
+  formatDistance,
+  formatDuration,
+  getRouteCoordinates,
+  getRouteFile,
+  isRouteVisible,
+  normalizeRouteEntries,
+  type RouteContentEntry,
+} from "../../../lib/routes/content";
 
 export async function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
@@ -17,7 +26,14 @@ const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 
-const entries = (await getCollection("map", ({ data }) => !data.draft))
+const [routes, legacyRoutes] = await Promise.all([
+  getCollection("routes", ({ data }) => isRouteVisible(data)),
+  getCollection("map", ({ data }) => isRouteVisible(data)),
+]);
+const entries = normalizeRouteEntries([
+  ...routes,
+  ...legacyRoutes,
+] as RouteContentEntry[])
   .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
@@ -37,28 +53,33 @@ const kindAccent: Record<string, string> = {
   "photo-walk": "#ff9d4d",
 };
 
-const items = entries.map((entry) => ({
-  slug: entry.slug,
-  title: entry.data.title,
-  description: entry.data.description,
-  date: entry.data.date.toISOString(),
-  dateLabel: entry.data.date.toLocaleDateString(dateLocale, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }),
-  kind: entry.data.kind,
-  kindLabel: kindLabel[entry.data.kind] ?? entry.data.kind,
-  location: entry.data.location,
-  distance: entry.data.distance,
-  duration: entry.data.duration,
-  coordinates: entry.data.coordinates,
-  route: entry.data.route,
-  routeFile: entry.data.routeFile,
-  mapZoom: entry.data.mapZoom,
-  accent: entry.data.accent ?? kindAccent[entry.data.kind] ?? "#5271ff",
-  url: localizePath(`/map/${entry.slug}`, locale),
-}));
+const items = entries.map((entry) => {
+  const data = entry.data as RouteContentEntry["data"] &
+    Record<string, unknown>;
+  const kind = data.kind ?? "travel";
+  return {
+    slug: entry.slug,
+    title: data.title,
+    description: data.description,
+    date: data.date.toISOString(),
+    dateLabel: data.date.toLocaleDateString(dateLocale, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+    kind,
+    kindLabel: kindLabel[kind] ?? kind,
+    location: data.location,
+    distance: formatDistance(data.distance),
+    duration: formatDuration(data.duration, locale),
+    coordinates: getRouteCoordinates(data),
+    route: data.route ?? [],
+    routeFile: getRouteFile(data),
+    mapZoom: data.mapZoom,
+    accent: data.accent ?? kindAccent[kind] ?? "#5271ff",
+    url: localizePath(`/map/${entry.slug}`, locale),
+  };
+});
 ---
 
 <BaseLayout title={t.mapPageTitle} description={t.mapPageDescription}>
