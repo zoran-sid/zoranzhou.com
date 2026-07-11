@@ -132,32 +132,66 @@ const photosCollection = defineCollection({
   }),
 });
 
+const routePointSchema = z.object({
+  lat: z.number(),
+  lng: z.number(),
+  name: z.string().optional(),
+});
+
+const routeMetricSchema = z.union([z.number(), z.string()]);
+
+const routeFields = {
+  kind: z
+    .enum(["run", "hike", "ride", "travel", "photo-walk"])
+    .default("travel"),
+  location: z.string().default("Unknown"),
+  distance: routeMetricSchema.optional(),
+  duration: routeMetricSchema.optional(),
+  elevationGain: routeMetricSchema.optional(),
+  gpx: z.string().optional(),
+  published: z.boolean().default(true),
+  start: routePointSchema.optional(),
+  end: routePointSchema.optional(),
+  coordinates: routePointSchema.optional(),
+  route: z.array(routePointSchema).default([]),
+  routeFile: z.string().optional(),
+  mapZoom: z.number().min(1).max(18).optional(),
+  accent: z.string().optional(),
+  photos: z
+    .array(
+      z.union([
+        z.string(),
+        z.object({
+          src: z.string(),
+          alt: z.string().optional(),
+          caption: z.string().optional(),
+        }),
+      ]),
+    )
+    .default([]),
+  metadata: z.record(z.unknown()).optional(),
+};
+
+// Legacy collection retained for existing URLs and Markdown files.
 const mapCollection = defineCollection({
   type: "content",
-  schema: baseSchema.extend({
-    kind: z
-      .enum(["run", "hike", "ride", "travel", "photo-walk"])
-      .default("travel"),
-    location: z.string(),
-    distance: z.string().optional(),
-    duration: z.string().optional(),
-    coordinates: z
-      .object({
-        lat: z.number(),
-        lng: z.number(),
-      })
-      .optional(),
-    route: z
-      .array(
+  schema: baseSchema.extend(routeFields),
+});
+
+// Route System v2 collection. New imports are written to src/content/routes/.
+const routesCollection = defineCollection({
+  type: "content",
+  schema: baseSchema.extend(routeFields).extend({
+    cover: z
+      .union([
+        z.string(),
         z.object({
-          lat: z.number(),
-          lng: z.number(),
+          src: z.string(),
+          alt: z.string().optional(),
+          caption: z.string().optional(),
         }),
-      )
-      .default([]),
-    routeFile: z.string().optional(),
-    mapZoom: z.number().min(1).max(18).optional(),
-    accent: z.string().optional(),
+      ])
+      .optional(),
   }),
 });
 
@@ -250,6 +284,7 @@ export const collections = {
   gear: gearCollection,
   photos: photosCollection,
   map: mapCollection,
+  routes: routesCollection,
   movies: moviesCollection,
   tv: tvCollection,
   books: booksCollection,
