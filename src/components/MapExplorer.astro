@@ -46,7 +46,8 @@ const mappedCount = items.filter(
 ).length;
 
 const pageUrl = Astro.url;
-const initialSlug = pageUrl.searchParams.get("journey") ??
+const initialSlug =
+  pageUrl.searchParams.get("journey") ??
   items.find((i) => i.coordinates || i.routeFile)?.slug ??
   "";
 ---
@@ -66,17 +67,24 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
       <span class="journey-toolbar__count-label">{labels.mapped}</span>
     </div>
     <div class="journey-filters" role="group" aria-label={labels.explore}>
-      <button type="button" class="journey-filter" data-active="true" data-map-filter="all">
+      <button
+        type="button"
+        class="journey-filter"
+        data-active="true"
+        data-map-filter="all"
+      >
         {labels.all}
       </button>
-      {kinds.map((kind) => {
-        const item = items.find((entry) => entry.kind === kind);
-        return (
-          <button type="button" class="journey-filter" data-map-filter={kind}>
-            {item?.kindLabel ?? kind}
-          </button>
-        );
-      })}
+      {
+        kinds.map((kind) => {
+          const item = items.find((entry) => entry.kind === kind);
+          return (
+            <button type="button" class="journey-filter" data-map-filter={kind}>
+              {item?.kindLabel ?? kind}
+            </button>
+          );
+        })
+      }
     </div>
   </header>
 
@@ -86,28 +94,40 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
     <aside class="journey-sidebar" aria-label={labels.explore}>
       <div class="journey-sidebar__heading">
         <span>{labels.explore}</span>
-        <span class="journey-sidebar__count">{String(items.length).padStart(2, "0")}</span>
+        <span class="journey-sidebar__count"
+          >{String(items.length).padStart(2, "0")}</span
+        >
       </div>
       <div class="journey-list">
-        {items.map((item, index) => (
-          <button
-            type="button"
-            class="journey-card"
-            data-map-item={item.slug}
-            data-map-kind={item.kind}
-            disabled={!item.coordinates && !item.routeFile}
-            aria-pressed="false"
-          >
-            <span class="journey-card__index">{String(index + 1).padStart(2, "0")}</span>
-            <span class="journey-card__content">
-              <strong class="journey-card__title">{item.title}</strong>
-              <span class="journey-card__meta">
-                {item.location}<span aria-hidden="true"> · </span>{item.dateLabel}
+        {
+          items.map((item, index) => (
+            <button
+              type="button"
+              class="journey-card"
+              data-map-item={item.slug}
+              data-map-kind={item.kind}
+              disabled={!item.coordinates && !item.routeFile}
+              aria-pressed="false"
+            >
+              <span class="journey-card__index">
+                {String(index + 1).padStart(2, "0")}
               </span>
-            </span>
-            <span class="journey-card__status" aria-hidden="true" style={`--marker-accent: ${item.accent}`}></span>
-          </button>
-        ))}
+              <span class="journey-card__content">
+                <strong class="journey-card__title">{item.title}</strong>
+                <span class="journey-card__meta">
+                  {item.location}
+                  <span aria-hidden="true"> · </span>
+                  {item.dateLabel}
+                </span>
+              </span>
+              <span
+                class="journey-card__status"
+                aria-hidden="true"
+                style={`--marker-accent: ${item.accent}`}
+              />
+            </button>
+          ))
+        }
       </div>
     </aside>
 
@@ -138,18 +158,25 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
       </header>
       <div class="journey-detail__map">
         <div class="journey-map-shell">
-          <div id="journey-map" class="journey-map-canvas" aria-label={labels.explore}></div>
+          <div
+            id="journey-map"
+            class="journey-map-canvas"
+            aria-label={labels.explore}
+          >
+          </div>
           <div class="journey-map-empty" data-map-empty-msg hidden>
-            {locale === "zh-CN" ? "该旅程暂时没有可用的路线数据。" : "Route data is not available for this journey."}
+            {
+              locale === "zh-CN"
+                ? "该旅程暂时没有可用的路线数据。"
+                : "Route data is not available for this journey."
+            }
           </div>
         </div>
       </div>
     </section>
   </div>
 
-  {mappedCount === 0 && (
-    <div class="journey-empty-state">{labels.empty}</div>
-  )}
+  {mappedCount === 0 && <div class="journey-empty-state">{labels.empty}</div>}
 </section>
 
 <script>
@@ -158,6 +185,7 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
     type Map as MapLibreMap,
     type Marker,
   } from "maplibre-gl";
+  import { parseRouteDocument } from "../lib/routes/gpx";
 
   type Point = { lat: number; lng: number };
   type Journey = {
@@ -185,33 +213,24 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
   const items: Journey[] = JSON.parse(root.dataset.items ?? "[]");
   const initialSlug = root.dataset.initialSlug ?? "";
   const isDark = document.documentElement.classList.contains("dark");
-  const lightStyle = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
-  const darkStyle = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+  const lightStyle =
+    "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+  const darkStyle =
+    "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
   // ── State ──
   let map: MapLibreMap | null = null;
   let selectedSlug: string | null = null;
-  let activeKind = "all";
   let currentRouteSourceId: string | null = null;
   const markers = new Map<string, Marker>();
   const routeCache = new Map<string, Point[]>();
 
-  // ── Parse GPX / GeoJSON ──
+  // ── Parse route files through the shared Route System v2 parser ──
   function parseRoutePoints(text: string, routeFile: string): Point[] {
-    if (routeFile.toLowerCase().endsWith(".gpx")) {
-      const xml = new DOMParser().parseFromString(text, "application/xml");
-      return [...xml.querySelectorAll("trkpt, rtept")]
-        .map((p) => ({ lat: Number(p.getAttribute("lat")), lng: Number(p.getAttribute("lon")) }))
-        .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
-    }
-    const geojson = JSON.parse(text);
-    const geom = geojson.type === "FeatureCollection"
-      ? geojson.features?.find((f: any) => f.geometry?.type === "LineString")?.geometry
-      : geojson.type === "Feature" ? geojson.geometry : geojson;
-    if (geom?.type === "LineString") {
-      return geom.coordinates.map(([lng, lat]: [number, number]) => ({ lat, lng }));
-    }
-    return [];
+    return parseRouteDocument(text, routeFile).points.map(({ lat, lng }) => ({
+      lat,
+      lng,
+    }));
   }
 
   // ── Fetch & cache route ──
@@ -240,8 +259,12 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
   function removeCurrentRoute() {
     if (!map) return;
     if (currentRouteSourceId && map.getSource(currentRouteSourceId)) {
-      try { if (map.getLayer("route-glow")) map.removeLayer("route-glow"); } catch (_) {}
-      try { if (map.getLayer("route-line")) map.removeLayer("route-line"); } catch (_) {}
+      try {
+        if (map.getLayer("route-glow")) map.removeLayer("route-glow");
+      } catch (_) {}
+      try {
+        if (map.getLayer("route-line")) map.removeLayer("route-line");
+      } catch (_) {}
       map.removeSource(currentRouteSourceId);
     }
     currentRouteSourceId = null;
@@ -265,12 +288,25 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
       },
     });
     map.addLayer({
-      id: "route-glow", type: "line", source: sourceId,
-      paint: { "line-color": item.accent, "line-width": 10, "line-opacity": 0.13, "line-blur": 5 },
+      id: "route-glow",
+      type: "line",
+      source: sourceId,
+      paint: {
+        "line-color": item.accent,
+        "line-width": 10,
+        "line-opacity": 0.13,
+        "line-blur": 5,
+      },
     });
     map.addLayer({
-      id: "route-line", type: "line", source: sourceId,
-      paint: { "line-color": item.accent, "line-width": 3.5, "line-opacity": 0.9 },
+      id: "route-line",
+      type: "line",
+      source: sourceId,
+      paint: {
+        "line-color": item.accent,
+        "line-width": 3.5,
+        "line-opacity": 0.9,
+      },
     });
   }
 
@@ -279,9 +315,17 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
     if (item.route.length > 1) {
       const bounds = new LngLatBounds();
       item.route.forEach((p) => bounds.extend([p.lng, p.lat]));
-      map.fitBounds(bounds, { padding: 40, maxZoom: 15, duration: animate ? 800 : 0 });
+      map.fitBounds(bounds, {
+        padding: 40,
+        maxZoom: 15,
+        duration: animate ? 800 : 0,
+      });
     } else if (item.coordinates) {
-      map.flyTo({ center: [item.coordinates.lng, item.coordinates.lat], zoom: item.mapZoom ?? 13, duration: animate ? 800 : 0 });
+      map.flyTo({
+        center: [item.coordinates.lng, item.coordinates.lat],
+        zoom: item.mapZoom ?? 13,
+        duration: animate ? 800 : 0,
+      });
     }
   }
 
@@ -301,13 +345,16 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
     sel("[data-map-detail-distance]").textContent = item.distance ?? "";
     sel("[data-map-detail-duration]").textContent = item.duration ?? "";
     (sel("[data-map-detail-link]") as HTMLAnchorElement).href = item.url;
-    sel("[data-map-empty-msg]").hidden = item.route.length > 1 || !!item.routeFile;
+    sel("[data-map-empty-msg]").hidden =
+      item.route.length > 1 || !!item.routeFile;
 
-    root!.querySelectorAll<HTMLButtonElement>("[data-map-item]").forEach((btn) => {
-      const isActive = btn.dataset.mapItem === item.slug;
-      btn.classList.toggle("active", isActive);
-      btn.setAttribute("aria-pressed", String(isActive));
-    });
+    root!
+      .querySelectorAll<HTMLButtonElement>("[data-map-item]")
+      .forEach((btn) => {
+        const isActive = btn.dataset.mapItem === item.slug;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-pressed", String(isActive));
+      });
   }
 
   async function showJourney(item: Journey) {
@@ -328,17 +375,24 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
 
   // ── Filter ──
   function applyFilter(kind: string) {
-    activeKind = kind;
-    root!.querySelectorAll<HTMLButtonElement>("[data-map-filter]").forEach((btn) => {
-      btn.setAttribute("data-active", String(btn.dataset.mapFilter === kind));
-    });
-    root!.querySelectorAll<HTMLButtonElement>("[data-map-item]").forEach((btn) => {
-      btn.hidden = kind !== "all" && btn.dataset.mapKind !== kind;
-    });
+    root!
+      .querySelectorAll<HTMLButtonElement>("[data-map-filter]")
+      .forEach((btn) => {
+        btn.setAttribute("data-active", String(btn.dataset.mapFilter === kind));
+      });
+    root!
+      .querySelectorAll<HTMLButtonElement>("[data-map-item]")
+      .forEach((btn) => {
+        btn.hidden = kind !== "all" && btn.dataset.mapKind !== kind;
+      });
     if (selectedSlug) {
       const sel = items.find((i) => i.slug === selectedSlug);
       if (sel && kind !== "all" && sel.kind !== kind) {
-        const first = items.find((i) => (kind === "all" || i.kind === kind) && (i.coordinates || i.routeFile));
+        const first = items.find(
+          (i) =>
+            (kind === "all" || i.kind === kind) &&
+            (i.coordinates || i.routeFile),
+        );
         if (first) showJourney(first);
       }
     }
@@ -346,7 +400,8 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
       const visible = kind === "all" || item.kind === kind;
       const marker = markers.get(item.slug);
       if (marker) marker.getElement().classList.toggle("filtered", !visible);
-      if (!visible && currentRouteSourceId === `route-${item.slug}`) removeCurrentRoute();
+      if (!visible && currentRouteSourceId === `route-${item.slug}`)
+        removeCurrentRoute();
     });
   }
 
@@ -361,8 +416,14 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
       maxZoom: 16,
       attributionControl: false,
     });
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      "bottom-right",
+    );
+    map.addControl(
+      new maplibregl.AttributionControl({ compact: true }),
+      "bottom-right",
+    );
   } catch (e) {
     console.warn("MapLibre GL init failed:", e);
     root.classList.add("map-fallback");
@@ -370,30 +431,35 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
 
   if (map) {
     map.on("load", async () => {
-      await Promise.all(items.map((i) => ensureRouteLoaded(i)));
+      await Promise.all(
+        items
+          .filter((item) => !item.coordinates && item.routeFile)
+          .map((item) => ensureRouteLoaded(item)),
+      );
 
-      const allBounds = new LngLatBounds();
-      items.filter((i) => i.coordinates).forEach((item) => {
-        const coords = item.coordinates!;
-        allBounds.extend([coords.lng, coords.lat]);
-        const el = document.createElement("button");
-        el.type = "button";
-        el.className = "journey-marker";
-        el.dataset.kind = item.kind;
-        el.setAttribute("aria-label", item.title);
-        el.style.setProperty("--marker-accent", item.accent);
-        el.innerHTML = "<span></span>";
-        el.addEventListener("click", () => showJourney(item));
-        markers.set(item.slug,
-          new maplibregl.Marker({ element: el })
-            .setLngLat([coords.lng, coords.lat])
-            .addTo(map!),
-        );
-      });
+      items
+        .filter((i) => i.coordinates)
+        .forEach((item) => {
+          const coords = item.coordinates!;
+          const el = document.createElement("button");
+          el.type = "button";
+          el.className = "journey-marker";
+          el.dataset.kind = item.kind;
+          el.setAttribute("aria-label", item.title);
+          el.style.setProperty("--marker-accent", item.accent);
+          el.innerHTML = "<span></span>";
+          el.addEventListener("click", () => showJourney(item));
+          markers.set(
+            item.slug,
+            new maplibregl.Marker({ element: el })
+              .setLngLat([coords.lng, coords.lat])
+              .addTo(map!),
+          );
+        });
 
       const firstMapped = items.find((i) => i.coordinates || i.routeFile);
       const target = initialSlug
-        ? items.find((i) => i.slug === initialSlug) ?? firstMapped
+        ? (items.find((i) => i.slug === initialSlug) ?? firstMapped)
         : firstMapped;
       if (target) await showJourney(target);
     });
@@ -406,7 +472,10 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
         if (sel) addRouteToMap(sel);
       });
     });
-    themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    themeObs.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
   } else {
     const firstMapped = items.find((i) => i.coordinates || i.routeFile);
     if (firstMapped) updateDetailUI(firstMapped);
@@ -420,11 +489,13 @@ const initialSlug = pageUrl.searchParams.get("journey") ??
     });
   });
 
-  root.querySelectorAll<HTMLButtonElement>("[data-map-filter]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      applyFilter(btn.dataset.mapFilter ?? "all");
+  root
+    .querySelectorAll<HTMLButtonElement>("[data-map-filter]")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyFilter(btn.dataset.mapFilter ?? "all");
+      });
     });
-  });
 
   window.addEventListener("popstate", () => {
     const params = new URLSearchParams(window.location.search);

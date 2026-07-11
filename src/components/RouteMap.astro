@@ -1,0 +1,734 @@
+---
+import "maplibre-gl/dist/maplibre-gl.css";
+import type { RouteCoordinate } from "../lib/routes/content";
+
+interface Props {
+  title: string;
+  routeFile?: string;
+  coordinates?: RouteCoordinate;
+  route?: RouteCoordinate[];
+  start?: RouteCoordinate;
+  end?: RouteCoordinate;
+  accent?: string;
+  locale: "zh-CN" | "en";
+}
+
+const {
+  title,
+  routeFile,
+  coordinates,
+  route = [],
+  start,
+  end,
+  accent = "#36d399",
+  locale,
+} = Astro.props;
+
+const labels =
+  locale === "zh-CN"
+    ? {
+        map: "路线地图",
+        start: "起点",
+        finish: "终点",
+        elevation: "海拔变化",
+        gain: "累计爬升",
+        loss: "累计下降",
+        range: "海拔范围",
+        noElevation: "该轨迹暂时没有可用的海拔数据。",
+        loadError: "路线文件加载失败，请检查 GPX 路径或文件内容。",
+        routeProfile: "ROUTE PROFILE",
+      }
+    : {
+        map: "Route map",
+        start: "Start",
+        finish: "Finish",
+        elevation: "Elevation profile",
+        gain: "Elevation gain",
+        loss: "Elevation loss",
+        range: "Elevation range",
+        noElevation: "Elevation data is not available for this route.",
+        loadError:
+          "The route file could not be loaded. Check the GPX path and file.",
+        routeProfile: "ROUTE PROFILE",
+      };
+---
+
+<section
+  class="route-visual"
+  data-route-visual
+  data-route-file={routeFile ?? ""}
+  data-coordinates={coordinates ? JSON.stringify(coordinates) : ""}
+  data-inline-route={JSON.stringify(route)}
+  data-start={start ? JSON.stringify(start) : ""}
+  data-end={end ? JSON.stringify(end) : ""}
+  data-accent={accent}
+  data-labels={JSON.stringify(labels)}
+>
+  <div class="route-map-card">
+    <header class="route-map-card__header">
+      <div>
+        <span class="route-section-kicker">MAP</span>
+        <h2>{labels.map}</h2>
+      </div>
+      <div class="route-map-legend" aria-hidden="true">
+        <span><i class="route-dot route-dot--start"></i>{labels.start}</span>
+        <span><i class="route-dot route-dot--finish"></i>{labels.finish}</span>
+      </div>
+    </header>
+
+    <div class="route-map-shell">
+      <div
+        id="route-detail-map"
+        class="route-map"
+        aria-label={`${title} · ${labels.map}`}
+      >
+      </div>
+      <p class="route-map-error" data-route-error hidden>{labels.loadError}</p>
+    </div>
+
+    <dl class="route-endpoints">
+      <div>
+        <dt><i class="route-dot route-dot--start"></i>{labels.start}</dt>
+        <dd data-route-start-name>{start?.name ?? labels.start}</dd>
+        <span data-route-start-coordinates>
+          {start ? `${start.lat.toFixed(5)}, ${start.lng.toFixed(5)}` : "—"}
+        </span>
+      </div>
+      <div>
+        <dt><i class="route-dot route-dot--finish"></i>{labels.finish}</dt>
+        <dd data-route-end-name>{end?.name ?? labels.finish}</dd>
+        <span data-route-end-coordinates>
+          {end ? `${end.lat.toFixed(5)}, ${end.lng.toFixed(5)}` : "—"}
+        </span>
+      </div>
+    </dl>
+  </div>
+
+  <section class="elevation-card" data-elevation-card hidden>
+    <header class="elevation-card__header">
+      <div>
+        <span class="route-section-kicker">{labels.routeProfile}</span>
+        <h2>{labels.elevation}</h2>
+      </div>
+      <dl class="elevation-card__stats">
+        <div><dt>{labels.gain}</dt><dd data-elevation-gain>—</dd></div>
+        <div><dt>{labels.loss}</dt><dd data-elevation-loss>—</dd></div>
+        <div><dt>{labels.range}</dt><dd data-elevation-range>—</dd></div>
+      </dl>
+    </header>
+    <div
+      class="elevation-chart"
+      data-elevation-chart
+      role="img"
+      aria-label={labels.elevation}
+    >
+    </div>
+  </section>
+  <p class="elevation-empty" data-elevation-empty hidden>
+    {labels.noElevation}
+  </p>
+</section>
+
+<script>
+  import maplibregl, { LngLatBounds, type Marker } from "maplibre-gl";
+  import {
+    parseRouteDocument,
+    type ParsedRoute,
+    type RouteEndpoint,
+    type RoutePoint,
+  } from "../lib/routes/gpx";
+
+  type Coordinate = { lat: number; lng: number; name?: string };
+
+  const root = document.querySelector<HTMLElement>("[data-route-visual]");
+
+  function parseJson<T>(value: string | undefined, fallback: T): T {
+    if (!value) return fallback;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function endpointElement(kind: "start" | "finish", label: string) {
+    const element = document.createElement("div");
+    element.className = `route-endpoint route-endpoint--${kind}`;
+    element.setAttribute("aria-label", label);
+    element.textContent = kind === "start" ? "S" : "F";
+    return element;
+  }
+
+  function setEndpoint(
+    kind: "start" | "end",
+    endpoint: RouteEndpoint | Coordinate | undefined,
+    fallbackLabel: string,
+  ) {
+    if (!root || !endpoint) return;
+    const name = root.querySelector<HTMLElement>(`[data-route-${kind}-name]`);
+    const coordinate = root.querySelector<HTMLElement>(
+      `[data-route-${kind}-coordinates]`,
+    );
+    if (name) name.textContent = endpoint.name ?? fallbackLabel;
+    if (coordinate) {
+      coordinate.textContent = `${endpoint.lat.toFixed(5)}, ${endpoint.lng.toFixed(5)}`;
+    }
+  }
+
+  function renderElevation(routeData: ParsedRoute, accent: string) {
+    const points = routeData.points;
+    if (!root) return;
+    const card = root.querySelector<HTMLElement>("[data-elevation-card]");
+    const empty = root.querySelector<HTMLElement>("[data-elevation-empty]");
+    const chart = root.querySelector<HTMLElement>("[data-elevation-chart]");
+    const samples = points.filter(
+      (point) =>
+        Number.isFinite(point.elevation) && Number.isFinite(point.distance),
+    );
+
+    if (!card || !empty || !chart || samples.length < 2) {
+      if (empty) empty.hidden = false;
+      return;
+    }
+
+    const elevations = samples.map((point) => point.elevation!);
+    const maxChartPoints = 800;
+    const chartSamples =
+      samples.length <= maxChartPoints
+        ? samples
+        : Array.from({ length: maxChartPoints }, (_, index) => {
+            const sourceIndex = Math.round(
+              (index / (maxChartPoints - 1)) * (samples.length - 1),
+            );
+            return samples[sourceIndex];
+          });
+    const gain = routeData.elevationGainMeters ?? 0;
+    const loss = routeData.elevationLossMeters ?? 0;
+    const minimum = routeData.minElevationMeters ?? Math.min(...elevations);
+    const maximum = routeData.maxElevationMeters ?? Math.max(...elevations);
+    const totalDistance = samples.at(-1)?.distance ?? 0;
+    const width = 900;
+    const height = 260;
+    const padding = { top: 22, right: 18, bottom: 38, left: 54 };
+    const plotWidth = width - padding.left - padding.right;
+    const plotHeight = height - padding.top - padding.bottom;
+    const elevationRange = Math.max(1, maximum - minimum);
+    const x = (point: RoutePoint) =>
+      padding.left +
+      ((point.distance ?? 0) / Math.max(1, totalDistance)) * plotWidth;
+    const y = (point: RoutePoint) =>
+      padding.top +
+      (1 - (point.elevation! - minimum) / elevationRange) * plotHeight;
+    const line = chartSamples
+      .map(
+        (point, index) =>
+          `${index === 0 ? "M" : "L"}${x(point).toFixed(1)},${y(point).toFixed(1)}`,
+      )
+      .join(" ");
+    const area = `${line} L${x(chartSamples.at(-1)!).toFixed(1)},${padding.top + plotHeight} L${x(chartSamples[0]).toFixed(1)},${padding.top + plotHeight} Z`;
+    const distanceKm = totalDistance / 1_000;
+
+    chart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="route-elevation-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${accent}" stop-opacity=".32"/><stop offset="1" stop-color="${accent}" stop-opacity=".03"/></linearGradient></defs>
+      <line class="elevation-grid" x1="${padding.left}" y1="${padding.top}" x2="${padding.left + plotWidth}" y2="${padding.top}"/>
+      <line class="elevation-grid" x1="${padding.left}" y1="${padding.top + plotHeight / 2}" x2="${padding.left + plotWidth}" y2="${padding.top + plotHeight / 2}"/>
+      <line class="elevation-grid" x1="${padding.left}" y1="${padding.top + plotHeight}" x2="${padding.left + plotWidth}" y2="${padding.top + plotHeight}"/>
+      <path d="${area}" fill="url(#route-elevation-fill)"/>
+      <path d="${line}" fill="none" stroke="${accent}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/>
+      <text class="elevation-axis" x="${padding.left - 8}" y="${padding.top + 4}" text-anchor="end">${Math.round(maximum)} m</text>
+      <text class="elevation-axis" x="${padding.left - 8}" y="${padding.top + plotHeight + 4}" text-anchor="end">${Math.round(minimum)} m</text>
+      <text class="elevation-axis" x="${padding.left}" y="${height - 10}" text-anchor="start">0 km</text>
+      <text class="elevation-axis" x="${padding.left + plotWidth}" y="${height - 10}" text-anchor="end">${distanceKm.toFixed(1)} km</text>
+    </svg>`;
+
+    const gainElement = root.querySelector<HTMLElement>(
+      "[data-elevation-gain]",
+    );
+    const lossElement = root.querySelector<HTMLElement>(
+      "[data-elevation-loss]",
+    );
+    const rangeElement = root.querySelector<HTMLElement>(
+      "[data-elevation-range]",
+    );
+    if (gainElement) gainElement.textContent = `${Math.round(gain)} m`;
+    if (lossElement) lossElement.textContent = `${Math.round(loss)} m`;
+    if (rangeElement) {
+      rangeElement.textContent = `${Math.round(minimum)}–${Math.round(maximum)} m`;
+    }
+    card.hidden = false;
+    empty.hidden = true;
+  }
+
+  if (root) {
+    const routeFile = root.dataset.routeFile;
+    const coordinates = parseJson<Coordinate | undefined>(
+      root.dataset.coordinates,
+      undefined,
+    );
+    const inlineRoute = parseJson<Coordinate[]>(root.dataset.inlineRoute, []);
+    const frontmatterStart = parseJson<Coordinate | undefined>(
+      root.dataset.start,
+      undefined,
+    );
+    const frontmatterEnd = parseJson<Coordinate | undefined>(
+      root.dataset.end,
+      undefined,
+    );
+    const labels = parseJson<Record<string, string>>(root.dataset.labels, {});
+    const accent = root.dataset.accent ?? "#36d399";
+    const mapContainer = document.getElementById("route-detail-map");
+    const errorElement = root.querySelector<HTMLElement>("[data-route-error]");
+    const lightStyle =
+      "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+    const darkStyle =
+      "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+    const initial = coordinates ?? frontmatterStart ?? inlineRoute[0];
+    let parsedRoute: ParsedRoute | undefined;
+    let markers: Marker[] = [];
+
+    const map = new maplibregl.Map({
+      container: mapContainer!,
+      style: document.documentElement.classList.contains("dark")
+        ? darkStyle
+        : lightStyle,
+      center: initial ? [initial.lng, initial.lat] : [114.1694, 22.3193],
+      zoom: initial ? 13 : 2.5,
+      attributionControl: false,
+    });
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      "bottom-right",
+    );
+    map.addControl(
+      new maplibregl.AttributionControl({ compact: true }),
+      "bottom-right",
+    );
+
+    function clearMapData() {
+      for (const id of ["route-line", "route-glow"]) {
+        if (map.getLayer(id)) map.removeLayer(id);
+      }
+      if (map.getSource("route")) map.removeSource("route");
+      markers.forEach((marker) => marker.remove());
+      markers = [];
+    }
+
+    function drawParsedRoute(routeData: ParsedRoute) {
+      clearMapData();
+      const points = routeData.points;
+      const start = routeData.start ?? frontmatterStart;
+      const end = routeData.end ?? frontmatterEnd;
+      setEndpoint("start", start, labels.start ?? "Start");
+      setEndpoint("end", end, labels.finish ?? "Finish");
+
+      if (routeData.segments.length > 0) {
+        const geometry =
+          routeData.segments.length === 1
+            ? {
+                type: "LineString" as const,
+                coordinates: routeData.segments[0].map((point) => [
+                  point.lng,
+                  point.lat,
+                ]),
+              }
+            : {
+                type: "MultiLineString" as const,
+                coordinates: routeData.segments.map((segment) =>
+                  segment.map((point) => [point.lng, point.lat]),
+                ),
+              };
+        map.addSource("route", {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            properties: {},
+            geometry,
+          },
+        });
+        map.addLayer({
+          id: "route-glow",
+          type: "line",
+          source: "route",
+          paint: {
+            "line-color": accent,
+            "line-width": 11,
+            "line-opacity": 0.14,
+            "line-blur": 5,
+          },
+        });
+        map.addLayer({
+          id: "route-line",
+          type: "line",
+          source: "route",
+          paint: {
+            "line-color": accent,
+            "line-width": 4,
+            "line-opacity": 0.94,
+          },
+        });
+      }
+
+      if (start) {
+        markers.push(
+          new maplibregl.Marker({
+            element: endpointElement("start", labels.start ?? "Start"),
+            anchor: "center",
+          })
+            .setLngLat([start.lng, start.lat])
+            .addTo(map),
+        );
+      }
+      if (end) {
+        markers.push(
+          new maplibregl.Marker({
+            element: endpointElement("finish", labels.finish ?? "Finish"),
+            anchor: "center",
+          })
+            .setLngLat([end.lng, end.lat])
+            .addTo(map),
+        );
+      }
+
+      const endpointNames = new Set([start?.name, end?.name].filter(Boolean));
+      routeData.waypoints
+        .filter((waypoint) => !endpointNames.has(waypoint.name))
+        .slice(0, 30)
+        .forEach((waypoint, index) => {
+          const element = document.createElement("div");
+          element.className = "route-waypoint";
+          element.textContent = String(index + 1);
+          element.setAttribute(
+            "aria-label",
+            waypoint.name ?? `Waypoint ${index + 1}`,
+          );
+          const marker = new maplibregl.Marker({
+            element,
+            anchor: "center",
+          }).setLngLat([waypoint.lng, waypoint.lat]);
+          if (waypoint.name) {
+            marker.setPopup(
+              new maplibregl.Popup({ offset: 18 }).setText(waypoint.name),
+            );
+          }
+          markers.push(marker.addTo(map));
+        });
+
+      if (points.length > 0) {
+        const bounds = new LngLatBounds();
+        points.forEach((point) => bounds.extend([point.lng, point.lat]));
+        map.fitBounds(bounds, {
+          padding: { top: 55, right: 55, bottom: 55, left: 55 },
+          maxZoom: 15,
+          duration: 800,
+        });
+      }
+      renderElevation(routeData, accent);
+    }
+
+    function inlineParsedRoute(): ParsedRoute | undefined {
+      if (inlineRoute.length === 0) return undefined;
+      const points: RoutePoint[] = inlineRoute.map((point, index) => ({
+        ...point,
+        segmentIndex: 0,
+        distance: index,
+      }));
+      return {
+        format: "geojson",
+        source: "Frontmatter",
+        distanceMeters: 0,
+        points,
+        segments: [points],
+        waypoints: [],
+        start: frontmatterStart ?? points[0],
+        end: frontmatterEnd ?? points.at(-1),
+        sensitiveMetrics: {},
+      };
+    }
+
+    async function loadRoute() {
+      if (parsedRoute) return parsedRoute;
+      if (routeFile) {
+        const response = await fetch(routeFile);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        parsedRoute = parseRouteDocument(await response.text(), routeFile);
+      } else {
+        parsedRoute = inlineParsedRoute();
+      }
+      return parsedRoute;
+    }
+
+    map.on("load", async () => {
+      try {
+        const routeData = await loadRoute();
+        if (routeData && routeData.points.length > 0) {
+          drawParsedRoute(routeData);
+        } else if (initial) {
+          markers.push(
+            new maplibregl.Marker()
+              .setLngLat([initial.lng, initial.lat])
+              .addTo(map),
+          );
+        }
+      } catch (error) {
+        console.warn("Failed to load route:", error);
+        if (errorElement) errorElement.hidden = false;
+      }
+    });
+
+    new MutationObserver(() => {
+      map.setStyle(
+        document.documentElement.classList.contains("dark")
+          ? darkStyle
+          : lightStyle,
+      );
+      map.once("styledata", () => {
+        if (parsedRoute) drawParsedRoute(parsedRoute);
+      });
+    }).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+</script>
+
+<style>
+  .route-visual {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .route-map-card,
+  .elevation-card {
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 1.25rem;
+    background: var(--surface-color);
+    box-shadow: 0 18px 55px rgb(15 23 42 / 0.08);
+  }
+
+  .route-map-card__header,
+  .elevation-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(1rem, 3vw, 1.4rem);
+  }
+
+  .route-section-kicker {
+    color: var(--text-muted);
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .route-map-card h2,
+  .elevation-card h2 {
+    margin: 0.25rem 0 0;
+    font-size: clamp(1.1rem, 3vw, 1.45rem);
+  }
+
+  .route-map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .route-map-legend span,
+  .route-endpoints dt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+  }
+
+  .route-dot {
+    display: inline-block;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+  }
+
+  .route-dot--start {
+    background: #17a673;
+  }
+
+  .route-dot--finish {
+    background: #ee4f67;
+  }
+
+  .route-map-shell {
+    position: relative;
+    border-block: 1px solid var(--border-color);
+  }
+
+  .route-map {
+    width: 100%;
+    height: clamp(420px, 58vw, 620px);
+  }
+
+  .route-map-error {
+    position: absolute;
+    inset: auto 1rem 1rem;
+    margin: 0;
+    padding: 0.8rem 1rem;
+    border: 1px solid color-mix(in srgb, #ee4f67 40%, var(--border-color));
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--surface-color) 92%, #ee4f67);
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+
+  .route-endpoints {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+  }
+
+  .route-endpoints > div {
+    display: grid;
+    gap: 0.25rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .route-endpoints > div + div {
+    border-left: 1px solid var(--border-color);
+  }
+
+  .route-endpoints dt,
+  .elevation-card__stats dt {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+
+  .route-endpoints dd,
+  .elevation-card__stats dd {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 750;
+  }
+
+  .route-endpoints span {
+    color: var(--text-muted);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+  }
+
+  :global(.route-endpoint) {
+    display: grid;
+    width: 2.2rem;
+    height: 2.2rem;
+    place-items: center;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 6px 18px rgb(15 23 42 / 0.28);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 850;
+  }
+
+  :global(.route-endpoint--start) {
+    background: #17a673;
+  }
+
+  :global(.route-endpoint--finish) {
+    background: #ee4f67;
+  }
+
+  :global(.route-waypoint) {
+    display: grid;
+    width: 1.65rem;
+    height: 1.65rem;
+    place-items: center;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #334155;
+    box-shadow: 0 4px 12px rgb(15 23 42 / 0.25);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+  }
+
+  .elevation-card {
+    padding-bottom: clamp(1rem, 3vw, 1.4rem);
+  }
+
+  .elevation-card__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.35rem;
+    margin: 0;
+  }
+
+  .elevation-card__stats div {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .elevation-chart {
+    min-height: 220px;
+    margin: 0 clamp(1rem, 3vw, 1.4rem);
+    overflow: hidden;
+    border-radius: 0.8rem;
+    background: color-mix(
+      in srgb,
+      var(--surface-color) 86%,
+      var(--border-color)
+    );
+  }
+
+  .elevation-chart :global(svg) {
+    display: block;
+    width: 100%;
+    height: 260px;
+  }
+
+  .elevation-chart :global(.elevation-grid) {
+    stroke: currentColor;
+    stroke-dasharray: 4 6;
+    stroke-opacity: 0.12;
+  }
+
+  .elevation-chart :global(.elevation-axis) {
+    fill: currentColor;
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    opacity: 0.58;
+  }
+
+  .elevation-empty {
+    margin: 0;
+    padding: 1rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 1rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  @media (max-width: 700px) {
+    .route-map-card__header,
+    .elevation-card__header {
+      display: grid;
+    }
+
+    .route-map {
+      height: 430px;
+    }
+
+    .route-endpoints {
+      grid-template-columns: 1fr;
+    }
+
+    .route-endpoints > div + div {
+      border-top: 1px solid var(--border-color);
+      border-left: 0;
+    }
+
+    .elevation-card__stats {
+      gap: 1rem;
+    }
+  }
+</style>
