@@ -44,3 +44,15 @@ public/                # Static assets (served as-is)
 - **Syntax Highlighting**: Shiki via rehype-pretty-code
 - **Diagrams**: Mermaid via rehype-mermaidjs
 - **Deployment**: Cloudflare Pages
+
+## Apple Health running data
+
+1. Export Apple Health data on iPhone: Health app → profile photo → Export All Health Data.
+2. Extract the archive and copy `apple_health_export/export.xml` into a local working folder outside `public/`.
+3. Import running workout summaries:
+
+```bash
+npm run import:apple-health -- path/to/export.xml --activity=running
+```
+
+The command writes `src/data/apple-health-workouts.json`. Apple Health's main `export.xml` contains workout summaries but does not reliably include GPS route geometry. Export route files separately as GPX/FIT/TCX, convert to GPX when needed, and place only the publishable route under `public/routes/`. Never commit the complete Health export because it contains sensitive health data.
