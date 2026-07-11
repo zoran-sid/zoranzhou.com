@@ -7,7 +7,7 @@
     "dev": "node scripts/run-astro.mjs dev",
     "start": "node scripts/run-astro.mjs dev",
     "build": "npm run enrich && astro build",
-    "prebuild": "npx tsx scripts/enrich-media.ts",
+    "prebuild": "npm run import:routes -- --no-geocode",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "astro check",
