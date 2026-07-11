@@ -1,0 +1,418 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { localizePath, type Locale } from "../i18n/utils";
+import {
+  formatDistance,
+  formatDuration,
+  formatElevation,
+  type RouteContentEntry,
+} from "../lib/routes/content";
+
+interface Props {
+  entry: RouteContentEntry;
+}
+
+interface RoutePhoto {
+  src: string;
+  alt?: string;
+  caption?: string;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const locale = (entry.data.lang ?? Astro.currentLocale ?? "zh-CN") as Locale;
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+const data = entry.data as RouteContentEntry["data"] & {
+  elevationGain?: number | string;
+  photos?: Array<string | RoutePhoto>;
+  published?: boolean;
+};
+const cover =
+  typeof data.cover === "string"
+    ? { src: data.cover, alt: data.title }
+    : data.cover;
+const photos = (data.photos ?? []).map((photo) =>
+  typeof photo === "string" ? { src: photo, alt: data.title } : photo,
+);
+const distance = formatDistance(data.distance);
+const duration = formatDuration(data.duration, locale);
+const elevationGain = formatElevation(data.elevationGain);
+const hasStory = Boolean(entry.body?.trim());
+
+const labels =
+  locale === "zh-CN"
+    ? {
+        map: "足迹",
+        journal: "TRAVEL JOURNAL",
+        date: "日期",
+        location: "地点",
+        distance: "距离",
+        duration: "总耗时",
+        elevationGain: "累计爬升",
+        story: "STORY",
+        photos: "PHOTOS",
+      }
+    : {
+        map: "Map",
+        journal: "TRAVEL JOURNAL",
+        date: "Date",
+        location: "Location",
+        distance: "Distance",
+        duration: "Elapsed time",
+        elevationGain: "Elevation gain",
+        story: "STORY",
+        photos: "PHOTOS",
+      };
+
+const articleUrl = new URL(
+  localizePath(`/map/${entry.slug}`, locale),
+  Astro.site,
+).href;
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: data.title,
+  description: data.description ?? "",
+  author: { "@type": "Person", name: data.author ?? "Zoran Zhou" },
+  datePublished: data.date.toISOString(),
+  dateModified: data.updated?.toISOString() ?? data.date.toISOString(),
+  url: articleUrl,
+  ...(cover?.src ? { image: new URL(cover.src, Astro.site).href } : {}),
+  ...(data.location
+    ? {
+        contentLocation: {
+          "@type": "Place",
+          name: data.location,
+        },
+      }
+    : {}),
+};
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  ogImage={cover?.src}
+  article={true}
+  jsonld={jsonld}
+>
+  <article class="route-journal">
+    {
+      cover?.src && (
+        <figure class="route-cover">
+          <img src={cover.src} alt={cover.alt ?? data.title} loading="eager" />
+          {cover.caption && <figcaption>{cover.caption}</figcaption>}
+        </figure>
+      )
+    }
+
+    <header class="route-journal__header">
+      <nav class="route-breadcrumb" aria-label="Breadcrumb">
+        <a href={localizePath("/", locale)}>ZORAN ZHOU</a>
+        <span aria-hidden="true">/</span>
+        <a href={localizePath("/map", locale)}>{labels.map}</a>
+      </nav>
+
+      <span class="route-journal__kicker">{labels.journal}</span>
+      <h1>{data.title}</h1>
+      {
+        data.description && (
+          <p class="route-journal__description">{data.description}</p>
+        )
+      }
+
+      <dl class="route-facts">
+        <div>
+          <dt>{labels.date}</dt>
+          <dd>
+            <time datetime={data.date.toISOString()}>
+              {
+                data.date.toLocaleDateString(dateLocale, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              }
+            </time>
+          </dd>
+        </div>
+        <div>
+          <dt>{labels.location}</dt>
+          <dd>{data.location}</dd>
+        </div>
+        {
+          distance && (
+            <div>
+              <dt>{labels.distance}</dt>
+              <dd>{distance}</dd>
+            </div>
+          )
+        }
+        {
+          duration && (
+            <div>
+              <dt>{labels.duration}</dt>
+              <dd>{duration}</dd>
+            </div>
+          )
+        }
+        {
+          elevationGain && (
+            <div>
+              <dt>{labels.elevationGain}</dt>
+              <dd>{elevationGain}</dd>
+            </div>
+          )
+        }
+      </dl>
+
+      {
+        data.tags.length > 0 && (
+          <div class="route-tags">
+            {data.tags.map((tag) => (
+              <a
+                href={localizePath(
+                  `/tags/${tag.toLowerCase().replace(/\s+/g, "-")}`,
+                  locale,
+                )}
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <section class="route-journal__visual">
+      <slot name="route-visual" />
+    </section>
+
+    {
+      hasStory && (
+        <section class="route-story">
+          <header class="route-section-header">
+            <span>{labels.story}</span>
+          </header>
+          <div class="prose article-prose">
+            <Content />
+          </div>
+        </section>
+      )
+    }
+
+    {
+      photos.length > 0 && (
+        <section class="route-photos">
+          <header class="route-section-header">
+            <span>{labels.photos}</span>
+          </header>
+          <div class="route-photo-grid">
+            {photos.map((photo, index) => (
+              <figure>
+                <img
+                  src={photo.src}
+                  alt={photo.alt ?? `${data.title} ${index + 1}`}
+                  loading="lazy"
+                />
+                {photo.caption && <figcaption>{photo.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  .route-journal {
+    width: min(100%, 1040px);
+    margin: 0 auto;
+    padding: clamp(1.5rem, 5vw, 4.5rem) 1rem 5rem;
+  }
+
+  .route-cover {
+    margin: 0 0 clamp(2rem, 5vw, 4rem);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 1.5rem;
+    background: var(--surface-color);
+    box-shadow: 0 22px 70px rgb(15 23 42 / 0.1);
+  }
+
+  .route-cover img {
+    display: block;
+    width: 100%;
+    max-height: 680px;
+    object-fit: cover;
+  }
+
+  .route-cover figcaption,
+  .route-photo-grid figcaption {
+    padding: 0.7rem 0.9rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .route-journal__header {
+    width: min(100%, 820px);
+    margin: 0 auto clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .route-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 2rem;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+
+  .route-breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .route-breadcrumb a:last-child {
+    color: var(--accent-color, #5271ff);
+    font-weight: 700;
+  }
+
+  .route-journal__kicker,
+  .route-section-header span {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+  }
+
+  .route-journal h1 {
+    margin: 0.55rem 0 0;
+    font-size: clamp(2.25rem, 7vw, 4.7rem);
+    line-height: 1.04;
+    letter-spacing: -0.045em;
+  }
+
+  .route-journal__description {
+    max-width: 720px;
+    margin: 1.25rem 0 0;
+    color: var(--text-muted);
+    font-size: clamp(1rem, 2.2vw, 1.22rem);
+    line-height: 1.75;
+  }
+
+  .route-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    margin: clamp(2rem, 5vw, 3rem) 0 0;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 1.1rem;
+    background: var(--surface-color);
+  }
+
+  .route-facts > div {
+    display: grid;
+    gap: 0.35rem;
+    min-height: 92px;
+    padding: 1rem 1.15rem;
+    border-right: 1px solid var(--border-color);
+  }
+
+  .route-facts > div:last-child {
+    border-right: 0;
+  }
+
+  .route-facts dt {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+
+  .route-facts dd {
+    margin: 0;
+    align-self: end;
+    font-size: 0.9rem;
+    font-weight: 750;
+  }
+
+  .route-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 1rem;
+  }
+
+  .route-tags a {
+    padding: 0.34rem 0.7rem;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    text-decoration: none;
+  }
+
+  .route-journal__visual,
+  .route-story,
+  .route-photos {
+    margin-top: clamp(2.5rem, 7vw, 5rem);
+  }
+
+  .route-story,
+  .route-photos {
+    width: min(100%, 820px);
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .route-section-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .route-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .route-photo-grid figure {
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    background: var(--surface-color);
+  }
+
+  .route-photo-grid img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  @media (max-width: 720px) {
+    .route-journal {
+      padding-right: 0.75rem;
+      padding-left: 0.75rem;
+    }
+
+    .route-facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .route-facts > div:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .route-facts > div:nth-child(n + 3) {
+      border-top: 1px solid var(--border-color);
+    }
+
+    .route-photo-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
