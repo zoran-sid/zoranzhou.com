@@ -2,7 +2,6 @@
 import "../styles/global.css";
 import ThemeScript from "../components/ThemeScript.astro";
 import Navigation from "../components/Navigation.astro";
-import Footer from "../components/Footer.astro";
 import {
   getTranslations,
   type Locale,
@@ -27,9 +26,8 @@ const t = getTranslations(locale);
 const pageTitle = title ? `${title} | ZORAN ZHOU` : "ZORAN ZHOU";
 const pageDescription = description ?? t.siteDescription;
 
-// Current path without locale prefix for canonical
+// Current page path used for canonical and alternate URLs.
 const canonicalPath = Astro.url.pathname;
-const isHome = /^\/(?:zh-CN|en)\/?$/.test(canonicalPath);
 ---
 
 <!doctype html>
@@ -130,7 +128,6 @@ const isHome = /^\/(?:zh-CN|en)\/?$/.test(canonicalPath);
     <main class="site-main min-h-screen relative z-[1]">
       <slot />
     </main>
-    {!isHome && <Footer />}
 
     <!-- Back to top -->
     <button id="back-to-top" class="back-to-top" aria-label="Back to top">
