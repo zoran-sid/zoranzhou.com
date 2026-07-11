@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "enrich": "npx tsx scripts/enrich-media.ts",
     "restore-media": "npx tsx scripts/restore-media.ts",
-    "import:apple-health": "npx tsx scripts/import-apple-health.ts"
+    "import:apple-health": "npx tsx scripts/import-apple-health.ts",
+    "import:routes": "npx tsx scripts/import-route.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
