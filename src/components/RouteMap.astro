@@ -1,12 +1,10 @@
 ---
-import "maplibre-gl/dist/maplibre-gl.css";
 import type { RouteCoordinate } from "../lib/routes/content";
 
 interface Props {
   title: string;
-  routeFile?: string;
+  gpx: string;
   coordinates?: RouteCoordinate;
-  route?: RouteCoordinate[];
   start?: RouteCoordinate;
   end?: RouteCoordinate;
   accent?: string;
@@ -15,9 +13,8 @@ interface Props {
 
 const {
   title,
-  routeFile,
+  gpx,
   coordinates,
-  route = [],
   start,
   end,
   accent = "#36d399",
@@ -56,9 +53,8 @@ const labels =
 <section
   class="route-visual"
   data-route-visual
-  data-route-file={routeFile ?? ""}
+  data-gpx={gpx}
   data-coordinates={coordinates ? JSON.stringify(coordinates) : ""}
-  data-inline-route={JSON.stringify(route)}
   data-start={start ? JSON.stringify(start) : ""}
   data-end={end ? JSON.stringify(end) : ""}
   data-accent={accent}
@@ -78,7 +74,6 @@ const labels =
 
     <div class="route-map-shell">
       <div
-        id="route-detail-map"
         class="route-map"
         aria-label={`${title} · ${labels.map}`}
       >
@@ -137,6 +132,7 @@ const labels =
     type RouteEndpoint,
     type RoutePoint,
   } from "../lib/routes/gpx";
+  import { downsampleSegments } from "../lib/routes/downsample";
 
   type Coordinate = { lat: number; lng: number; name?: string };
 
@@ -260,12 +256,11 @@ const labels =
   }
 
   if (root) {
-    const routeFile = root.dataset.routeFile;
+    const gpx = root.dataset.gpx;
     const coordinates = parseJson<Coordinate | undefined>(
       root.dataset.coordinates,
       undefined,
     );
-    const inlineRoute = parseJson<Coordinate[]>(root.dataset.inlineRoute, []);
     const frontmatterStart = parseJson<Coordinate | undefined>(
       root.dataset.start,
       undefined,
@@ -276,13 +271,13 @@ const labels =
     );
     const labels = parseJson<Record<string, string>>(root.dataset.labels, {});
     const accent = root.dataset.accent ?? "#36d399";
-    const mapContainer = document.getElementById("route-detail-map");
+    const mapContainer = root.querySelector<HTMLElement>(".route-map");
     const errorElement = root.querySelector<HTMLElement>("[data-route-error]");
     const lightStyle =
       "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
     const darkStyle =
       "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
-    const initial = coordinates ?? frontmatterStart ?? inlineRoute[0];
+    const initial = coordinates ?? frontmatterStart;
     let parsedRoute: ParsedRoute | undefined;
     let markers: Marker[] = [];
 
@@ -321,19 +316,20 @@ const labels =
       setEndpoint("start", start, labels.start ?? "Start");
       setEndpoint("end", end, labels.finish ?? "Finish");
 
-      if (routeData.segments.length > 0) {
+      const displaySegments = downsampleSegments(routeData.segments, 2_000);
+      if (displaySegments.length > 0) {
         const geometry =
-          routeData.segments.length === 1
+          displaySegments.length === 1
             ? {
                 type: "LineString" as const,
-                coordinates: routeData.segments[0].map((point) => [
+                coordinates: displaySegments[0].map((point) => [
                   point.lng,
                   point.lat,
                 ]),
               }
             : {
                 type: "MultiLineString" as const,
-                coordinates: routeData.segments.map((segment) =>
+                coordinates: displaySegments.map((segment) =>
                   segment.map((point) => [point.lng, point.lat]),
                 ),
               };
@@ -425,41 +421,29 @@ const labels =
       renderElevation(routeData, accent);
     }
 
-    function inlineParsedRoute(): ParsedRoute | undefined {
-      if (inlineRoute.length === 0) return undefined;
-      const points: RoutePoint[] = inlineRoute.map((point, index) => ({
-        ...point,
-        segmentIndex: 0,
-        distance: index,
-      }));
-      return {
-        format: "geojson",
-        source: "Frontmatter",
-        distanceMeters: 0,
-        points,
-        segments: [points],
-        waypoints: [],
-        start: frontmatterStart ?? points[0],
-        end: frontmatterEnd ?? points.at(-1),
-        sensitiveMetrics: {},
-      };
-    }
-
     async function loadRoute() {
       if (parsedRoute) return parsedRoute;
-      if (routeFile) {
-        const response = await fetch(routeFile);
+      if (gpx) {
+        const response = await fetch(gpx);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        parsedRoute = parseRouteDocument(await response.text(), routeFile);
-      } else {
-        parsedRoute = inlineParsedRoute();
+        parsedRoute = parseRouteDocument(await response.text(), gpx);
       }
       return parsedRoute;
     }
 
+    const routePromise = loadRoute();
+    routePromise
+      .then((routeData) => {
+        if (routeData) renderElevation(routeData, accent);
+      })
+      .catch((error) => {
+        console.warn("Failed to load route:", error);
+        if (errorElement) errorElement.hidden = false;
+      });
+
     map.on("load", async () => {
       try {
-        const routeData = await loadRoute();
+        const routeData = await routePromise;
         if (routeData && routeData.points.length > 0) {
           drawParsedRoute(routeData);
         } else if (initial) {
@@ -474,8 +458,11 @@ const labels =
         if (errorElement) errorElement.hidden = false;
       }
     });
+    map.on("error", () => {
+      if (errorElement) errorElement.hidden = false;
+    });
 
-    new MutationObserver(() => {
+    const themeObserver = new MutationObserver(() => {
       map.setStyle(
         document.documentElement.classList.contains("dark")
           ? darkStyle
@@ -484,10 +471,22 @@ const labels =
       map.once("styledata", () => {
         if (parsedRoute) drawParsedRoute(parsedRoute);
       });
-    }).observe(document.documentElement, {
+    });
+    themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
     });
+    const resize = () => map.resize();
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("orientationchange", resize, { passive: true });
+    const cleanup = () => {
+      themeObserver.disconnect();
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("orientationchange", resize);
+      markers.forEach((marker) => marker.remove());
+      map.remove();
+    };
+    document.addEventListener("astro:before-swap", cleanup, { once: true });
   }
 </script>
 

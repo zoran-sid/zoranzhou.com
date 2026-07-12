@@ -1,0 +1,121 @@
+---
+interface Props { locale: "zh-CN" | "en" }
+const { locale } = Astro.props;
+const ui = locale === "zh-CN"
+  ? { search: "搜索", placeholder: "搜索文章...", loading: "加载中...", noResults: "没有找到结果", prompt: "输入标题搜索", navigate: "导航", open: "打开" }
+  : { search: "Search", placeholder: "Search articles...", loading: "Loading...", noResults: "No results", prompt: "Type to search by title", navigate: "Navigate", open: "Open" };
+const labels = locale === "zh-CN"
+  ? { blog: "博客", research: "研究", projects: "项目" }
+  : { blog: "Blog", research: "Research", projects: "Projects" };
+---
+
+<div class="search-modal" data-search-modal data-locale={locale} data-labels={JSON.stringify(labels)}>
+  <button
+    type="button"
+    data-search-open
+    class="group inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-400 transition-all hover:border-gray-300 hover:text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500 dark:hover:border-gray-600 dark:hover:text-gray-300"
+    aria-label={`${ui.search} (Ctrl+K)`}
+  >
+    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path></svg>
+    <span class="hidden sm:inline">{ui.search}</span>
+    <kbd class="hidden sm:inline-flex items-center gap-0.5 rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-xs text-gray-400 group-hover:border-gray-400"><span class="text-[10px]">⌘</span>K</kbd>
+  </button>
+
+  <div class="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh]" data-search-dialog role="dialog" aria-modal="true" aria-label={ui.search} hidden>
+    <button type="button" class="absolute inset-0 cursor-default dark:bg-black/40" data-search-close aria-label="Close search"></button>
+    <div class="relative w-full max-w-xl overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10">
+      <div class="flex items-center gap-3 px-4">
+        <svg class="h-5 w-5 shrink-0 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path></svg>
+        <input data-search-input type="search" autocomplete="off" placeholder={ui.placeholder} class="search-modal-input flex-1 bg-transparent py-4 text-base text-gray-900 placeholder:text-gray-400 outline-none focus:outline-none focus-visible:outline-none dark:text-gray-100 dark:placeholder:text-gray-500" />
+        <kbd class="hidden rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 font-mono text-[10px] text-gray-400 sm:inline dark:border-gray-600 dark:bg-gray-700 dark:text-gray-500">esc</kbd>
+      </div>
+      <div class="max-h-80 overflow-y-auto border-t border-gray-100 dark:border-gray-700" data-search-results>
+        <p class="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500" data-search-message>{ui.prompt}</p>
+      </div>
+      <div class="flex items-center gap-4 border-t border-gray-100 px-4 py-2.5 text-xs text-gray-400 dark:border-gray-700 dark:text-gray-500">
+        <span class="flex items-center gap-1"><kbd class="rounded border border-gray-200 bg-gray-50 px-1 py-0.5 font-mono text-[10px] dark:border-gray-600 dark:bg-gray-700">↑↓</kbd> {ui.navigate}</span>
+        <span class="flex items-center gap-1"><kbd class="rounded border border-gray-200 bg-gray-50 px-1 py-0.5 font-mono text-[10px] dark:border-gray-600 dark:bg-gray-700">↵</kbd> {ui.open}</span>
+      </div>
+    </div>
+  </div>
+  <template data-search-result-template>
+    <a class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-700/50">
+      <span data-result-type class="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-gray-500 dark:bg-gray-600 dark:text-gray-300"></span>
+      <span data-result-title class="flex-1 truncate text-sm font-medium text-gray-700 dark:text-gray-200"></span>
+      <span data-result-date class="shrink-0 text-xs text-gray-400 dark:text-gray-500"></span>
+    </a>
+  </template>
+</div>
+
+<script>
+  interface SearchEntry { title: string; collection: string; url: string; date: string }
+  const modal = document.querySelector<HTMLElement>("[data-search-modal]");
+  if (modal) {
+    const locale = modal.dataset.locale ?? "zh-CN";
+    const labels = JSON.parse(modal.dataset.labels ?? "{}") as Record<string, string>;
+    const dialog = modal.querySelector<HTMLElement>("[data-search-dialog]")!;
+    const input = modal.querySelector<HTMLInputElement>("[data-search-input]")!;
+    const results = modal.querySelector<HTMLElement>("[data-search-results]")!;
+    const template = modal.querySelector<HTMLTemplateElement>("[data-search-result-template]")!;
+    let fuse: import("fuse.js").default<SearchEntry> | undefined;
+    let loading: Promise<void> | undefined;
+    let entries: SearchEntry[] = [];
+    let selected = 0;
+
+    const message = (text: string) => { results.innerHTML = `<p class="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500"></p>`; results.firstElementChild!.textContent = text; };
+    const load = () => loading ??= Promise.all([
+      import("fuse.js"),
+      fetch(`/${locale}/search-index.json`).then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json() as Promise<SearchEntry[]>;
+      }),
+    ]).then(([module, data]) => {
+      entries = data;
+      fuse = new module.default(entries, { keys: ["title"], threshold: 0.4, includeScore: true });
+    }).catch(() => { message(locale === "zh-CN" ? "搜索加载失败" : "Search failed to load"); });
+
+    const select = (index: number) => {
+      const links = [...results.querySelectorAll<HTMLAnchorElement>("a")];
+      selected = Math.max(0, Math.min(index, links.length - 1));
+      links.forEach((link, itemIndex) => link.classList.toggle("bg-gray-50", itemIndex === selected));
+      links[selected]?.scrollIntoView({ block: "nearest" });
+    };
+    const search = () => {
+      const query = input.value.trim();
+      if (!query) { message(locale === "zh-CN" ? "输入标题搜索" : "Type to search by title"); return; }
+      const matches = fuse?.search(query).slice(0, 8).map((result) => result.item) ?? [];
+      if (matches.length === 0) { message(locale === "zh-CN" ? `没有找到“${query}”` : `No results for “${query}”`); return; }
+      results.replaceChildren(...matches.map((entry) => {
+        const node = template.content.firstElementChild!.cloneNode(true) as HTMLAnchorElement;
+        node.href = entry.url;
+        node.querySelector<HTMLElement>("[data-result-type]")!.textContent = labels[entry.collection] ?? entry.collection;
+        node.querySelector<HTMLElement>("[data-result-title]")!.textContent = entry.title;
+        node.querySelector<HTMLElement>("[data-result-date]")!.textContent = entry.date;
+        node.addEventListener("mouseenter", () => select([...results.children].indexOf(node)));
+        return node;
+      }));
+      select(0);
+    };
+    const open = async () => {
+      dialog.hidden = false;
+      document.body.style.overflow = "hidden";
+      input.focus();
+      if (!fuse) { message(locale === "zh-CN" ? "加载中..." : "Loading..."); await load(); search(); }
+    };
+    const close = () => { dialog.hidden = true; document.body.style.overflow = ""; input.value = ""; };
+    modal.querySelector("[data-search-open]")?.addEventListener("click", open);
+    modal.querySelector("[data-search-close]")?.addEventListener("click", close);
+    input.addEventListener("input", search);
+    input.addEventListener("keydown", (event) => {
+      const links = [...results.querySelectorAll<HTMLAnchorElement>("a")];
+      if (event.key === "ArrowDown") { event.preventDefault(); select(selected + 1); }
+      if (event.key === "ArrowUp") { event.preventDefault(); select(selected - 1); }
+      if (event.key === "Enter" && links[selected]) { event.preventDefault(); links[selected].click(); }
+      if (event.key === "Escape") close();
+    });
+    window.addEventListener("keydown", (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); dialog.hidden ? open() : close(); }
+      else if (event.key === "Escape" && !dialog.hidden) close();
+    });
+  }
+</script>

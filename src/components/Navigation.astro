@@ -1,5 +1,7 @@
 ---
-import SearchModal from "../components/SearchModal.tsx";
+import SearchModal from "./SearchModal.astro";
+import BrandPortrait from "./BrandPortrait.astro";
+import { getCollection } from "astro:content";
 import {
   getTranslations,
   type Locale,
@@ -76,11 +78,19 @@ function getLanguageSwitchHref(targetLocale: Locale): string {
     : localizedPath;
 }
 
+const routeDetailMatch = /^\/(?:zh-CN|en)\/map\/([^/]+)\/?$/.exec(path);
+let translatedRouteHref: string | undefined;
+if (routeDetailMatch) {
+  const routes = await getCollection("routes", ({ data }) => data.draft !== true && data.published !== false);
+  const current = routes.find((entry) => entry.slug === routeDetailMatch[1] && entry.data.lang === locale);
+  const translated = current && routes.find((entry) => entry.data.routeId === current.data.routeId && entry.data.lang !== locale);
+  if (translated) translatedRouteHref = localizePath(`/map/${translated.slug}`, translated.data.lang);
+}
+
 const alternateLocale: Locale =
   locale === "zh-CN" ? "en" : "zh-CN";
 
-const alternateLocaleHref =
-  getLanguageSwitchHref(alternateLocale);
+const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alternateLocale);
 ---
 
 <header
@@ -117,13 +127,7 @@ const alternateLocaleHref =
         aria-label="Zoran Zhou home"
       >
         <span class="site-brand__mark" aria-hidden="true">
-          <img
-            src="/images/zoran-portrait.webp"
-            alt=""
-            width="512"
-            height="512"
-            decoding="async"
-          />
+          <BrandPortrait />
         </span>
 
         <span class="site-brand__copy">
@@ -197,7 +201,7 @@ const alternateLocaleHref =
         </div>
 
         <div class="site-search">
-          <SearchModal client:load locale={locale} />
+          <SearchModal locale={locale} />
         </div>
 
         <a
@@ -480,16 +484,22 @@ const alternateLocaleHref =
       });
     });
 
+  let headerFrame = 0;
   const updateHeaderState = () => {
     siteHeader?.classList.toggle(
       "is-scrolled",
       window.scrollY > 12,
     );
+    headerFrame = 0;
+  };
+
+  const requestHeaderUpdate = () => {
+    if (!headerFrame) headerFrame = window.requestAnimationFrame(updateHeaderState);
   };
 
   window.addEventListener(
     "scroll",
-    updateHeaderState,
+    requestHeaderUpdate,
     { passive: true },
   );
 

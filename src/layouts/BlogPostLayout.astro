@@ -12,8 +12,7 @@ type ContentCollection =
   | "tools"
   | "homelab"
   | "gear"
-  | "photos"
-  | "map";
+  | "photos";
 
 interface Props {
   entry: CollectionEntry<ContentCollection>;
@@ -62,7 +61,6 @@ const labelMap: Record<string, string> = {
   homelab: t.navHomelab,
   gear: t.navGear,
   photos: t.navPhotos,
-  map: t.navMap,
 };
 
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";

@@ -1,0 +1,20 @@
+.journey-map-shell .maplibregl-map {
+  font-family: var(--font-sans);
+}
+
+.journey-map-shell .maplibregl-canvas {
+  outline: none;
+}
+
+.journey-map-shell .maplibregl-ctrl-group {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.28) !important;
+  border-radius: 0.7rem !important;
+  background: rgb(255 255 255 / 0.78) !important;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.12) !important;
+  backdrop-filter: blur(14px);
+}
+
+.dark .journey-map-shell .maplibregl-ctrl-group {
+  background: rgb(15 18 26 / 0.78) !important;
+}

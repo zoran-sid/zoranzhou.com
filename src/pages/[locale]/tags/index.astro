@@ -22,7 +22,7 @@ const allContent = [
   ...(await getCollection("projects", ({ data }) => !data.draft)),
   ...(await getCollection("tools", ({ data }) => !data.draft)),
   ...(await getCollection("photos", ({ data }) => !data.draft)),
-  ...(await getCollection("map", ({ data }) => !data.draft)),
+  ...(await getCollection("routes", ({ data }) => !data.draft && data.published !== false)),
 ];
 
 const tagMap = new Map<string, number>();

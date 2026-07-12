@@ -1,6 +1,4 @@
 ---
-import "maplibre-gl/dist/maplibre-gl.css";
-
 interface MapPoint {
   lat: number;
   lng: number;
@@ -19,7 +17,7 @@ interface MapItem {
   duration?: string;
   coordinates?: MapPoint;
   route: MapPoint[];
-  routeFile?: string;
+  gpx?: string;
   mapZoom?: number;
   accent: string;
   url: string;
@@ -42,17 +40,17 @@ interface Props {
 const { items, locale, labels } = Astro.props;
 const kinds = [...new Set(items.map((item) => item.kind))];
 const mappedCount = items.filter(
-  (item) => item.coordinates || item.routeFile,
+  (item) => item.coordinates || item.gpx,
 ).length;
 
 const pageUrl = Astro.url;
 const initialSlug =
   pageUrl.searchParams.get("journey") ??
-  items.find((item) => item.coordinates || item.routeFile)?.slug ??
+  items.find((item) => item.coordinates || item.gpx)?.slug ??
   "";
 const initialItem =
   items.find((item) => item.slug === initialSlug) ??
-  items.find((item) => item.coordinates || item.routeFile) ??
+  items.find((item) => item.coordinates || item.gpx) ??
   items[0];
 ---
 
@@ -113,8 +111,8 @@ const initialItem =
               ]}
               data-map-item={item.slug}
               data-map-kind={item.kind}
-              disabled={!item.coordinates && !item.routeFile}
-              aria-pressed={String(item.slug === initialItem?.slug)}
+              disabled={!item.coordinates && !item.gpx}
+              aria-pressed={item.slug === initialItem?.slug}
             >
               <span class="journey-card__index">
                 {String(index + 1).padStart(2, "0")}
@@ -173,8 +171,7 @@ const initialItem =
         </div>
         <a
           class="journey-detail__link"
-          href={initialItem?.url ?? "#"}
-          aria-disabled={!initialItem}
+          href={initialItem?.url ?? `/${locale}/map/`}
           data-map-detail-link
         >
           {labels.details}<span aria-hidden="true">↗</span>
@@ -183,7 +180,6 @@ const initialItem =
       <div class="journey-detail__map">
         <div class="journey-map-shell">
           <div
-            id="journey-map"
             class="journey-map-canvas"
             aria-label={labels.explore}
           >
@@ -192,7 +188,7 @@ const initialItem =
             class="journey-map-empty"
             data-map-empty-msg
             hidden={Boolean(
-              initialItem?.routeFile || initialItem?.route.length,
+              initialItem?.gpx || initialItem?.route.length,
             )}
           >
             {
@@ -200,6 +196,9 @@ const initialItem =
                 ? "该旅程暂时没有可用的路线数据。"
                 : "Route data is not available for this journey."
             }
+          </div>
+          <div class="journey-map-empty" data-map-fallback-msg hidden>
+            {locale === "zh-CN" ? "地图暂时无法加载，路线文字和详情链接仍可使用。" : "The map is unavailable. Route text and detail links remain available."}
           </div>
         </div>
       </div>
@@ -216,6 +215,7 @@ const initialItem =
     type Marker,
   } from "maplibre-gl";
   import { parseRouteDocument } from "../lib/routes/gpx";
+  import { downsampleSegments } from "../lib/routes/downsample";
 
   type Point = { lat: number; lng: number };
   type Journey = {
@@ -231,7 +231,7 @@ const initialItem =
     duration?: string;
     coordinates?: Point;
     route: Point[];
-    routeFile?: string;
+    gpx?: string;
     accent: string;
     url: string;
     mapZoom?: number;
@@ -252,12 +252,14 @@ const initialItem =
   let map: MapLibreMap | null = null;
   let selectedSlug: string | null = null;
   let currentRouteSourceId: string | null = null;
+  let disconnectThemeObserver = () => {};
   const markers = new Map<string, Marker>();
   const routeCache = new Map<string, Point[]>();
 
   // ── Parse route files through the shared Route System v2 parser ──
-  function parseRoutePoints(text: string, routeFile: string): Point[] {
-    return parseRouteDocument(text, routeFile).points.map(({ lat, lng }) => ({
+  function parseRoutePoints(text: string, gpx: string): Point[] {
+    const parsed = parseRouteDocument(text, gpx);
+    return downsampleSegments(parsed.segments, 2_000).flat().map(({ lat, lng }) => ({
       lat,
       lng,
     }));
@@ -267,12 +269,12 @@ const initialItem =
   async function ensureRouteLoaded(item: Journey): Promise<Point[]> {
     if (item.route.length > 1) return item.route;
     if (routeCache.has(item.slug)) return routeCache.get(item.slug)!;
-    if (!item.routeFile) return [];
+    if (!item.gpx) return [];
     try {
-      const resp = await fetch(item.routeFile);
+      const resp = await fetch(item.gpx);
       if (!resp.ok) return [];
       const text = await resp.text();
-      const points = parseRoutePoints(text, item.routeFile);
+      const points = parseRoutePoints(text, item.gpx);
       if (points.length > 1) {
         item.route = points;
         item.coordinates ??= points[Math.floor(points.length / 2)];
@@ -280,7 +282,7 @@ const initialItem =
       routeCache.set(item.slug, points);
       return points;
     } catch (e) {
-      console.warn(`Route load failed: ${item.routeFile}`, e);
+      console.warn(`Route load failed: ${item.gpx}`, e);
       return [];
     }
   }
@@ -376,7 +378,7 @@ const initialItem =
     sel("[data-map-detail-duration]").textContent = item.duration ?? "";
     (sel("[data-map-detail-link]") as HTMLAnchorElement).href = item.url;
     sel("[data-map-empty-msg]").hidden =
-      item.route.length > 1 || !!item.routeFile;
+      item.route.length > 1 || !!item.gpx;
 
     root!
       .querySelectorAll<HTMLButtonElement>("[data-map-item]")
@@ -395,9 +397,10 @@ const initialItem =
     url.searchParams.set("journey", item.slug);
     window.history.replaceState({ journey: item.slug }, "", url);
 
-    if (item.route.length < 2 && item.routeFile) {
+    if (item.route.length < 2 && item.gpx) {
       const points = await ensureRouteLoaded(item);
       if (points.length > 1) item.route = points;
+      else root!.querySelector<HTMLElement>("[data-map-empty-msg]")!.hidden = false;
     }
     addRouteToMap(item);
     fitRouteToMap(item, true);
@@ -421,7 +424,7 @@ const initialItem =
         const first = items.find(
           (i) =>
             (kind === "all" || i.kind === kind) &&
-            (i.coordinates || i.routeFile),
+            (i.coordinates || i.gpx),
         );
         if (first) showJourney(first);
       }
@@ -437,7 +440,7 @@ const initialItem =
 
   const initialJourney =
     items.find((item) => item.slug === initialSlug) ??
-    items.find((item) => item.coordinates || item.routeFile) ??
+    items.find((item) => item.coordinates || item.gpx) ??
     items[0];
 
   // Render useful route information immediately. The page must remain usable
@@ -449,8 +452,10 @@ const initialItem =
 
   // ── Init map (once) ──
   try {
+    const mapContainer = root.querySelector<HTMLElement>(".journey-map-canvas");
+    if (!mapContainer) throw new Error("Map container not found");
     map = new maplibregl.Map({
-      container: "journey-map",
+      container: mapContainer,
       style: isDark ? darkStyle : lightStyle,
       center: [120.15, 30.25],
       zoom: 12,
@@ -469,6 +474,7 @@ const initialItem =
   } catch (e) {
     console.warn("MapLibre GL init failed:", e);
     root.classList.add("map-fallback");
+    root.querySelector<HTMLElement>("[data-map-fallback-msg]")!.hidden = false;
   }
 
   if (map) {
@@ -476,6 +482,7 @@ const initialItem =
     const mapLoadTimeout = window.setTimeout(() => {
       if (!mapLoaded) {
         root.classList.add("map-fallback");
+        root.querySelector<HTMLElement>("[data-map-fallback-msg]")!.hidden = false;
         console.warn(
           "Map basemap load timed out; route details remain available.",
         );
@@ -486,12 +493,7 @@ const initialItem =
       mapLoaded = true;
       window.clearTimeout(mapLoadTimeout);
       root.classList.remove("map-fallback");
-      await Promise.all(
-        items
-          .filter((item) => !item.coordinates && item.routeFile)
-          .map((item) => ensureRouteLoaded(item)),
-      );
-
+      root.querySelector<HTMLElement>("[data-map-fallback-msg]")!.hidden = true;
       items
         .filter((i) => i.coordinates)
         .forEach((item) => {
@@ -516,7 +518,10 @@ const initialItem =
     });
 
     map.on("error", () => {
-      if (!mapLoaded) root.classList.add("map-fallback");
+      if (!mapLoaded) {
+        root.classList.add("map-fallback");
+        root.querySelector<HTMLElement>("[data-map-fallback-msg]")!.hidden = false;
+      }
     });
 
     const themeObs = new MutationObserver(() => {
@@ -531,13 +536,14 @@ const initialItem =
       attributes: true,
       attributeFilter: ["class"],
     });
+    disconnectThemeObserver = () => themeObs.disconnect();
   }
 
   // ── Event binding ──
   root.querySelectorAll<HTMLButtonElement>("[data-map-item]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const item = items.find((i) => i.slug === btn.dataset.mapItem);
-      if (item && (item.coordinates || item.routeFile)) showJourney(item);
+      if (item && (item.coordinates || item.gpx)) showJourney(item);
     });
   });
 
@@ -549,10 +555,28 @@ const initialItem =
       });
     });
 
-  window.addEventListener("popstate", () => {
+  const handlePopState = () => {
     const params = new URLSearchParams(window.location.search);
     const slug = params.get("journey");
     const item = slug ? items.find((i) => i.slug === slug) : null;
-    if (item && (item.coordinates || item.routeFile)) showJourney(item);
-  });
+    if (item && (item.coordinates || item.gpx)) showJourney(item);
+  };
+  window.addEventListener("popstate", handlePopState);
+
+  const resizeMap = () => map?.resize();
+  window.addEventListener("resize", resizeMap, { passive: true });
+  window.addEventListener("orientationchange", resizeMap, { passive: true });
+  document.addEventListener(
+    "astro:before-swap",
+    () => {
+      window.removeEventListener("resize", resizeMap);
+      window.removeEventListener("orientationchange", resizeMap);
+      window.removeEventListener("popstate", handlePopState);
+      disconnectThemeObserver();
+      markers.forEach((marker) => marker.remove());
+      map?.remove();
+      map = null;
+    },
+    { once: true },
+  );
 </script>

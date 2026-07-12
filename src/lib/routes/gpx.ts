@@ -38,6 +38,7 @@ export interface ParsedRoute {
   endedAt?: string;
   durationSeconds?: number;
   distanceMeters: number;
+  trackCount: number;
   elevationGainMeters?: number;
   elevationLossMeters?: number;
   minElevationMeters?: number;
@@ -352,6 +353,7 @@ export function parseGpx(xml: string): ParsedRoute {
   const routeBlock = getBlocks(xml, "rte")[0] ?? "";
 
   const rawSegments = getBlocks(xml, "trkseg");
+  const trackCount = getBlocks(xml, "trk").length;
   let segments = rawSegments
     .map((segment, segmentIndex) =>
       getElementMatches(segment, "trkpt")
@@ -420,6 +422,7 @@ export function parseGpx(xml: string): ParsedRoute {
     endedAt,
     durationSeconds,
     distanceMeters: points.at(-1)?.distance ?? 0,
+    trackCount,
     ...elevation,
     points,
     segments,
@@ -486,6 +489,7 @@ export function parseGeoJson(text: string): ParsedRoute {
     format: "geojson",
     source: "GeoJSON",
     distanceMeters: points.at(-1)?.distance ?? 0,
+    trackCount: coordinateSegments.length,
     ...elevation,
     points,
     segments,

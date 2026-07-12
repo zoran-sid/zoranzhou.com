@@ -138,23 +138,20 @@ const routePointSchema = z.object({
   name: z.string().optional(),
 });
 
-const routeMetricSchema = z.union([z.number(), z.string()]);
-
 const routeFields = {
+  routeId: z.string().regex(/^route-[a-f0-9]{12}$/),
   kind: z
     .enum(["run", "hike", "ride", "travel", "photo-walk"])
     .default("travel"),
   location: z.string().default("Unknown"),
-  distance: routeMetricSchema.optional(),
-  duration: routeMetricSchema.optional(),
-  elevationGain: routeMetricSchema.optional(),
-  gpx: z.string().optional(),
+  distance: z.number().nonnegative(),
+  duration: z.number().int().nonnegative().optional(),
+  elevationGain: z.number().optional(),
+  gpx: z.string().regex(/^\/routes\/.+\.gpx$/i),
   published: z.boolean().default(true),
   start: routePointSchema.optional(),
   end: routePointSchema.optional(),
   coordinates: routePointSchema.optional(),
-  route: z.array(routePointSchema).default([]),
-  routeFile: z.string().optional(),
   mapZoom: z.number().min(1).max(18).optional(),
   accent: z.string().optional(),
   photos: z
@@ -172,13 +169,6 @@ const routeFields = {
   metadata: z.record(z.unknown()).optional(),
 };
 
-// Legacy collection retained for existing URLs and Markdown files.
-const mapCollection = defineCollection({
-  type: "content",
-  schema: baseSchema.extend(routeFields),
-});
-
-// Route System v2 collection. New imports are written to src/content/routes/.
 const routesCollection = defineCollection({
   type: "content",
   schema: baseSchema.extend(routeFields).extend({
@@ -283,7 +273,6 @@ export const collections = {
   homelab: homelabCollection,
   gear: gearCollection,
   photos: photosCollection,
-  map: mapCollection,
   routes: routesCollection,
   movies: moviesCollection,
   tv: tvCollection,

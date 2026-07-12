@@ -15,7 +15,6 @@ import {
   getRouteFile,
   isRouteVisible,
   normalizeRouteEntries,
-  type RouteContentEntry,
 } from "../../../lib/routes/content";
 
 export async function getStaticPaths() {
@@ -26,14 +25,8 @@ const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 
-const [routes, legacyRoutes] = await Promise.all([
-  getCollection("routes", ({ data }) => isRouteVisible(data)),
-  getCollection("map", ({ data }) => isRouteVisible(data)),
-]);
-const entries = normalizeRouteEntries([
-  ...routes,
-  ...legacyRoutes,
-] as RouteContentEntry[])
+const routes = await getCollection("routes", ({ data }) => isRouteVisible(data));
+const entries = normalizeRouteEntries(routes)
   .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
@@ -54,8 +47,7 @@ const kindAccent: Record<string, string> = {
 };
 
 const items = entries.map((entry) => {
-  const data = entry.data as RouteContentEntry["data"] &
-    Record<string, unknown>;
+  const data = entry.data;
   const kind = data.kind ?? "travel";
   return {
     slug: entry.slug,
@@ -73,8 +65,8 @@ const items = entries.map((entry) => {
     distance: formatDistance(data.distance),
     duration: formatDuration(data.duration, locale),
     coordinates: getRouteCoordinates(data),
-    route: data.route ?? [],
-    routeFile: getRouteFile(data),
+    route: [],
+    gpx: getRouteFile(data),
     mapZoom: data.mapZoom,
     accent: data.accent ?? kindAccent[kind] ?? "#5271ff",
     url: localizePath(`/map/${entry.slug}`, locale),
@@ -82,7 +74,7 @@ const items = entries.map((entry) => {
 });
 ---
 
-<BaseLayout title={t.mapPageTitle} description={t.mapPageDescription}>
+<BaseLayout title={t.mapPageTitle} description={t.mapPageDescription} mapStyles={true}>
   <div class="map-page">
     <header class="map-page-header page-container">
       <span class="section-kicker">{t.navMap}</span>

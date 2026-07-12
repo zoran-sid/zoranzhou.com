@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import { getCollection } from "astro:content";
 import { localizePath, type Locale } from "../i18n/utils";
 import {
   formatDistance,
@@ -68,6 +69,14 @@ const articleUrl = new URL(
   localizePath(`/map/${entry.slug}`, locale),
   Astro.site,
 ).href;
+const translations = await getCollection("routes", ({ data: candidate }) =>
+  candidate.draft !== true && candidate.published !== false,
+);
+const alternatePaths = Object.fromEntries(
+  translations
+    .filter((candidate) => candidate.data.routeId === data.routeId)
+    .map((candidate) => [candidate.data.lang, localizePath(`/map/${candidate.slug}`, candidate.data.lang)]),
+);
 const jsonld = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -95,6 +104,8 @@ const jsonld = {
   ogImage={cover?.src}
   article={true}
   jsonld={jsonld}
+  alternatePaths={alternatePaths}
+  mapStyles={true}
 >
   <article class="route-journal">
     {

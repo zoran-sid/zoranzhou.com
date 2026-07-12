@@ -16,7 +16,7 @@ export async function getStaticPaths() {
     ...(await getCollection("projects", ({ data }) => !data.draft)),
     ...(await getCollection("tools", ({ data }) => !data.draft)),
     ...(await getCollection("photos", ({ data }) => !data.draft)),
-    ...(await getCollection("map", ({ data }) => !data.draft)),
+    ...(await getCollection("routes", ({ data }) => !data.draft && data.published !== false)),
   ];
 
   // Build per-locale tag sets
@@ -53,7 +53,7 @@ const allContent = [
   ...(await getCollection("projects", ({ data }) => !data.draft)),
   ...(await getCollection("tools", ({ data }) => !data.draft)),
   ...(await getCollection("photos", ({ data }) => !data.draft)),
-  ...(await getCollection("map", ({ data }) => !data.draft)),
+  ...(await getCollection("routes", ({ data }) => !data.draft && data.published !== false)),
 ];
 
 const filtered = allContent
@@ -92,12 +92,12 @@ const displayTag = tag.replace(/-/g, " ");
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((entry) => (
             <a
-              href={localizePath(`/${entry.collection}/${entry.slug}`, locale)}
+              href={localizePath(`/${entry.collection === "routes" ? "map" : entry.collection}/${entry.slug}`, locale)}
               class="group flex flex-col rounded-xl border border-gray-100 bg-white p-6 no-underline shadow-card transition-all duration-200 hover:border-gray-200 hover:shadow-card-hover dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
             >
               <div class="mb-3">
                 <span class="rounded-md bg-gray-50 px-2 py-0.5 text-xs font-medium uppercase text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                  {entry.collection}
+                  {entry.collection === "routes" ? "map" : entry.collection}
                 </span>
               </div>
               <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 dark:text-gray-100 dark:group-hover:text-blue-400">

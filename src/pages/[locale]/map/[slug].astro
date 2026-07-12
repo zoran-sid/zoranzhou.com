@@ -13,11 +13,8 @@ import {
 } from "../../../lib/routes/content";
 
 export async function getStaticPaths() {
-  const [routes, legacyRoutes] = await Promise.all([
-    getCollection("routes", ({ data }) => isRouteVisible(data)),
-    getCollection("map", ({ data }) => isRouteVisible(data)),
-  ]);
-  return normalizeRouteEntries([...routes, ...legacyRoutes]).map((entry) => ({
+  const routes = await getCollection("routes", ({ data }) => isRouteVisible(data));
+  return normalizeRouteEntries(routes).map((entry) => ({
     params: { locale: entry.data.lang ?? "zh-CN", slug: entry.slug },
     props: { entry },
   }));
@@ -25,11 +22,10 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props as { entry: RouteContentEntry };
 const data = entry.data as RouteContentEntry["data"] & Record<string, unknown>;
-const routeFile = getRouteFile(data);
+const gpx = getRouteFile(data);
 const coordinates = getRouteCoordinates(data);
 const start = getRouteStart(data);
 const end = getRouteEnd(data);
-const route = data.route ?? [];
 const locale = (data.lang ?? "zh-CN") as "zh-CN" | "en";
 const accentByKind: Record<string, string> = {
   run: "#ff5d8f",
@@ -46,9 +42,8 @@ const routeAccent =
   <RouteMap
     slot="route-visual"
     title={data.title}
-    routeFile={routeFile}
+    gpx={gpx}
     coordinates={coordinates}
-    route={route}
     start={start}
     end={end}
     accent={routeAccent}

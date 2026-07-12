@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
-import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
@@ -52,7 +51,6 @@ export default defineConfig({
         ],
       ],
     }),
-    react(),
     sitemap({
       filter: (page) =>
         !page.includes("/404") &&
@@ -133,7 +131,7 @@ export default defineConfig({
 
   prefetch: {
     defaultStrategy: "hover",
-    prefetchAll: true,
+    prefetchAll: false,
   },
 
   output: "static",

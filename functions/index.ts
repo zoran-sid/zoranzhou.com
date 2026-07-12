@@ -4,7 +4,7 @@ const LANG_COOKIE = "pref-lang";
 const CHINESE_LOCALE: Locale = "zh-CN";
 const ENGLISH_LOCALE: Locale = "en";
 
-function getCookie(request: Request, name: string): string | null {
+export function getCookie(request: Request, name: string): string | null {
   const cookieHeader = request.headers.get("Cookie");
 
   if (!cookieHeader) {
@@ -30,11 +30,11 @@ function getCookie(request: Request, name: string): string | null {
   return null;
 }
 
-function isSupportedLocale(value: string | null): value is Locale {
+export function isSupportedLocale(value: string | null): value is Locale {
   return value === CHINESE_LOCALE || value === ENGLISH_LOCALE;
 }
 
-function detectBrowserLocale(acceptLanguage: string | null): Locale {
+export function detectBrowserLocale(acceptLanguage: string | null): Locale {
   if (!acceptLanguage) {
     return ENGLISH_LOCALE;
   }

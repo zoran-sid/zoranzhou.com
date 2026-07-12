@@ -6,10 +6,6 @@ const t = getTranslations(locale);
 ---
 
 <section class="home-section surface-hero hero-scene">
-  <div class="hero-coordinates" aria-hidden="true">
-    <span>30.2741° N</span><span>120.1551° E</span><span>UTC +08:00</span>
-  </div>
-
   <div class="page-container relative z-10">
     <div class="hero-layout">
       <div class="hero-copy">
@@ -71,16 +67,16 @@ const t = getTranslations(locale);
         <div class="hero-console__body">
           <div class="signal-radar" aria-hidden="true">
             <div class="signal-radar__grid"></div>
-            <div class="signal-radar__sweep"></div>
+            <div class="signal-radar__sweep" data-radar-sweep></div>
             <div class="signal-radar__ring ring-one"></div>
             <div class="signal-radar__ring ring-two"></div>
             <div class="signal-radar__ring ring-three"></div>
             <div class="signal-radar__axis axis-x"></div>
             <div class="signal-radar__axis axis-y"></div>
             <div class="signal-radar__core"><span></span></div>
-            <i class="radar-node radar-node-a"></i>
-            <i class="radar-node radar-node-b"></i>
-            <i class="radar-node radar-node-c"></i>
+            <i class="radar-node" data-radar-target data-angle="52" data-radius="34"></i>
+            <i class="radar-node" data-radar-target data-angle="178" data-radius="36"></i>
+            <i class="radar-node" data-radar-target data-angle="286" data-radius="35"></i>
           </div>
 
           <dl class="console-readouts">
@@ -106,3 +102,42 @@ const t = getTranslations(locale);
     </div>
   </div>
 </section>
+
+<script>
+  import { crossedRadarTarget, radarPosition } from "../lib/radar";
+  const radar = document.querySelector<HTMLElement>(".signal-radar");
+  if (radar && !radar.dataset.radarInitialized) {
+    radar.dataset.radarInitialized = "true";
+    const sweep = radar.querySelector<HTMLElement>("[data-radar-sweep]");
+    const targets = [...radar.querySelectorAll<HTMLElement>("[data-radar-target]")];
+    for (const target of targets) {
+      const angle = Number(target.dataset.angle ?? 0);
+      const position = radarPosition(angle, Number(target.dataset.radius ?? 0));
+      target.style.setProperty("--radar-x", `${position.x}%`);
+      target.style.setProperty("--radar-y", `${position.y}%`);
+    }
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion || !sweep) {
+      targets.forEach((target) => target.classList.add("is-detected"));
+    } else {
+      const duration = 8_000;
+      const animation = sweep.animate(
+        [{ transform: "rotate(-90deg)" }, { transform: "rotate(270deg)" }],
+        { duration, iterations: Infinity, easing: "linear" },
+      );
+      let frame = 0;
+      let previousTime = 0;
+      const detect = () => {
+        const currentTime = Number(animation.currentTime ?? 0);
+        for (const target of targets) {
+          if (target.classList.contains("is-detected")) continue;
+          if (crossedRadarTarget(previousTime, currentTime, Number(target.dataset.angle ?? 0), duration)) target.classList.add("is-detected");
+        }
+        previousTime = currentTime;
+        if (targets.some((target) => !target.classList.contains("is-detected"))) frame = requestAnimationFrame(detect);
+      };
+      frame = requestAnimationFrame(detect);
+      document.addEventListener("astro:before-swap", () => { cancelAnimationFrame(frame); animation.cancel(); }, { once: true });
+    }
+  }
+</script>

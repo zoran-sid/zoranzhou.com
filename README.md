@@ -27,7 +27,7 @@
 页面会同时读取 `routes` 和旧的 `map` 集合，因此：
 
 - 现有 `src/content/map/*.md` 不需要立即迁移。
-- 现有 `routeFile` 字段继续有效。
+- 旧内容已通过一次性迁移命令转换为 `gpx` 字段；运行时只读取 `routes` collection。
 - 新路线优先使用 `gpx` 字段。
 - 旧路线 URL 和现有 Markdown 正文可以继续使用。
 - 若新旧集合出现相同语言和相同 slug，新 `routes` 条目优先，避免重复页面。
@@ -65,7 +65,7 @@
 |---|---|---|
 | `package.json` | 新增 `import:routes` 命令 | 提供统一的 GPX 导入入口，不增加依赖 |
 | `scripts/import-route.ts` | 新增 Route v2 导入器 | 扫描 GPX、解析数据、反向地理编码、创建或安全更新 Markdown |
-| `src/content/config.ts` | 新增 `routes` collection，并扩展 Route schema | 同时支持新字段和旧 `map` / `routeFile` 内容 |
+| `src/content/config.ts` | 定义唯一的 `routes` collection 和 Route schema | Route 页面只读取已提交的 v2 内容 |
 | `src/content/routes/.gitkeep` | 新增空目录占位文件 | 保证新 Route 内容目录进入版本控制 |
 | `src/lib/routes/gpx.ts` | 新增通用 GPX / GeoJSON 解析模块 | 浏览器和导入脚本共用同一套解析逻辑，避免重复实现和格式写死 |
 | `src/lib/routes/content.ts` | 新增 Route 内容兼容与格式化工具 | 统一处理新旧 collection、字段别名、可见性和显示格式 |
@@ -317,7 +317,7 @@ gpx: "/routes/Apple Health Export.gpx"
 npm run import:routes
 ```
 
-导入器会在新旧目录中根据 `gpx` 或旧的 `routeFile` 查找对应 Markdown：
+导入器按 `routeId + lang`、规范化 `gpx + lang`、受控内容指纹的顺序匹配现有 Markdown：
 
 - 找到时：更新 Frontmatter，保留正文和人工维护字段。
 - 未找到时：创建新的规范命名 Markdown。

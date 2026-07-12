@@ -1,7 +1,6 @@
 import type { CollectionEntry } from "astro:content";
 
-export type RouteContentEntry =
-  CollectionEntry<"map"> | CollectionEntry<"routes">;
+export type RouteContentEntry = CollectionEntry<"routes">;
 
 export interface RouteCoordinate {
   lat: number;
@@ -16,7 +15,7 @@ export function isRouteVisible(data: RouteData) {
 }
 
 export function getRouteFile(data: RouteData) {
-  return (data.gpx ?? data.routeFile) as string | undefined;
+  return data.gpx as string;
 }
 
 export function getRouteStart(data: RouteData): RouteCoordinate | undefined {
@@ -24,15 +23,13 @@ export function getRouteStart(data: RouteData): RouteCoordinate | undefined {
   if (start && Number.isFinite(start.lat) && Number.isFinite(start.lng)) {
     return start;
   }
-  const route = data.route as RouteCoordinate[] | undefined;
-  return route?.[0];
+  return undefined;
 }
 
 export function getRouteEnd(data: RouteData): RouteCoordinate | undefined {
   const end = data.end as RouteCoordinate | undefined;
   if (end && Number.isFinite(end.lat) && Number.isFinite(end.lng)) return end;
-  const route = data.route as RouteCoordinate[] | undefined;
-  return route?.at(-1);
+  return undefined;
 }
 
 export function getRouteCoordinates(data: RouteData) {
@@ -45,8 +42,6 @@ export function getRouteCoordinates(data: RouteData) {
     return coordinates;
   }
 
-  const route = data.route as RouteCoordinate[] | undefined;
-  if (route && route.length > 0) return route[Math.floor(route.length / 2)];
   return getRouteStart(data) ?? getRouteEnd(data);
 }
 
@@ -100,7 +95,7 @@ export function normalizeRouteEntries(entries: RouteContentEntry[]) {
 
   for (const entry of entries) {
     const locale = entry.data.lang ?? "zh-CN";
-    const key = `${locale}:${entry.slug}`;
+    const key = `${locale}:${entry.data.routeId}`;
     if (seen.has(key)) continue;
     seen.add(key);
     result.push(entry);
