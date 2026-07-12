@@ -1,12 +1,12 @@
 ---
-title: "Unknown · 路线记录"
-description: "Unknown的一段旅行与生活记录。"
+title: "合肥大蜀山"
+description: "蜗牛玫瑰线路"
 tags: ["Route","Travel Journal"]
 published: true
 draft: false
 kind: "run"
 lang: "zh-CN"
-location: "Unknown"
+location: "合肥蜀山区"
 photos: []
 routeId: "route-06d859c3a9cf"
 date: "2026-07-03T10:56:45.000Z"
@@ -21,5 +21,4 @@ metadata: {"sourceFormat":"gpx","sourceApp":"ResetRun","creator":"ResetRun","sou
 ---
 
 ## 旅程记录
-
-<!-- 在这里写下这段旅程。重新导入 GPX 不会覆盖正文。 -->
+上山不宜过快，长上坡。日落后过于昏暗，需要额外照明。
