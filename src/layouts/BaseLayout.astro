@@ -4,6 +4,7 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import ThemeScript from "../components/ThemeScript.astro";
 import Navigation from "../components/Navigation.astro";
+import SiteFooter from "../components/SiteFooter.astro";
 import {
   getTranslations,
   type Locale,
@@ -22,7 +23,15 @@ interface Props {
   mapStyles?: boolean;
 }
 
-const { title, description, ogImage, article = false, jsonld, alternatePaths, mapStyles = false } = Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  article = false,
+  jsonld,
+  alternatePaths,
+  mapStyles = false,
+} = Astro.props;
 
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
@@ -32,11 +41,16 @@ const pageDescription = description ?? t.siteDescription;
 
 // Current page path used for canonical and alternate URLs.
 const canonicalPath = Astro.url.pathname;
-const pathWithoutLocale = canonicalPath.replace(/^\/(?:zh-CN|en)(?=\/|$)/, "") || "/";
+const pathWithoutLocale =
+  canonicalPath.replace(/^\/(?:zh-CN|en)(?=\/|$)/, "") || "/";
 const isListingPath = pathWithoutLocale.split("/").filter(Boolean).length <= 1;
-const safeAlternatePaths = alternatePaths ?? (isListingPath
-  ? Object.fromEntries(locales.map((item) => [item, localizePath(pathWithoutLocale, item)]))
-  : {});
+const safeAlternatePaths =
+  alternatePaths ??
+  (isListingPath
+    ? Object.fromEntries(
+        locales.map((item) => [item, localizePath(pathWithoutLocale, item)]),
+      )
+    : {});
 ---
 
 <!doctype html>
@@ -64,7 +78,11 @@ const safeAlternatePaths = alternatePaths ?? (isListingPath
         );
       })
     }
-    <link rel="alternate" hreflang="x-default" href={new URL("/", Astro.site).href} />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL("/", Astro.site).href}
+    />
 
     <!-- OpenGraph -->
     <meta property="og:title" content={pageTitle} />
@@ -134,6 +152,8 @@ const safeAlternatePaths = alternatePaths ?? (isListingPath
       <slot />
     </main>
 
+    {isListingPath && <SiteFooter />}
+
     <!-- Back to top -->
     <button id="back-to-top" class="back-to-top" aria-label="Back to top">
       <svg
@@ -162,13 +182,20 @@ const safeAlternatePaths = alternatePaths ?? (isListingPath
     ).matches;
     let animationFrame = 0;
     let homeExperienceMetrics: { top: number; height: number } | undefined;
-    let sectionMetrics: Array<{ section: HTMLElement; top: number; height: number }> = [];
+    let sectionMetrics: Array<{
+      section: HTMLElement;
+      top: number;
+      height: number;
+    }> = [];
 
     function measureScrollSections() {
       const scrollTop = window.scrollY;
       if (homeExperience) {
         const rect = homeExperience.getBoundingClientRect();
-        homeExperienceMetrics = { top: rect.top + scrollTop, height: rect.height };
+        homeExperienceMetrics = {
+          top: rect.top + scrollTop,
+          height: rect.height,
+        };
       }
       sectionMetrics = [...homeSections].map((section) => {
         const rect = section.getBoundingClientRect();
@@ -182,13 +209,20 @@ const safeAlternatePaths = alternatePaths ?? (isListingPath
       const docHeight =
         document.documentElement.scrollHeight - window.innerHeight;
       const progress = docHeight > 0 ? scrollTop / docHeight : 0;
-      if (progressBar) progressBar.style.transform = `scaleX(${progress.toFixed(4)})`;
+      if (progressBar)
+        progressBar.style.transform = `scaleX(${progress.toFixed(4)})`;
 
       backToTop?.classList.toggle("visible", scrollTop > 500);
 
       if (homeExperience && homeExperienceMetrics) {
-        const travel = Math.max(1, homeExperienceMetrics.height - window.innerHeight);
-        const journeyProgress = Math.min(1, Math.max(0, (scrollTop - homeExperienceMetrics.top) / travel));
+        const travel = Math.max(
+          1,
+          homeExperienceMetrics.height - window.innerHeight,
+        );
+        const journeyProgress = Math.min(
+          1,
+          Math.max(0, (scrollTop - homeExperienceMetrics.top) / travel),
+        );
         homeExperience.style.setProperty(
           "--journey-progress",
           journeyProgress.toFixed(4),
@@ -237,7 +271,11 @@ const safeAlternatePaths = alternatePaths ?? (isListingPath
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("visible");
-            entry.target.addEventListener("transitionend", () => entry.target.classList.add("reveal-complete"), { once: true });
+            entry.target.addEventListener(
+              "transitionend",
+              () => entry.target.classList.add("reveal-complete"),
+              { once: true },
+            );
             revealObserver.unobserve(entry.target);
           }
         });

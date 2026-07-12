@@ -69,6 +69,7 @@ export interface UIStrings {
   projectsViewAll: string;
   skillsLabel: string;
   skillsHeading: string;
+  skillsGroups: Array<{ category: string; items: string[] }>;
   timelineLabel: string;
   timelineHeading: string;
   contactLabel: string;

@@ -70,18 +70,12 @@ const copy =
   locale === "zh-CN"
     ? {
         library: "照片资料库",
-        photos: "张照片",
-        albums: "组记录",
-        hint: "轻触照片查看完整画面",
         close: "关闭",
         previous: "上一张",
         next: "下一张",
       }
     : {
         library: "Photo library",
-        photos: "photos",
-        albums: "stories",
-        hint: "Open a photo to see the full frame",
         close: "Close",
         previous: "Previous",
         next: "Next",
@@ -95,16 +89,6 @@ const copy =
         <p class="section-kicker">{copy.library}</p>
         <h1 class="photo-page__title">{t.photosPageTitle}</h1>
         <p class="photo-page__description">{t.photosPageDescription}</p>
-      </div>
-      <div
-        class="photo-page__summary"
-        aria-label={`${photos.length} ${copy.photos}`}
-      >
-        <span class="photo-page__count"
-          >{String(photos.length).padStart(2, "0")}</span
-        >
-        <span>{copy.photos} · {albums.length} {copy.albums}</span>
-        <small>{copy.hint}</small>
       </div>
     </header>
 
@@ -300,10 +284,6 @@ const copy =
   }
   .photo-page__header {
     position: relative;
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 2rem;
     padding: clamp(2.5rem, 7vw, 6.5rem) clamp(0.25rem, 2vw, 2rem)
       clamp(2rem, 5vw, 4.5rem);
     border-bottom: 1px solid rgb(var(--accent-rgb) / 0.15);
@@ -340,33 +320,6 @@ const copy =
     max-width: 42rem;
     margin: 1.5rem 0 0;
     font-size: clamp(0.95rem, 1.4vw, 1.1rem);
-  }
-  .photo-page__summary {
-    display: grid;
-    min-width: 12rem;
-    padding: 1rem;
-    justify-items: end;
-    border: 1px solid rgb(var(--accent-rgb) / 0.14);
-    border-radius: 0.65rem;
-    background: var(--surface-raised);
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .photo-page__summary small {
-    margin-top: 0.45rem;
-    color: var(--faint);
-    font: inherit;
-    font-size: 0.58rem;
-  }
-  .photo-page__count {
-    color: var(--accent);
-    font-size: clamp(2.4rem, 5vw, 4.8rem);
-    font-weight: 500;
-    letter-spacing: -0.08em;
-    line-height: 1;
   }
   .photo-grid {
     display: grid;
@@ -583,16 +536,10 @@ const copy =
       padding-inline: 3px;
     }
     .photo-page__header {
-      align-items: flex-start;
-      flex-direction: column;
       padding-inline: 1.25rem;
     }
     .photo-page__header::before {
       right: 1.25rem;
-    }
-    .photo-page__summary {
-      min-width: 0;
-      justify-items: start;
     }
     .photo-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -635,9 +582,7 @@ const copy =
       display: flex;
       width: 100vw;
       height: 100dvh;
-      padding:
-        calc(4.1rem + env(safe-area-inset-top))
-        0
+      padding: calc(4.1rem + env(safe-area-inset-top)) 0
         calc(4.6rem + env(safe-area-inset-bottom));
       align-items: center;
       justify-content: center;

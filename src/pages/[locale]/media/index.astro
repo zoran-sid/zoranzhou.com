@@ -1,9 +1,18 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import CategoryTabs from "../../../components/media/CategoryTabs.astro";
-import { getTranslations, localizePath, type Locale, locales } from "../../../i18n/utils";
+import {
+  getTranslations,
+  localizePath,
+  type Locale,
+  locales,
+} from "../../../i18n/utils";
 import mediaListSource from "../../../content/media.md?raw";
-import { parseMediaList, type MediaCategory, type MediaListItem } from "../../../lib/media/list";
+import {
+  parseMediaList,
+  type MediaCategory,
+  type MediaListItem,
+} from "../../../lib/media/list";
 
 export async function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
@@ -91,125 +100,174 @@ const jsonld = {
 };
 ---
 
-<BaseLayout title={t.mediaTitle} description={t.mediaDescription} jsonld={jsonld}>
+<BaseLayout
+  title={t.mediaTitle}
+  description={t.mediaDescription}
+  jsonld={jsonld}
+>
   <main class="page-container py-14 md:py-20">
     <header class="max-w-3xl">
-      <p class="text-sm font-medium uppercase text-gray-500 dark:text-gray-400">{t.navMedia}</p>
-      <h1 class="mt-3 text-4xl font-bold text-gray-950 dark:text-gray-50 md:text-5xl">
+      <p class="text-sm font-medium uppercase text-gray-500 dark:text-gray-400">
+        {t.navMedia}
+      </p>
+      <h1
+        class="mt-3 text-4xl font-bold text-gray-950 dark:text-gray-50 md:text-5xl"
+      >
         {t.mediaTitle}
       </h1>
-      <p class="mt-5 max-w-2xl text-base leading-8 text-gray-600 dark:text-gray-300">
+      <p
+        class="mt-5 max-w-2xl text-base leading-8 text-gray-600 dark:text-gray-300"
+      >
         {t.mediaIntro}
       </p>
     </header>
 
-    <section class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label={t.mediaType}>
-      {categoryOrder.map((category) => (
-        <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <span class={`h-2.5 w-2.5 rounded-full ${categoryAccent[category]}`}></span>
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
-                {categoryLabelMap[category]}
+    <section
+      class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+      aria-label={t.mediaType}
+    >
+      {
+        categoryOrder.map((category) => (
+          <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <span
+                  class={`h-2.5 w-2.5 rounded-full ${categoryAccent[category]}`}
+                />
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  {categoryLabelMap[category]}
+                </span>
+              </div>
+              <span class="text-2xl font-semibold text-gray-950 dark:text-gray-50">
+                {countByCategory[category]}
               </span>
             </div>
-            <span class="text-2xl font-semibold text-gray-950 dark:text-gray-50">
-              {countByCategory[category]}
-            </span>
           </div>
-        </div>
-      ))}
+        ))
+      }
     </section>
 
     <section class="mt-10">
-      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div
+        class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
+      >
         <CategoryTabs categories={categories} activeCategory="all" />
-        <p class="text-sm text-gray-500 dark:text-gray-400">{formatTotal(allItems.length)}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {formatTotal(allItems.length)}
+        </p>
       </div>
 
-      {allItems.length === 0 ? (
-        <p id="media-empty" class="rounded-lg border border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-800 dark:text-gray-500">
-          {t.mediaEmpty}
-        </p>
-      ) : (
-        <>
-          <!-- Desktop header -->
-          <div class="media-header hidden rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400 md:grid" style="grid-template-columns: 80px minmax(0, 1fr) 56px 90px 90px">
-            <span class="px-4 py-3">{t.mediaType}</span>
-            <span class="px-4 py-3">{t.mediaName}</span>
-            <span class="px-4 py-3 text-center">{t.mediaYear}</span>
-            <span class="px-4 py-3 text-center">{t.mediaRating}</span>
-            <span class="px-4 py-3 text-right">{t.mediaStatus}</span>
-          </div>
-
-          <!-- Media list -->
-          <div class="media-list divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-            {allItems.map((item: MediaListItem) => (
-              <div data-category={item.category} class="media-row group transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-900/50">
-                <!-- Desktop: 5-column grid -->
-                <div class="hidden items-center text-sm md:grid" style="grid-template-columns: 80px minmax(0, 1fr) 56px 90px 90px">
-                  <!-- Type -->
-                  <span class="inline-flex items-center gap-2 px-4 py-4 text-xs font-medium text-gray-500 dark:text-gray-400" style="min-width:0">
-                    <span class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}></span>
-                    <span class="truncate">{categoryLabelMap[item.category]}</span>
-                  </span>
-                  <!-- Name -->
-                  <div class="px-4 py-4" style="min-width:0">
-                    <p class="text-[15px] font-medium leading-snug text-gray-950 dark:text-gray-50" style="overflow-wrap:anywhere;word-break:normal">
-                      {item.name}
-                    </p>
-                  </div>
-                  <!-- Year -->
-                  <span class="px-4 py-4 text-center tabular-nums text-gray-500 dark:text-gray-400">
-                    {item.year ?? "-"}
-                  </span>
-                  <!-- Rating -->
-                  <span class="px-4 py-4 text-center tracking-wide text-yellow-600 dark:text-yellow-400" aria-label={`${t.mediaRating}: ${item.rating}`}>
-                    {item.rating > 0 ? renderRating(item.rating) : "-"}
-                  </span>
-                  <!-- Status -->
-                  <span class="px-4 py-4 text-right">
-                    <span class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                      {statusLabelMap[item.status] ?? item.status}
-                    </span>
-                  </span>
-                </div>
-
-                <!-- Mobile: 2-row card -->
-                <div class="flex flex-col gap-1 px-4 py-3 md:hidden">
-                  <!-- Row 1: type + year + status -->
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
-                      <span class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}></span>
-                      {categoryLabelMap[item.category]}
-                    </span>
-                    <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
-                      <span class="tabular-nums">{item.year ?? "-"}</span>
-                      <span>·</span>
-                      <span>{statusLabelMap[item.status] ?? item.status}</span>
-                    </div>
-                  </div>
-                  <!-- Row 2: name + optional rating -->
-                  <div>
-                    <p class="media-name-mobile text-[15px] font-medium leading-snug text-gray-950 dark:text-gray-50" style="display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:100%;overflow-wrap:anywhere;word-break:normal">
-                      {item.name}
-                    </p>
-                    {item.rating > 0 && (
-                      <span class="mt-1 inline-block text-xs tracking-wide text-yellow-600 dark:text-yellow-400">
-                        {renderRating(item.rating)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p id="media-empty" class="hidden rounded-lg border border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-800 dark:text-gray-500">
+      {
+        allItems.length === 0 ? (
+          <p
+            id="media-empty"
+            class="rounded-lg border border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-800 dark:text-gray-500"
+          >
             {t.mediaEmpty}
           </p>
-        </>
-      )}
+        ) : (
+          <>
+            <div
+              class="media-header hidden rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400 md:grid"
+              style="grid-template-columns: 80px minmax(0, 1fr) 72px 90px 104px"
+            >
+              <span class="px-4 py-3">{t.mediaType}</span>
+              <span class="px-4 py-3">{t.mediaName}</span>
+              <span class="px-4 py-3 text-center">{t.mediaYear}</span>
+              <span class="px-4 py-3 text-center">{t.mediaRating}</span>
+              <span class="px-4 py-3 text-right">{t.mediaStatus}</span>
+            </div>
+
+            <div class="media-list divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+              {allItems.map((item: MediaListItem) => (
+                <div
+                  data-category={item.category}
+                  class="media-row group transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-900/50"
+                >
+                  <div
+                    class="hidden items-center text-sm md:grid"
+                    style="grid-template-columns: 80px minmax(0, 1fr) 72px 90px 104px"
+                  >
+                    <span
+                      class="inline-flex items-center gap-2 px-4 py-4 text-xs font-medium text-gray-500 dark:text-gray-400"
+                      style="min-width:0"
+                    >
+                      <span
+                        class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}
+                      />
+                      <span class="truncate">
+                        {categoryLabelMap[item.category]}
+                      </span>
+                    </span>
+                    <div class="px-4 py-4" style="min-width:0">
+                      <p
+                        class="text-[15px] font-medium leading-snug text-gray-950 dark:text-gray-50"
+                        style="overflow-wrap:anywhere;word-break:normal"
+                      >
+                        {item.name}
+                      </p>
+                    </div>
+                    <span class="media-year px-4 py-4 text-center tabular-nums text-gray-500 dark:text-gray-400">
+                      {item.year ?? "-"}
+                    </span>
+                    <span
+                      class="px-4 py-4 text-center tracking-wide text-yellow-600 dark:text-yellow-400"
+                      aria-label={`${t.mediaRating}: ${item.rating}`}
+                    >
+                      {item.rating > 0 ? renderRating(item.rating) : "-"}
+                    </span>
+                    <span class="px-4 py-4 text-right">
+                      <span class="media-status-chip inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        {statusLabelMap[item.status] ?? item.status}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div class="flex flex-col gap-1 px-4 py-3 md:hidden">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+                        <span
+                          class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}
+                        />
+                        {categoryLabelMap[item.category]}
+                      </span>
+                      <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+                        <span class="media-year tabular-nums">
+                          {item.year ?? "-"}
+                        </span>
+                        <span>·</span>
+                        <span class="media-status-chip">
+                          {statusLabelMap[item.status] ?? item.status}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <p
+                        class="media-name-mobile text-[15px] font-medium leading-snug text-gray-950 dark:text-gray-50"
+                        style="display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:100%;overflow-wrap:anywhere;word-break:normal"
+                      >
+                        {item.name}
+                      </p>
+                      {item.rating > 0 && (
+                        <span class="mt-1 inline-block text-xs tracking-wide text-yellow-600 dark:text-yellow-400">
+                          {renderRating(item.rating)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p
+              id="media-empty"
+              class="hidden rounded-lg border border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-800 dark:text-gray-500"
+            >
+              {t.mediaEmpty}
+            </p>
+          </>
+        )
+      }
     </section>
   </main>
 </BaseLayout>
@@ -221,10 +279,12 @@ const jsonld = {
   .media-row {
     container-type: inline-size;
   }
-  /* Prevent horizontal overflow on all media containers */
-  .media-row * {
-    max-width: 100%;
-    overflow-wrap: anywhere;
+  .media-year,
+  .media-status-chip {
+    max-width: none;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: normal;
   }
   /* Desktop: ensure grid children don't overflow */
   @media (min-width: 768px) {

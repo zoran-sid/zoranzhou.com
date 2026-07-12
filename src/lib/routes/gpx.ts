@@ -3,6 +3,7 @@ export interface RoutePoint {
   lng: number;
   elevation?: number;
   time?: string;
+  cadence?: number;
   distance?: number;
   segmentIndex?: number;
 }
@@ -156,12 +157,16 @@ function parsePoint(
     getAttribute(attributes, "lon") ?? getAttribute(attributes, "lng"),
   );
   if (lat == null || lng == null) return undefined;
+  const cadence = ["cad", "cadence", "runcadence"]
+    .map((name) => finiteNumber(getFirstTagText(body, name)))
+    .find((value) => value != null && value > 0 && value <= 300);
 
   return {
     lat,
     lng,
     elevation: finiteNumber(getFirstTagText(body, "ele")),
     time: validIsoDate(getFirstTagText(body, "time")),
+    cadence,
     segmentIndex,
   };
 }

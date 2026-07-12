@@ -13,7 +13,9 @@ import {
 } from "../../../lib/routes/content";
 
 export async function getStaticPaths() {
-  const routes = await getCollection("routes", ({ data }) => isRouteVisible(data));
+  const routes = await getCollection("routes", ({ data }) =>
+    isRouteVisible(data),
+  );
   return normalizeRouteEntries(routes).map((entry) => ({
     params: { locale: entry.data.lang ?? "zh-CN", slug: entry.slug },
     props: { entry },
@@ -43,6 +45,7 @@ const routeAccent =
     slot="route-visual"
     title={data.title}
     gpx={gpx}
+    displayGeometry={data.displayGeometry as string | undefined}
     coordinates={coordinates}
     start={start}
     end={end}

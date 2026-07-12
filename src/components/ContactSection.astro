@@ -1,5 +1,5 @@
 ﻿---
-import { SOCIAL_LINKS, SOCIAL_ICONS, COPYRIGHT } from "../lib/constants";
+import { SOCIAL_LINKS, SOCIAL_ICONS } from "../lib/constants";
 import { getTranslations, type Locale } from "../i18n/utils";
 
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
@@ -37,14 +37,6 @@ const t = getTranslations(locale);
           ))
         }
       </div>
-    </div>
-
-    <div class="contact-endpoint">
-      <span>&copy; {new Date().getFullYear()} ZORAN ZHOU</span>
-      <span class="contact-endpoint__status"><i></i>ALL SYSTEMS NOMINAL</span>
-      <a href={COPYRIGHT.licenseUrl} target="_blank" rel="noopener noreferrer">
-        {COPYRIGHT.license}
-      </a>
     </div>
   </div>
 </section>

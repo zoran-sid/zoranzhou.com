@@ -18,8 +18,9 @@
     "import:routes:preview": "npx tsx scripts/import-route.ts --dry-run --no-geocode",
     "migrate:routes": "npx tsx scripts/migrate-routes.ts",
     "validate:routes": "npx tsx scripts/validate-routes.ts",
-    "test:language-routing": "npx tsx scripts/test-language-routing.ts"
-    ,"test:radar": "npx tsx scripts/test-radar.ts"
+    "test:language-routing": "npx tsx scripts/test-language-routing.ts",
+    "test:radar": "npx tsx scripts/test-radar.ts",
+    "test:route-logic": "npx tsx scripts/test-route-logic.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

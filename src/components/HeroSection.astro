@@ -74,9 +74,21 @@ const t = getTranslations(locale);
             <div class="signal-radar__axis axis-x"></div>
             <div class="signal-radar__axis axis-y"></div>
             <div class="signal-radar__core"><span></span></div>
-            <i class="radar-node" data-radar-target data-angle="52" data-radius="34"></i>
-            <i class="radar-node" data-radar-target data-angle="178" data-radius="36"></i>
-            <i class="radar-node" data-radar-target data-angle="286" data-radius="35"></i>
+            <i
+              class="radar-node"
+              data-radar-target
+              data-angle="52"
+              data-radius="34"></i>
+            <i
+              class="radar-node"
+              data-radar-target
+              data-angle="178"
+              data-radius="36"></i>
+            <i
+              class="radar-node"
+              data-radar-target
+              data-angle="286"
+              data-radius="35"></i>
           </div>
 
           <dl class="console-readouts">
@@ -106,156 +118,102 @@ const t = getTranslations(locale);
 <script>
   import {
     crossedRadarTarget,
+    RADAR_CSS_INITIAL_ROTATION_DEGREES,
+    RADAR_DURATION_MS,
     radarPosition,
   } from "../lib/radar";
 
-  const radar =
-    document.querySelector<HTMLElement>(
-      ".signal-radar",
-    );
+  let activeRadar: HTMLElement | null = null;
+  let cleanupRadar = () => {};
 
-  if (
-    radar &&
-    !radar.dataset.radarInitialized
-  ) {
-    radar.dataset.radarInitialized = "true";
+  function initializeRadar() {
+    const radar = document.querySelector<HTMLElement>(".signal-radar");
+    if (radar === activeRadar) return;
 
-    const sweep =
-      radar.querySelector<HTMLElement>(
-        "[data-radar-sweep]",
-      );
+    cleanupRadar();
+    activeRadar = radar;
+    if (!radar) return;
+
+    const sweep = radar.querySelector<HTMLElement>("[data-radar-sweep]");
 
     const targets = [
-      ...radar.querySelectorAll<HTMLElement>(
-        "[data-radar-target]",
-      ),
+      ...radar.querySelectorAll<HTMLElement>("[data-radar-target]"),
     ];
 
     for (const target of targets) {
-      const angle = Number(
-        target.dataset.angle ?? 0,
-      );
+      const angle = Number(target.dataset.angle ?? 0);
+      const radius = Number(target.dataset.radius ?? 0);
+      const position = radarPosition(angle, radius);
 
-      const radius = Number(
-        target.dataset.radius ?? 0,
-      );
+      target.style.setProperty("--radar-left", `${50 + position.x}%`);
 
-      const position = radarPosition(
-        angle,
-        radius,
-      );
-
-      /*
-       * 将极坐标转换成雷达容器内的位置。
-       * 50% / 50% 是雷达中心。
-       */
-      target.style.setProperty(
-        "--radar-left",
-        `${50 + position.x}%`,
-      );
-
-      target.style.setProperty(
-        "--radar-top",
-        `${50 + position.y}%`,
-      );
+      target.style.setProperty("--radar-top", `${50 + position.y}%`);
     }
 
-    const reducedMotion =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     if (reducedMotion || !sweep) {
-      targets.forEach((target) => {
-        target.classList.add(
-          "is-detected",
-        );
-      });
-    } else {
-      const duration = 8_000;
-
-      const animation = sweep.animate(
-        [
-          {
-            transform:
-              "rotate(-90deg)",
-          },
-          {
-            transform:
-              "rotate(270deg)",
-          },
-        ],
-        {
-          duration,
-          iterations: Infinity,
-          easing: "linear",
-        },
-      );
-
-      let frame = 0;
-      let previousTime = 0;
-
-      const detect = () => {
-        const currentTime = Number(
-          animation.currentTime ?? 0,
-        );
-
-        for (const target of targets) {
-          if (
-            target.classList.contains(
-              "is-detected",
-            )
-          ) {
-            continue;
-          }
-
-          const angle = Number(
-            target.dataset.angle ?? 0,
-          );
-
-          if (
-            crossedRadarTarget(
-              previousTime,
-              currentTime,
-              angle,
-              duration,
-            )
-          ) {
-            target.classList.add(
-              "is-detected",
-            );
-          }
-        }
-
-        previousTime = currentTime;
-
-        const hasUndetectedTargets =
-          targets.some(
-            (target) =>
-              !target.classList.contains(
-                "is-detected",
-              ),
-          );
-
-        if (hasUndetectedTargets) {
-          frame =
-            requestAnimationFrame(
-              detect,
-            );
-        }
+      targets.forEach((target) => target.classList.add("is-detected"));
+      cleanupRadar = () => {
+        activeRadar = null;
       };
-
-      frame =
-        requestAnimationFrame(detect);
-
-      document.addEventListener(
-        "astro:before-swap",
-        () => {
-          cancelAnimationFrame(frame);
-          animation.cancel();
-        },
-        { once: true },
-      );
+      return;
     }
+
+    const animation = sweep.animate(
+      [
+        { transform: `rotate(${RADAR_CSS_INITIAL_ROTATION_DEGREES}deg)` },
+        {
+          transform: `rotate(${RADAR_CSS_INITIAL_ROTATION_DEGREES + 360}deg)`,
+        },
+      ],
+      {
+        duration: RADAR_DURATION_MS,
+        iterations: Infinity,
+        easing: "linear",
+      },
+    );
+
+    let frame = 0;
+    let previousTime = 0;
+
+    const detect = () => {
+      const currentTime = Number(animation.currentTime ?? 0);
+
+      for (const target of targets) {
+        if (target.classList.contains("is-detected")) continue;
+
+        const angle = Number(target.dataset.angle ?? 0);
+        if (
+          crossedRadarTarget(
+            previousTime,
+            currentTime,
+            angle,
+            RADAR_DURATION_MS,
+          )
+        ) {
+          target.classList.add("is-detected");
+        }
+      }
+
+      previousTime = currentTime;
+      if (targets.some((target) => !target.classList.contains("is-detected"))) {
+        frame = requestAnimationFrame(detect);
+      }
+    };
+
+    frame = requestAnimationFrame(detect);
+    cleanupRadar = () => {
+      cancelAnimationFrame(frame);
+      animation.cancel();
+      activeRadar = null;
+      cleanupRadar = () => {};
+    };
   }
+
+  initializeRadar();
+  document.addEventListener("astro:page-load", initializeRadar);
+  document.addEventListener("astro:before-swap", () => cleanupRadar());
 </script>

@@ -2,30 +2,41 @@
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import MapExplorer from "../../../components/MapExplorer.astro";
 import { getCollection } from "astro:content";
+
 import {
   getTranslations,
   localizePath,
   type Locale,
   locales,
 } from "../../../i18n/utils";
+
 import {
   formatDistance,
   formatDuration,
   getRouteCoordinates,
+  getRouteEnd,
   getRouteFile,
+  getRouteStart,
   isRouteVisible,
   normalizeRouteEntries,
 } from "../../../lib/routes/content";
 
 export async function getStaticPaths() {
-  return locales.map((locale) => ({ params: { locale } }));
+  return locales.map((locale) => ({
+    params: { locale },
+  }));
 }
 
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+
 const t = getTranslations(locale);
+
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 
-const routes = await getCollection("routes", ({ data }) => isRouteVisible(data));
+const routes = await getCollection("routes", ({ data }) =>
+  isRouteVisible(data),
+);
+
 const entries = normalizeRouteEntries(routes)
   .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -49,36 +60,64 @@ const kindAccent: Record<string, string> = {
 const items = entries.map((entry) => {
   const data = entry.data;
   const kind = data.kind ?? "travel";
+
   return {
     slug: entry.slug,
     title: data.title,
     description: data.description,
+
     date: data.date.toISOString(),
+
     dateLabel: data.date.toLocaleDateString(dateLocale, {
       year: "numeric",
       month: "short",
       day: "numeric",
     }),
+
     kind,
     kindLabel: kindLabel[kind] ?? kind,
+
     location: data.location,
+
     distance: formatDistance(data.distance),
+
     duration: formatDuration(data.duration, locale),
+
     coordinates: getRouteCoordinates(data),
+
+    start: getRouteStart(data),
+
+    end: getRouteEnd(data),
+
     route: [],
+    segments: [],
+
     gpx: getRouteFile(data),
+
+    displayGeometry: data.displayGeometry,
+
     mapZoom: data.mapZoom,
+
     accent: data.accent ?? kindAccent[kind] ?? "#5271ff",
+
     url: localizePath(`/map/${entry.slug}`, locale),
   };
 });
 ---
 
-<BaseLayout title={t.mapPageTitle} description={t.mapPageDescription} mapStyles={true}>
+<BaseLayout
+  title={t.mapPageTitle}
+  description={t.mapPageDescription}
+  mapStyles={true}
+>
   <div class="map-page">
     <header class="map-page-header page-container">
-      <span class="section-kicker">{t.navMap}</span>
+      <span class="section-kicker">
+        {t.navMap}
+      </span>
+
       <h1>{t.mapPageTitle}</h1>
+
       <p>{t.mapPageDescription}</p>
     </header>
 
@@ -87,12 +126,22 @@ const items = entries.map((entry) => {
       locale={locale}
       labels={{
         all: locale === "zh-CN" ? "全部" : "All",
+
         explore: locale === "zh-CN" ? "探索足迹" : "Explore journeys",
+
         empty: t.mapEmpty,
+
         details: locale === "zh-CN" ? "查看完整记录" : "View full story",
+
         distance: t.mapDistance,
+
         duration: t.mapDuration,
+
         mapped: locale === "zh-CN" ? "个已标记地点" : "mapped places",
+
+        start: locale === "zh-CN" ? "起点" : "Start",
+
+        end: locale === "zh-CN" ? "终点" : "Finish",
       }}
     />
   </div>

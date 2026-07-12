@@ -39,7 +39,7 @@ const en: UIStrings = {
   heroTitleLine1: "Coding the World",
   heroTitleLine2: "Documenting what I learn along the way",
   heroDescription:
-    "Network and security engineer. This is where I document my work, learning, and experiences along the way.",
+    "Network and security engineer focused on secure infrastructure, automation, and applied research.",
   heroReadBlog: "Read the blog",
   heroGetInTouch: "Get in touch",
 
@@ -47,8 +47,8 @@ const en: UIStrings = {
   aboutLabel: "About",
   aboutHeadline: "Network & Security Engineer",
   aboutParagraphs: [
-    "I design and operate secure, resilient network architectures for large-scale enterprise environments. With CCIE and CISP-PTE certifications, I focus on the intersection of infrastructure reliability and offensive security.",
-    "Beyond day-to-day operations, I work on threat hunting, system hardening, and defensive tooling that can be applied in real environments.",
+    "I design and operate secure, resilient network infrastructure, with a focus on the intersection of reliability and security engineering.",
+    "My work spans network engineering, web security testing, endpoint operations, system hardening, and practical automation.",
     "This site is where I document technical research, work in progress, what I am learning, and experiences from everyday life.",
   ],
 
@@ -85,6 +85,50 @@ const en: UIStrings = {
   // ── Homepage: Skills ──
   skillsLabel: "Expertise",
   skillsHeading: "Skills & technologies",
+  skillsGroups: [
+    {
+      category: "Offensive Security & Web Testing",
+      items: [
+        "Web application penetration testing",
+        "Burp Suite",
+        "Metasploit",
+        "SQLMap",
+        "Authentication & authorization testing",
+        "Business-logic testing",
+        "Vulnerability assessment",
+        "Secure configuration review",
+        "Remediation verification",
+        "Secure code review fundamentals",
+      ],
+    },
+    {
+      category: "Network Engineering & Multi-Vendor Platforms",
+      items: [
+        "BGP / MPLS / VLAN",
+        "Routing & switching",
+        "Network segmentation",
+        "Campus network design",
+        "SDN deployment concepts",
+        "Firewall policy design",
+        "Network traffic analysis",
+        "Cisco / Huawei / ZTE / H3C",
+      ],
+    },
+    {
+      category: "Systems, Automation & Security Operations",
+      items: [
+        "Python / Shell / PowerShell",
+        "Windows & Linux operations",
+        "Endpoint security operations",
+        "Trellix ePO administration",
+        "Endpoint policy orchestration",
+        "Security deployment automation",
+        "IDS / IPS & SIEM operations",
+        "Vulnerability remediation workflows",
+        "Incident response support",
+      ],
+    },
+  ],
 
   // ── Homepage: Timeline ──
   timelineLabel: "Journey",

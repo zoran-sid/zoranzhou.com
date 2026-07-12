@@ -37,8 +37,7 @@ const zhCN: UIStrings = {
   heroKicker: "网络安全工程师",
   heroTitleLine1: "Coding构筑世界",
   heroTitleLine2: "以文字记录一路所学",
-  heroDescription:
-    "网络与安全工程师。这里记录我的工作实践、学习过程和一路上的个人经历。",
+  heroDescription: "网络与安全工程师，专注于安全基础设施、自动化与应用研究。",
   heroReadBlog: "阅读博客",
   heroGetInTouch: "联系我",
 
@@ -46,8 +45,8 @@ const zhCN: UIStrings = {
   aboutLabel: "关于",
   aboutHeadline: "网络与安全工程师",
   aboutParagraphs: [
-    "我为大型企业环境设计和运营安全、弹性的网络架构。持有 CCIE 和 CISP-PTE 认证，专注于基础设施可靠性与进攻性安全的交叉领域。",
-    "在日常运维之外，我参与了多个网络安全项目——威胁狩猎、系统加固，并构建了可规模化落地的防御工具。",
+    "我设计并运营安全、弹性的网络基础设施，关注可靠性与安全工程的交叉领域。",
+    "我的技术实践涵盖网络工程、Web 安全测试、终端安全运营、系统加固与实用自动化。",
     "这个网站是我记录技术研究、工作实践、学习过程与生活经历的地方。",
   ],
 
@@ -83,6 +82,50 @@ const zhCN: UIStrings = {
   // ── Homepage: Skills ──
   skillsLabel: "专业技能",
   skillsHeading: "技能与技术",
+  skillsGroups: [
+    {
+      category: "进攻性安全与 Web 测试",
+      items: [
+        "Web 应用渗透测试",
+        "Burp Suite",
+        "Metasploit",
+        "SQLMap",
+        "身份认证与权限测试",
+        "业务逻辑测试",
+        "漏洞评估",
+        "安全配置审查",
+        "修复验证",
+        "安全代码审查基础",
+      ],
+    },
+    {
+      category: "网络工程与多厂商平台",
+      items: [
+        "BGP / MPLS / VLAN",
+        "路由与交换",
+        "网络分段",
+        "园区网络设计",
+        "SDN 部署概念",
+        "防火墙策略设计",
+        "网络流量分析",
+        "Cisco / Huawei / ZTE / H3C",
+      ],
+    },
+    {
+      category: "系统、自动化与安全运营",
+      items: [
+        "Python / Shell / PowerShell",
+        "Windows 与 Linux 运维",
+        "终端安全运营",
+        "Trellix ePO 管理",
+        "终端策略编排",
+        "安全部署自动化",
+        "IDS / IPS 与 SIEM 运营",
+        "漏洞修复流程",
+        "事件响应支持",
+      ],
+    },
+  ],
 
   // ── Homepage: Timeline ──
   timelineLabel: "旅程",

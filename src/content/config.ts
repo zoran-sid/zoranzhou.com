@@ -148,6 +148,10 @@ const routeFields = {
   duration: z.number().int().nonnegative().optional(),
   elevationGain: z.number().optional(),
   gpx: z.string().regex(/^\/routes\/.+\.gpx$/i),
+  displayGeometry: z
+    .string()
+    .regex(/^\/routes\/.+\.geojson$/i)
+    .optional(),
   published: z.boolean().default(true),
   start: routePointSchema.optional(),
   end: routePointSchema.optional(),

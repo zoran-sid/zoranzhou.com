@@ -4,6 +4,7 @@ import type { RouteCoordinate } from "../lib/routes/content";
 interface Props {
   title: string;
   gpx: string;
+  displayGeometry?: string;
   coordinates?: RouteCoordinate;
   start?: RouteCoordinate;
   end?: RouteCoordinate;
@@ -14,6 +15,7 @@ interface Props {
 const {
   title,
   gpx,
+  displayGeometry,
   coordinates,
   start,
   end,
@@ -34,6 +36,14 @@ const labels =
         noElevation: "该轨迹暂时没有可用的海拔数据。",
         loadError: "路线文件加载失败，请检查 GPX 路径或文件内容。",
         routeProfile: "ROUTE PROFILE",
+        splits: "每公里分段",
+        kilometre: "公里",
+        splitDistance: "分段距离",
+        splitDuration: "分段用时",
+        pace: "配速",
+        paceUnit: "分/公里",
+        cadence: "步频",
+        partial: "不足一公里",
       }
     : {
         map: "Route map",
@@ -47,6 +57,14 @@ const labels =
         loadError:
           "The route file could not be loaded. Check the GPX path and file.",
         routeProfile: "ROUTE PROFILE",
+        splits: "Per-kilometre splits",
+        kilometre: "Kilometre",
+        splitDistance: "Split distance",
+        splitDuration: "Split duration",
+        pace: "Pace",
+        paceUnit: "min/km",
+        cadence: "Cadence",
+        partial: "Partial",
       };
 ---
 
@@ -54,6 +72,7 @@ const labels =
   class="route-visual"
   data-route-visual
   data-gpx={gpx}
+  data-display-geometry={displayGeometry ?? ""}
   data-coordinates={coordinates ? JSON.stringify(coordinates) : ""}
   data-start={start ? JSON.stringify(start) : ""}
   data-end={end ? JSON.stringify(end) : ""}
@@ -73,11 +92,7 @@ const labels =
     </header>
 
     <div class="route-map-shell">
-      <div
-        class="route-map"
-        aria-label={`${title} · ${labels.map}`}
-      >
-      </div>
+      <div class="route-map" aria-label={`${title} · ${labels.map}`}></div>
       <p class="route-map-error" data-route-error hidden>{labels.loadError}</p>
     </div>
 
@@ -122,6 +137,24 @@ const labels =
   <p class="elevation-empty" data-elevation-empty hidden>
     {labels.noElevation}
   </p>
+
+  <details class="route-splits" data-route-splits open hidden>
+    <summary>{labels.splits}</summary>
+    <div class="route-splits__table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{labels.kilometre}</th>
+            <th>{labels.splitDistance}</th>
+            <th>{labels.splitDuration}</th>
+            <th>{labels.pace}</th>
+            <th data-cadence-heading>{labels.cadence}</th>
+          </tr>
+        </thead>
+        <tbody data-route-splits-body></tbody>
+      </table>
+    </div>
+  </details>
 </section>
 
 <script>
@@ -132,7 +165,16 @@ const labels =
     type RouteEndpoint,
     type RoutePoint,
   } from "../lib/routes/gpx";
-  import { downsampleSegments } from "../lib/routes/downsample";
+  import { processRouteForDisplay } from "../lib/routes/display-geometry";
+  import {
+    endpointMarkerOffsets,
+    resolveRouteEndpoints,
+  } from "../lib/routes/endpoints";
+  import {
+    calculateKilometreSplits,
+    formatPace,
+    formatSplitDuration,
+  } from "../lib/routes/splits";
 
   type Coordinate = { lat: number; lng: number; name?: string };
 
@@ -165,7 +207,7 @@ const labels =
     const coordinate = root.querySelector<HTMLElement>(
       `[data-route-${kind}-coordinates]`,
     );
-    if (name) name.textContent = endpoint.name ?? fallbackLabel;
+    if (name) name.textContent = fallbackLabel;
     if (coordinate) {
       coordinate.textContent = `${endpoint.lat.toFixed(5)}, ${endpoint.lng.toFixed(5)}`;
     }
@@ -255,8 +297,53 @@ const labels =
     empty.hidden = true;
   }
 
+  function renderSplits(
+    routeData: ParsedRoute,
+    labels: Record<string, string>,
+  ) {
+    if (!root) return;
+    const section = root.querySelector<HTMLDetailsElement>(
+      "[data-route-splits]",
+    );
+    const body = root.querySelector<HTMLTableSectionElement>(
+      "[data-route-splits-body]",
+    );
+    const cadenceHeading = root.querySelector<HTMLElement>(
+      "[data-cadence-heading]",
+    );
+    if (!section || !body || !cadenceHeading) return;
+
+    const splits = calculateKilometreSplits(routeData);
+    if (splits.length === 0) return;
+    const hasCadence = splits.some((split) => split.averageCadence != null);
+    cadenceHeading.hidden = !hasCadence;
+    body.replaceChildren(
+      ...splits.map((split) => {
+        const row = document.createElement("tr");
+        const values = [
+          `${split.kilometre}${split.partial ? ` (${labels.partial})` : ""}`,
+          `${(split.distanceMeters / 1_000).toFixed(split.partial ? 2 : 1)} km`,
+          formatSplitDuration(split.durationSeconds),
+          `${formatPace(split.paceSecondsPerKm)} ${labels.paceUnit}`,
+          split.averageCadence == null
+            ? "—"
+            : `${Math.round(split.averageCadence)} spm`,
+        ];
+        values.forEach((value, index) => {
+          const cell = document.createElement("td");
+          cell.textContent = value;
+          if (index === 4) cell.hidden = !hasCadence;
+          row.append(cell);
+        });
+        return row;
+      }),
+    );
+    section.hidden = false;
+  }
+
   if (root) {
     const gpx = root.dataset.gpx;
+    const displayGeometry = root.dataset.displayGeometry;
     const coordinates = parseJson<Coordinate | undefined>(
       root.dataset.coordinates,
       undefined,
@@ -279,6 +366,7 @@ const labels =
       "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
     const initial = coordinates ?? frontmatterStart;
     let parsedRoute: ParsedRoute | undefined;
+    let displaySegments: RoutePoint[][] = [];
     let markers: Marker[] = [];
 
     const map = new maplibregl.Map({
@@ -311,12 +399,15 @@ const labels =
     function drawParsedRoute(routeData: ParsedRoute) {
       clearMapData();
       const points = routeData.points;
-      const start = routeData.start ?? frontmatterStart;
-      const end = routeData.end ?? frontmatterEnd;
+      const { start, end } = resolveRouteEndpoints(
+        frontmatterStart,
+        frontmatterEnd,
+        routeData.segments,
+      );
+      const offsets = endpointMarkerOffsets(start, end);
       setEndpoint("start", start, labels.start ?? "Start");
       setEndpoint("end", end, labels.finish ?? "Finish");
 
-      const displaySegments = downsampleSegments(routeData.segments, 2_000);
       if (displaySegments.length > 0) {
         const geometry =
           displaySegments.length === 1
@@ -369,6 +460,7 @@ const labels =
           new maplibregl.Marker({
             element: endpointElement("start", labels.start ?? "Start"),
             anchor: "center",
+            offset: offsets.start,
           })
             .setLngLat([start.lng, start.lat])
             .addTo(map),
@@ -379,6 +471,7 @@ const labels =
           new maplibregl.Marker({
             element: endpointElement("finish", labels.finish ?? "Finish"),
             anchor: "center",
+            offset: offsets.end,
           })
             .setLngLat([end.lng, end.lat])
             .addTo(map),
@@ -419,6 +512,7 @@ const labels =
         });
       }
       renderElevation(routeData, accent);
+      renderSplits(routeData, labels);
     }
 
     async function loadRoute() {
@@ -427,6 +521,24 @@ const labels =
         const response = await fetch(gpx);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         parsedRoute = parseRouteDocument(await response.text(), gpx);
+        displaySegments = processRouteForDisplay(parsedRoute.segments);
+
+        if (displayGeometry) {
+          try {
+            const displayResponse = await fetch(displayGeometry);
+            if (displayResponse.ok) {
+              const cachedGeometry = parseRouteDocument(
+                await displayResponse.text(),
+                displayGeometry,
+              );
+              if (cachedGeometry.points.length > 1) {
+                displaySegments = processRouteForDisplay(
+                  cachedGeometry.segments,
+                );
+              }
+            }
+          } catch {}
+        }
       }
       return parsedRoute;
     }
@@ -434,10 +546,12 @@ const labels =
     const routePromise = loadRoute();
     routePromise
       .then((routeData) => {
-        if (routeData) renderElevation(routeData, accent);
+        if (routeData) {
+          renderElevation(routeData, accent);
+          renderSplits(routeData, labels);
+        }
       })
-      .catch((error) => {
-        console.warn("Failed to load route:", error);
+      .catch(() => {
         if (errorElement) errorElement.hidden = false;
       });
 
@@ -453,8 +567,7 @@ const labels =
               .addTo(map),
           );
         }
-      } catch (error) {
-        console.warn("Failed to load route:", error);
+      } catch {
         if (errorElement) errorElement.hidden = false;
       }
     });
@@ -468,7 +581,7 @@ const labels =
           ? darkStyle
           : lightStyle,
       );
-      map.once("styledata", () => {
+      map.once("style.load", () => {
         if (parsedRoute) drawParsedRoute(parsedRoute);
       });
     });
@@ -497,7 +610,9 @@ const labels =
   }
 
   .route-map-card,
-  .elevation-card {
+  .elevation-card,
+  .route-splits {
+    overflow: visible;
     overflow: hidden;
     border: 1px solid var(--border-color);
     border-radius: 1.25rem;
@@ -705,6 +820,47 @@ const labels =
     border-radius: 1rem;
     color: var(--text-muted);
     text-align: center;
+  }
+
+  .route-splits summary {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: 0.88rem;
+    font-weight: 750;
+  }
+
+  .route-splits__table-wrap {
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: 0.45rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .route-splits table {
+    width: 100%;
+    min-width: 36rem;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+  }
+
+  .route-splits th,
+  .route-splits td {
+    padding: 0.72rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+  }
+
+  .route-splits th {
+    color: var(--text-muted);
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .route-splits tbody tr:last-child td {
+    padding-bottom: 1rem;
+    border-bottom: 0;
   }
 
   @media (max-width: 700px) {
