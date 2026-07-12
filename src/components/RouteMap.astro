@@ -39,7 +39,7 @@ const labels =
         splits: "每公里分段",
         kilometre: "公里",
         splitDistance: "分段距离",
-        splitDuration: "分段用时",
+        totalDuration: "总用时",
         pace: "配速",
         paceUnit: "分/公里",
         cadence: "步频",
@@ -60,7 +60,7 @@ const labels =
         splits: "Per-kilometre splits",
         kilometre: "Kilometre",
         splitDistance: "Split distance",
-        splitDuration: "Split duration",
+        totalDuration: "Total time",
         pace: "Pace",
         paceUnit: "min/km",
         cadence: "Cadence",
@@ -139,22 +139,24 @@ const labels =
   </p>
 
   <details class="route-splits" data-route-splits open hidden>
-    <summary>{labels.splits}</summary>
-    <div class="route-splits__table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>{labels.kilometre}</th>
-            <th>{labels.splitDistance}</th>
-            <th>{labels.splitDuration}</th>
-            <th>{labels.pace}</th>
-            <th data-cadence-heading>{labels.cadence}</th>
-          </tr>
-        </thead>
-        <tbody data-route-splits-body></tbody>
-      </table>
-    </div>
-  </details>
+  <summary>{labels.splits}</summary>
+
+  <div class="route-splits__table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>{labels.kilometre}</th>
+          <th>{labels.splitDistance}</th>
+          <th>{labels.totalDuration}</th>
+          <th>{labels.pace}</th>
+          <th data-cadence-heading>{labels.cadence}</th>
+        </tr>
+      </thead>
+
+      <tbody data-route-splits-body></tbody>
+    </table>
+  </div>
+</details>
 </section>
 
 <script>
@@ -297,49 +299,76 @@ const labels =
     empty.hidden = true;
   }
 
-  function renderSplits(
-    routeData: ParsedRoute,
-    labels: Record<string, string>,
-  ) {
-    if (!root) return;
-    const section = root.querySelector<HTMLDetailsElement>(
-      "[data-route-splits]",
-    );
-    const body = root.querySelector<HTMLTableSectionElement>(
-      "[data-route-splits-body]",
-    );
-    const cadenceHeading = root.querySelector<HTMLElement>(
-      "[data-cadence-heading]",
-    );
-    if (!section || !body || !cadenceHeading) return;
+function renderSplits(
+  routeData: ParsedRoute,
+  labels: Record<string, string>,
+) {
+  if (!root) return;
 
-    const splits = calculateKilometreSplits(routeData);
-    if (splits.length === 0) return;
-    const hasCadence = splits.some((split) => split.averageCadence != null);
-    cadenceHeading.hidden = !hasCadence;
-    body.replaceChildren(
-      ...splits.map((split) => {
-        const row = document.createElement("tr");
-        const values = [
-          `${split.kilometre}${split.partial ? ` (${labels.partial})` : ""}`,
-          `${(split.distanceMeters / 1_000).toFixed(split.partial ? 2 : 1)} km`,
-          formatSplitDuration(split.durationSeconds),
-          `${formatPace(split.paceSecondsPerKm)} ${labels.paceUnit}`,
-          split.averageCadence == null
-            ? "—"
-            : `${Math.round(split.averageCadence)} spm`,
-        ];
-        values.forEach((value, index) => {
-          const cell = document.createElement("td");
-          cell.textContent = value;
-          if (index === 4) cell.hidden = !hasCadence;
-          row.append(cell);
-        });
-        return row;
-      }),
-    );
-    section.hidden = false;
-  }
+  const section = root.querySelector<HTMLDetailsElement>(
+    "[data-route-splits]",
+  );
+
+  const body = root.querySelector<HTMLTableSectionElement>(
+    "[data-route-splits-body]",
+  );
+
+  const cadenceHeading = root.querySelector<HTMLElement>(
+    "[data-cadence-heading]",
+  );
+
+  if (!section || !body || !cadenceHeading) return;
+
+  const splits = calculateKilometreSplits(routeData);
+
+  if (splits.length === 0) return;
+
+  const hasCadence = splits.some(
+    (split) => split.averageCadence != null,
+  );
+
+  cadenceHeading.hidden = !hasCadence;
+
+  let totalDurationSeconds = 0;
+
+  body.replaceChildren(
+    ...splits.map((split) => {
+      totalDurationSeconds += split.durationSeconds;
+
+      const row = document.createElement("tr");
+
+      const values = [
+        `${split.kilometre}${
+          split.partial ? ` (${labels.partial})` : ""
+        }`,
+        `${(split.distanceMeters / 1_000).toFixed(
+          split.partial ? 2 : 1,
+        )} km`,
+        formatSplitDuration(totalDurationSeconds),
+        `${formatPace(split.paceSecondsPerKm)} ${labels.paceUnit}`,
+        split.averageCadence == null
+          ? "—"
+          : `${Math.round(split.averageCadence)} spm`,
+      ];
+
+      values.forEach((value, index) => {
+        const cell = document.createElement("td");
+
+        cell.textContent = value;
+
+        if (index === 4) {
+          cell.hidden = !hasCadence;
+        }
+
+        row.append(cell);
+      });
+
+      return row;
+    }),
+  );
+
+  section.hidden = false;
+}
 
   if (root) {
     const gpx = root.dataset.gpx;
