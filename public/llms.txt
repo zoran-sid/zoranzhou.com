@@ -1,0 +1,28 @@
+# ZORAN ZHOU
+
+> Personal website of Zoran Zhou, covering cybersecurity, research, technical projects, essays, media, photography, and personal travel records.
+
+## Main Pages
+
+- [中文主页](https://zoranzhou.com/zh-CN/): Zoran Zhou 的中文个人主页
+- [English Home](https://zoranzhou.com/en/): English homepage of Zoran Zhou
+- [中文博客](https://zoranzhou.com/zh-CN/blog/): 技术文章和个人记录
+- [English Blog](https://zoranzhou.com/en/blog/): Technical articles and personal writing
+- [中文研究](https://zoranzhou.com/zh-CN/research/): 研究记录和安全分析
+- [English Research](https://zoranzhou.com/en/research/): Research notes and security analysis
+- [中文项目](https://zoranzhou.com/zh-CN/projects/): 个人项目和技术项目
+- [English Projects](https://zoranzhou.com/en/projects/): Personal and technical projects
+- [中文随笔](https://zoranzhou.com/zh-CN/essays/): 长篇文章和随笔
+- [English Essays](https://zoranzhou.com/en/essays/): Essays and long-form writing
+- [中文媒体](https://zoranzhou.com/zh-CN/media/): 电影、书籍和游戏记录
+- [English Media](https://zoranzhou.com/en/media/): Movies, books, and games
+- [中文照片](https://zoranzhou.com/zh-CN/photos/): 摄影和照片记录
+- [English Photos](https://zoranzhou.com/en/photos/): Photography and photo gallery
+- [中文足迹](https://zoranzhou.com/zh-CN/map/): 旅行、徒步和路线记录
+- [English Map](https://zoranzhou.com/en/map/): Travel, hiking, and route records
+
+## Feeds and Indexes
+
+- [中文 RSS](https://zoranzhou.com/zh-CN/rss.xml): 中文内容订阅
+- [English RSS](https://zoranzhou.com/en/rss.xml): English content feed
+- [Sitemap](https://zoranzhou.com/sitemap-index.xml): Website sitemap index
