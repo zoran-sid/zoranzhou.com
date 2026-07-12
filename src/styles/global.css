@@ -2970,24 +2970,48 @@ body.menu-open {
 }
 
 .radar-node {
+  /*
+   * 位置相对于整个雷达容器计算。
+   * 默认值 50% / 50% 为雷达中心。
+   */
+  top: var(--radar-top, 50%);
+  left: var(--radar-left, 50%);
+
   width: 0.5rem;
   height: 0.5rem;
   border: 2px solid var(--surface);
   border-radius: 50%;
   background: var(--signal);
-  box-shadow: 0 0 0.9rem var(--signal);
+  box-shadow:
+    0 0 0.35rem var(--signal),
+    0 0 0.9rem rgb(67 228 255 / 0.72);
+
   opacity: 0;
   pointer-events: none;
-  transform: translate(calc(-50% + var(--radar-x)), calc(-50% + var(--radar-y))) scale(0.25);
-  transition: opacity 420ms var(--ease-out), transform 520ms var(--ease-out);
-}
-.reveal.visible:not(.reveal-complete) {
-  will-change: opacity, filter, transform;
+
+  /*
+   * translate 现在只负责让点以自身中心对齐坐标。
+   * 不再使用百分比移动点的位置。
+   */
+  transform:
+    translate(-50%, -50%)
+    scale(0.25);
+
+  transition:
+    opacity 420ms var(--ease-out),
+    transform 520ms var(--ease-out);
+
+  will-change:
+    opacity,
+    transform;
 }
 
 .radar-node.is-detected {
   opacity: 1;
-  transform: translate(calc(-50% + var(--radar-x)), calc(-50% + var(--radar-y))) scale(1);
+
+  transform:
+    translate(-50%, -50%)
+    scale(1);
 }
 
 .console-readouts {

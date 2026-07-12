@@ -104,40 +104,158 @@ const t = getTranslations(locale);
 </section>
 
 <script>
-  import { crossedRadarTarget, radarPosition } from "../lib/radar";
-  const radar = document.querySelector<HTMLElement>(".signal-radar");
-  if (radar && !radar.dataset.radarInitialized) {
+  import {
+    crossedRadarTarget,
+    radarPosition,
+  } from "../lib/radar";
+
+  const radar =
+    document.querySelector<HTMLElement>(
+      ".signal-radar",
+    );
+
+  if (
+    radar &&
+    !radar.dataset.radarInitialized
+  ) {
     radar.dataset.radarInitialized = "true";
-    const sweep = radar.querySelector<HTMLElement>("[data-radar-sweep]");
-    const targets = [...radar.querySelectorAll<HTMLElement>("[data-radar-target]")];
+
+    const sweep =
+      radar.querySelector<HTMLElement>(
+        "[data-radar-sweep]",
+      );
+
+    const targets = [
+      ...radar.querySelectorAll<HTMLElement>(
+        "[data-radar-target]",
+      ),
+    ];
+
     for (const target of targets) {
-      const angle = Number(target.dataset.angle ?? 0);
-      const position = radarPosition(angle, Number(target.dataset.radius ?? 0));
-      target.style.setProperty("--radar-x", `${position.x}%`);
-      target.style.setProperty("--radar-y", `${position.y}%`);
+      const angle = Number(
+        target.dataset.angle ?? 0,
+      );
+
+      const radius = Number(
+        target.dataset.radius ?? 0,
+      );
+
+      const position = radarPosition(
+        angle,
+        radius,
+      );
+
+      /*
+       * 将极坐标转换成雷达容器内的位置。
+       * 50% / 50% 是雷达中心。
+       */
+      target.style.setProperty(
+        "--radar-left",
+        `${50 + position.x}%`,
+      );
+
+      target.style.setProperty(
+        "--radar-top",
+        `${50 + position.y}%`,
+      );
     }
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const reducedMotion =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
     if (reducedMotion || !sweep) {
-      targets.forEach((target) => target.classList.add("is-detected"));
+      targets.forEach((target) => {
+        target.classList.add(
+          "is-detected",
+        );
+      });
     } else {
       const duration = 8_000;
+
       const animation = sweep.animate(
-        [{ transform: "rotate(-90deg)" }, { transform: "rotate(270deg)" }],
-        { duration, iterations: Infinity, easing: "linear" },
+        [
+          {
+            transform:
+              "rotate(-90deg)",
+          },
+          {
+            transform:
+              "rotate(270deg)",
+          },
+        ],
+        {
+          duration,
+          iterations: Infinity,
+          easing: "linear",
+        },
       );
+
       let frame = 0;
       let previousTime = 0;
+
       const detect = () => {
-        const currentTime = Number(animation.currentTime ?? 0);
+        const currentTime = Number(
+          animation.currentTime ?? 0,
+        );
+
         for (const target of targets) {
-          if (target.classList.contains("is-detected")) continue;
-          if (crossedRadarTarget(previousTime, currentTime, Number(target.dataset.angle ?? 0), duration)) target.classList.add("is-detected");
+          if (
+            target.classList.contains(
+              "is-detected",
+            )
+          ) {
+            continue;
+          }
+
+          const angle = Number(
+            target.dataset.angle ?? 0,
+          );
+
+          if (
+            crossedRadarTarget(
+              previousTime,
+              currentTime,
+              angle,
+              duration,
+            )
+          ) {
+            target.classList.add(
+              "is-detected",
+            );
+          }
         }
+
         previousTime = currentTime;
-        if (targets.some((target) => !target.classList.contains("is-detected"))) frame = requestAnimationFrame(detect);
+
+        const hasUndetectedTargets =
+          targets.some(
+            (target) =>
+              !target.classList.contains(
+                "is-detected",
+              ),
+          );
+
+        if (hasUndetectedTargets) {
+          frame =
+            requestAnimationFrame(
+              detect,
+            );
+        }
       };
-      frame = requestAnimationFrame(detect);
-      document.addEventListener("astro:before-swap", () => { cancelAnimationFrame(frame); animation.cancel(); }, { once: true });
+
+      frame =
+        requestAnimationFrame(detect);
+
+      document.addEventListener(
+        "astro:before-swap",
+        () => {
+          cancelAnimationFrame(frame);
+          animation.cancel();
+        },
+        { once: true },
+      );
     }
   }
 </script>
