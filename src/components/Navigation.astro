@@ -6,9 +6,11 @@ import {
   localeLabels,
   locales,
   localizePath,
+  LANG_COOKIE,
 } from "../i18n/utils";
 
 const path = Astro.url.pathname;
+const currentSearch = Astro.url.search;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
 
@@ -21,19 +23,81 @@ const primaryNavItems = [
 ];
 
 const personalNavItems = [
-  { label: t.navPhotos, href: localizePath("/photos", locale), icon: "photos" },
-  { label: t.navMap, href: localizePath("/map", locale), icon: "map" },
+  {
+    label: t.navPhotos,
+    href: localizePath("/photos", locale),
+    icon: "photos",
+  },
+  {
+    label: t.navMap,
+    href: localizePath("/map", locale),
+    icon: "map",
+  },
 ];
+
+const languageSwitchSections = new Set([
+  "blog",
+  "research",
+  "projects",
+  "media",
+  "essays",
+  "photos",
+  "map",
+  "tags",
+  "tools",
+]);
+
+function getLanguageSwitchHref(targetLocale: Locale): string {
+  const pathWithoutLocale =
+    path.replace(/^\/(?:zh-CN|en)(?=\/|$)/, "") || "/";
+
+  const segments = pathWithoutLocale.split("/").filter(Boolean);
+
+  let targetPath = "/";
+  let preserveSearch = false;
+
+  // 首页或顶级栏目页可以直接切换到相同路径。
+  if (segments.length <= 1) {
+    targetPath = pathWithoutLocale;
+    preserveSearch = true;
+  } else {
+    // 详情页回到目标语言下相同栏目，防止没有对应翻译而出现 404。
+    const section = segments[0];
+
+    if (section && languageSwitchSections.has(section)) {
+      targetPath = `/${section}/`;
+    }
+  }
+
+  const localizedPath = localizePath(targetPath, targetLocale);
+
+  return preserveSearch
+    ? `${localizedPath}${currentSearch}`
+    : localizedPath;
+}
+
+const alternateLocale: Locale =
+  locale === "zh-CN" ? "en" : "zh-CN";
+
+const alternateLocaleHref =
+  getLanguageSwitchHref(alternateLocale);
 ---
 
-<header class="site-header" data-site-header>
+<header
+  class="site-header"
+  data-site-header
+  data-language-cookie={LANG_COOKIE}
+>
   <svg aria-hidden="true" class="hidden">
     <symbol id="nav-icon-photos" viewBox="0 0 24 24">
       <path
         d="M4.75 7.75A2.75 2.75 0 0 1 7.5 5h1.6l1.15-1.5h3.5L14.9 5h1.6a2.75 2.75 0 0 1 2.75 2.75v8.5A2.75 2.75 0 0 1 16.5 19H7.5a2.75 2.75 0 0 1-2.75-2.75v-8.5Z"
       ></path>
-      <path d="M12 15.5a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"></path>
+      <path
+        d="M12 15.5a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"
+      ></path>
     </symbol>
+
     <symbol id="nav-icon-map" viewBox="0 0 24 24">
       <path
         d="M9 18.75 4.75 20.5V6.25L9 4.5l6 1.75 4.25-1.75v14.25L15 20.5l-6-1.75Z"
@@ -61,6 +125,7 @@ const personalNavItems = [
             decoding="async"
           />
         </span>
+
         <span class="site-brand__copy">
           <strong>ZORAN ZHOU</strong>
           <small>NETWORK / SECURITY</small>
@@ -71,11 +136,16 @@ const personalNavItems = [
         {
           primaryNavItems.map((item) => {
             const active =
-              path === item.href || path.startsWith(item.href + "/");
+              path === item.href ||
+              path.startsWith(item.href + "/");
+
             return (
               <a
                 href={item.href}
-                class:list={["site-nav__link", { active }]}
+                class:list={[
+                  "site-nav__link",
+                  { active },
+                ]}
                 aria-current={active ? "page" : undefined}
               >
                 {item.label}
@@ -86,18 +156,28 @@ const personalNavItems = [
       </div>
 
       <div class="site-nav__tools">
-        <div class="site-nav__personal" aria-label="Personal sections">
+        <div
+          class="site-nav__personal"
+          aria-label="Personal sections"
+        >
           {
             personalNavItems.map((item) => {
               const active =
-                path === item.href || path.startsWith(item.href + "/");
+                path === item.href ||
+                path.startsWith(item.href + "/");
+
               return (
                 <a
                   href={item.href}
-                  class:list={["site-nav__icon", { active }]}
+                  class:list={[
+                    "site-nav__icon",
+                    { active },
+                  ]}
                   aria-label={item.label}
                   title={item.label}
-                  aria-current={active ? "page" : undefined}
+                  aria-current={
+                    active ? "page" : undefined
+                  }
                 >
                   <svg
                     fill="none"
@@ -106,7 +186,9 @@ const personalNavItems = [
                     stroke-linejoin="round"
                     stroke-width="1.7"
                   >
-                    <use href={`#nav-icon-${item.icon}`} />
+                    <use
+                      href={`#nav-icon-${item.icon}`}
+                    />
                   </svg>
                 </a>
               );
@@ -119,11 +201,13 @@ const personalNavItems = [
         </div>
 
         <a
-          href={locale === "zh-CN" ? "/en/" : "/zh-CN/"}
+          href={alternateLocaleHref}
           class="site-nav__language"
           aria-label={t.langLabel}
+          data-language-switch
+          data-target-locale={alternateLocale}
         >
-          {localeLabels[locale === "zh-CN" ? "en" : "zh-CN"]}
+          {localeLabels[alternateLocale]}
         </a>
 
         <button
@@ -144,6 +228,7 @@ const personalNavItems = [
               d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7 5.3 5.3"
             ></path>
           </svg>
+
           <svg
             class="block dark:hidden"
             fill="none"
@@ -172,8 +257,13 @@ const personalNavItems = [
             stroke="currentColor"
             stroke-width="1.8"
             viewBox="0 0 24 24"
-            ><path stroke-linecap="round" d="M5 8h14M5 16h14"></path></svg
           >
+            <path
+              stroke-linecap="round"
+              d="M5 8h14M5 16h14"
+            ></path>
+          </svg>
+
           <svg
             id="menu-icon-close"
             class="hidden"
@@ -181,24 +271,37 @@ const personalNavItems = [
             stroke="currentColor"
             stroke-width="1.8"
             viewBox="0 0 24 24"
-            ><path stroke-linecap="round" d="m7 7 10 10M17 7 7 17"></path></svg
           >
+            <path
+              stroke-linecap="round"
+              d="m7 7 10 10M17 7 7 17"
+            ></path>
+          </svg>
         </button>
       </div>
     </nav>
   </div>
 
-  <div id="mobile-menu" class="site-mobile-menu" hidden>
+  <div
+    id="mobile-menu"
+    class="site-mobile-menu"
+    hidden
+  >
     <div class="page-container site-mobile-menu__inner">
       <div class="site-mobile-menu__links">
         {
           primaryNavItems.map((item) => {
             const active =
-              path === item.href || path.startsWith(item.href + "/");
+              path === item.href ||
+              path.startsWith(item.href + "/");
+
             return (
               <a
                 href={item.href}
-                class:list={["site-mobile-menu__link", { active }]}
+                class:list={[
+                  "site-mobile-menu__link",
+                  { active },
+                ]}
                 aria-current={active ? "page" : undefined}
               >
                 <>
@@ -209,14 +312,20 @@ const personalNavItems = [
             );
           })
         }
+
         {
           personalNavItems.map((item) => {
             const active =
-              path === item.href || path.startsWith(item.href + "/");
+              path === item.href ||
+              path.startsWith(item.href + "/");
+
             return (
               <a
                 href={item.href}
-                class:list={["site-mobile-menu__link", { active }]}
+                class:list={[
+                  "site-mobile-menu__link",
+                  { active },
+                ]}
                 aria-current={active ? "page" : undefined}
               >
                 <>
@@ -228,14 +337,24 @@ const personalNavItems = [
           })
         }
       </div>
+
       <div class="site-mobile-menu__languages">
         {
-          locales.map((altLocale) => (
+          locales.map((targetLocale) => (
             <a
-              href={altLocale === "zh-CN" ? "/zh-CN/" : "/en/"}
-              class:list={{ active: altLocale === locale }}
+              href={getLanguageSwitchHref(targetLocale)}
+              class:list={{
+                active: targetLocale === locale,
+              }}
+              aria-current={
+                targetLocale === locale
+                  ? "page"
+                  : undefined
+              }
+              data-language-switch
+              data-target-locale={targetLocale}
             >
-              {localeLabels[altLocale]}
+              {localeLabels[targetLocale]}
             </a>
           ))
         }
@@ -247,8 +366,16 @@ const personalNavItems = [
 <script>
   function toggleDarkMode() {
     const html = document.documentElement;
-    const nextTheme = html.classList.contains("dark") ? "light" : "dark";
-    html.classList.toggle("dark", nextTheme === "dark");
+
+    const nextTheme = html.classList.contains("dark")
+      ? "light"
+      : "dark";
+
+    html.classList.toggle(
+      "dark",
+      nextTheme === "dark",
+    );
+
     localStorage.setItem("pref-theme", nextTheme);
   }
 
@@ -256,32 +383,115 @@ const personalNavItems = [
     .getElementById("theme-toggle")
     ?.addEventListener("click", toggleDarkMode);
 
-  const menuToggle = document.getElementById("mobile-menu-toggle");
-  const mobileMenu = document.getElementById("mobile-menu");
-  const menuIconOpen = document.getElementById("menu-icon-open");
-  const menuIconClose = document.getElementById("menu-icon-close");
+  const menuToggle = document.getElementById(
+    "mobile-menu-toggle",
+  );
+
+  const mobileMenu =
+    document.getElementById("mobile-menu");
+
+  const menuIconOpen =
+    document.getElementById("menu-icon-open");
+
+  const menuIconClose =
+    document.getElementById("menu-icon-close");
 
   function setMenu(open: boolean) {
-    if (mobileMenu) mobileMenu.hidden = !open;
-    menuToggle?.setAttribute("aria-expanded", String(open));
+    if (mobileMenu) {
+      mobileMenu.hidden = !open;
+    }
+
+    menuToggle?.setAttribute(
+      "aria-expanded",
+      String(open),
+    );
+
     menuIconOpen?.classList.toggle("hidden", open);
     menuIconClose?.classList.toggle("hidden", !open);
-    document.body.classList.toggle("menu-open", open);
+
+    document.body.classList.toggle(
+      "menu-open",
+      open,
+    );
   }
 
   menuToggle?.addEventListener("click", () =>
     setMenu(mobileMenu?.hidden ?? true),
   );
+
   mobileMenu
     ?.querySelectorAll("a")
-    .forEach((link) => link.addEventListener("click", () => setMenu(false)));
+    .forEach((link) =>
+      link.addEventListener("click", () =>
+        setMenu(false),
+      ),
+    );
+
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") setMenu(false);
+    if (event.key === "Escape") {
+      setMenu(false);
+    }
   });
 
-  const siteHeader = document.querySelector<HTMLElement>("[data-site-header]");
-  const updateHeaderState = () =>
-    siteHeader?.classList.toggle("is-scrolled", window.scrollY > 12);
-  window.addEventListener("scroll", updateHeaderState, { passive: true });
+  const siteHeader =
+    document.querySelector<HTMLElement>(
+      "[data-site-header]",
+    );
+
+  /**
+   * 用户点击语言切换按钮时保存语言偏好。
+   *
+   * Cookie 保存一年；
+   * 本地开发使用 HTTP 时不添加 Secure；
+   * 正式 HTTPS 网站自动添加 Secure。
+   */
+  const languageCookieName =
+    siteHeader?.dataset.languageCookie ??
+    "pref-lang";
+
+  document
+    .querySelectorAll<HTMLAnchorElement>(
+      "[data-language-switch]",
+    )
+    .forEach((link) => {
+      link.addEventListener("click", () => {
+        const targetLocale =
+          link.dataset.targetLocale;
+
+        if (
+          targetLocale !== "zh-CN" &&
+          targetLocale !== "en"
+        ) {
+          return;
+        }
+
+        const secureAttribute =
+          window.location.protocol === "https:"
+            ? "; Secure"
+            : "";
+
+        document.cookie =
+          `${encodeURIComponent(languageCookieName)}` +
+          `=${encodeURIComponent(targetLocale)}` +
+          "; Path=/" +
+          "; Max-Age=31536000" +
+          "; SameSite=Lax" +
+          secureAttribute;
+      });
+    });
+
+  const updateHeaderState = () => {
+    siteHeader?.classList.toggle(
+      "is-scrolled",
+      window.scrollY > 12,
+    );
+  };
+
+  window.addEventListener(
+    "scroll",
+    updateHeaderState,
+    { passive: true },
+  );
+
   updateHeaderState();
 </script>
