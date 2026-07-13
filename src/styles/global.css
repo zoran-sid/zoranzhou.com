@@ -2146,7 +2146,8 @@ a:hover {
     grid-template-rows: auto minmax(480px, 62dvh);
     height: auto;
     min-height: 0;
-    overflow: visible;
+    min-width: 0;
+    overflow: hidden;
   }
 
   .journey-sidebar {
