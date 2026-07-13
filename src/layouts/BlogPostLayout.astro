@@ -363,12 +363,13 @@ const jsonld = {
             (a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
           )[0];
         if (!visible) return;
-        tocLinks.forEach((link) =>
-          link.classList.toggle(
-            "active",
-            link.hash === `#${visible.target.id}`,
-          ),
-        );
+        tocLinks.forEach((link) => {
+          const isActive = link.hash === `#${visible.target.id}`;
+          link.classList.toggle("active", isActive);
+          if (isActive) {
+            link.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
+        });
       },
       { rootMargin: "-15% 0px -72% 0px", threshold: [0, 1] },
     );
