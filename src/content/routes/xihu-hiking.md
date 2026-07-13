@@ -1,6 +1,6 @@
 ---
-title: Xihu Hiking
-description: A scenic 15 km hiking route around West Lake (Xihu) in Hangzhou with ~1000 m elevation gain.
+title: "Xihu"
+description: "A scenic 15 km hiking route in Hangzhou with 1000 m elevation gain."
 date: "2025-07-26T00:52:00.000Z"
 tags: ["Hike", "Hangzhou", "Route"]
 lang: en
