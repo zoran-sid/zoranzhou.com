@@ -6,7 +6,7 @@ published: true
 draft: false
 kind: "run"
 lang: en
-location: "HeiFei ShuShan District"
+location: "HeiFei"
 photos: []
 routeId: "route-06d859c3a9cf"
 date: "2026-07-03T10:56:45.000Z"

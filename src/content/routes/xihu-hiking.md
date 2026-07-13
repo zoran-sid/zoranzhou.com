@@ -5,7 +5,7 @@ date: "2025-07-26T00:52:00.000Z"
 tags: ["Hike", "Hangzhou", "Route"]
 lang: en
 kind: hike
-location: Hangzhou, West Lake
+location: Hangzhou
 distance: 15.03
 duration: 18981
 gpx: "/routes/xihu-hiking.gpx"
