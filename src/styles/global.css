@@ -1034,10 +1034,12 @@ a:hover {
 /* Long-form reading */
 .article-shell {
   display: grid;
-  width: min(calc(100% - 2.5rem), 76rem);
+  width: 100%;
+  max-width: 96rem;
   margin-inline: auto;
-  grid-template-columns: minmax(0, 48rem) minmax(13rem, 16rem);
-  gap: clamp(4rem, 7vw, 7rem);
+  padding-inline: clamp(1.25rem, 5vw, 5rem);
+  grid-template-columns: minmax(0, 48rem) 1fr;
+  gap: clamp(2.5rem, 5vw, 5rem);
   align-items: start;
 }
 .article-main {
@@ -1099,6 +1101,8 @@ a:hover {
   max-height: calc(100vh - 9rem);
   overflow: auto;
   scrollbar-width: thin;
+  justify-self: end;
+  max-width: 20rem;
 }
 .article-toc nav {
   padding-left: 1.25rem;
@@ -1129,6 +1133,9 @@ a:hover {
   color: var(--faint);
   font-size: 0.78rem;
   line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition:
     color 0.22s ease,
     transform 0.28s var(--ease-out);
@@ -3800,6 +3807,7 @@ body.menu-open {
   .article-shell {
     display: block;
     width: min(calc(100% - 2.5rem), 48rem);
+    padding-inline: 0;
   }
 }
 
