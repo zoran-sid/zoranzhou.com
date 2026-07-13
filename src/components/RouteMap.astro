@@ -100,16 +100,10 @@ const labels =
       <div>
         <dt><i class="route-dot route-dot--start"></i>{labels.start}</dt>
         <dd data-route-start-name>{start?.name ?? labels.start}</dd>
-        <span data-route-start-coordinates>
-          {start ? `${start.lat.toFixed(5)}, ${start.lng.toFixed(5)}` : "—"}
-        </span>
       </div>
       <div>
         <dt><i class="route-dot route-dot--finish"></i>{labels.finish}</dt>
         <dd data-route-end-name>{end?.name ?? labels.finish}</dd>
-        <span data-route-end-coordinates>
-          {end ? `${end.lat.toFixed(5)}, ${end.lng.toFixed(5)}` : "—"}
-        </span>
       </div>
     </dl>
   </div>
@@ -168,10 +162,7 @@ const labels =
     type RoutePoint,
   } from "../lib/routes/gpx";
   import { processRouteForDisplay } from "../lib/routes/display-geometry";
-  import {
-    endpointMarkerOffsets,
-    resolveRouteEndpoints,
-  } from "../lib/routes/endpoints";
+  import { resolveRouteEndpoints } from "../lib/routes/endpoints";
   import {
     calculateKilometreSplits,
     formatPace,
@@ -206,13 +197,7 @@ const labels =
   ) {
     if (!root || !endpoint) return;
     const name = root.querySelector<HTMLElement>(`[data-route-${kind}-name]`);
-    const coordinate = root.querySelector<HTMLElement>(
-      `[data-route-${kind}-coordinates]`,
-    );
-    if (name) name.textContent = fallbackLabel;
-    if (coordinate) {
-      coordinate.textContent = `${endpoint.lat.toFixed(5)}, ${endpoint.lng.toFixed(5)}`;
-    }
+    if (name) name.textContent = endpoint.name ?? fallbackLabel;
   }
 
   function renderElevation(routeData: ParsedRoute, accent: string) {
@@ -433,7 +418,6 @@ function renderSplits(
         frontmatterEnd,
         routeData.segments,
       );
-      const offsets = endpointMarkerOffsets(start, end);
       setEndpoint("start", start, labels.start ?? "Start");
       setEndpoint("end", end, labels.finish ?? "Finish");
 
@@ -489,7 +473,6 @@ function renderSplits(
           new maplibregl.Marker({
             element: endpointElement("start", labels.start ?? "Start"),
             anchor: "center",
-            offset: offsets.start,
           })
             .setLngLat([start.lng, start.lat])
             .addTo(map),
@@ -500,7 +483,6 @@ function renderSplits(
           new maplibregl.Marker({
             element: endpointElement("finish", labels.finish ?? "Finish"),
             anchor: "center",
-            offset: offsets.end,
           })
             .setLngLat([end.lng, end.lat])
             .addTo(map),
@@ -754,12 +736,6 @@ function renderSplits(
     font-weight: 750;
   }
 
-  .route-endpoints span {
-    color: var(--text-muted);
-    font-family: "JetBrains Mono", monospace;
-    font-size: 0.68rem;
-  }
-
   :global(.route-endpoint) {
     display: grid;
     width: 2.2rem;
@@ -852,11 +828,32 @@ function renderSplits(
   }
 
   .route-splits summary {
+    position: relative;
     padding: 1rem 1.25rem;
     cursor: pointer;
     color: var(--text-color);
     font-size: 0.88rem;
     font-weight: 750;
+    list-style: none;
+    text-align: center;
+  }
+
+  .route-splits summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .route-splits summary::before {
+    position: absolute;
+    top: 50%;
+    left: 1.25rem;
+    content: "\25B8";
+    transform: translateY(-50%);
+    transform-origin: center;
+    transition: transform 0.16s ease;
+  }
+
+  .route-splits[open] summary::before {
+    transform: translateY(-50%) rotate(90deg);
   }
 
   .route-splits__table-wrap {
@@ -870,14 +867,18 @@ function renderSplits(
     width: 100%;
     min-width: 36rem;
     border-collapse: collapse;
+    table-layout: fixed;
     font-size: 0.76rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .route-splits th,
-  .route-splits td {
+  .route-splits :global(td) {
     padding: 0.72rem 1rem;
     border-bottom: 1px solid var(--border-color);
-    text-align: left;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
   }
 
   .route-splits th {
@@ -887,7 +888,7 @@ function renderSplits(
     text-transform: uppercase;
   }
 
-  .route-splits tbody tr:last-child td {
+  .route-splits tbody :global(tr:last-child td) {
     padding-bottom: 1rem;
     border-bottom: 0;
   }

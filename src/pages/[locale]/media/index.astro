@@ -168,14 +168,13 @@ const jsonld = {
         ) : (
           <>
             <div
-              class="media-header hidden rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400 md:grid"
-              style="grid-template-columns: 80px minmax(0, 1fr) 72px 90px 104px"
+              class="media-desktop-grid media-header hidden rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400 md:grid"
             >
-              <span class="px-4 py-3">{t.mediaType}</span>
+              <span class="px-4 py-3 text-center">{t.mediaType}</span>
               <span class="px-4 py-3">{t.mediaName}</span>
               <span class="px-4 py-3 text-center">{t.mediaYear}</span>
               <span class="px-4 py-3 text-center">{t.mediaRating}</span>
-              <span class="px-4 py-3 text-right">{t.mediaStatus}</span>
+              <span class="px-4 py-3 text-center">{t.mediaStatus}</span>
             </div>
 
             <div class="media-list divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
@@ -185,17 +184,15 @@ const jsonld = {
                   class="media-row group transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-900/50"
                 >
                   <div
-                    class="hidden items-center text-sm md:grid"
-                    style="grid-template-columns: 80px minmax(0, 1fr) 72px 90px 104px"
+                    class="media-desktop-grid hidden items-center text-sm md:grid"
                   >
                     <span
-                      class="inline-flex items-center gap-2 px-4 py-4 text-xs font-medium text-gray-500 dark:text-gray-400"
-                      style="min-width:0"
+                      class="media-type inline-flex min-w-0 items-center justify-center gap-2 px-4 py-4 text-xs font-medium text-gray-500 dark:text-gray-400"
                     >
                       <span
                         class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}
                       />
-                      <span class="truncate">
+                      <span class="whitespace-nowrap">
                         {categoryLabelMap[item.category]}
                       </span>
                     </span>
@@ -216,7 +213,7 @@ const jsonld = {
                     >
                       {item.rating > 0 ? renderRating(item.rating) : "-"}
                     </span>
-                    <span class="px-4 py-4 text-right">
+                    <span class="flex items-center justify-center px-4 py-4">
                       <span class="media-status-chip inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                         {statusLabelMap[item.status] ?? item.status}
                       </span>
@@ -279,6 +276,11 @@ const jsonld = {
   .media-row {
     container-type: inline-size;
   }
+  .media-desktop-grid {
+    grid-template-columns:
+      8rem minmax(0, 1fr) 5rem 7.5rem
+      9rem;
+  }
   .media-year,
   .media-status-chip {
     max-width: none;
@@ -288,8 +290,8 @@ const jsonld = {
   }
   /* Desktop: ensure grid children don't overflow */
   @media (min-width: 768px) {
-    .media-row [style*="min-width:0"] {
-      min-width: 0 !important;
+    .media-row .media-type {
+      min-width: 0;
     }
   }
   /* Mobile: name clamping */

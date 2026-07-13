@@ -1,9 +1,20 @@
 // ── Site Identity (non-translatable) ──
 export const SITE = {
+  title: "Zoran Zhou",
   url: "https://zoranzhou.com",
   author: "Zoran Zhou",
   since: 2024,
 } as const;
+
+// Retained for the legacy Header component. The active Navigation component
+// supplies localized labels and paths at render time.
+export const NAV_ITEMS = [
+  { href: "/blog", label: "Blog" },
+  { href: "/research", label: "Research" },
+  { href: "/projects", label: "Projects" },
+  { href: "/media", label: "Media" },
+  { href: "/essays", label: "Essays" },
+] as const;
 
 // ── Social ──
 export const SOCIAL_LINKS = [

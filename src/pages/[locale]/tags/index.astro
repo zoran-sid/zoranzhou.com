@@ -20,7 +20,6 @@ const allContent = [
   ...(await getCollection("essays", ({ data }) => !data.draft)),
   ...(await getCollection("research", ({ data }) => !data.draft)),
   ...(await getCollection("projects", ({ data }) => !data.draft)),
-  ...(await getCollection("tools", ({ data }) => !data.draft)),
   ...(await getCollection("photos", ({ data }) => !data.draft)),
   ...(await getCollection("routes", ({ data }) => !data.draft && data.published !== false)),
 ];

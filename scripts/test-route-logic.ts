@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { processRouteForDisplay } from "../src/lib/routes/display-geometry";
-import { endpointMarkerOffsets } from "../src/lib/routes/endpoints";
+import { resolveRouteEndpoints } from "../src/lib/routes/endpoints";
 import {
   parseGpx,
   type ParsedRoute,
@@ -110,14 +110,24 @@ console.log(
   "PASS supported namespaced cadence is parsed and missing cadence is not fabricated",
 );
 
+const nearbyStart = { lat: 31.851008, lng: 117.176344, name: "Start" };
+const nearbyEnd = { lat: 31.851197, lng: 117.176441, name: "Finish" };
 assert.deepEqual(
-  endpointMarkerOffsets(
-    { lat: 31.851008, lng: 117.176344 },
-    { lat: 31.851197, lng: 117.176441 },
-  ),
-  { start: [0, -30], end: [0, 30] },
+  resolveRouteEndpoints(nearbyStart, nearbyEnd, [[nearbyStart, nearbyEnd]]),
+  { start: nearbyStart, end: nearbyEnd },
+  "nearby endpoints must retain their exact source coordinates",
 );
-console.log("PASS nearby start and finish markers receive visible offsets");
+
+const endpointMapSources = [
+  readFileSync("src/components/RouteMap.astro", "utf8"),
+  readFileSync("src/components/MapExplorer.astro", "utf8"),
+].join("\n");
+assert.doesNotMatch(
+  endpointMapSources,
+  /endpointMarkerOffsets|offset:\s*offsets\.(?:start|end)/,
+  "map markers must not receive artificial offsets",
+);
+console.log("PASS nearby start and finish markers retain their true positions");
 
 const globalCss = readFileSync("src/styles/global.css", "utf8");
 assert.match(

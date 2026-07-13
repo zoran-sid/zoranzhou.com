@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>本地内容管理台</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">Z</span>
+        <div>
+          <p class="eyebrow">ZORAN ZHOU · 仅限本机</p>
+          <h1>内容管理台</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="save-state" class="status-pill">尚未选择文章</span>
+        <button id="assets-button" type="button" class="button secondary">
+          素材库
+        </button>
+        <button id="git-button" type="button" class="button secondary">
+          Git / 检查
+        </button>
+        <button id="settings-button" type="button" class="button secondary">
+          设置
+        </button>
+        <button id="explorer-button" type="button" class="button secondary">
+          在资源管理器打开
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="sidebar panel">
+        <div class="sidebar-toolbar">
+          <label>
+            <span>内容类型</span>
+            <select id="collection" aria-label="内容类型"></select>
+          </label>
+          <button id="new-button" type="button" class="button primary">
+            新建
+          </button>
+        </div>
+        <label class="search-field">
+          <span class="sr-only">搜索文章</span>
+          <input
+            id="search"
+            type="search"
+            placeholder="搜索标题、文件名或标签…"
+            autocomplete="off"
+          />
+        </label>
+        <div id="entry-count" class="entry-count">正在读取…</div>
+        <div id="entry-list" class="entry-list" aria-live="polite"></div>
+      </aside>
+
+      <section class="editor panel">
+        <div id="empty-state" class="empty-state">
+          <div class="empty-icon" aria-hidden="true">✎</div>
+          <h2>从左侧选择文章，或点击“新建”</h2>
+          <p>所有内容直接保存在当前仓库，不会自动发布、提交或上传。</p>
+        </div>
+
+        <form id="editor-form" hidden>
+          <div class="editor-heading">
+            <div class="title-input-wrap">
+              <label for="field-title" class="sr-only">标题</label>
+              <input
+                id="field-title"
+                name="title"
+                class="title-input"
+                placeholder="文章标题"
+                required
+              />
+              <p id="editing-label" class="file-label">新文章</p>
+            </div>
+            <div class="toolbar-actions">
+              <button id="delete-button" type="button" class="button danger">
+                删除
+              </button>
+              <button
+                id="save-button"
+                type="submit"
+                class="button primary large"
+              >
+                保存文章
+              </button>
+            </div>
+          </div>
+
+          <div id="message" class="message" hidden role="status"></div>
+
+          <details class="metadata" open>
+            <summary>
+              <span>文章信息</span>
+              <small>日期、语言、标签和文件名</small>
+            </summary>
+            <fieldset class="field-grid">
+              <legend class="sr-only">文章信息</legend>
+              <label>
+                <span>发布日期 <b aria-hidden="true">*</b></span>
+                <input id="field-date" name="date" type="date" required />
+              </label>
+              <label>
+                <span>语言 <b aria-hidden="true">*</b></span>
+                <select id="field-lang" name="lang" required>
+                  <option value="zh-CN">简体中文</option>
+                  <option value="en">English</option>
+                </select>
+              </label>
+              <label class="span-2">
+                <span>摘要</span>
+                <textarea
+                  id="field-description"
+                  name="description"
+                  rows="2"
+                  placeholder="用一两句话介绍这篇内容"
+                ></textarea>
+              </label>
+              <label>
+                <span>作者</span>
+                <input id="field-author" name="author" placeholder="Zoran" />
+              </label>
+              <label>
+                <span>多语言关联键</span>
+                <input
+                  id="field-translationKey"
+                  name="translationKey"
+                  placeholder="中英文文章填写相同值"
+                />
+              </label>
+              <label>
+                <span>自定义 URL slug</span>
+                <input
+                  id="field-slug"
+                  name="slug"
+                  pattern="[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*"
+                  placeholder="可留空"
+                />
+              </label>
+              <label>
+                <span>标签 <small>（用逗号分隔）</small></span>
+                <input id="field-tags" name="tags" placeholder="技术, 随笔" />
+              </label>
+              <label class="span-2">
+                <span>文件名 <b aria-hidden="true">*</b></span>
+                <div class="filename-row">
+                  <input
+                    id="field-filename"
+                    name="filename"
+                    required
+                    pattern='[^&lt;&gt;:"/\\|?*]+\.(?:md|mdx)'
+                  />
+                  <button
+                    id="suggest-filename"
+                    type="button"
+                    class="button secondary"
+                  >
+                    根据标题生成
+                  </button>
+                </div>
+                <small
+                  >修改文件名即重命名；英文版本建议使用
+                  <code>.en.md</code>。</small
+                >
+              </label>
+              <div class="checkbox-row span-2">
+                <label class="checkbox">
+                  <input id="field-draft" name="draft" type="checkbox" />
+                  保存为草稿
+                </label>
+                <label class="checkbox">
+                  <input id="field-featured" name="featured" type="checkbox" />
+                  设为精选
+                </label>
+              </div>
+            </fieldset>
+          </details>
+
+          <section class="writing-card" aria-label="正文编辑器">
+            <div
+              class="format-toolbar"
+              role="toolbar"
+              aria-label="Markdown 格式工具栏"
+            >
+              <select
+                id="heading-select"
+                aria-label="标题级别"
+                title="标题级别"
+              >
+                <option value="" disabled>段落样式</option>
+                <option value="p">正文</option>
+                <option value="# ">一级标题</option>
+                <option value="## ">二级标题</option>
+                <option value="### ">三级标题</option>
+              </select>
+              <span class="toolbar-divider" aria-hidden="true"></span>
+              <button type="button" data-format="bold" title="粗体 (Ctrl+B)">
+                <b>B</b>
+              </button>
+              <button type="button" data-format="italic" title="斜体 (Ctrl+I)">
+                <i>I</i>
+              </button>
+              <button type="button" data-format="strike" title="删除线">
+                <s>S</s>
+              </button>
+              <button type="button" data-format="quote" title="引用">❝</button>
+              <button type="button" data-format="code" title="行内代码">
+                &lt;/&gt;
+              </button>
+              <span class="toolbar-divider" aria-hidden="true"></span>
+              <button type="button" data-format="bullet" title="无序列表">
+                • 列表
+              </button>
+              <button type="button" data-format="number" title="有序列表">
+                1. 列表
+              </button>
+              <button type="button" data-format="link" title="插入链接">
+                🔗 链接
+              </button>
+              <button type="button" data-format="table" title="插入表格">
+                ▦ 表格
+              </button>
+              <span class="toolbar-spacer"></span>
+              <button
+                id="image-button"
+                type="button"
+                class="asset-action"
+                title="选择图片并通过 PicGo 上传"
+              >
+                图片
+              </button>
+              <button
+                id="gpx-button"
+                type="button"
+                class="asset-action"
+                title="选择并导入 GPX 文件"
+              >
+                GPX
+              </button>
+            </div>
+
+            <div class="view-toolbar" role="tablist" aria-label="编辑模式">
+              <button
+                id="write-tab"
+                type="button"
+                class="tab active"
+                role="tab"
+              >
+                可视化
+              </button>
+              <button id="split-tab" type="button" class="tab" role="tab">
+                源码 / MDX
+              </button>
+              <button id="preview-tab" type="button" class="tab" role="tab">
+                阅读预览
+              </button>
+              <span id="word-count" class="word-count">0 字</span>
+            </div>
+
+            <div id="writing-panes" class="writing-panes visual">
+              <div id="body-pane" class="body-pane">
+                <div
+                  id="visual-warning"
+                  class="visual-warning"
+                  role="status"
+                  hidden
+                >
+                  <strong>已保护高级 Markdown / MDX</strong>
+                  <span id="visual-warning-text"
+                    >此正文包含可视化编辑器无法安全往返的语法，请使用源码模式编辑。</span
+                  >
+                </div>
+                <div
+                  id="visual-editor"
+                  class="visual-editor"
+                  contenteditable="true"
+                  role="textbox"
+                  aria-multiline="true"
+                  aria-label="可视化正文编辑器"
+                  data-placeholder="从这里开始写作……"
+                  spellcheck="true"
+                ></div>
+                <label for="body" class="sr-only">Markdown 或 MDX 正文</label>
+                <textarea
+                  id="body"
+                  class="body-editor"
+                  spellcheck="true"
+                  placeholder="在这里直接编辑 Markdown / MDX 源码。复杂组件和未知语法会原样保存。"
+                ></textarea>
+                <div id="drop-hint" class="drop-hint" hidden>
+                  松开即可通过 PicGo 上传图片
+                </div>
+              </div>
+              <article id="preview" class="preview" aria-label="实时预览">
+                <p class="preview-placeholder">预览会显示在这里。</p>
+              </article>
+            </div>
+          </section>
+
+          <details class="advanced">
+            <summary>高级 frontmatter（通常无需修改）</summary>
+            <p>未显示在表单中的自定义字段会原样保留；保存时以上表单值优先。</p>
+            <textarea
+              id="frontmatter"
+              rows="12"
+              spellcheck="false"
+              aria-label="不含分隔线的原始 frontmatter"
+            ></textarea>
+          </details>
+        </form>
+      </section>
+    </main>
+
+    <input
+      id="image-input"
+      type="file"
+      accept="image/png,image/jpeg,image/gif,image/webp,image/avif,image/bmp"
+      hidden
+    />
+    <input
+      id="gpx-input"
+      type="file"
+      accept=".gpx,application/gpx+xml,application/xml,text/xml"
+      hidden
+    />
+
+    <dialog id="utility-dialog">
+      <div class="dialog-card">
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow">仓库工具</p>
+            <h2 id="dialog-title">Git 状态</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button dialog-close"
+            aria-label="关闭"
+          >
+            ×
+          </button>
+        </div>
+        <div id="dialog-actions" class="dialog-actions">
+          <button id="check-button" type="button" class="button secondary">
+            快速检查
+          </button>
+          <button id="build-button" type="button" class="button secondary">
+            部署前构建（较慢）
+          </button>
+        </div>
+        <p class="task-explanation">
+          “快速检查”验证 Astro 内容和类型；“部署前构建”生成 Cloudflare 使用的
+          <code>dist/</code>，日常编辑不必每次运行。GPX
+          转路线内容请使用“素材库”。
+        </p>
+        <pre id="dialog-output" aria-live="polite">正在读取…</pre>
+      </div>
+    </dialog>
+
+    <dialog id="settings-dialog">
+      <form id="settings-form" class="dialog-card">
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow">本机设置</p>
+            <h2>PicGo 图片上传</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button dialog-close"
+            aria-label="关闭"
+          >
+            ×
+          </button>
+        </div>
+        <p class="dialog-copy">
+          只需填写本机
+          <code>PicGo.exe</code> 的完整路径。设置仅保存在本地且不会提交到 Git。
+        </p>
+        <label>
+          <span>PicGo 安装路径</span>
+          <input
+            id="picgo-path"
+            type="text"
+            placeholder="C:\\Program Files\\PicGo\\PicGo.exe"
+            autocomplete="off"
+          />
+        </label>
+        <p id="settings-status" class="inline-status"></p>
+        <div class="dialog-footer">
+          <button type="button" class="button secondary dialog-close">
+            取消
+          </button>
+          <button id="settings-save" type="submit" class="button primary">
+            保存设置
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="assets-dialog">
+      <div class="dialog-card assets-card">
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow">本地素材</p>
+            <h2>图片与 GPX 管理</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button dialog-close"
+            aria-label="关闭"
+          >
+            ×
+          </button>
+        </div>
+        <section class="asset-section">
+          <div class="section-heading">
+            <div>
+              <h3>图片</h3>
+              <p id="picgo-summary">正在读取 PicGo 设置…</p>
+            </div>
+            <button
+              id="asset-image-button"
+              type="button"
+              class="button primary"
+            >
+              上传并插入图片
+            </button>
+          </div>
+        </section>
+        <section class="asset-section">
+          <div class="section-heading">
+            <div>
+              <h3>GPX 路线文件</h3>
+              <p>
+                文件保存在
+                <code>public/routes/</code
+                >；可插入文章、生成网站路线内容或安全删除。
+              </p>
+            </div>
+            <div class="dialog-actions compact">
+              <label class="compact-select">
+                <span>路线语言</span>
+                <select id="route-language">
+                  <option value="zh-CN">中文</option>
+                  <option value="en">English</option>
+                </select>
+              </label>
+              <button
+                id="gpx-explorer-button"
+                type="button"
+                class="button secondary"
+              >
+                打开目录
+              </button>
+              <button
+                id="asset-gpx-button"
+                type="button"
+                class="button primary"
+              >
+                导入 GPX
+              </button>
+            </div>
+          </div>
+          <div id="gpx-list" class="asset-list" aria-live="polite"></div>
+        </section>
+      </div>
+    </dialog>
+
+    <div
+      id="toast-region"
+      class="toast-region"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+    <script type="module" src="/editor.js"></script>
+  </body>
+</html>

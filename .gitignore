@@ -4,9 +4,3 @@ dist/
 .env
 .DS_Store
 *.log
-
-# Media enrichment cache (auto-generated during build)
-.cache/
-
-# Downloaded media posters (auto-generated during build)
-public/media/posters/

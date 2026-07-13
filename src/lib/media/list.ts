@@ -89,12 +89,28 @@ function normalizeStatus(raw: string): MediaStatus {
 }
 
 function splitTableRow(line: string) {
-  return line
-    .trim()
-    .replace(/^\|/, "")
-    .replace(/\|$/, "")
-    .split("|")
-    .map(normalizeCell);
+  const source = line.trim().replace(/^\|/, "").replace(/\|$/, "");
+  const cells: string[] = [];
+  let cell = "";
+  let escaped = false;
+
+  for (const character of source) {
+    if (escaped) {
+      cell += character;
+      escaped = false;
+    } else if (character === "\\") {
+      escaped = true;
+    } else if (character === "|") {
+      cells.push(normalizeCell(cell));
+      cell = "";
+    } else {
+      cell += character;
+    }
+  }
+
+  if (escaped) cell += "\\";
+  cells.push(normalizeCell(cell));
+  return cells;
 }
 
 function isDividerRow(cells: string[]) {

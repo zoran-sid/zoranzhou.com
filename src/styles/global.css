@@ -1990,9 +1990,10 @@ a:hover {
 .journey-endpoint-marker {
   /* MapLibre positions the custom marker element with an inline transform. */
   position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
   white-space: nowrap;
   pointer-events: none;
   filter: drop-shadow(0 7px 14px rgb(0 0 0 / 0.28));
@@ -2016,6 +2017,9 @@ a:hover {
 }
 
 .journey-endpoint-marker span {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 0.35rem);
   display: inline-flex;
   min-height: 1.65rem;
   padding: 0.3rem 0.55rem;
@@ -2027,6 +2031,7 @@ a:hover {
   font-size: 0.68rem;
   font-weight: 720;
   line-height: 1;
+  transform: translateY(-50%);
   backdrop-filter: blur(10px);
 }
 
@@ -2050,7 +2055,12 @@ a:hover {
 }
 
 .journey-endpoint-marker--end {
-  flex-direction: row-reverse;
+  z-index: 1;
+}
+
+.journey-endpoint-marker--end span {
+  right: calc(100% + 0.35rem);
+  left: auto;
 }
 
 @media (max-width: 640px) {

@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import { PAGINATION } from "../../../lib/constants";
 import {
   getTranslations,
@@ -70,7 +70,7 @@ const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
         <p class="text-gray-400">{t.researchPageEmpty}</p>
       ) : (
         <div class="system-index__list divide-y divide-gray-100 dark:divide-gray-800">
-          {page.data.map((entry) => (
+          {page.data.map((entry: CollectionEntry<"research">) => (
             <a
               href={localizePath(`/research/${entry.slug}`, locale)}
               class="system-index__item group flex flex-col gap-3 py-6 no-underline transition-colors sm:flex-row sm:items-baseline sm:gap-8"
@@ -109,7 +109,7 @@ const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
                 )}
                 {entry.data.tags.length > 0 && (
                   <div class="mt-2 flex flex-wrap gap-1.5">
-                    {entry.data.tags.slice(0, 4).map((tag) => (
+                    {entry.data.tags.slice(0, 4).map((tag: string) => (
                       <span class="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
                         {tag}
                       </span>

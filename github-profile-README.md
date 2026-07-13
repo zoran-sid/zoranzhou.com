@@ -60,7 +60,6 @@ I build resilient, secure network architectures and explore the boundary between
 | [NetGuard](https://zoranzhou.com/projects/netguard) | Network traffic analysis & monitoring tool |
 | [Cloudflare Zero Trust](https://zoranzhou.com/research/cloudflare-zero-trust) | Zero Trust architecture research & deployment |
 | [OpenClaw Guide](https://zoranzhou.com/blog/openclaw-complete-guide) | Complete operational guide & best practices |
-| [Wireshark Tooling](https://zoranzhou.com/tools/wireshark) | Packet analysis workflows & custom profiles |
 
 ---
 

@@ -289,7 +289,6 @@ const initialItem =
   import { parseRouteDocument } from "../lib/routes/gpx";
 
   import { processRouteForDisplay } from "../lib/routes/display-geometry";
-  import { endpointMarkerOffsets } from "../lib/routes/endpoints";
 
   type Point = {
     lat: number;
@@ -576,16 +575,12 @@ const initialItem =
         return 0;
       }
 
-      const offsets = endpointMarkerOffsets(start, end);
-
       if (start) {
         endpointMarkers.push(
           new maplibregl.Marker({
             element: endpointElement("start", startLabel),
 
             anchor: "center",
-
-            offset: offsets.start,
           })
             .setLngLat([start.lng, start.lat])
             .addTo(map),
@@ -598,8 +593,6 @@ const initialItem =
             element: endpointElement("end", endLabel),
 
             anchor: "center",
-
-            offset: offsets.end,
           })
             .setLngLat([end.lng, end.lat])
             .addTo(map),

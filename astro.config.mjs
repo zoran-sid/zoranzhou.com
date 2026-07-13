@@ -73,12 +73,12 @@ export default defineConfig({
           changefreq = "daily";
         }
         // Individual articles
-        else if (path.match(/^\/(zh-CN|en)\/(blog|essays|research|projects|tools)\/.+/)) {
+        else if (path.match(/^\/(zh-CN|en)\/(blog|essays|research|projects)\/.+/)) {
           priority = 0.6;
           changefreq = "monthly";
         }
-        // Tags, projects, tools listing
-        else if (path.match(/^\/(zh-CN|en)\/(tags|projects|tools)\/?$/)) {
+        // Tags and projects listing
+        else if (path.match(/^\/(zh-CN|en)\/(tags|projects)\/?$/)) {
           priority = 0.5;
           changefreq = "weekly";
         }
