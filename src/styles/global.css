@@ -1665,6 +1665,10 @@ a:hover {
   scrollbar-gutter: stable;
 }
 
+.journey-switcher {
+  display: none;
+}
+
 .journey-card {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr);
@@ -2175,24 +2179,86 @@ a:hover {
   }
 
   .journey-sidebar {
+    grid-template-rows: auto auto auto;
     min-height: 0;
   }
 
   .journey-list {
-    display: grid;
-    grid-auto-columns: minmax(16rem, 38vw);
-    grid-auto-flow: column;
+    display: block;
     max-height: none;
-    padding-bottom: 12px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-padding-inline: 10px;
-    scroll-snap-type: x proximity;
+    padding-bottom: 8px;
+    overflow: visible;
   }
 
   .journey-card {
+    display: none;
     min-height: 5.75rem;
-    scroll-snap-align: start;
+  }
+
+  .journey-card.active:not([hidden]),
+  .journey-card[aria-pressed="true"]:not([hidden]) {
+    display: grid;
+    animation: journey-card-switch-next 0.28s var(--ease-out) both;
+  }
+
+  .journey-explorer[data-switch-direction="previous"]
+    .journey-card.active:not([hidden]) {
+    animation-name: journey-card-switch-previous;
+  }
+
+  .journey-switcher {
+    display: flex;
+    padding: 0 10px 12px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .journey-switcher__button {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    place-items: center;
+    border: 1px solid var(--je-border);
+    border-radius: 50%;
+    background: var(--je-card);
+    color: var(--je-text);
+    font: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+      border-color 0.16s ease,
+      transform 0.16s ease;
+  }
+
+  .journey-switcher__button:hover:not(:disabled) {
+    border-color: rgb(37 201 149 / 0.48);
+    transform: translateY(-1px);
+  }
+
+  .journey-switcher__button:focus-visible {
+    outline: 3px solid rgb(37 201 149 / 0.32);
+    outline-offset: 2px;
+  }
+
+  .journey-switcher__button:disabled {
+    cursor: default;
+    opacity: 0.35;
+  }
+
+  .journey-switcher__position {
+    min-width: 4.5rem;
+    color: var(--je-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  .journey-switcher__position strong {
+    color: var(--je-text);
+    font-size: 0.82rem;
   }
 
   .journey-detail {
@@ -2266,10 +2332,6 @@ a:hover {
     min-height: 0;
   }
 
-  .journey-list {
-    grid-auto-columns: min(82vw, 20rem);
-  }
-
   .journey-card {
     padding: 13px;
   }
@@ -2299,6 +2361,33 @@ a:hover {
   .journey-filter,
   .journey-detail__link {
     transition: none;
+  }
+
+  .journey-card.active:not([hidden]),
+  .journey-card[aria-pressed="true"]:not([hidden]) {
+    animation: none;
+  }
+}
+
+@keyframes journey-card-switch-next {
+  from {
+    opacity: 0;
+    transform: translateX(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes journey-card-switch-previous {
+  from {
+    opacity: 0;
+    transform: translateX(-0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

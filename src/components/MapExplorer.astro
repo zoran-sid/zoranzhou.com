@@ -172,6 +172,32 @@ const initialItem =
           ))
         }
       </div>
+
+      <div class="journey-switcher" data-map-switcher>
+        <button
+          type="button"
+          class="journey-switcher__button"
+          data-map-previous
+          aria-label={locale === "zh-CN" ? "上一段足迹" : "Previous journey"}
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <output class="journey-switcher__position" aria-live="polite">
+          <strong data-map-position>01</strong>
+          <span aria-hidden="true">/</span>
+          <span data-map-total>{String(items.length).padStart(2, "0")}</span>
+        </output>
+
+        <button
+          type="button"
+          class="journey-switcher__button"
+          data-map-next
+          aria-label={locale === "zh-CN" ? "下一段足迹" : "Next journey"}
+        >
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </aside>
 
     <section class="journey-detail" aria-live="polite">
@@ -775,6 +801,55 @@ const initialItem =
 
           button.setAttribute("aria-pressed", String(active));
         });
+
+      updateJourneySwitcher();
+    }
+
+    function selectableJourneyButtons() {
+      return [
+        ...root.querySelectorAll<HTMLButtonElement>("[data-map-item]"),
+      ].filter((button) => !button.hidden && !button.disabled);
+    }
+
+    function updateJourneySwitcher() {
+      const buttons = selectableJourneyButtons();
+      const currentIndex = buttons.findIndex(
+        (button) => button.dataset.mapItem === selectedSlug,
+      );
+      const position = root.querySelector<HTMLElement>("[data-map-position]");
+      const total = root.querySelector<HTMLElement>("[data-map-total]");
+      const previous = root.querySelector<HTMLButtonElement>(
+        "[data-map-previous]",
+      );
+      const next = root.querySelector<HTMLButtonElement>("[data-map-next]");
+
+      if (position) {
+        position.textContent = String(Math.max(0, currentIndex + 1)).padStart(
+          2,
+          "0",
+        );
+      }
+      if (total) total.textContent = String(buttons.length).padStart(2, "0");
+      if (previous) previous.disabled = buttons.length < 2;
+      if (next) next.disabled = buttons.length < 2;
+    }
+
+    function switchJourney(direction: -1 | 1) {
+      const buttons = selectableJourneyButtons();
+      if (buttons.length < 2) return;
+
+      const currentIndex = buttons.findIndex(
+        (button) => button.dataset.mapItem === selectedSlug,
+      );
+      const targetIndex =
+        (Math.max(0, currentIndex) + direction + buttons.length) %
+        buttons.length;
+      const targetSlug = buttons[targetIndex]?.dataset.mapItem;
+      const item = items.find((entry) => entry.slug === targetSlug);
+      if (!item) return;
+
+      root.dataset.switchDirection = direction > 0 ? "next" : "previous";
+      void showJourney(item);
     }
 
     async function showJourney(item: Journey) {
@@ -880,6 +955,8 @@ const initialItem =
           removeCurrentRoute();
         }
       });
+
+      updateJourneySwitcher();
     }
 
     const initialJourney =
@@ -1060,6 +1137,14 @@ const initialItem =
           applyFilter(button.dataset.mapFilter ?? "all");
         });
       });
+
+    root
+      .querySelector<HTMLButtonElement>("[data-map-previous]")
+      ?.addEventListener("click", () => switchJourney(-1));
+
+    root
+      .querySelector<HTMLButtonElement>("[data-map-next]")
+      ?.addEventListener("click", () => switchJourney(1));
 
     const handlePopState = () => {
       const parameters = new URLSearchParams(window.location.search);
