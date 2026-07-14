@@ -96,16 +96,6 @@ const labels =
       <p class="route-map-error" data-route-error hidden>{labels.loadError}</p>
     </div>
 
-    <dl class="route-endpoints">
-      <div>
-        <dt><i class="route-dot route-dot--start"></i>{labels.start}</dt>
-        <dd data-route-start-name>{start?.name ?? labels.start}</dd>
-      </div>
-      <div>
-        <dt><i class="route-dot route-dot--finish"></i>{labels.finish}</dt>
-        <dd data-route-end-name>{end?.name ?? labels.finish}</dd>
-      </div>
-    </dl>
   </div>
 
   <section class="elevation-card" data-elevation-card hidden>
@@ -133,24 +123,24 @@ const labels =
   </p>
 
   <details class="route-splits" data-route-splits open hidden>
-  <summary>{labels.splits}</summary>
+    <summary>{labels.splits}</summary>
 
-  <div class="route-splits__table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>{labels.kilometre}</th>
-          <th>{labels.splitDistance}</th>
-          <th>{labels.totalDuration}</th>
-          <th>{labels.pace}</th>
-          <th data-cadence-heading>{labels.cadence}</th>
-        </tr>
-      </thead>
+    <div class="route-splits__table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>{labels.kilometre}</th>
+            <th>{labels.splitDistance}</th>
+            <th>{labels.totalDuration}</th>
+            <th>{labels.pace}</th>
+            <th data-cadence-heading>{labels.cadence}</th>
+          </tr>
+        </thead>
 
-      <tbody data-route-splits-body></tbody>
-    </table>
-  </div>
-</details>
+        <tbody data-route-splits-body></tbody>
+      </table>
+    </div>
+  </details>
 </section>
 
 <script>
@@ -158,7 +148,6 @@ const labels =
   import {
     parseRouteDocument,
     type ParsedRoute,
-    type RouteEndpoint,
     type RoutePoint,
   } from "../lib/routes/gpx";
   import { processRouteForDisplay } from "../lib/routes/display-geometry";
@@ -188,16 +177,6 @@ const labels =
     element.setAttribute("aria-label", label);
     element.textContent = kind === "start" ? "S" : "F";
     return element;
-  }
-
-  function setEndpoint(
-    kind: "start" | "end",
-    endpoint: RouteEndpoint | Coordinate | undefined,
-    fallbackLabel: string,
-  ) {
-    if (!root || !endpoint) return;
-    const name = root.querySelector<HTMLElement>(`[data-route-${kind}-name]`);
-    if (name) name.textContent = endpoint.name ?? fallbackLabel;
   }
 
   function renderElevation(routeData: ParsedRoute, accent: string) {
@@ -284,76 +263,79 @@ const labels =
     empty.hidden = true;
   }
 
-function renderSplits(
-  routeData: ParsedRoute,
-  labels: Record<string, string>,
-) {
-  if (!root) return;
+  function renderSplits(
+    routeData: ParsedRoute,
+    labels: Record<string, string>,
+  ) {
+    if (!root) return;
 
-  const section = root.querySelector<HTMLDetailsElement>(
-    "[data-route-splits]",
-  );
+    const section = root.querySelector<HTMLDetailsElement>(
+      "[data-route-splits]",
+    );
 
-  const body = root.querySelector<HTMLTableSectionElement>(
-    "[data-route-splits-body]",
-  );
+    const body = root.querySelector<HTMLTableSectionElement>(
+      "[data-route-splits-body]",
+    );
 
-  const cadenceHeading = root.querySelector<HTMLElement>(
-    "[data-cadence-heading]",
-  );
+    const cadenceHeading = root.querySelector<HTMLElement>(
+      "[data-cadence-heading]",
+    );
 
-  if (!section || !body || !cadenceHeading) return;
+    if (!section || !body || !cadenceHeading) return;
 
-  const splits = calculateKilometreSplits(routeData);
+    const splits = calculateKilometreSplits(routeData);
 
-  if (splits.length === 0) return;
+    if (splits.length === 0) return;
 
-  const hasCadence = splits.some(
-    (split) => split.averageCadence != null,
-  );
+    const hasCadence = splits.some((split) => split.averageCadence != null);
 
-  cadenceHeading.hidden = !hasCadence;
+    const valueLabels = [
+      labels.kilometre,
+      labels.splitDistance,
+      labels.totalDuration,
+      labels.pace,
+      labels.cadence,
+    ];
 
-  let totalDurationSeconds = 0;
+    cadenceHeading.hidden = !hasCadence;
 
-  body.replaceChildren(
-    ...splits.map((split) => {
-      totalDurationSeconds += split.durationSeconds;
+    let totalDurationSeconds = 0;
 
-      const row = document.createElement("tr");
+    body.replaceChildren(
+      ...splits.map((split) => {
+        totalDurationSeconds += split.durationSeconds;
 
-      const values = [
-        `${split.kilometre}${
-          split.partial ? ` (${labels.partial})` : ""
-        }`,
-        `${(split.distanceMeters / 1_000).toFixed(
-          split.partial ? 2 : 1,
-        )} km`,
-        formatSplitDuration(totalDurationSeconds),
-        `${formatPace(split.paceSecondsPerKm)} ${labels.paceUnit}`,
-        split.averageCadence == null
-          ? "—"
-          : `${Math.round(split.averageCadence)} spm`,
-      ];
+        const row = document.createElement("tr");
 
-      values.forEach((value, index) => {
-        const cell = document.createElement("td");
+        const values = [
+          `${split.kilometre}${split.partial ? ` (${labels.partial})` : ""}`,
+          `${(split.distanceMeters / 1_000).toFixed(split.partial ? 2 : 1)} km`,
+          formatSplitDuration(totalDurationSeconds),
+          `${formatPace(split.paceSecondsPerKm)} ${labels.paceUnit}`,
+          split.averageCadence == null
+            ? "—"
+            : `${Math.round(split.averageCadence)} spm`,
+        ];
 
-        cell.textContent = value;
+        values.forEach((value, index) => {
+          const cell = document.createElement("td");
 
-        if (index === 4) {
-          cell.hidden = !hasCadence;
-        }
+          cell.textContent = value;
+          cell.dataset.label = valueLabels[index] ?? "";
 
-        row.append(cell);
-      });
+          if (index === 4) {
+            cell.hidden = !hasCadence;
+          }
 
-      return row;
-    }),
-  );
+          row.append(cell);
+        });
 
-  section.hidden = false;
-}
+        return row;
+      }),
+    );
+
+    section.hidden = false;
+  }
 
   if (root) {
     const gpx = root.dataset.gpx;
@@ -418,8 +400,6 @@ function renderSplits(
         frontmatterEnd,
         routeData.segments,
       );
-      setEndpoint("start", start, labels.start ?? "Start");
-      setEndpoint("end", end, labels.finish ?? "Finish");
 
       if (displaySegments.length > 0) {
         const geometry =
@@ -662,8 +642,7 @@ function renderSplits(
     font-weight: 700;
   }
 
-  .route-map-legend span,
-  .route-endpoints dt {
+  .route-map-legend span {
     display: inline-flex;
     align-items: center;
     gap: 0.38rem;
@@ -706,30 +685,12 @@ function renderSplits(
     font-size: 0.82rem;
   }
 
-  .route-endpoints {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 0;
-  }
-
-  .route-endpoints > div {
-    display: grid;
-    gap: 0.25rem;
-    padding: 1rem 1.25rem;
-  }
-
-  .route-endpoints > div + div {
-    border-left: 1px solid var(--border-color);
-  }
-
-  .route-endpoints dt,
   .elevation-card__stats dt {
     color: var(--text-muted);
     font-size: 0.68rem;
     font-weight: 700;
   }
 
-  .route-endpoints dd,
   .elevation-card__stats dd {
     margin: 0;
     font-size: 0.9rem;
@@ -903,17 +864,73 @@ function renderSplits(
       height: 430px;
     }
 
-    .route-endpoints {
-      grid-template-columns: 1fr;
-    }
-
-    .route-endpoints > div + div {
-      border-top: 1px solid var(--border-color);
-      border-left: 0;
-    }
-
     .elevation-card__stats {
       gap: 1rem;
+    }
+
+    .route-splits__table-wrap {
+      padding: 0 0.65rem 0.65rem;
+      overflow: visible;
+    }
+
+    .route-splits table,
+    .route-splits :global(tbody) {
+      display: block;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .route-splits thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .route-splits :global(tbody tr) {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.35rem;
+      margin-top: 0.65rem;
+      padding: 0.65rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.9rem;
+      background: color-mix(
+        in srgb,
+        var(--surface-color) 92%,
+        var(--border-color)
+      );
+    }
+
+    .route-splits :global(tbody td) {
+      display: grid;
+      min-width: 0;
+      gap: 0.2rem;
+      padding: 0.45rem 0.5rem;
+      border: 0;
+      text-align: left;
+      white-space: normal;
+    }
+
+    .route-splits :global(tbody td::before) {
+      color: var(--text-muted);
+      content: attr(data-label);
+      font-size: 0.58rem;
+      font-weight: 750;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .route-splits :global(tbody td:nth-child(5):not([hidden])) {
+      grid-column: 1 / -1;
+    }
+
+    .route-splits :global(tbody tr:last-child td) {
+      padding-bottom: 0.45rem;
     }
   }
 </style>
