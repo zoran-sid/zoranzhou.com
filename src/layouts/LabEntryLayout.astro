@@ -1,0 +1,211 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import LabLayout from "./LabLayout.astro";
+import { getLabTranslations } from "../i18n/lab";
+import {
+  findLabTranslation,
+  getLabEntryPath,
+  getLabHomePath,
+} from "../lib/lab";
+import { type Locale } from "../i18n/utils";
+
+interface Props {
+  entry: CollectionEntry<"lab">;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const copy = getLabTranslations(locale);
+const allEntries = await getCollection("lab", ({ data }) => !data.draft);
+const otherLocale: Locale = locale === "zh-CN" ? "en" : "zh-CN";
+const translation = findLabTranslation(allEntries, entry, otherLocale);
+const alternatePaths = {
+  [locale]: getLabEntryPath(entry),
+  ...(translation ? { [otherLocale]: getLabEntryPath(translation) } : {}),
+};
+const relatedProject =
+  entry.data.type === "build" || !entry.data.project
+    ? undefined
+    : allEntries.find(
+        (candidate) =>
+          candidate.data.type === "build" &&
+          candidate.data.project === entry.data.project &&
+          candidate.data.lang === locale &&
+          !candidate.data.draft,
+      );
+const statusLabel = copy.statusLabels[entry.data.status] ?? entry.data.status;
+const verificationLabel =
+  copy.verificationLabels[entry.data.verificationStatus] ??
+  entry.data.verificationStatus;
+const typeLabel = copy.typeLabels[entry.data.type] ?? entry.data.type;
+const trackLabel = copy.trackLabels[entry.data.track] ?? entry.data.track;
+const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
+const isPlanned = entry.data.status === "planned";
+const entryUrl = new URL(getLabEntryPath(entry), Astro.site).href;
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": entry.data.type === "security" ? "TechArticle" : "CreativeWork",
+  name: entry.data.title,
+  headline: entry.data.title,
+  description: entry.data.description ?? "",
+  datePublished: entry.data.date.toISOString(),
+  dateModified: (entry.data.updated ?? entry.data.date).toISOString(),
+  inLanguage: locale === "zh-CN" ? "zh-Hans" : "en",
+  author: { "@type": "Person", name: "Zoran Zhou" },
+  url: entryUrl,
+  isPartOf: {
+    "@type": "WebSite",
+    name: "Zoran Zhou · Web3 Lab",
+    url: new URL(getLabHomePath(locale), Astro.site).href,
+  },
+};
+---
+
+<LabLayout
+  title={entry.data.title}
+  description={entry.data.description ?? entry.data.title}
+  article={true}
+  alternatePaths={alternatePaths}
+  jsonld={jsonld}
+>
+  <article class="lab-entry lab-shell">
+    <header class="lab-entry__header">
+      <a class="lab-entry__back" href={getLabHomePath(locale)}>
+        <span aria-hidden="true">←</span>
+        {copy.detail.backToLab}
+      </a>
+
+      <div class="lab-entry__eyebrow">
+        <span>{typeLabel}</span>
+        <i></i>
+        <span>{trackLabel}</span>
+      </div>
+
+      <h1>{entry.data.title}</h1>
+      {entry.data.description && <p>{entry.data.description}</p>}
+
+      <div class="lab-entry__boundary-row" aria-label="Project boundaries">
+        <span>{copy.badges.educational}</span>
+        {entry.data.testnetOnly && <span>{copy.badges.testnetOnly}</span>}
+        {!entry.data.audited && <span>{copy.badges.unaudited}</span>}
+        {!entry.data.realFunds && <span>{copy.badges.noRealFunds}</span>}
+      </div>
+    </header>
+
+    <div class="lab-entry__layout">
+      <aside class="lab-entry__rail">
+        <dl class="lab-entry__facts">
+          <div>
+            <dt>{copy.detail.status}</dt>
+            <dd class:list={["lab-signal", `lab-signal--${entry.data.status}`]}>
+              <i></i>{statusLabel}
+            </dd>
+          </div>
+          <div>
+            <dt>{copy.detail.verification}</dt>
+            <dd
+              class:list={[
+                "lab-signal",
+                `lab-signal--${entry.data.verificationStatus}`,
+              ]}
+            >
+              <i></i>{verificationLabel}
+            </dd>
+          </div>
+          <div>
+            <dt>{copy.detail.track}</dt>
+            <dd>{trackLabel}</dd>
+          </div>
+          {
+            entry.data.currentPhase && (
+              <div>
+                <dt>{copy.detail.phase}</dt>
+                <dd>{entry.data.currentPhase}</dd>
+              </div>
+            )
+          }
+          {
+            entry.data.lastVerified && (
+              <div>
+                <dt>{copy.detail.lastVerified}</dt>
+                <dd>
+                  {entry.data.lastVerified.toLocaleDateString(dateLocale)}
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+
+        {
+          entry.data.technologies.length > 0 && (
+            <section class="lab-entry__rail-section">
+              <h2>
+                {isPlanned
+                  ? copy.detail.candidateStack
+                  : copy.detail.technologies}
+              </h2>
+              <div class="lab-entry__chips">
+                {entry.data.technologies.map((technology) => (
+                  <span>{technology}</span>
+                ))}
+              </div>
+            </section>
+          )
+        }
+
+        <section class="lab-entry__rail-section">
+          <h2>{copy.detail.implemented}</h2>
+          {
+            entry.data.implementedFeatures.length > 0 ? (
+              <ul>
+                {entry.data.implementedFeatures.map((feature) => (
+                  <li>{feature}</li>
+                ))}
+              </ul>
+            ) : (
+              <p class="lab-entry__empty">{copy.detail.noImplemented}</p>
+            )
+          }
+        </section>
+
+        {
+          entry.data.knownLimitations.length > 0 && (
+            <section class="lab-entry__rail-section">
+              <h2>{copy.detail.limitations}</h2>
+              <ul>
+                {entry.data.knownLimitations.map((limitation) => (
+                  <li>{limitation}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          relatedProject && (
+            <section class="lab-entry__rail-section">
+              <h2>{copy.detail.relatedProject}</h2>
+              <a
+                class="lab-entry__related"
+                href={getLabEntryPath(relatedProject)}
+              >
+                {relatedProject.data.title} <span aria-hidden="true">↗</span>
+              </a>
+            </section>
+          )
+        }
+      </aside>
+
+      <div class="lab-entry__content">
+        <div class="lab-entry__evidence">
+          <strong>{copy.detail.evidenceBoundary}</strong>
+          <p>{copy.detail.evidenceBoundaryText}</p>
+        </div>
+        <div class="lab-prose">
+          <Content />
+        </div>
+      </div>
+    </div>
+  </article>
+</LabLayout>

@@ -141,6 +141,44 @@ const essaysCollection = defineCollection({
   }),
 });
 
+const labCollection = defineCollection({
+  type: "content",
+  schema: baseSchema.extend({
+    type: z.enum(["learning", "build", "security", "architecture", "note"]),
+    track: z.enum(["integration", "backend", "product-security", "solutions"]),
+    status: z.enum([
+      "planned",
+      "building",
+      "prototype",
+      "testnet",
+      "security-review",
+      "completed",
+      "blocked",
+      "revised",
+      "archived",
+    ]),
+    verificationStatus: z.enum([
+      "unverified",
+      "documented",
+      "tested",
+      "verified",
+      "theoretical",
+    ]),
+    project: z.string().optional(),
+    week: z.number().int().min(1).max(24).optional(),
+    technologies: z.array(z.string()).default([]),
+    securityLevel: z.enum(["educational"]).default("educational"),
+    testnetOnly: z.boolean().default(false),
+    audited: z.boolean().default(false),
+    realFunds: z.boolean().default(false),
+    featured: z.boolean().default(false),
+    currentPhase: z.string().optional(),
+    lastVerified: z.coerce.date().optional(),
+    implementedFeatures: z.array(z.string()).default([]),
+    knownLimitations: z.array(z.string()).default([]),
+  }),
+});
+
 export const collections = {
   blog: blogCollection,
   essays: essaysCollection,
@@ -148,4 +186,5 @@ export const collections = {
   projects: projectsCollection,
   photos: photosCollection,
   routes: routesCollection,
+  lab: labCollection,
 };

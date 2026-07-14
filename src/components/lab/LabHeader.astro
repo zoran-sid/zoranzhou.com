@@ -1,0 +1,60 @@
+---
+import type { LabCopy } from "../../i18n/lab";
+import { getLabHomePath } from "../../lib/lab";
+import { localizePath, type Locale } from "../../i18n/utils";
+
+interface Props {
+  locale: Locale;
+  copy: LabCopy;
+  languageHref: string;
+}
+
+const { locale, copy, languageHref } = Astro.props;
+const labHome = getLabHomePath(locale);
+const mainHome = localizePath("/", locale);
+const navItems = [
+  { label: copy.nav.overview, href: `${labHome}#overview` },
+  { label: copy.nav.learning, href: `${labHome}#learning` },
+  { label: copy.nav.builds, href: `${labHome}#builds` },
+  { label: copy.nav.security, href: `${labHome}#security` },
+  { label: copy.nav.about, href: `${labHome}#about` },
+];
+---
+
+<header class="lab-header" data-lab-header>
+  <div class="lab-shell lab-header__inner">
+    <a class="lab-return" href={mainHome}>
+      <span aria-hidden="true">←</span>
+      <span>{copy.returnToSite}</span>
+    </a>
+
+    <a class="lab-brand" href={labHome} aria-label={copy.siteName}>
+      <span class="lab-brand__mark" aria-hidden="true">
+        <i></i><i></i><i></i><i></i>
+      </span>
+      <span class="lab-brand__copy">
+        <strong>{copy.siteName}</strong>
+        <small>{copy.siteTagline}</small>
+      </span>
+    </a>
+
+    <nav class="lab-nav" aria-label="Web3 Lab">
+      {
+        navItems.map((item) => (
+          <a href={item.href} data-lab-nav-link>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <a
+      class="lab-language"
+      href={languageHref}
+      hreflang={locale === "zh-CN" ? "en" : "zh-Hans"}
+    >
+      <span class="lab-language__signal" aria-hidden="true"></span>
+      {copy.switchLanguage}
+    </a>
+  </div>
+</header>

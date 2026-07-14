@@ -67,13 +67,25 @@ export default defineConfig({
           priority = 1.0;
           changefreq = "daily";
         }
+        // Web3 Lab landing pages
+        else if (path.match(/^\/(zh-CN|en)\/lab\/?$/)) {
+          priority = 0.9;
+          changefreq = "weekly";
+        }
+        // Web3 Lab build, security, learning, architecture, and note records
+        else if (path.match(/^\/(zh-CN|en)\/lab\/.+/)) {
+          priority = 0.65;
+          changefreq = "monthly";
+        }
         // Blog/research/essays listing pages
         else if (path.match(/^\/(zh-CN|en)\/(blog|essays|research)\/?$/)) {
           priority = 0.8;
           changefreq = "daily";
         }
         // Individual articles
-        else if (path.match(/^\/(zh-CN|en)\/(blog|essays|research|projects)\/.+/)) {
+        else if (
+          path.match(/^\/(zh-CN|en)\/(blog|essays|research|projects)\/.+/)
+        ) {
           priority = 0.6;
           changefreq = "monthly";
         }

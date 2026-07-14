@@ -1,0 +1,365 @@
+---
+import { getCollection } from "astro:content";
+import LabLayout from "../../../layouts/LabLayout.astro";
+import { getLabTranslations } from "../../../i18n/lab";
+import { getLabEntryPath } from "../../../lib/lab";
+import { localizePath, locales, type Locale } from "../../../i18n/utils";
+
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const copy = getLabTranslations(locale);
+const allEntries = await getCollection(
+  "lab",
+  ({ data }) => !data.draft && data.lang === locale,
+);
+const featuredBuild = allEntries.find(
+  (entry) => entry.data.type === "build" && entry.data.featured,
+);
+const securityEntries = allEntries.filter(
+  (entry) => entry.data.type === "security" && entry.data.featured,
+);
+const learningEntries = allEntries.filter(
+  (entry) => entry.data.type === "learning",
+);
+const verifiedLearningCount = learningEntries.filter(
+  (entry) => entry.data.verificationStatus === "verified",
+).length;
+const description =
+  locale === "zh-CN"
+    ? "Web3 Lab 是 Zoran Zhou 的独立技术子站，记录钱包集成、数字资产后端工程、产品安全与解决方案架构的真实构建和验证过程。"
+    : "Web3 Lab is Zoran Zhou's independent technical subsite for documented work in wallet integration, digital asset backend engineering, product security, and solution architecture.";
+const alternatePaths = {
+  "zh-CN": localizePath("/lab", "zh-CN"),
+  en: localizePath("/lab", "en"),
+};
+const labUrl = new URL(localizePath("/lab", locale), Astro.site).href;
+const jsonld = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: `Web3 Lab · Zoran Zhou`,
+  description,
+  url: labUrl,
+  inLanguage: locale === "zh-CN" ? "zh-Hans" : "en",
+  author: { "@type": "Person", name: "Zoran Zhou" },
+  about: [
+    "Wallet integration",
+    "Blockchain backend engineering",
+    "Digital asset product security",
+    "Solution architecture",
+  ],
+};
+---
+
+<LabLayout
+  description={description}
+  alternatePaths={alternatePaths}
+  jsonld={jsonld}
+>
+  <section id="overview" class="lab-hero lab-section">
+    <div class="lab-shell lab-hero__grid">
+      <div class="lab-hero__copy">
+        <div class="lab-kicker">
+          <span class="lab-kicker__signal"></span>
+          {copy.hero.kicker}
+        </div>
+        <h1>{copy.hero.title}</h1>
+        <p>{copy.hero.description}</p>
+
+        <div class="lab-hero__actions">
+          <a class="lab-button lab-button--primary" href="#builds">
+            {copy.hero.primary}<span aria-hidden="true">↘</span>
+          </a>
+          <a class="lab-button lab-button--ghost" href="#learning">
+            {copy.hero.secondary}
+          </a>
+        </div>
+
+        <div class="lab-boundaries" aria-label="Web3 Lab boundaries">
+          {
+            copy.boundaries.map((boundary, index) => (
+              <span>
+                <i>{String(index + 1).padStart(2, "0")}</i>
+                {boundary}
+              </span>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="lab-system" data-lab-spotlight>
+        <header class="lab-system__header">
+          <span class="lab-window-dots" aria-hidden="true"
+            ><i></i><i></i><i></i></span
+          >
+          <strong>{copy.hero.systemTitle}</strong>
+          <span class="lab-system__live"><i></i>STATIC / V1</span>
+        </header>
+        <div class="lab-code-panel">
+          <div class="lab-code-panel__meta">
+            <span>TYPESCRIPT / REFERENCE</span>
+            <span>webhook-handler.ts</span>
+          </div>
+          <pre
+            aria-label="Reference TypeScript pattern for secure blockchain event handling"><code><span class="lab-code-line"><i>01</i><b>type</b> EventKey = <em>`${"${number}:${string}:${number}"}`</em>;</span>
+<span class="lab-code-line"><i>02</i></span>
+<span class="lab-code-line"><i>03</i><b>async function</b> <strong>acceptTransfer</strong>(event: SignedWebhook) {`{`}</span>
+<span class="lab-code-line"><i>04</i>  <strong>verifyHmac</strong>(event.rawBody, event.signature);</span>
+<span class="lab-code-line"><i>05</i></span>
+<span class="lab-code-line"><i>06</i>  <b>const</b> transfer = <strong>decodeErc20</strong>(event.log);</span>
+<span class="lab-code-line"><i>07</i>  <b>const</b> key: EventKey =</span>
+<span class="lab-code-line"><i>08</i>    <em>`${"${event.chainId}:${event.txHash}:${event.logIndex}"}`</em>;</span>
+<span class="lab-code-line"><i>09</i></span>
+<span class="lab-code-line"><i>10</i>  <b>await</b> db.<strong>transaction</strong>(<b>async</b> (tx) =&gt; {`{`}</span>
+<span class="lab-code-line"><i>11</i>    <b>if</b> (<b>await</b> tx.events.exists(key)) <b>return</b>;</span>
+<span class="lab-code-line"><i>12</i>    <b>await</b> tx.deposits.credit(transfer);</span>
+<span class="lab-code-line"><i>13</i>    <b>await</b> tx.events.record(key);</span>
+<span class="lab-code-line"><i>14</i>  {`}`});</span>
+<span class="lab-code-line"><i>15</i>{`}`}</span></code></pre>
+          <div class="lab-code-panel__signals" aria-label="Code concerns">
+            <span>HMAC</span>
+            <span>ERC-20</span>
+            <span>IDEMPOTENCY</span>
+            <span>DB TRANSACTION</span>
+          </div>
+        </div>
+        <footer class="lab-system__footer">
+          <span>{copy.hero.codeBoundary}</span>
+          <span>STATIC / NO SECRETS</span>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="lab-section lab-section--tracks"
+    aria-labelledby="tracks-title"
+  >
+    <div class="lab-shell">
+      <header class="lab-section__header">
+        <div>
+          <span class="lab-section__label">{copy.tracks.label}</span>
+          <h2 id="tracks-title">{copy.tracks.title}</h2>
+        </div>
+        <p>{copy.tracks.description}</p>
+      </header>
+
+      <div class="lab-track-grid">
+        {
+          copy.tracks.items.map((track, index) => (
+            <article
+              class={`lab-track lab-track--${index + 1}`}
+              data-lab-spotlight
+            >
+              <span class="lab-track__code">{track.code}</span>
+              <h3>{track.title}</h3>
+              <p>{track.description}</p>
+              <ul>
+                {track.topics.map((topic) => (
+                  <li>{topic}</li>
+                ))}
+              </ul>
+              <span class="lab-track__corner" aria-hidden="true" />
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="builds"
+    class="lab-section lab-section--builds"
+    aria-labelledby="builds-title"
+  >
+    <div class="lab-shell">
+      <header class="lab-section__header">
+        <div>
+          <span class="lab-section__label">{copy.builds.label}</span>
+          <h2 id="builds-title">{copy.builds.title}</h2>
+        </div>
+        <p>{copy.builds.description}</p>
+      </header>
+
+      {
+        featuredBuild && (
+          <article class="lab-featured-build" data-lab-spotlight>
+            <div class="lab-featured-build__topline">
+              <span>{copy.builds.featured}</span>
+              <span class="lab-signal lab-signal--planned">
+                <i />
+                {copy.statusLabels[featuredBuild.data.status]}
+              </span>
+            </div>
+
+            <div class="lab-featured-build__grid">
+              <div class="lab-featured-build__main">
+                <span class="lab-featured-build__id">
+                  BUILD / TESTNET-WALLET-PLATFORM
+                </span>
+                <h3>{featuredBuild.data.title}</h3>
+                <p>{featuredBuild.data.description}</p>
+
+                <div class="lab-entry-badges">
+                  <span>{copy.badges.educational}</span>
+                  {featuredBuild.data.testnetOnly && (
+                    <span>{copy.badges.testnetOnly}</span>
+                  )}
+                  {!featuredBuild.data.audited && (
+                    <span>{copy.badges.unaudited}</span>
+                  )}
+                  {!featuredBuild.data.realFunds && (
+                    <span>{copy.badges.noRealFunds}</span>
+                  )}
+                </div>
+
+                <a class="lab-build-link" href={getLabEntryPath(featuredBuild)}>
+                  {copy.builds.view}
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+
+              <div class="lab-featured-build__facts">
+                <dl>
+                  <div>
+                    <dt>{copy.builds.status}</dt>
+                    <dd>{copy.statusLabels[featuredBuild.data.status]}</dd>
+                  </div>
+                  <div>
+                    <dt>{copy.builds.phase}</dt>
+                    <dd>{featuredBuild.data.currentPhase}</dd>
+                  </div>
+                  <div>
+                    <dt>{copy.builds.candidateStack}</dt>
+                    <dd>{featuredBuild.data.technologies.join(" / ")}</dd>
+                  </div>
+                  <div>
+                    <dt>{copy.builds.implemented}</dt>
+                    <dd>
+                      {featuredBuild.data.implementedFeatures.length > 0
+                        ? featuredBuild.data.implementedFeatures.join(" / ")
+                        : copy.builds.noImplemented}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </article>
+        )
+      }
+    </div>
+  </section>
+
+  <section
+    id="learning"
+    class="lab-section lab-section--learning"
+    aria-labelledby="learning-title"
+  >
+    <div class="lab-shell lab-learning">
+      <div class="lab-learning__copy">
+        <span class="lab-section__label">{copy.learning.label}</span>
+        <h2 id="learning-title">{copy.learning.title}</h2>
+        <p>{copy.learning.description}</p>
+        <div class="lab-learning__notice">
+          <i aria-hidden="true">!</i>
+          <span>{copy.learning.noPublicOutcomes}</span>
+        </div>
+      </div>
+
+      <div class="lab-learning-log" data-lab-spotlight>
+        <header>
+          <span>{copy.learning.log}</span>
+          <strong>VERIFIED / PUBLIC</strong>
+        </header>
+        <div class="lab-learning-log__metric">
+          <strong>{verifiedLearningCount}</strong>
+          <span>{copy.learning.verified}</span>
+        </div>
+        <ul class="lab-learning-log__evidence">
+          {copy.learning.evidence.map((item) => <li>{item}</li>)}
+        </ul>
+        <footer>{copy.learning.nextGate}</footer>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="security"
+    class="lab-section lab-section--security"
+    aria-labelledby="security-title"
+  >
+    <div class="lab-shell">
+      <header class="lab-section__header">
+        <div>
+          <span class="lab-section__label">{copy.security.label}</span>
+          <h2 id="security-title">{copy.security.title}</h2>
+        </div>
+        <p>{copy.security.description}</p>
+      </header>
+
+      <div class="lab-security-grid">
+        {
+          securityEntries.map((entry) => (
+            <article class="lab-security-card" data-lab-spotlight>
+              <header>
+                <span class="lab-security-card__type">
+                  {copy.typeLabels[entry.data.type]}
+                </span>
+                <span class="lab-signal lab-signal--theoretical">
+                  <i />
+                  {copy.verificationLabels[entry.data.verificationStatus]}
+                </span>
+              </header>
+              <div class="lab-security-card__diagram" aria-hidden="true">
+                <>
+                  <span>SIGNED EVENT</span>
+                  <i>→</i>
+                  <span class="is-warning">REPLAY?</span>
+                  <i>→</i>
+                  <span>BUSINESS STATE</span>
+                </>
+              </div>
+              <h3>{entry.data.title}</h3>
+              <p>{entry.data.description}</p>
+              <div class="lab-security-card__notice">
+                {copy.security.theoryNotice}
+              </div>
+              <a href={getLabEntryPath(entry)}>
+                {copy.security.view}
+                <span aria-hidden="true">↗</span>
+              </a>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="about"
+    class="lab-section lab-section--about"
+    aria-labelledby="about-title"
+  >
+    <div class="lab-shell lab-about">
+      <div class="lab-about__copy">
+        <span class="lab-section__label">{copy.about.label}</span>
+        <h2 id="about-title">{copy.about.title}</h2>
+        {copy.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+
+      <ol class="lab-about__principles">
+        {
+          copy.about.principles.map((principle, index) => (
+            <li>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{principle}</strong>
+              <i aria-hidden="true">—</i>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+</LabLayout>

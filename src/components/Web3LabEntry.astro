@@ -1,0 +1,83 @@
+---
+import { localizePath, type Locale } from "../i18n/utils";
+
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const ariaLabel =
+  locale === "zh-CN"
+    ? "进入 Web3 Lab 技术子站"
+    : "Enter the Web3 Lab technical subsite";
+---
+
+<a
+  class="hero-secondary-action web3-lab-button"
+  href={localizePath("/lab", locale)}
+  aria-label={ariaLabel}
+>
+  <span class="web3-lab-button__mark" aria-hidden="true">W3</span>
+  <span>WEB3 LAB</span>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.8"
+    aria-hidden="true"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M5 12h14m-5-5 5 5-5 5"></path>
+  </svg>
+</a>
+
+<style>
+  .web3-lab-button {
+    gap: 0.65rem;
+    border-color: rgb(var(--accent-rgb) / 0.24);
+    background: linear-gradient(
+      120deg,
+      rgb(var(--accent-rgb) / 0.07),
+      rgb(130 101 255 / 0.08)
+    );
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.32);
+  }
+
+  .web3-lab-button:hover {
+    border-color: rgb(var(--accent-rgb) / 0.5);
+    background: linear-gradient(
+      120deg,
+      rgb(var(--accent-rgb) / 0.12),
+      rgb(130 101 255 / 0.13)
+    );
+  }
+
+  .web3-lab-button__mark {
+    display: inline-grid;
+    min-width: 1.8rem;
+    height: 1.35rem;
+    place-items: center;
+    border: 1px solid rgb(var(--accent-rgb) / 0.28);
+    border-radius: 0.28rem;
+    background: rgb(12 17 34 / 0.94);
+    color: #47e7ff;
+    font-size: 0.52rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .web3-lab-button svg {
+    width: 0.95rem;
+    flex: 0 0 auto;
+    transition: transform 220ms ease;
+  }
+
+  .web3-lab-button:hover svg,
+  .web3-lab-button:focus-visible svg {
+    transform: translateX(0.2rem);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .web3-lab-button svg {
+      transition: none;
+    }
+  }
+</style>

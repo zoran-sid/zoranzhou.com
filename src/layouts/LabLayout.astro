@@ -1,0 +1,144 @@
+---
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/lab.css";
+import LabHeader from "../components/lab/LabHeader.astro";
+import LabFooter from "../components/lab/LabFooter.astro";
+import { getLabTranslations } from "../i18n/lab";
+import { hreflangMap, locales, localizePath, type Locale } from "../i18n/utils";
+
+interface Props {
+  title?: string;
+  description: string;
+  article?: boolean;
+  alternatePaths?: Partial<Record<Locale, string>>;
+  jsonld?: Record<string, unknown>;
+}
+
+const {
+  title,
+  description,
+  article = false,
+  alternatePaths,
+  jsonld,
+} = Astro.props;
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const copy = getLabTranslations(locale);
+const canonicalPath = Astro.url.pathname;
+const pageTitle = title
+  ? `${title} · WEB3 LAB | ZORAN ZHOU`
+  : `WEB3 LAB | ZORAN ZHOU`;
+const otherLocale: Locale = locale === "zh-CN" ? "en" : "zh-CN";
+const languageHref =
+  alternatePaths?.[otherLocale] ?? localizePath("/lab", otherLocale);
+const safeAlternatePaths = alternatePaths ?? {
+  [locale]: canonicalPath,
+};
+---
+
+<!doctype html>
+<html lang={locale} class="lab-document">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#05070d" />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(canonicalPath, Astro.site)} />
+
+    {
+      locales.map((altLocale) => {
+        const altPath = safeAlternatePaths[altLocale];
+        if (!altPath) return null;
+        return (
+          <link
+            rel="alternate"
+            hreflang={hreflangMap[altLocale]}
+            href={new URL(altPath, Astro.site).href}
+          />
+        );
+      })
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL("/en/lab/", Astro.site).href}
+    />
+
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={article ? "article" : "website"} />
+    <meta property="og:url" content={new URL(canonicalPath, Astro.site)} />
+    <meta
+      property="og:locale"
+      content={locale === "zh-CN" ? "zh_Hans" : "en_US"}
+    />
+    <meta property="og:site_name" content="ZORAN ZHOU · WEB3 LAB" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    {
+      jsonld && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(jsonld)}
+        />
+      )
+    }
+  </head>
+  <body class="lab-body">
+    <div class="lab-backdrop" aria-hidden="true">
+      <span class="lab-backdrop__grid"></span>
+      <span class="lab-backdrop__beam lab-backdrop__beam--a"></span>
+      <span class="lab-backdrop__beam lab-backdrop__beam--b"></span>
+      <span class="lab-backdrop__noise"></span>
+    </div>
+
+    <a class="lab-skip" href="#lab-content">
+      {locale === "zh-CN" ? "跳到主要内容" : "Skip to content"}
+    </a>
+    <LabHeader locale={locale} copy={copy} languageHref={languageHref} />
+    <main id="lab-content" class="lab-main">
+      <slot />
+    </main>
+    <LabFooter locale={locale} copy={copy} />
+
+    <script>
+      const header = document.querySelector<HTMLElement>("[data-lab-header]");
+      const updateHeader = () =>
+        header?.classList.toggle("is-scrolled", window.scrollY > 24);
+      updateHeader();
+      window.addEventListener("scroll", updateHeader, { passive: true });
+
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      if (!reducedMotion && matchMedia("(pointer: fine)").matches) {
+        document
+          .querySelectorAll<HTMLElement>("[data-lab-spotlight]")
+          .forEach((panel) => {
+            panel.addEventListener("pointermove", (event) => {
+              const bounds = panel.getBoundingClientRect();
+              panel.style.setProperty(
+                "--spot-x",
+                `${event.clientX - bounds.left}px`,
+              );
+              panel.style.setProperty(
+                "--spot-y",
+                `${event.clientY - bounds.top}px`,
+              );
+            });
+          });
+      }
+    </script>
+  </body>
+</html>

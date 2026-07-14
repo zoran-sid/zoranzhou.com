@@ -17,7 +17,7 @@ Neither program belongs to the production website runtime.
 ```text
 Versioned source files
   |
-  +-- src/content/{blog,essays,research,projects,photos,routes}/
+  +-- src/content/{blog,essays,research,projects,photos,routes,lab}/
   |      -> Astro content schemas -> locale pages -> layouts/components
   |
   +-- src/content/media.md
@@ -62,6 +62,7 @@ The deployment artifact is `dist/`. Cloudflare must never publish the repository
 | `src/content/`                      | Versioned Markdown/MDX data and the special `media.md` file              |
 | `src/pages/[locale]/`               | Locale-prefixed listing, detail, search, RSS, and utility pages          |
 | `src/layouts/BaseLayout.astro`      | Global document metadata, navigation, footer, theme, JSON-LD shell       |
+| `src/layouts/LabLayout.astro`       | Independent Web3 Lab metadata, navigation, footer, and visual shell      |
 | `src/layouts/BlogPostLayout.astro`  | Article TOC, reading metadata, related and adjacent entries              |
 | `src/layouts/RoutePostLayout.astro` | Route-specific article and endpoint/statistic presentation               |
 | `src/components/`                   | Reusable site UI, navigation, Media table, maps, and route charts        |
@@ -141,6 +142,7 @@ research
 projects
 photos
 routes
+lab
 ```
 
 The former Tools, Homelab, and Gear website sections were removed. Do not restore their
@@ -180,6 +182,7 @@ Collection-specific fields:
 | `projects` | optional `repo`, `demo`, `icon`; `tech[]`; `status: active/completed/archived` |
 | `photos`   | optional location/camera/lens/film; `gallery[]` image objects                  |
 | `routes`   | Stable identity, source file, exact endpoints, map and activity metadata       |
+| `lab`      | type/track/status/verification; project evidence, boundaries, and technologies |
 
 ### Route frontmatter contract
 
@@ -219,7 +222,7 @@ normalize that union casually; existing migrated content depends on it.
 ### Page generation
 
 Public page families under `src/pages/[locale]/` include Home, Blog, Essays, Research,
-Projects, Media, Photos, Map, Tags, RSS, search data, and locale 404 pages.
+Projects, Media, Photos, Map, Web3 Lab, Tags, RSS, search data, and locale 404 pages.
 
 The usual collection flow is:
 
@@ -244,6 +247,11 @@ previous/next entries in date order, and emits Article and Breadcrumb JSON-LD.
 RSS links, global fonts/CSS, navigation, theme bootstrapping, scroll UI, and general
 structured data. MapLibre CSS should be enabled only through the layout's map styling
 contract, not copied into individual pages.
+
+Web3 Lab intentionally uses `LabLayout.astro` and `src/styles/lab.css` so its technical
+subsite shell remains independent from the personal-site navigation and theme. Lab
+content still uses the shared locale utilities, Astro content collections, search index,
+and sitemap generation.
 
 ### Locale rules
 

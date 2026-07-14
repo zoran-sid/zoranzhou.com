@@ -1,0 +1,22 @@
+---
+import { getCollection } from "astro:content";
+import LabEntryLayout from "@layouts/LabEntryLayout.astro";
+import { LAB_TYPE_SEGMENTS } from "@lib/lab";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("lab", ({ data }) => !data.draft);
+
+  return entries.map((entry) => ({
+    params: {
+      locale: entry.data.lang,
+      type: LAB_TYPE_SEGMENTS[entry.data.type],
+      slug: entry.slug,
+    },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+---
+
+<LabEntryLayout entry={entry} />

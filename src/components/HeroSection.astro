@@ -1,5 +1,6 @@
 ---
 import { getTranslations, localizePath, type Locale } from "../i18n/utils";
+import Web3LabEntry from "./Web3LabEntry.astro";
 
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
@@ -46,6 +47,7 @@ const t = getTranslations(locale);
           <a href="#contact" class="hero-secondary-action">
             <span>{t.heroGetInTouch}</span><i aria-hidden="true"></i>
           </a>
+          <Web3LabEntry />
         </div>
 
         <div class="hero-disciplines" aria-label="Core disciplines">

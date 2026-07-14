@@ -37,6 +37,11 @@ const personalNavItems = [
   },
 ];
 
+const labNavItem = {
+  label: "WEB3 LAB",
+  href: localizePath("/lab", locale),
+};
+
 const languageSwitchSections = new Set([
   "blog",
   "research",
@@ -49,8 +54,7 @@ const languageSwitchSections = new Set([
 ]);
 
 function getLanguageSwitchHref(targetLocale: Locale): string {
-  const pathWithoutLocale =
-    path.replace(/^\/(?:zh-CN|en)(?=\/|$)/, "") || "/";
+  const pathWithoutLocale = path.replace(/^\/(?:zh-CN|en)(?=\/|$)/, "") || "/";
 
   const segments = pathWithoutLocale.split("/").filter(Boolean);
 
@@ -72,39 +76,46 @@ function getLanguageSwitchHref(targetLocale: Locale): string {
 
   const localizedPath = localizePath(targetPath, targetLocale);
 
-  return preserveSearch
-    ? `${localizedPath}${currentSearch}`
-    : localizedPath;
+  return preserveSearch ? `${localizedPath}${currentSearch}` : localizedPath;
 }
 
 const routeDetailMatch = /^\/(?:zh-CN|en)\/map\/([^/]+)\/?$/.exec(path);
 let translatedRouteHref: string | undefined;
 if (routeDetailMatch) {
-  const routes = await getCollection("routes", ({ data }) => data.draft !== true && data.published !== false);
-  const current = routes.find((entry) => entry.slug === routeDetailMatch[1] && entry.data.lang === locale);
-  const translated = current && routes.find((entry) => entry.data.routeId === current.data.routeId && entry.data.lang !== locale);
-  if (translated) translatedRouteHref = localizePath(`/map/${translated.slug}`, translated.data.lang);
+  const routes = await getCollection(
+    "routes",
+    ({ data }) => data.draft !== true && data.published !== false,
+  );
+  const current = routes.find(
+    (entry) => entry.slug === routeDetailMatch[1] && entry.data.lang === locale,
+  );
+  const translated =
+    current &&
+    routes.find(
+      (entry) =>
+        entry.data.routeId === current.data.routeId &&
+        entry.data.lang !== locale,
+    );
+  if (translated)
+    translatedRouteHref = localizePath(
+      `/map/${translated.slug}`,
+      translated.data.lang,
+    );
 }
 
-const alternateLocale: Locale =
-  locale === "zh-CN" ? "en" : "zh-CN";
+const alternateLocale: Locale = locale === "zh-CN" ? "en" : "zh-CN";
 
-const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alternateLocale);
+const alternateLocaleHref =
+  translatedRouteHref ?? getLanguageSwitchHref(alternateLocale);
 ---
 
-<header
-  class="site-header"
-  data-site-header
-  data-language-cookie={LANG_COOKIE}
->
+<header class="site-header" data-site-header data-language-cookie={LANG_COOKIE}>
   <svg aria-hidden="true" class="hidden">
     <symbol id="nav-icon-photos" viewBox="0 0 24 24">
       <path
         d="M4.75 7.75A2.75 2.75 0 0 1 7.5 5h1.6l1.15-1.5h3.5L14.9 5h1.6a2.75 2.75 0 0 1 2.75 2.75v8.5A2.75 2.75 0 0 1 16.5 19H7.5a2.75 2.75 0 0 1-2.75-2.75v-8.5Z"
       ></path>
-      <path
-        d="M12 15.5a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"
-      ></path>
+      <path d="M12 15.5a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"></path>
     </symbol>
 
     <symbol id="nav-icon-map" viewBox="0 0 24 24">
@@ -139,16 +150,12 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
         {
           primaryNavItems.map((item) => {
             const active =
-              path === item.href ||
-              path.startsWith(item.href + "/");
+              path === item.href || path.startsWith(item.href + "/");
 
             return (
               <a
                 href={item.href}
-                class:list={[
-                  "site-nav__link",
-                  { active },
-                ]}
+                class:list={["site-nav__link", { active }]}
                 aria-current={active ? "page" : undefined}
               >
                 {item.label}
@@ -159,28 +166,19 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
       </div>
 
       <div class="site-nav__tools">
-        <div
-          class="site-nav__personal"
-          aria-label="Personal sections"
-        >
+        <div class="site-nav__personal" aria-label="Personal sections">
           {
             personalNavItems.map((item) => {
               const active =
-                path === item.href ||
-                path.startsWith(item.href + "/");
+                path === item.href || path.startsWith(item.href + "/");
 
               return (
                 <a
                   href={item.href}
-                  class:list={[
-                    "site-nav__icon",
-                    { active },
-                  ]}
+                  class:list={["site-nav__icon", { active }]}
                   aria-label={item.label}
                   title={item.label}
-                  aria-current={
-                    active ? "page" : undefined
-                  }
+                  aria-current={active ? "page" : undefined}
                 >
                   <svg
                     fill="none"
@@ -189,9 +187,7 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
                     stroke-linejoin="round"
                     stroke-width="1.7"
                   >
-                    <use
-                      href={`#nav-icon-${item.icon}`}
-                    />
+                    <use href={`#nav-icon-${item.icon}`} />
                   </svg>
                 </a>
               );
@@ -261,10 +257,7 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
             stroke-width="1.8"
             viewBox="0 0 24 24"
           >
-            <path
-              stroke-linecap="round"
-              d="M5 8h14M5 16h14"
-            ></path>
+            <path stroke-linecap="round" d="M5 8h14M5 16h14"></path>
           </svg>
 
           <svg
@@ -275,36 +268,25 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
             stroke-width="1.8"
             viewBox="0 0 24 24"
           >
-            <path
-              stroke-linecap="round"
-              d="m7 7 10 10M17 7 7 17"
-            ></path>
+            <path stroke-linecap="round" d="m7 7 10 10M17 7 7 17"></path>
           </svg>
         </button>
       </div>
     </nav>
   </div>
 
-  <div
-    id="mobile-menu"
-    class="site-mobile-menu"
-    hidden
-  >
+  <div id="mobile-menu" class="site-mobile-menu" hidden>
     <div class="page-container site-mobile-menu__inner">
       <div class="site-mobile-menu__links">
         {
           primaryNavItems.map((item) => {
             const active =
-              path === item.href ||
-              path.startsWith(item.href + "/");
+              path === item.href || path.startsWith(item.href + "/");
 
             return (
               <a
                 href={item.href}
-                class:list={[
-                  "site-mobile-menu__link",
-                  { active },
-                ]}
+                class:list={["site-mobile-menu__link", { active }]}
                 aria-current={active ? "page" : undefined}
               >
                 <>
@@ -319,16 +301,12 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
         {
           personalNavItems.map((item) => {
             const active =
-              path === item.href ||
-              path.startsWith(item.href + "/");
+              path === item.href || path.startsWith(item.href + "/");
 
             return (
               <a
                 href={item.href}
-                class:list={[
-                  "site-mobile-menu__link",
-                  { active },
-                ]}
+                class:list={["site-mobile-menu__link", { active }]}
                 aria-current={active ? "page" : undefined}
               >
                 <>
@@ -339,6 +317,14 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
             );
           })
         }
+
+        <a
+          href={labNavItem.href}
+          class="site-mobile-menu__link site-mobile-menu__link--lab"
+        >
+          <strong><span aria-hidden="true">W3</span>{labNavItem.label}</strong>
+          <i>→</i>
+        </a>
       </div>
 
       <div class="site-mobile-menu__languages">
@@ -349,11 +335,7 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
               class:list={{
                 active: targetLocale === locale,
               }}
-              aria-current={
-                targetLocale === locale
-                  ? "page"
-                  : undefined
-              }
+              aria-current={targetLocale === locale ? "page" : undefined}
               data-language-switch
               data-target-locale={targetLocale}
             >
@@ -370,14 +352,9 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
   function toggleDarkMode() {
     const html = document.documentElement;
 
-    const nextTheme = html.classList.contains("dark")
-      ? "light"
-      : "dark";
+    const nextTheme = html.classList.contains("dark") ? "light" : "dark";
 
-    html.classList.toggle(
-      "dark",
-      nextTheme === "dark",
-    );
+    html.classList.toggle("dark", nextTheme === "dark");
 
     localStorage.setItem("pref-theme", nextTheme);
   }
@@ -386,36 +363,25 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
     .getElementById("theme-toggle")
     ?.addEventListener("click", toggleDarkMode);
 
-  const menuToggle = document.getElementById(
-    "mobile-menu-toggle",
-  );
+  const menuToggle = document.getElementById("mobile-menu-toggle");
 
-  const mobileMenu =
-    document.getElementById("mobile-menu");
+  const mobileMenu = document.getElementById("mobile-menu");
 
-  const menuIconOpen =
-    document.getElementById("menu-icon-open");
+  const menuIconOpen = document.getElementById("menu-icon-open");
 
-  const menuIconClose =
-    document.getElementById("menu-icon-close");
+  const menuIconClose = document.getElementById("menu-icon-close");
 
   function setMenu(open: boolean) {
     if (mobileMenu) {
       mobileMenu.hidden = !open;
     }
 
-    menuToggle?.setAttribute(
-      "aria-expanded",
-      String(open),
-    );
+    menuToggle?.setAttribute("aria-expanded", String(open));
 
     menuIconOpen?.classList.toggle("hidden", open);
     menuIconClose?.classList.toggle("hidden", !open);
 
-    document.body.classList.toggle(
-      "menu-open",
-      open,
-    );
+    document.body.classList.toggle("menu-open", open);
   }
 
   menuToggle?.addEventListener("click", () =>
@@ -424,11 +390,7 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
 
   mobileMenu
     ?.querySelectorAll("a")
-    .forEach((link) =>
-      link.addEventListener("click", () =>
-        setMenu(false),
-      ),
-    );
+    .forEach((link) => link.addEventListener("click", () => setMenu(false)));
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -436,10 +398,7 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
     }
   });
 
-  const siteHeader =
-    document.querySelector<HTMLElement>(
-      "[data-site-header]",
-    );
+  const siteHeader = document.querySelector<HTMLElement>("[data-site-header]");
 
   /**
    * 用户点击语言切换按钮时保存语言偏好。
@@ -448,30 +407,20 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
    * 本地开发使用 HTTP 时不添加 Secure；
    * 正式 HTTPS 网站自动添加 Secure。
    */
-  const languageCookieName =
-    siteHeader?.dataset.languageCookie ??
-    "pref-lang";
+  const languageCookieName = siteHeader?.dataset.languageCookie ?? "pref-lang";
 
   document
-    .querySelectorAll<HTMLAnchorElement>(
-      "[data-language-switch]",
-    )
+    .querySelectorAll<HTMLAnchorElement>("[data-language-switch]")
     .forEach((link) => {
       link.addEventListener("click", () => {
-        const targetLocale =
-          link.dataset.targetLocale;
+        const targetLocale = link.dataset.targetLocale;
 
-        if (
-          targetLocale !== "zh-CN" &&
-          targetLocale !== "en"
-        ) {
+        if (targetLocale !== "zh-CN" && targetLocale !== "en") {
           return;
         }
 
         const secureAttribute =
-          window.location.protocol === "https:"
-            ? "; Secure"
-            : "";
+          window.location.protocol === "https:" ? "; Secure" : "";
 
         document.cookie =
           `${encodeURIComponent(languageCookieName)}` +
@@ -485,22 +434,16 @@ const alternateLocaleHref = translatedRouteHref ?? getLanguageSwitchHref(alterna
 
   let headerFrame = 0;
   const updateHeaderState = () => {
-    siteHeader?.classList.toggle(
-      "is-scrolled",
-      window.scrollY > 12,
-    );
+    siteHeader?.classList.toggle("is-scrolled", window.scrollY > 12);
     headerFrame = 0;
   };
 
   const requestHeaderUpdate = () => {
-    if (!headerFrame) headerFrame = window.requestAnimationFrame(updateHeaderState);
+    if (!headerFrame)
+      headerFrame = window.requestAnimationFrame(updateHeaderState);
   };
 
-  window.addEventListener(
-    "scroll",
-    requestHeaderUpdate,
-    { passive: true },
-  );
+  window.addEventListener("scroll", requestHeaderUpdate, { passive: true });
 
   updateHeaderState();
 </script>

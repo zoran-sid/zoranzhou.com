@@ -5,8 +5,8 @@ const ui = locale === "zh-CN"
   ? { search: "搜索", placeholder: "搜索文章...", loading: "加载中...", noResults: "没有找到结果", prompt: "输入标题搜索", navigate: "导航", open: "打开" }
   : { search: "Search", placeholder: "Search articles...", loading: "Loading...", noResults: "No results", prompt: "Type to search by title", navigate: "Navigate", open: "Open" };
 const labels = locale === "zh-CN"
-  ? { blog: "博客", research: "研究", projects: "项目" }
-  : { blog: "Blog", research: "Research", projects: "Projects" };
+  ? { blog: "博客", research: "研究", projects: "项目", lab: "Web3 Lab" }
+  : { blog: "Blog", research: "Research", projects: "Projects", lab: "Web3 Lab" };
 ---
 
 <div class="search-modal" data-search-modal data-locale={locale} data-labels={JSON.stringify(labels)}>
