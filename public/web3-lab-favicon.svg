@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>WEB3 LAB</title>
+  <path
+    d="M32 3 61 32 32 61 3 32Z"
+    fill="#0e1420"
+    stroke="#47e7ff"
+    stroke-opacity=".72"
+    stroke-width="2"
+  />
+  <path d="m32 11 8 8-8 8-8-8Z" fill="#47e7ff" />
+  <path d="m19 24 8 8-8 8-8-8Z" fill="#8265ff" />
+  <path d="m45 24 8 8-8 8-8-8Z" fill="#8265ff" />
+  <path d="m32 37 8 8-8 8-8-8Z" fill="#f154ff" />
+</svg>

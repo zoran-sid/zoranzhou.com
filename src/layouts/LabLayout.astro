@@ -25,9 +25,7 @@ const {
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const copy = getLabTranslations(locale);
 const canonicalPath = Astro.url.pathname;
-const pageTitle = title
-  ? `${title} · WEB3 LAB | ZORAN ZHOU`
-  : `WEB3 LAB | ZORAN ZHOU`;
+const pageTitle = title ? `${title} | WEB3 LAB` : "WEB3 LAB";
 const otherLocale: Locale = locale === "zh-CN" ? "en" : "zh-CN";
 const languageHref =
   alternatePaths?.[otherLocale] ?? localizePath("/lab", otherLocale);
@@ -75,14 +73,24 @@ const safeAlternatePaths = alternatePaths ?? {
       property="og:locale"
       content={locale === "zh-CN" ? "zh_Hans" : "en_US"}
     />
-    <meta property="og:site_name" content="ZORAN ZHOU · WEB3 LAB" />
+    <meta property="og:site_name" content="WEB3 LAB" />
 
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
 
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/web3-lab-favicon.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="64x64"
+      href="/web3-lab-favicon-64.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/web3-lab-apple-touch-icon.png"
+    />
 
     {
       jsonld && (

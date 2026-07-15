@@ -24,8 +24,8 @@ const securityEntries = allEntries.filter(
 const currentLearningStage = 0;
 const description =
   locale === "zh-CN"
-    ? "Web3 Lab 是 Zoran Zhou 的独立技术子站，记录钱包集成、数字资产后端工程、产品安全与解决方案架构的真实构建和验证过程。"
-    : "Web3 Lab is Zoran Zhou's independent technical subsite for documented work in wallet integration, digital asset backend engineering, product security, and solution architecture.";
+    ? "Web3 Lab 是独立技术子站，记录钱包集成、数字资产后端工程、产品安全与解决方案架构的真实构建和验证过程。"
+    : "Web3 Lab is an independent technical subsite for documented work in wallet integration, digital asset backend engineering, product security, and solution architecture.";
 const alternatePaths = {
   "zh-CN": localizePath("/lab", "zh-CN"),
   en: localizePath("/lab", "en"),
@@ -34,7 +34,7 @@ const labUrl = new URL(localizePath("/lab", locale), Astro.site).href;
 const jsonld = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  name: `Web3 Lab · Zoran Zhou`,
+  name: "WEB3 LAB",
   description,
   url: labUrl,
   inLanguage: locale === "zh-CN" ? "zh-Hans" : "en",
