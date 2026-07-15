@@ -109,19 +109,73 @@ const jsonld = {
             role="group"
             aria-label={copy.hero.terminalLabel}
           >
-            <pre
+            <div
               class="lab-terminal__source"
-              aria-label={copy.hero
-                .terminalCodeLabel}><code><span class="lab-code-line"><i>01</i><b>contract</b> <strong>ReplayGuard</strong> {`{`}</span>
-<span class="lab-code-line"><i>02</i>  address <b>immutable</b> verifier;</span>
-<span class="lab-code-line"><i>03</i>  <b>mapping</b>(bytes32 =&gt; bool) <b>public</b> processed;</span>
-<span class="lab-code-line"><i>04</i>  <b>event</b> TransferRecorded(bytes32 <b>indexed</b> key, address token, uint256 amount);</span>
-<span class="lab-code-line"><i>05</i>  <b>constructor</b>(address v) {`{`} verifier = v; {`}`}</span>
-<span class="lab-code-line"><i>06</i>  <b>function</b> <strong>record</strong>(bytes32 key, address token, uint256 amount) <b>external</b> {`{`}</span>
-<span class="lab-code-line"><i>07</i>    <strong>require</strong>(msg.sender == verifier, <em>"AUTH"</em>);</span>
-<span class="lab-code-line"><i>08</i>    <strong>require</strong>(!processed[key], <em>"REPLAY"</em>);</span>
-<span class="lab-code-line"><i>09</i>    processed[key] = <b>true</b>; <b>emit</b> TransferRecorded(key, token, amount);</span>
-<span class="lab-code-line"><i>10</i>  {`}`} {`}`}</span></code></pre>
+              role="group"
+              aria-label={copy.hero.terminalCodeLabel}
+            >
+              <div class="lab-terminal__contract">
+                <span>CONTRACT</span>
+                <strong>ReplayGuard</strong>
+                <span>EIP-712 / SOLIDITY</span>
+              </div>
+              <ol class="lab-terminal__rules">
+                <li>
+                  <i aria-hidden="true">01</i>
+                  <strong>TYPEHASH</strong>
+                  <code
+                    >bytes32 constant TYPEHASH = <b>keccak256</b>(<em
+                      >"Transfer(bytes32 key,address token,uint256 amount,uint48
+                      deadline)"</em
+                    >);</code
+                  >
+                </li>
+                <li>
+                  <i aria-hidden="true">02</i>
+                  <strong>DIGEST</strong>
+                  <code
+                    >bytes32 digest = <b>_hashTypedDataV4</b>(<wbr /><b
+                      >keccak256</b
+                    >(<wbr /><b>abi.encode</b>(<wbr />TYPEHASH, key, token,
+                    amount, deadline)));</code
+                  >
+                </li>
+                <li>
+                  <i aria-hidden="true">03</i>
+                  <strong>AUTH</strong>
+                  <code
+                    >if (!<b>SignatureChecker</b>.<wbr
+                    />isValidSignatureNow(<wbr />verifier, digest, signature))
+                    revert <em>InvalidSignature()</em>;</code
+                  >
+                </li>
+                <li>
+                  <i aria-hidden="true">04</i>
+                  <strong>EXPIRY</strong>
+                  <code
+                    >if (block.timestamp &gt; deadline) revert <em
+                      >Expired(deadline)</em
+                    ></code
+                  >
+                </li>
+                <li>
+                  <i aria-hidden="true">05</i>
+                  <strong>REPLAY</strong>
+                  <code
+                    >if (_processed[key]) revert <em>Replayed(key)</em>;<wbr />
+                    _processed[key] = <em>true</em></code
+                  >
+                </li>
+                <li>
+                  <i aria-hidden="true">06</i>
+                  <strong>AUDIT</strong>
+                  <code
+                    >emit <b>TransferRecorded</b>(<wbr />key, digest, token,
+                    amount);</code
+                  >
+                </li>
+              </ol>
+            </div>
             <p class="lab-terminal__command lab-terminal__command--pending">
               <span class="lab-terminal__path" aria-hidden="true"
                 >~/web3-lab</span
@@ -136,10 +190,10 @@ const jsonld = {
             </p>
           </div>
           <div class="lab-code-panel__signals" aria-label="Code concerns">
-            <span>ACCESS CONTROL</span>
-            <span>ERC-20</span>
-            <span>REPLAY GUARD</span>
-            <span>EVM TRACE</span>
+            <span>EIP-712</span>
+            <span>ERC-1271</span>
+            <span>DEADLINE</span>
+            <span>ATOMIC REPLAY</span>
           </div>
         </div>
         <footer class="lab-system__footer">

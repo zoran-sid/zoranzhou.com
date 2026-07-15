@@ -142,7 +142,7 @@ const en: LabCopy = {
     codeBoundary: "REFERENCE PATTERN · NOT AN IMPLEMENTATION CLAIM",
     terminalLabel:
       "Smart contract execution terminal preview; commands are not executed",
-    terminalCodeLabel: "Reference Solidity replay-protection contract",
+    terminalCodeLabel: "EIP-712 signed-event replay-protection reference flow",
     terminalReady: "READY",
     routeLabel: "Web3 technology route",
     route: [
@@ -365,7 +365,7 @@ const zhCN: LabCopy = {
     systemTitle: "安全事件处理示例",
     codeBoundary: "参考模式 · 不代表已完成实现",
     terminalLabel: "智能合约执行终端预览；命令不会实际执行",
-    terminalCodeLabel: "Solidity 防重放参考合约",
+    terminalCodeLabel: "EIP-712 签名事件防重放参考流程",
     terminalReady: "就绪",
     routeLabel: "Web3 技术路线",
     route: [

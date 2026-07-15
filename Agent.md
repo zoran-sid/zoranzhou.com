@@ -421,13 +421,16 @@ TypeScript typed events
   -> Sepolia verification and published evidence
 ```
 
-The hero code panel is a static blockchain execution preview, not an executable console.
-Its accessible label must state that commands are not run. The visual contract is:
+The hero code panel is a static blockchain control preview, not an executable console or
+a source-file viewer. Its accessible label must state that commands are not run. The
+visual contract is:
 
-- keep only the compact, technically meaningful `ReplayGuard` lines needed to show
-  authorization, replay protection, and event recording;
-- keep the current example within its ten numbered lines; do not expand the hero into a
-  full source-file viewer;
+- present `ReplayGuard` as six fixed, numbered rule rows: `TYPEHASH`, `DIGEST`, `AUTH`,
+  `EXPIRY`, `REPLAY`, and `AUDIT`;
+- use the expressions to demonstrate EIP-712 typed-data hashing, ERC-1271-compatible
+  signature checking, deadline enforcement, an atomic replay-state transition, and audit
+  event recording;
+- use a responsive structured grid rather than a literal multiline source-code block;
 - use the blockchain test command
   `forge test --match-test testReplayProtection -vvvv`;
 - show `READY`/`就绪`, not an instruction to press Enter;
@@ -435,11 +438,12 @@ Its accessible label must state that commands are not run. The visual contract i
   separate low-value prompt-only line;
 - use the cursor and status signal to suggest a pending execution state without claiming
   that a command is actually running;
-- allow source-code horizontal scrolling and hide the path before shrinking command text
-  below a readable size on mobile.
+- keep the rule rows within the panel without horizontal scrolling; on mobile, stack each
+  expression below its rule label and hide the path before shrinking command text below a
+  readable size.
 
-The concern labels remain `ACCESS CONTROL`, `ERC-20`, `REPLAY GUARD`, and `EVM TRACE`.
-They describe the code being previewed; do not replace them with generic build labels.
+The concern labels remain `EIP-712`, `ERC-1271`, `DEADLINE`, and `ATOMIC REPLAY`. They
+describe the controls being previewed; do not replace them with generic build labels.
 
 Cursor and status pulse animations run only when the media query permits motion
 (`prefers-reduced-motion: no-preference`). The reduced-motion branch must suppress them.
