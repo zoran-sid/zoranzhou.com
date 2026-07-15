@@ -291,6 +291,275 @@ src/content/config.ts
 
 Change the schema/source first. Avoid a second parser or a parallel content format.
 
+## Web3 Lab subsystem
+
+The Web3 Lab is a deliberately independent technical subsite, not a themed section of
+the personal-site shell. Read these files as one design and content system:
+
+```text
+src/content/config.ts
+src/content/lab/*
+src/i18n/lab.ts
+src/lib/lab.ts
+src/pages/[locale]/lab/index.astro
+src/pages/[locale]/lab/[type]/[slug].astro
+src/layouts/LabLayout.astro
+src/layouts/LabEntryLayout.astro
+src/components/lab/{LabHeader,LabFooter}.astro
+src/styles/lab.css
+public/web3-lab-favicon.svg
+public/web3-lab-favicon-64.png
+public/web3-lab-apple-touch-icon.png
+```
+
+The source-to-UI dependency chain is:
+
+```text
+Lab schema + bilingual entries
+  -> bilingual Lab copy
+  -> Lab home/detail layouts
+  -> isolated Lab components and CSS
+  -> static bilingual routes and metadata
+```
+
+### Routes, discovery, and visual shell
+
+Lab home routes are `/zh-CN/lab/` and `/en/lab/`. Detail routes use
+`/[locale]/lab/[type]/[slug]/`; `LAB_TYPE_SEGMENTS` is the only type-to-path mapping:
+
+```text
+learning     -> learning
+build        -> builds
+security     -> security
+architecture -> architecture
+note         -> notes
+```
+
+Use `getLabEntryPath()` and `getLabHomePath()` instead of rebuilding these paths. Lab
+entries remain part of the shared search index and sitemap. The personal-site hero has a
+Web3 Lab entry button on wider screens; below the mobile breakpoint it is hidden from the
+hero and the `WEB3 LAB` entry remains available in the mobile navigation. Do not remove
+one entry point without proving that the other remains reachable and localized.
+
+The Lab has a fixed dark visual system rather than inheriting the personal-site theme.
+Its CSS tokens start with a `#05070d` background and cyan, violet, magenta, green, and
+amber signals. It uses Inter, JetBrains Mono, and an explicit CJK font stack. Preserve
+the `lab-*` class namespace, grid/beam/noise backdrop, translucent sticky header, and
+isolated focus/selection treatments; do not move these rules into the global theme.
+
+The home-page section order is Hero, technical tracks, featured build, learning route,
+security cases, About, and the Lab footer. Detail pages use a large entry header and
+boundary badges followed by a sticky facts rail, evidence notice, and prose column.
+Cards with `data-lab-spotlight` track the pointer only for a fine pointer when reduced
+motion has not been requested.
+
+### Brand and metadata boundary
+
+`LabLayout.astro` owns the Lab document shell. Do not route Lab pages through
+`BaseLayout.astro` or inherit the personal-site title/favicon contract.
+
+The browser and share metadata rules are exact:
+
+- `/zh-CN/lab/` and `/en/lab/` use the title `WEB3 LAB`.
+- Lab details use `<entry title> | WEB3 LAB`.
+- Lab titles must not append `ZORAN ZHOU`.
+- `og:site_name`, the home JSON-LD `name`, and detail JSON-LD
+  `isPartOf.name` are `WEB3 LAB`.
+- The Lab description identifies it as an independent technical subsite without
+  incorporating the personal-site name as Lab branding.
+- Person attribution may remain in JSON-LD `author`, the explicit return-to-site link,
+  and copyright. Authorship and subsite branding are separate concerns.
+
+Lab routes use only these Lab-specific icon assets:
+
+```text
+/web3-lab-favicon.svg
+/web3-lab-favicon-64.png
+/web3-lab-apple-touch-icon.png
+```
+
+The main site continues to use `/favicon.png` and `/apple-touch-icon.png`. The Lab icon
+matches the header's cyan, violet, and magenta diamond mark. When the mark changes,
+update the CSS mark, SVG source, 64 px fallback, and 180 px touch icon together; do not
+silently reuse the portrait favicon.
+
+Brand separation must not remove locale and discovery metadata. Preserve canonical
+links, both locale alternates, and the `x-default` link to `/en/lab/`.
+
+### Header, return controls, and responsive behavior
+
+The Lab header provides four independent actions: return to the personal site, return to
+the Lab home through the brand, navigate Lab sections, and switch language. Preserve the
+meaning and focus order of all four.
+
+Touch targets are deliberate:
+
+- `.lab-return` has a minimum height of `3rem`; at narrow widths it also has a minimum
+  width of `3rem`, producing an approximately 48 by 48 px target.
+- Mobile may hide the return link's visible text, but it must retain the full localized
+  `aria-label` and must not shrink to a bare glyph-sized target.
+- `.lab-entry__back` must remain at least `2.75rem` (44 px) high.
+- The footer return link must also remain at least `2.75rem` (44 px) high.
+- A visible arrow is decoration inside the link, never the only clickable element.
+- Keyboard focus indicators and skip-link behavior must remain visible and usable.
+
+At the header breakpoint, Lab navigation becomes a horizontally scrollable second row.
+Do not make the brand, language switch, or return target overlap in order to preserve all
+desktop labels on a narrow screen.
+
+### Hero route and execution preview
+
+The hero route replaces the former four-box promotional list (`BUILDING IN PUBLIC`,
+`STATIC TECH LAB`, `TESTNET PROJECTS`, and `NO REAL FUNDS`). Do not restore generic
+promotional boundary cards. `copy.hero.route` presents a concrete engineering sequence:
+
+```text
+TypeScript typed events
+  -> viem RPC log decoding
+  -> Solidity replay protection
+  -> Foundry fuzz and invariant tests
+  -> Sepolia verification and published evidence
+```
+
+The hero code panel is a static blockchain execution preview, not an executable console.
+Its accessible label must state that commands are not run. The visual contract is:
+
+- keep only the compact, technically meaningful `ReplayGuard` lines needed to show
+  authorization, replay protection, and event recording;
+- keep the current example within its ten numbered lines; do not expand the hero into a
+  full source-file viewer;
+- use the blockchain test command
+  `forge test --match-test testReplayProtection -vvvv`;
+- show `READY`/`就绪`, not an instruction to press Enter;
+- do not show `npm run build`, `cat ReplayGuard.sol`, `等待回车`, `Press Enter`, or a
+  separate low-value prompt-only line;
+- use the cursor and status signal to suggest a pending execution state without claiming
+  that a command is actually running;
+- allow source-code horizontal scrolling and hide the path before shrinking command text
+  below a readable size on mobile.
+
+The concern labels remain `ACCESS CONTROL`, `ERC-20`, `REPLAY GUARD`, and `EVM TRACE`.
+They describe the code being previewed; do not replace them with generic build labels.
+
+Cursor and status pulse animations run only when the media query permits motion
+(`prefers-reduced-motion: no-preference`). The reduced-motion branch must suppress them.
+The preview must never contain secrets, live credentials, or a UI that implies remote
+command execution.
+
+### Fishbone learning route
+
+The learning progress visualization is an ordered fishbone route driven by
+`copy.learning.evidence`, not a generic checklist. Its five steps are specific and
+bilingual:
+
+1. TypeScript: typed onchain event ingestion.
+2. viem: RPC log decoding and ERC-20 normalization.
+3. Solidity: a replay-protected event registry.
+4. Foundry: unit, fuzz, and invariant tests.
+5. Sepolia: deployment, transaction hashes, and a verification report.
+
+`currentLearningStage` is a zero-based index and currently remains `0` (TypeScript) until
+evidence supports advancing it. Exactly one item may have
+`data-state="current"` and `aria-current="step"`; all other steps remain pending until
+evidence supports a state change. Current state is expressed with text and ARIA as well
+as cyan `#47e7ff`; pending nodes use the readable gray fishbone token `#718198`. Maintain
+their contrast against the Lab background and never style a pending stage so that it
+appears completed.
+
+On wide containers, the five cards alternate above and below a horizontal spine. Branch
+lines occupy only the gap between a card edge and the spine: they must be clipped beneath
+the card layer and must never cross into or through a stage card. When the learning-route
+container is narrower than `46rem`, the visualization changes to a vertical spine. The
+diagonal SVG branches disappear and short horizontal connectors join the vertical spine
+to each full-width card.
+
+When the route changes, update all of the following as one bilingual change:
+
+```text
+copy.hero.route
+copy.learning.evidence
+copy.learning.nextGate
+currentLearningStage and its evidence-backed state
+desktop and narrow-container geometry
+```
+
+Do not replace the concrete technology/outcome pairs with labels such as
+`implementation`, `test results`, `security review`, or `documentation`. Those labels do
+not describe an engineering route.
+
+### Planned stack and evidence semantics
+
+The Lab distinguishes planned technology from adopted technology. Planned builds use the
+structured `candidateStack` field, whose group keys are exactly:
+
+```text
+server | onchain | data | contracts | network
+```
+
+The current wallet-platform plan is explicit:
+
+| Responsibility | Planned selection   |
+| -------------- | ------------------- |
+| Server         | TypeScript + NestJS |
+| Onchain        | viem                |
+| Data           | PostgreSQL          |
+| Contracts      | Solidity + Foundry  |
+| Network        | Sepolia             |
+
+Render these as labeled responsibility groups, not as one slash-separated tool string.
+When `status` is `planned` and `candidateStack` is nonempty, the UI uses `PLANNED STACK` /
+`规划技术栈` plus the explicit note that the selection is not implemented or verified.
+
+`technologies` is reserved for tools supported by implementation evidence. Moving an
+item from the planned stack into actual technology requires the corresponding content
+update to `status`, `verificationStatus`, `implementedFeatures`, and evidence or known
+limitations. Lifecycle status and verification status are independent axes; do not label
+work `tested`, `verified`, or `completed` without reproducible evidence.
+
+### Footer and copy rules
+
+The Lab footer contains only the `WEB3 / LAB` brand, the localized return-to-site link,
+and copyright. Do not restore the removed footer boundary slogan:
+
+```text
+静态优先 · 教育用途 · 面向测试网 · 不使用真实资金
+STATIC-FIRST · EDUCATIONAL · TESTNET-ORIENTED · NO REAL FUNDS
+```
+
+Those safety boundaries still belong in entry badges, the About section, entry content,
+and evidence notices where they have context. They should not be repeated as a thin
+full-width footer sentence.
+
+The Security section header intentionally has no generic explanatory paragraph;
+`security.description` is not part of `LabCopy`. Keep concrete boundaries in the
+security cards, theory notice, and entry evidence instead of restoring the removed
+header copy.
+
+Localized Lab copy lives in `src/i18n/lab.ts`. Keep English and Chinese structure,
+technical order, status meaning, and accessibility labels synchronized. Lab detail
+translations are paired through `translationKey`; when a safe translated entry cannot
+be found, language switching returns to the target-locale Lab home rather than inventing
+a translated slug.
+
+### Responsive and motion contract
+
+The responsive transitions are part of the design, not optional cleanup:
+
+- below `74rem`, Hero, learning, and About move to one column while technical tracks use
+  two columns;
+- below `56rem`, the header becomes two rows with horizontally scrollable navigation,
+  and featured-build and detail two-column layouts collapse;
+- below `40rem`, routes, candidate-stack groups, track cards, and the footer become one
+  column; the terminal hides its path and the security flow becomes vertical;
+- the learning fishbone also responds to its own `46rem` container threshold, independent
+  of the viewport breakpoints.
+
+At each transition, verify long text in both locales, terminal overflow, fishbone
+connectors, touch targets, and the detail facts rail. When the user requests reduced
+motion (`prefers-reduced-motion: reduce`), disable smooth scrolling, spotlight, hover
+translation, cursor blink, and continuous status animations without removing state text
+or focus feedback.
+
 ## Route and map subsystem
 
 This is the highest-risk part of the project. Read the following files as one system:
@@ -922,6 +1191,23 @@ Use Prettier on the intended file(s) when unrelated user formatting must be pres
 5. Test escaped pipes, bilingual labels, missing ratings, and manual values.
 6. Run updater tests, dry-run, and build.
 
+### Change Web3 Lab design or content
+
+1. Read the Lab schema, both localized entries, `src/i18n/lab.ts`, both Lab layouts,
+   Lab components, and `src/styles/lab.css` as one system.
+2. Change structured content or schema before its visual consumers; do not encode planned
+   stack or progress evidence only in CSS or page markup.
+3. Keep `hero.route`, `learning.evidence`, `learning.nextGate`, candidate-stack groups,
+   and both locales semantically aligned.
+4. Preserve the independent title, Open Graph, JSON-LD, favicon, canonical, and
+   `hreflang` contract.
+5. Check the header and detail return targets, terminal overflow, fishbone connector
+   geometry, current/pending contrast, and text wrapping at desktop and mobile widths.
+6. Verify planned tools are not presented as implemented and that verification claims
+   match checked-in evidence.
+7. Run Astro checks and the full static build, then inspect a home and detail page in both
+   locales.
+
 ### Change the editor
 
 1. Keep code under `tools/content-editor/`.
@@ -952,21 +1238,22 @@ unless it belongs to the removed public feature.
 
 ## Validation matrix
 
-| Change                                 | Minimum focused validation                                                |
-| -------------------------------------- | ------------------------------------------------------------------------- |
-| Markdown/MDX content                   | `npm run lint`; relevant locale page; build if deployment-bound           |
-| Astro page/component/layout            | `npm run lint`, `npm run build`                                           |
-| TypeScript library                     | `npx tsc --noEmit` plus focused tests                                     |
-| Navigation/i18n/root redirect          | `npm run test:language-routing`, build                                    |
-| Route parser/identity/endpoints/splits | `npm run test:route-logic`, `npm run validate:routes`, build              |
-| Route importer                         | Dry-run preview, body/manual-field preservation inspection, Route tests   |
-| Route/map CSS                          | Desktop and narrow mobile maps, closed-loop marker overlap, light/dark    |
-| Media parser/updater                   | `npm run test:media-update`, dry-run, manual-field diff, build            |
-| Media table CSS                        | Long Type/Status labels at desktop/mobile, both locales                   |
-| Local editor/API                       | `npm run test:editor`, both Node syntax checks, interactive Windows smoke |
-| Cloudflare/build boundary              | Build, `dist` secret/editor scan, inspect `_routes.json`                  |
-| Feature removal                        | Repository-wide stale-reference searches plus build                       |
-| Documentation only                     | Prettier/check formatting, verify every named path/command exists         |
+| Change                                 | Minimum focused validation                                                 |
+| -------------------------------------- | -------------------------------------------------------------------------- |
+| Markdown/MDX content                   | `npm run lint`; relevant locale page; build if deployment-bound            |
+| Astro page/component/layout            | `npm run lint`, `npm run build`                                            |
+| TypeScript library                     | `npx tsc --noEmit` plus focused tests                                      |
+| Navigation/i18n/root redirect          | `npm run test:language-routing`, build                                     |
+| Route parser/identity/endpoints/splits | `npm run test:route-logic`, `npm run validate:routes`, build               |
+| Route importer                         | Dry-run preview, body/manual-field preservation inspection, Route tests    |
+| Route/map CSS                          | Desktop and narrow mobile maps, closed-loop marker overlap, light/dark     |
+| Media parser/updater                   | `npm run test:media-update`, dry-run, manual-field diff, build             |
+| Media table CSS                        | Long Type/Status labels at desktop/mobile, both locales                    |
+| Web3 Lab layout/content/metadata       | Lint/build; both locales; home/detail title, favicon, touch targets, route |
+| Local editor/API                       | `npm run test:editor`, both Node syntax checks, interactive Windows smoke  |
+| Cloudflare/build boundary              | Build, `dist` secret/editor scan, inspect `_routes.json`                   |
+| Feature removal                        | Repository-wide stale-reference searches plus build                        |
+| Documentation only                     | Prettier/check formatting, verify every named path/command exists          |
 
 Final hygiene:
 
