@@ -119,14 +119,14 @@ const jsonld = {
                 <strong>ReplayGuard</strong>
                 <span>EIP-712 / SOLIDITY</span>
               </div>
-              <ol class="lab-terminal__rules">
+              <ol class="lab-terminal__rules" role="list">
                 <li>
                   <i aria-hidden="true">01</i>
                   <strong>TYPEHASH</strong>
                   <code
                     >bytes32 constant TYPEHASH = <b>keccak256</b>(<em
-                      >"Transfer(bytes32 key,address token,uint256 amount,uint48
-                      deadline)"</em
+                      >"TransferAuthorization(bytes32 key,address token,uint256
+                      amount,uint48 deadline)"</em
                     >);</code
                   >
                 </li>
@@ -145,7 +145,7 @@ const jsonld = {
                   <strong>AUTH</strong>
                   <code
                     >if (!<b>SignatureChecker</b>.<wbr
-                    />isValidSignatureNow(<wbr />verifier, digest, signature))
+                    />isValidSignatureNow(<wbr />signer, digest, signature))
                     revert <em>InvalidSignature()</em>;</code
                   >
                 </li>
@@ -155,7 +155,7 @@ const jsonld = {
                   <code
                     >if (block.timestamp &gt; deadline) revert <em
                       >Expired(deadline)</em
-                    ></code
+                    >;</code
                   >
                 </li>
                 <li>
@@ -163,15 +163,15 @@ const jsonld = {
                   <strong>REPLAY</strong>
                   <code
                     >if (_processed[key]) revert <em>Replayed(key)</em>;<wbr />
-                    _processed[key] = <em>true</em></code
+                    _processed[key] = <em>true</em>;</code
                   >
                 </li>
                 <li>
                   <i aria-hidden="true">06</i>
                   <strong>AUDIT</strong>
                   <code
-                    >emit <b>TransferRecorded</b>(<wbr />key, digest, token,
-                    amount);</code
+                    >emit <b>AuthorizationConsumed</b>(<wbr />key, signer,
+                    digest, deadline);</code
                   >
                 </li>
               </ol>
@@ -193,7 +193,7 @@ const jsonld = {
             <span>EIP-712</span>
             <span>ERC-1271</span>
             <span>DEADLINE</span>
-            <span>ATOMIC REPLAY</span>
+            <span>ATOMIC CONSUME</span>
           </div>
         </div>
         <footer class="lab-system__footer">

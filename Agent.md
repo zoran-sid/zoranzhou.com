@@ -442,7 +442,7 @@ visual contract is:
   expression below its rule label and hide the path before shrinking command text below a
   readable size.
 
-The concern labels remain `EIP-712`, `ERC-1271`, `DEADLINE`, and `ATOMIC REPLAY`. They
+The concern labels remain `EIP-712`, `ERC-1271`, `DEADLINE`, and `ATOMIC CONSUME`. They
 describe the controls being previewed; do not replace them with generic build labels.
 
 Cursor and status pulse animations run only when the media query permits motion
