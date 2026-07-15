@@ -21,12 +21,7 @@ const featuredBuild = allEntries.find(
 const securityEntries = allEntries.filter(
   (entry) => entry.data.type === "security" && entry.data.featured,
 );
-const learningEntries = allEntries.filter(
-  (entry) => entry.data.type === "learning",
-);
-const verifiedLearningCount = learningEntries.filter(
-  (entry) => entry.data.verificationStatus === "verified",
-).length;
+const currentLearningStage = 0;
 const description =
   locale === "zh-CN"
     ? "Web3 Lab 是 Zoran Zhou 的独立技术子站，记录钱包集成、数字资产后端工程、产品安全与解决方案架构的真实构建和验证过程。"
@@ -77,16 +72,23 @@ const jsonld = {
           </a>
         </div>
 
-        <div class="lab-boundaries" aria-label="Web3 Lab boundaries">
+        <ol
+          class="lab-hero-route"
+          role="list"
+          aria-label={copy.hero.routeLabel}
+        >
           {
-            copy.boundaries.map((boundary, index) => (
-              <span>
-                <i>{String(index + 1).padStart(2, "0")}</i>
-                {boundary}
-              </span>
+            copy.hero.route.map((stage, index) => (
+              <li>
+                <span>
+                  <i aria-hidden="true">{String(index + 1).padStart(2, "0")}</i>
+                  {stage.technology}
+                </span>
+                <strong>{stage.outcome}</strong>
+              </li>
             ))
           }
-        </div>
+        </ol>
       </div>
 
       <div class="lab-system" data-lab-spotlight>
@@ -99,30 +101,45 @@ const jsonld = {
         </header>
         <div class="lab-code-panel">
           <div class="lab-code-panel__meta">
-            <span>TYPESCRIPT / REFERENCE</span>
-            <span>webhook-handler.ts</span>
+            <span>SOLIDITY / EXECUTION PREVIEW</span>
+            <span>~/web3-lab</span>
           </div>
-          <pre
-            aria-label="Reference TypeScript pattern for secure blockchain event handling"><code><span class="lab-code-line"><i>01</i><b>type</b> EventKey = <em>`${"${number}:${string}:${number}"}`</em>;</span>
-<span class="lab-code-line"><i>02</i></span>
-<span class="lab-code-line"><i>03</i><b>async function</b> <strong>acceptTransfer</strong>(event: SignedWebhook) {`{`}</span>
-<span class="lab-code-line"><i>04</i>  <strong>verifyHmac</strong>(event.rawBody, event.signature);</span>
-<span class="lab-code-line"><i>05</i></span>
-<span class="lab-code-line"><i>06</i>  <b>const</b> transfer = <strong>decodeErc20</strong>(event.log);</span>
-<span class="lab-code-line"><i>07</i>  <b>const</b> key: EventKey =</span>
-<span class="lab-code-line"><i>08</i>    <em>`${"${event.chainId}:${event.txHash}:${event.logIndex}"}`</em>;</span>
-<span class="lab-code-line"><i>09</i></span>
-<span class="lab-code-line"><i>10</i>  <b>await</b> db.<strong>transaction</strong>(<b>async</b> (tx) =&gt; {`{`}</span>
-<span class="lab-code-line"><i>11</i>    <b>if</b> (<b>await</b> tx.events.exists(key)) <b>return</b>;</span>
-<span class="lab-code-line"><i>12</i>    <b>await</b> tx.deposits.credit(transfer);</span>
-<span class="lab-code-line"><i>13</i>    <b>await</b> tx.events.record(key);</span>
-<span class="lab-code-line"><i>14</i>  {`}`});</span>
-<span class="lab-code-line"><i>15</i>{`}`}</span></code></pre>
+          <div
+            class="lab-terminal"
+            role="group"
+            aria-label={copy.hero.terminalLabel}
+          >
+            <pre
+              class="lab-terminal__source"
+              aria-label={copy.hero
+                .terminalCodeLabel}><code><span class="lab-code-line"><i>01</i><b>contract</b> <strong>ReplayGuard</strong> {`{`}</span>
+<span class="lab-code-line"><i>02</i>  address <b>immutable</b> verifier;</span>
+<span class="lab-code-line"><i>03</i>  <b>mapping</b>(bytes32 =&gt; bool) <b>public</b> processed;</span>
+<span class="lab-code-line"><i>04</i>  <b>event</b> TransferRecorded(bytes32 <b>indexed</b> key, address token, uint256 amount);</span>
+<span class="lab-code-line"><i>05</i>  <b>constructor</b>(address v) {`{`} verifier = v; {`}`}</span>
+<span class="lab-code-line"><i>06</i>  <b>function</b> <strong>record</strong>(bytes32 key, address token, uint256 amount) <b>external</b> {`{`}</span>
+<span class="lab-code-line"><i>07</i>    <strong>require</strong>(msg.sender == verifier, <em>"AUTH"</em>);</span>
+<span class="lab-code-line"><i>08</i>    <strong>require</strong>(!processed[key], <em>"REPLAY"</em>);</span>
+<span class="lab-code-line"><i>09</i>    processed[key] = <b>true</b>; <b>emit</b> TransferRecorded(key, token, amount);</span>
+<span class="lab-code-line"><i>10</i>  {`}`} {`}`}</span></code></pre>
+            <p class="lab-terminal__command lab-terminal__command--pending">
+              <span class="lab-terminal__path" aria-hidden="true"
+                >~/web3-lab</span
+              >
+              <span class="lab-terminal__prompt" aria-hidden="true">$</span>
+              <code>forge test --match-test testReplayProtection -vvvv</code>
+              <span class="lab-terminal__cursor" aria-hidden="true"></span>
+            </p>
+            <p class="lab-terminal__status">
+              <i aria-hidden="true"></i>
+              <span>{copy.hero.terminalReady}</span>
+            </p>
+          </div>
           <div class="lab-code-panel__signals" aria-label="Code concerns">
-            <span>HMAC</span>
+            <span>ACCESS CONTROL</span>
             <span>ERC-20</span>
-            <span>IDEMPOTENCY</span>
-            <span>DB TRANSACTION</span>
+            <span>REPLAY GUARD</span>
+            <span>EVM TRACE</span>
           </div>
         </div>
         <footer class="lab-system__footer">
@@ -233,7 +250,19 @@ const jsonld = {
                   </div>
                   <div>
                     <dt>{copy.builds.candidateStack}</dt>
-                    <dd>{featuredBuild.data.technologies.join(" / ")}</dd>
+                    <dd>
+                      <ul class="lab-stack-groups" role="list">
+                        {featuredBuild.data.candidateStack.map((group) => (
+                          <li class="lab-stack-group">
+                            <span class="lab-stack-group__label">
+                              {copy.stack.groups[group.group]}
+                            </span>
+                            <strong>{group.items.join(" + ")}</strong>
+                          </li>
+                        ))}
+                      </ul>
+                      <small class="lab-stack-note">{copy.stack.note}</small>
+                    </dd>
                   </div>
                   <div>
                     <dt>{copy.builds.implemented}</dt>
@@ -271,15 +300,51 @@ const jsonld = {
       <div class="lab-learning-log" data-lab-spotlight>
         <header>
           <span>{copy.learning.log}</span>
-          <strong>VERIFIED / PUBLIC</strong>
+          <strong>
+            {copy.learning.currentStage} / {
+              String(currentLearningStage + 1).padStart(2, "0")
+            }
+          </strong>
         </header>
-        <div class="lab-learning-log__metric">
-          <strong>{verifiedLearningCount}</strong>
-          <span>{copy.learning.verified}</span>
-        </div>
-        <ul class="lab-learning-log__evidence">
-          {copy.learning.evidence.map((item) => <li>{item}</li>)}
-        </ul>
+        <ol
+          class="lab-learning-log__fishbone"
+          role="list"
+          aria-label={copy.learning.progressLabel}
+        >
+          {
+            copy.learning.evidence.map((item, index) => {
+              const isCurrent = index === currentLearningStage;
+              return (
+                <li
+                  data-state={isCurrent ? "current" : "pending"}
+                  aria-current={isCurrent ? "step" : undefined}
+                >
+                  <div class="lab-learning-log__stage">
+                    <span>
+                      <i aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
+                      </i>
+                      {isCurrent
+                        ? copy.learning.currentStage
+                        : copy.learning.pendingStage}
+                    </span>
+                    <strong>{item.technology}</strong>
+                    <p>{item.outcome}</p>
+                  </div>
+                  <svg
+                    class="lab-learning-log__branch"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <line x1="22" y1="0" x2="50" y2="100" />
+                  </svg>
+                </li>
+              );
+            })
+          }
+        </ol>
         <footer>{copy.learning.nextGate}</footer>
       </div>
     </div>
@@ -291,12 +356,11 @@ const jsonld = {
     aria-labelledby="security-title"
   >
     <div class="lab-shell">
-      <header class="lab-section__header">
+      <header class="lab-section__header lab-section__header--single">
         <div>
           <span class="lab-section__label">{copy.security.label}</span>
           <h2 id="security-title">{copy.security.title}</h2>
         </div>
-        <p>{copy.security.description}</p>
       </header>
 
       <div class="lab-security-grid">

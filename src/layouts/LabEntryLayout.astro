@@ -42,6 +42,7 @@ const typeLabel = copy.typeLabels[entry.data.type] ?? entry.data.type;
 const trackLabel = copy.trackLabels[entry.data.track] ?? entry.data.track;
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 const isPlanned = entry.data.status === "planned";
+const hasCandidateStack = isPlanned && entry.data.candidateStack.length > 0;
 const entryUrl = new URL(getLabEntryPath(entry), Astro.site).href;
 const jsonld = {
   "@context": "https://schema.org",
@@ -138,18 +139,34 @@ const jsonld = {
         </dl>
 
         {
-          entry.data.technologies.length > 0 && (
+          (hasCandidateStack || entry.data.technologies.length > 0) && (
             <section class="lab-entry__rail-section">
               <h2>
-                {isPlanned
+                {hasCandidateStack
                   ? copy.detail.candidateStack
                   : copy.detail.technologies}
               </h2>
-              <div class="lab-entry__chips">
-                {entry.data.technologies.map((technology) => (
-                  <span>{technology}</span>
-                ))}
-              </div>
+              {hasCandidateStack ? (
+                <>
+                  <ul class="lab-stack-groups" role="list">
+                    {entry.data.candidateStack.map((group) => (
+                      <li class="lab-stack-group">
+                        <span class="lab-stack-group__label">
+                          {copy.stack.groups[group.group]}
+                        </span>
+                        <strong>{group.items.join(" + ")}</strong>
+                      </li>
+                    ))}
+                  </ul>
+                  <small class="lab-stack-note">{copy.stack.note}</small>
+                </>
+              ) : (
+                <div class="lab-entry__chips">
+                  {entry.data.technologies.map((technology) => (
+                    <span>{technology}</span>
+                  ))}
+                </div>
+              )}
             </section>
           )
         }

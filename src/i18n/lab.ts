@@ -27,8 +27,15 @@ export interface LabCopy {
     secondary: string;
     systemTitle: string;
     codeBoundary: string;
+    terminalLabel: string;
+    terminalCodeLabel: string;
+    terminalReady: string;
+    routeLabel: string;
+    route: Array<{
+      technology: string;
+      outcome: string;
+    }>;
   };
-  boundaries: string[];
   tracks: {
     label: string;
     title: string;
@@ -47,20 +54,31 @@ export interface LabCopy {
     noImplemented: string;
     view: string;
   };
+  stack: {
+    groups: Record<
+      "server" | "onchain" | "data" | "contracts" | "network",
+      string
+    >;
+    note: string;
+  };
   learning: {
     label: string;
     title: string;
     description: string;
     log: string;
-    verified: string;
-    evidence: string[];
+    evidence: Array<{
+      technology: string;
+      outcome: string;
+    }>;
+    progressLabel: string;
+    currentStage: string;
+    pendingStage: string;
     noPublicOutcomes: string;
     nextGate: string;
   };
   security: {
     label: string;
     title: string;
-    description: string;
     theoryNotice: string;
     view: string;
   };
@@ -97,7 +115,6 @@ export interface LabCopy {
     noRealFunds: string;
   };
   footer: {
-    boundary: string;
     returnToSite: string;
   };
 }
@@ -123,13 +140,19 @@ const en: LabCopy = {
     secondary: "View learning outcomes",
     systemTitle: "SECURE EVENT HANDLER",
     codeBoundary: "REFERENCE PATTERN · NOT AN IMPLEMENTATION CLAIM",
+    terminalLabel:
+      "Smart contract execution terminal preview; commands are not executed",
+    terminalCodeLabel: "Reference Solidity replay-protection contract",
+    terminalReady: "READY",
+    routeLabel: "Web3 technology route",
+    route: [
+      { technology: "TYPESCRIPT", outcome: "TYPE-SAFE EVENTS" },
+      { technology: "VIEM", outcome: "RPC LOG DECODING" },
+      { technology: "SOLIDITY", outcome: "REPLAY PROTECTION" },
+      { technology: "FOUNDRY", outcome: "FUZZ + INVARIANT TESTS" },
+      { technology: "SEPOLIA", outcome: "VERIFY + PUBLISH" },
+    ],
   },
-  boundaries: [
-    "BUILDING IN PUBLIC",
-    "STATIC TECH LAB",
-    "TESTNET PROJECTS",
-    "NO REAL FUNDS",
-  ],
   tracks: {
     label: "04 / TECHNICAL TRACKS",
     title: "Four technical domains. One engineering system.",
@@ -189,28 +212,61 @@ const en: LabCopy = {
     featured: "FEATURED BUILD",
     status: "STATUS",
     phase: "CURRENT PHASE",
-    candidateStack: "CANDIDATE STACK",
+    candidateStack: "PLANNED STACK",
     implemented: "IMPLEMENTED",
     noImplemented: "No features are claimed as implemented yet.",
     view: "Open build record",
+  },
+  stack: {
+    groups: {
+      server: "SERVER",
+      onchain: "ONCHAIN",
+      data: "DATA",
+      contracts: "CONTRACTS",
+      network: "NETWORK",
+    },
+    note: "PLANNED SELECTION · NOT IMPLEMENTED OR VERIFIED",
   },
   learning: {
     label: "LEARNING / PUBLIC OUTCOMES",
     title: "Learning outcomes, published when they can be verified.",
     description:
       "Public entries focus on concrete outputs, problems encountered, security findings, related code, and the date each result was last verified.",
-    log: "EVIDENCE LOG",
-    verified: "verified public outcomes",
-    evidence: ["IMPLEMENTATION", "TESTS", "SECURITY FINDINGS", "DOCUMENTATION"],
+    log: "WEB3 VERIFICATION ROUTE",
+    evidence: [
+      {
+        technology: "TYPESCRIPT",
+        outcome: "Typed chain-event ingestion",
+      },
+      {
+        technology: "VIEM",
+        outcome: "RPC log decoding and ERC-20 normalization",
+      },
+      {
+        technology: "SOLIDITY",
+        outcome: "Replay-protected event registry",
+      },
+      {
+        technology: "FOUNDRY",
+        outcome: "Unit, fuzz, and invariant tests",
+      },
+      {
+        technology: "SEPOLIA",
+        outcome: "Deployment, transaction hashes, and verification report",
+      },
+    ],
+    progressLabel:
+      "Web3 delivery route from typed ingestion to public verification evidence",
+    currentStage: "CURRENT STAGE",
+    pendingStage: "PENDING",
     noPublicOutcomes:
       "No learning outcome is currently claimed as verified. Entries will appear only after there is a concrete implementation or documented result.",
-    nextGate: "NEXT PUBLICATION GATE / IMPLEMENT → TEST → DOCUMENT",
+    nextGate:
+      "TECHNICAL ROUTE / TYPESCRIPT → VIEM → SOLIDITY → FOUNDRY → SEPOLIA EVIDENCE",
   },
   security: {
     label: "SECURITY / ATTACK SURFACE",
     title: "Security work stays attached to real workflows.",
-    description:
-      "Analysis is separated from tested evidence. A case becomes tested or verified only when reproduction and regression evidence exists.",
     theoryNotice: "THEORETICAL ANALYSIS · NOT IMPLEMENTATION-TESTED",
     view: "Read the security case",
   },
@@ -236,7 +292,7 @@ const en: LabCopy = {
     track: "TRACK",
     phase: "CURRENT PHASE",
     lastVerified: "LAST VERIFIED",
-    candidateStack: "CANDIDATE STACK",
+    candidateStack: "PLANNED STACK",
     technologies: "TECHNOLOGIES",
     implemented: "IMPLEMENTED FEATURES",
     noImplemented: "No implementation is claimed for this entry yet.",
@@ -284,7 +340,6 @@ const en: LabCopy = {
     noRealFunds: "NO REAL FUNDS",
   },
   footer: {
-    boundary: "STATIC-FIRST · EDUCATIONAL · TESTNET-ORIENTED · NO REAL FUNDS",
     returnToSite: "Return to the personal website",
   },
 };
@@ -309,8 +364,18 @@ const zhCN: LabCopy = {
     secondary: "查看学习成果",
     systemTitle: "安全事件处理示例",
     codeBoundary: "参考模式 · 不代表已完成实现",
+    terminalLabel: "智能合约执行终端预览；命令不会实际执行",
+    terminalCodeLabel: "Solidity 防重放参考合约",
+    terminalReady: "就绪",
+    routeLabel: "Web3 技术路线",
+    route: [
+      { technology: "TYPESCRIPT", outcome: "类型化事件" },
+      { technology: "VIEM", outcome: "RPC 日志解析" },
+      { technology: "SOLIDITY", outcome: "防重放校验" },
+      { technology: "FOUNDRY", outcome: "模糊与不变量测试" },
+      { technology: "SEPOLIA", outcome: "验证并发布证据" },
+    ],
   },
-  boundaries: ["公开构建", "静态技术实验室", "测试网项目", "不使用真实资金"],
   tracks: {
     label: "04 / 技术方向",
     title: "四个技术能力域，一套工程系统。",
@@ -352,28 +417,60 @@ const zhCN: LabCopy = {
     featured: "重点构建",
     status: "状态",
     phase: "当前阶段",
-    candidateStack: "候选技术栈",
+    candidateStack: "规划技术栈",
     implemented: "已实现",
     noImplemented: "目前没有声称任何功能已经实现。",
     view: "打开构建记录",
+  },
+  stack: {
+    groups: {
+      server: "服务端",
+      onchain: "链上交互",
+      data: "数据层",
+      contracts: "合约与测试",
+      network: "测试网络",
+    },
+    note: "规划选型 · 尚未实现或验证",
   },
   learning: {
     label: "学习 / 公开成果",
     title: "学习成果，仅在可以验证时发布。",
     description:
       "公开条目聚焦具体产出、遇到的问题、安全发现、相关代码，以及每项结果的最后验证日期。",
-    log: "证据记录",
-    verified: "项已验证公开成果",
-    evidence: ["具体实现", "测试结果", "安全发现", "技术文档"],
+    log: "WEB3 验证路线",
+    evidence: [
+      {
+        technology: "TYPESCRIPT",
+        outcome: "类型化链上事件采集",
+      },
+      {
+        technology: "VIEM",
+        outcome: "RPC 日志解析与 ERC-20 标准化",
+      },
+      {
+        technology: "SOLIDITY",
+        outcome: "防重放事件登记合约",
+      },
+      {
+        technology: "FOUNDRY",
+        outcome: "单元、模糊与不变量测试",
+      },
+      {
+        technology: "SEPOLIA",
+        outcome: "测试网部署、交易哈希与验证报告",
+      },
+    ],
+    progressLabel: "从类型化事件采集到公开验证成果的 Web3 技术路线",
+    currentStage: "当前阶段",
+    pendingStage: "待推进",
     noPublicOutcomes:
       "目前没有学习成果被标记为已验证。只有在存在具体实现或可记录结果后，公开条目才会出现。",
-    nextGate: "下一发布门槛 / 实现 → 测试 → 记录",
+    nextGate:
+      "技术路线 / TYPESCRIPT → VIEM → SOLIDITY → FOUNDRY → SEPOLIA 验证成果",
   },
   security: {
     label: "安全 / 攻击面",
     title: "安全工作始终依附于真实流程。",
-    description:
-      "分析与测试证据明确分开。只有具备复现和回归证据，安全案例才会标记为已测试或已验证。",
     theoryNotice: "理论分析 · 尚未通过实现测试",
     view: "阅读安全案例",
   },
@@ -399,7 +496,7 @@ const zhCN: LabCopy = {
     track: "技术方向",
     phase: "当前阶段",
     lastVerified: "最后验证",
-    candidateStack: "候选技术栈",
+    candidateStack: "规划技术栈",
     technologies: "技术",
     implemented: "已实现功能",
     noImplemented: "此条目目前不声称存在已完成实现。",
@@ -447,7 +544,6 @@ const zhCN: LabCopy = {
     noRealFunds: "不使用真实资金",
   },
   footer: {
-    boundary: "静态优先 · 教育用途 · 面向测试网 · 不使用真实资金",
     returnToSite: "返回个人网站",
   },
 };

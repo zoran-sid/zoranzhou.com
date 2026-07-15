@@ -12,10 +12,7 @@ const { locale, copy } = Astro.props;
 
 <footer class="lab-footer">
   <div class="lab-shell lab-footer__grid">
-    <div>
-      <span class="lab-footer__brand">WEB3 / LAB</span>
-      <p>{copy.footer.boundary}</p>
-    </div>
+    <span class="lab-footer__brand">WEB3 / LAB</span>
     <div class="lab-footer__links">
       <a href={localizePath("/", locale)}>← {copy.footer.returnToSite}</a>
       <span>© {new Date().getFullYear()} ZORAN ZHOU</span>
