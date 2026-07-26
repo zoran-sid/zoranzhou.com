@@ -23,7 +23,11 @@ const navItems = [
 
 <header class="lab-header" data-lab-header>
   <div class="lab-shell lab-header__inner">
-    <a class="lab-return" href={mainHome}>
+    <a
+      class="lab-return"
+      href={mainHome}
+      aria-label={`${copy.footer.returnToSite}: ${copy.returnToSite}`}
+    >
       <span aria-hidden="true">←</span>
       <span>{copy.returnToSite}</span>
     </a>

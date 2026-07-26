@@ -10,7 +10,17 @@ track: backend
 status: planned
 verificationStatus: unverified
 project: testnet-wallet-platform
-technologies: ["TypeScript", "NestJS", "PostgreSQL", "Ethereum 测试网"]
+candidateStack:
+  - group: server
+    items: ["TypeScript", "NestJS"]
+  - group: onchain
+    items: ["viem"]
+  - group: data
+    items: ["PostgreSQL"]
+  - group: contracts
+    items: ["Solidity", "Foundry"]
+  - group: network
+    items: ["Sepolia"]
 securityLevel: educational
 testnetOnly: true
 audited: false

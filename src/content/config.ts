@@ -167,6 +167,14 @@ const labCollection = defineCollection({
     project: z.string().optional(),
     week: z.number().int().min(1).max(24).optional(),
     technologies: z.array(z.string()).default([]),
+    candidateStack: z
+      .array(
+        z.object({
+          group: z.enum(["server", "onchain", "data", "contracts", "network"]),
+          items: z.array(z.string()).min(1),
+        }),
+      )
+      .default([]),
     securityLevel: z.enum(["educational"]).default("educational"),
     testnetOnly: z.boolean().default(false),
     audited: z.boolean().default(false),
