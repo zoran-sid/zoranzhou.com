@@ -1,7 +1,7 @@
 ---
 author: "Zoran"
 title: "Building Your Free Blog from Scratch (GitHub + Cloudflare)"
-date: "2024-05-01"
+date: "2026-09-05"
 description: "A static site deployment guide based on GitHub and Cloudflare (Hugo)"
 tags:
   - Technology

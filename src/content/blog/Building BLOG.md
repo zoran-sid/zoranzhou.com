@@ -1,7 +1,7 @@
 ---
 author: "Zoran"
 title: "博客还在慢慢长大：从 Hugo 到 Astro（GitHub + Cloudflare）"
-date: "2024-05-01"
+date: "2026-09-05"
 updated: "2026-09-05"
 description: "从最初的 Hugo 主题，到借助 GPT-5.6 Sol 和 GPT-6 Astra 重构后的 Astro 博客。记录这一路的调整，也聊聊现在怎样写文章、维护和部署。"
 tags:
