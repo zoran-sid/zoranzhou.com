@@ -1,6 +1,6 @@
 ---
 import type { LabCopy } from "../../i18n/lab";
-import { getLabHomePath } from "../../lib/lab";
+import { getLabHomePath, LAB_ICON_REVISION } from "../../lib/lab";
 import { localizePath, type Locale } from "../../i18n/utils";
 
 interface Props {
@@ -33,9 +33,13 @@ const navItems = [
     </a>
 
     <a class="lab-brand" href={labHome} aria-label={copy.siteName}>
-      <span class="lab-brand__mark" aria-hidden="true">
-        <i></i><i></i><i></i><i></i>
-      </span>
+      <img
+        class="lab-brand__mark"
+        src={`/web3-lab-favicon.svg?v=${LAB_ICON_REVISION}`}
+        alt=""
+        width="32"
+        height="32"
+      />
       <span class="lab-brand__copy">
         <strong>{copy.siteName}</strong>
         <small>{copy.siteTagline}</small>

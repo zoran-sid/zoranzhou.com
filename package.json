@@ -21,8 +21,10 @@
     "migrate:routes": "npx tsx scripts/migrate-routes.ts",
     "validate:routes": "npx tsx scripts/validate-routes.ts",
     "test:language-routing": "npx tsx scripts/test-language-routing.ts",
-    "test:radar": "npx tsx scripts/test-radar.ts",
-    "test:route-logic": "npx tsx scripts/test-route-logic.ts"
+    "test:route-logic": "npx tsx scripts/test-route-logic.ts",
+    "test:editorial": "tsx --test scripts/test-editorial.ts",
+    "test:site-build": "tsx scripts/test-site-build.ts",
+    "icons:lab": "node scripts/generate-lab-icons.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -46,6 +48,7 @@
     "prettier": "^3.0.0",
     "prettier-plugin-astro": "^0.14.0",
     "prettier-plugin-tailwindcss": "^0.6.0",
+    "sharp": "0.34.5",
     "tsx": "^4.22.4",
     "typescript": "^5.0.0"
   },

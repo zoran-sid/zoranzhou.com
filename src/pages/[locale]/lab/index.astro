@@ -2,482 +2,187 @@
 import { getCollection } from "astro:content";
 import LabLayout from "../../../layouts/LabLayout.astro";
 import { getLabTranslations } from "../../../i18n/lab";
-import { getLabEntryPath } from "../../../lib/lab";
+import { getLabEntryPath, LAB_CURRENT_FOCUS_KEY } from "../../../lib/lab";
 import { localizePath, locales, type Locale } from "../../../i18n/utils";
-
 export async function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
 }
-
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
-const copy = getLabTranslations(locale);
-const allEntries = await getCollection(
+const copy = getLabTranslations(locale),
+  c = copy.home;
+const entries = await getCollection(
   "lab",
   ({ data }) => !data.draft && data.lang === locale,
 );
-const featuredBuild = allEntries.find(
-  (entry) => entry.data.type === "build" && entry.data.featured,
+const focus = entries.find(
+  (entry) => entry.data.translationKey === LAB_CURRENT_FOCUS_KEY,
 );
-const securityEntries = allEntries.filter(
-  (entry) => entry.data.type === "security" && entry.data.featured,
+if (!focus) throw new Error(`Missing Lab focus: ${locale}`);
+const plans = entries.filter(
+  (entry) => entry.data.type === "build" && entry.data.status === "planned",
 );
-const currentLearningStage = 0;
-const description =
-  locale === "zh-CN"
-    ? "Web3 Lab 是独立技术子站，记录钱包集成、数字资产后端工程、产品安全与解决方案架构的真实构建和验证过程。"
-    : "Web3 Lab is an independent technical subsite for documented work in wallet integration, digital asset backend engineering, product security, and solution architecture.";
-const alternatePaths = {
-  "zh-CN": localizePath("/lab", "zh-CN"),
-  en: localizePath("/lab", "en"),
-};
-const labUrl = new URL(localizePath("/lab", locale), Astro.site).href;
+const security = entries.filter((entry) => entry.data.type === "security");
+const alternatePaths = Object.fromEntries(
+  locales.map((lang) => [lang, localizePath("/lab", lang)]),
+);
 const jsonld = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "WEB3 LAB",
-  description,
-  url: labUrl,
-  inLanguage: locale === "zh-CN" ? "zh-Hans" : "en",
+  description: c.intro,
+  url: new URL(localizePath("/lab", locale), Astro.site).href,
+  inLanguage: locale,
   author: { "@type": "Person", name: "Zoran Zhou" },
-  about: [
-    "Wallet integration",
-    "Blockchain backend engineering",
-    "Digital asset product security",
-    "Solution architecture",
-  ],
 };
 ---
 
 <LabLayout
-  description={description}
+  description={c.intro}
   alternatePaths={alternatePaths}
   jsonld={jsonld}
 >
-  <section id="overview" class="lab-hero lab-section">
-    <div class="lab-shell lab-hero__grid">
-      <div class="lab-hero__copy">
-        <div class="lab-kicker">
-          <span class="lab-kicker__signal"></span>
-          {copy.hero.kicker}
-        </div>
-        <h1>{copy.hero.title}</h1>
-        <p>{copy.hero.description}</p>
-
-        <div class="lab-hero__actions">
-          <a class="lab-button lab-button--primary" href="#builds">
-            {copy.hero.primary}<span aria-hidden="true">↘</span>
-          </a>
-          <a class="lab-button lab-button--ghost" href="#learning">
-            {copy.hero.secondary}
-          </a>
-        </div>
-
-        <ol
-          class="lab-hero-route"
-          role="list"
-          aria-label={copy.hero.routeLabel}
+  <section id="overview" class="lab-shell lab-hero">
+    <div>
+      <p class="lab-kicker"><span class="lab-dot"></span>{c.kicker}</p><h1>
+        {c.title.map((line) => <span>{line}</span>)}
+      </h1><p class="lab-hero__intro">{c.intro}</p><div
+        class="lab-hero__actions"
+      >
+        <a class="lab-button lab-button--primary" href={getLabEntryPath(focus)}
+          >{c.readFocus}<span aria-hidden="true">↗</span></a
+        ><a class="lab-text-link" href="#learning">{c.viewRoute} ↓</a>
+      </div>
+    </div>
+    <a class="lab-focus" href={getLabEntryPath(focus)}
+      ><div class="lab-focus__top">
+        <span>{c.current}</span><span class="lab-signal lab-signal--building"
+          ><i></i>{c.learning}</span
         >
-          {
-            copy.hero.route.map((stage, index) => (
-              <li>
-                <span>
-                  <i aria-hidden="true">{String(index + 1).padStart(2, "0")}</i>
-                  {stage.technology}
-                </span>
-                <strong>{stage.outcome}</strong>
-              </li>
-            ))
-          }
-        </ol>
-      </div>
-
-      <div class="lab-system" data-lab-spotlight>
-        <header class="lab-system__header">
-          <span class="lab-window-dots" aria-hidden="true"
-            ><i></i><i></i><i></i></span
-          >
-          <strong>{copy.hero.systemTitle}</strong>
-          <span class="lab-system__live"><i></i>STATIC / V1</span>
-        </header>
-        <div class="lab-code-panel">
-          <div class="lab-code-panel__meta">
-            <span>SOLIDITY / EXECUTION PREVIEW</span>
-            <span>~/web3-lab</span>
-          </div>
-          <div
-            class="lab-terminal"
-            role="group"
-            aria-label={copy.hero.terminalLabel}
-          >
-            <div
-              class="lab-terminal__source"
-              role="group"
-              aria-label={copy.hero.terminalCodeLabel}
-            >
-              <div class="lab-terminal__contract">
-                <span>CONTRACT</span>
-                <strong>ReplayGuard</strong>
-                <span>EIP-712 / SOLIDITY</span>
-              </div>
-              <ol class="lab-terminal__rules" role="list">
-                <li>
-                  <i aria-hidden="true">01</i>
-                  <strong>TYPEHASH</strong>
-                  <code
-                    >bytes32 constant TYPEHASH = <b>keccak256</b>(<em
-                      >"TransferAuthorization(bytes32 key,address token,uint256
-                      amount,uint48 deadline)"</em
-                    >);</code
-                  >
-                </li>
-                <li>
-                  <i aria-hidden="true">02</i>
-                  <strong>DIGEST</strong>
-                  <code
-                    >bytes32 digest = <b>_hashTypedDataV4</b>(<wbr /><b
-                      >keccak256</b
-                    >(<wbr /><b>abi.encode</b>(<wbr />TYPEHASH, key, token,
-                    amount, deadline)));</code
-                  >
-                </li>
-                <li>
-                  <i aria-hidden="true">03</i>
-                  <strong>AUTH</strong>
-                  <code
-                    >if (!<b>SignatureChecker</b>.<wbr
-                    />isValidSignatureNow(<wbr />signer, digest, signature))
-                    revert <em>InvalidSignature()</em>;</code
-                  >
-                </li>
-                <li>
-                  <i aria-hidden="true">04</i>
-                  <strong>EXPIRY</strong>
-                  <code
-                    >if (block.timestamp &gt; deadline) revert <em
-                      >Expired(deadline)</em
-                    >;</code
-                  >
-                </li>
-                <li>
-                  <i aria-hidden="true">05</i>
-                  <strong>REPLAY</strong>
-                  <code
-                    >if (_processed[key]) revert <em>Replayed(key)</em>;<wbr />
-                    _processed[key] = <em>true</em>;</code
-                  >
-                </li>
-                <li>
-                  <i aria-hidden="true">06</i>
-                  <strong>AUDIT</strong>
-                  <code
-                    >emit <b>AuthorizationConsumed</b>(<wbr />key, signer,
-                    digest, deadline);</code
-                  >
-                </li>
-              </ol>
-            </div>
-            <p class="lab-terminal__command lab-terminal__command--pending">
-              <span class="lab-terminal__path" aria-hidden="true"
-                >~/web3-lab</span
-              >
-              <span class="lab-terminal__prompt" aria-hidden="true">$</span>
-              <code>forge test --match-test testReplayProtection -vvvv</code>
-              <span class="lab-terminal__cursor" aria-hidden="true"></span>
-            </p>
-            <p class="lab-terminal__status">
-              <i aria-hidden="true"></i>
-              <span>{copy.hero.terminalReady}</span>
-            </p>
-          </div>
-          <div class="lab-code-panel__signals" aria-label="Code concerns">
-            <span>EIP-712</span>
-            <span>ERC-1271</span>
-            <span>DEADLINE</span>
-            <span>ATOMIC CONSUME</span>
-          </div>
-        </div>
-        <footer class="lab-system__footer">
-          <span>{copy.hero.codeBoundary}</span>
-          <span>STATIC / NO SECRETS</span>
-        </footer>
-      </div>
-    </div>
+      </div><div class="lab-focus__symbol" aria-hidden="true">
+        TS<span>01</span>
+      </div><div class="lab-focus__bottom">
+        <h2>TypeScript<span aria-hidden="true">↗</span></h2><p>{c.focusDeck}</p>
+      </div></a
+    >
   </section>
-
-  <section
-    class="lab-section lab-section--tracks"
-    aria-labelledby="tracks-title"
-  >
-    <div class="lab-shell">
-      <header class="lab-section__header">
-        <div>
-          <span class="lab-section__label">{copy.tracks.label}</span>
-          <h2 id="tracks-title">{copy.tracks.title}</h2>
-        </div>
-        <p>{copy.tracks.description}</p>
-      </header>
-
-      <div class="lab-track-grid">
-        {
-          copy.tracks.items.map((track, index) => (
-            <article
-              class={`lab-track lab-track--${index + 1}`}
-              data-lab-spotlight
-            >
-              <span class="lab-track__code">{track.code}</span>
-              <h3>{track.title}</h3>
-              <p>{track.description}</p>
-              <ul>
-                {track.topics.map((topic) => (
-                  <li>{topic}</li>
-                ))}
-              </ul>
-              <span class="lab-track__corner" aria-hidden="true" />
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <section
-    id="builds"
-    class="lab-section lab-section--builds"
-    aria-labelledby="builds-title"
-  >
-    <div class="lab-shell">
-      <header class="lab-section__header">
-        <div>
-          <span class="lab-section__label">{copy.builds.label}</span>
-          <h2 id="builds-title">{copy.builds.title}</h2>
-        </div>
-        <p>{copy.builds.description}</p>
-      </header>
-
+  <section id="learning" class="lab-shell lab-section">
+    <header class="lab-section__header">
+      <div>
+        <p class="lab-kicker">01 / LEARNING PATH</p><h2>{c.routeTitle}</h2>
+      </div><p>{c.routeDeck}</p>
+    </header>
+    <ol
+      class="lab-roadmap"
+      aria-label={locale === "zh-CN" ? "Web3 学习路线" : "Web3 learning path"}
+    >
       {
-        featuredBuild && (
-          <article class="lab-featured-build" data-lab-spotlight>
-            <div class="lab-featured-build__topline">
-              <span>{copy.builds.featured}</span>
-              <span class="lab-signal lab-signal--planned">
-                <i />
-                {copy.statusLabels[featuredBuild.data.status]}
-              </span>
-            </div>
-
-            <div class="lab-featured-build__grid">
-              <div class="lab-featured-build__main">
-                <span class="lab-featured-build__id">
-                  BUILD / TESTNET-WALLET-PLATFORM
-                </span>
-                <h3>{featuredBuild.data.title}</h3>
-                <p>{featuredBuild.data.description}</p>
-
-                <div class="lab-entry-badges">
-                  <span>{copy.badges.educational}</span>
-                  {featuredBuild.data.testnetOnly && (
-                    <span>{copy.badges.testnetOnly}</span>
-                  )}
-                  {!featuredBuild.data.audited && (
-                    <span>{copy.badges.unaudited}</span>
-                  )}
-                  {!featuredBuild.data.realFunds && (
-                    <span>{copy.badges.noRealFunds}</span>
-                  )}
+        c.stages.map((stage, index) => (
+          <li
+            data-state={index === 0 ? "current" : "pending"}
+            aria-current={index === 0 ? "step" : undefined}
+          >
+            <>
+              <div class="lab-roadmap__index">
+                <>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <span>{index === 0 ? c.learning : c.pending}</span>
+                </>
+              </div>
+              <h3>{stage.tech}</h3>
+              <strong>{stage.title}</strong>
+              <p>{stage.outcome}</p>
+            </>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+  <section id="builds" class="lab-shell lab-section">
+    <header class="lab-section__header">
+      <div>
+        <p class="lab-kicker">02 / PROJECT PLANS</p><h2>{c.buildTitle}</h2>
+      </div><p>{c.buildDeck}</p>
+    </header>
+    {
+      plans.map((entry) => (
+        <article class="lab-project-plan">
+          <>
+            <div class="lab-project-plan__copy">
+              <>
+                <div class="lab-record-labels">
+                  <>
+                    <span>{copy.statusLabels[entry.data.status]}</span>
+                    <span>
+                      {copy.verificationLabels[entry.data.verificationStatus]}
+                    </span>
+                  </>
                 </div>
-
-                <a class="lab-build-link" href={getLabEntryPath(featuredBuild)}>
-                  {copy.builds.view}
+                <h3>
+                  <a href={getLabEntryPath(entry)}>{entry.data.title}</a>
+                </h3>
+                <p>{entry.data.description}</p>
+                <a class="lab-text-link" href={getLabEntryPath(entry)}>
+                  {c.buildLink} ↗
+                </a>
+              </>
+            </div>
+            <div class="lab-project-plan__stack">
+              <>
+                <p class="lab-kicker">{c.stack}</p>
+                <dl>
+                  {entry.data.candidateStack.map((group) => (
+                    <div>
+                      <dt>{copy.stack.groups[group.group]}</dt>
+                      <dd>{group.items.join(" + ")}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <small>{c.stackNote}</small>
+              </>
+            </div>
+          </>
+        </article>
+      ))
+    }
+  </section>
+  <section id="security" class="lab-shell lab-section">
+    <header class="lab-section__header">
+      <div>
+        <p class="lab-kicker">03 / SECURITY NOTES</p><h2>{c.securityTitle}</h2>
+      </div><p>{c.securityDeck}</p>
+    </header><div class="lab-note-list">
+      {
+        security.map((entry) => (
+          <article>
+            <>
+              <div class="lab-record-labels">
+                <span>
+                  {copy.verificationLabels[entry.data.verificationStatus]}
+                </span>
+              </div>
+              <h3>
+                <a href={getLabEntryPath(entry)}>
+                  {entry.data.title}
                   <span aria-hidden="true">↗</span>
                 </a>
-              </div>
-
-              <div class="lab-featured-build__facts">
-                <dl>
-                  <div>
-                    <dt>{copy.builds.status}</dt>
-                    <dd>{copy.statusLabels[featuredBuild.data.status]}</dd>
-                  </div>
-                  <div>
-                    <dt>{copy.builds.phase}</dt>
-                    <dd>{featuredBuild.data.currentPhase}</dd>
-                  </div>
-                  <div>
-                    <dt>{copy.builds.candidateStack}</dt>
-                    <dd>
-                      <ul class="lab-stack-groups" role="list">
-                        {featuredBuild.data.candidateStack.map((group) => (
-                          <li class="lab-stack-group">
-                            <span class="lab-stack-group__label">
-                              {copy.stack.groups[group.group]}
-                            </span>
-                            <strong>{group.items.join(" + ")}</strong>
-                          </li>
-                        ))}
-                      </ul>
-                      <small class="lab-stack-note">{copy.stack.note}</small>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>{copy.builds.implemented}</dt>
-                    <dd>
-                      {featuredBuild.data.implementedFeatures.length > 0
-                        ? featuredBuild.data.implementedFeatures.join(" / ")
-                        : copy.builds.noImplemented}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
+              </h3>
+              <p>{entry.data.description}</p>
+              <a class="lab-text-link" href={getLabEntryPath(entry)}>
+                {c.securityLink} →
+              </a>
+            </>
           </article>
-        )
+        ))
       }
     </div>
   </section>
-
-  <section
-    id="learning"
-    class="lab-section lab-section--learning"
-    aria-labelledby="learning-title"
-  >
-    <div class="lab-shell lab-learning">
-      <div class="lab-learning__copy">
-        <span class="lab-section__label">{copy.learning.label}</span>
-        <h2 id="learning-title">{copy.learning.title}</h2>
-        <p>{copy.learning.description}</p>
-        <div class="lab-learning__notice">
-          <i aria-hidden="true">!</i>
-          <span>{copy.learning.noPublicOutcomes}</span>
-        </div>
-      </div>
-
-      <div class="lab-learning-log" data-lab-spotlight>
-        <header>
-          <span>{copy.learning.log}</span>
-          <strong>
-            {copy.learning.currentStage} / {
-              String(currentLearningStage + 1).padStart(2, "0")
-            }
-          </strong>
-        </header>
-        <ol
-          class="lab-learning-log__fishbone"
-          role="list"
-          aria-label={copy.learning.progressLabel}
-        >
-          {
-            copy.learning.evidence.map((item, index) => {
-              const isCurrent = index === currentLearningStage;
-              return (
-                <li
-                  data-state={isCurrent ? "current" : "pending"}
-                  aria-current={isCurrent ? "step" : undefined}
-                >
-                  <div class="lab-learning-log__stage">
-                    <span>
-                      <i aria-hidden="true">
-                        {String(index + 1).padStart(2, "0")}
-                      </i>
-                      {isCurrent
-                        ? copy.learning.currentStage
-                        : copy.learning.pendingStage}
-                    </span>
-                    <strong>{item.technology}</strong>
-                    <p>{item.outcome}</p>
-                  </div>
-                  <svg
-                    class="lab-learning-log__branch"
-                    viewBox="0 0 100 100"
-                    preserveAspectRatio="none"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <line x1="22" y1="0" x2="50" y2="100" />
-                  </svg>
-                </li>
-              );
-            })
-          }
-        </ol>
-        <footer>{copy.learning.nextGate}</footer>
-      </div>
-    </div>
-  </section>
-
-  <section
-    id="security"
-    class="lab-section lab-section--security"
-    aria-labelledby="security-title"
-  >
-    <div class="lab-shell">
-      <header class="lab-section__header lab-section__header--single">
-        <div>
-          <span class="lab-section__label">{copy.security.label}</span>
-          <h2 id="security-title">{copy.security.title}</h2>
-        </div>
-      </header>
-
-      <div class="lab-security-grid">
-        {
-          securityEntries.map((entry) => (
-            <article class="lab-security-card" data-lab-spotlight>
-              <header>
-                <span class="lab-security-card__type">
-                  {copy.typeLabels[entry.data.type]}
-                </span>
-                <span class="lab-signal lab-signal--theoretical">
-                  <i />
-                  {copy.verificationLabels[entry.data.verificationStatus]}
-                </span>
-              </header>
-              <div class="lab-security-card__diagram" aria-hidden="true">
-                <>
-                  <span>SIGNED EVENT</span>
-                  <i>→</i>
-                  <span class="is-warning">REPLAY?</span>
-                  <i>→</i>
-                  <span>BUSINESS STATE</span>
-                </>
-              </div>
-              <h3>{entry.data.title}</h3>
-              <p>{entry.data.description}</p>
-              <div class="lab-security-card__notice">
-                {copy.security.theoryNotice}
-              </div>
-              <a href={getLabEntryPath(entry)}>
-                {copy.security.view}
-                <span aria-hidden="true">↗</span>
-              </a>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <section
-    id="about"
-    class="lab-section lab-section--about"
-    aria-labelledby="about-title"
-  >
-    <div class="lab-shell lab-about">
-      <div class="lab-about__copy">
-        <span class="lab-section__label">{copy.about.label}</span>
-        <h2 id="about-title">{copy.about.title}</h2>
-        {copy.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-      </div>
-
-      <ol class="lab-about__principles">
-        {
-          copy.about.principles.map((principle, index) => (
-            <li>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{principle}</strong>
-              <i aria-hidden="true">—</i>
-            </li>
-          ))
-        }
-      </ol>
+  <section id="about" class="lab-shell lab-section lab-about">
+    <div>
+      <p class="lab-kicker">04 / ABOUT THIS LAB</p><h2>{c.aboutTitle}</h2>
+    </div><div>
+      <p>{c.aboutDeck}</p><div class="lab-domains">
+        {c.domains.map((domain) => <span>{domain}</span>)}
+      </div><p class="lab-about__boundary">{c.boundary}</p>
     </div>
   </section>
 </LabLayout>

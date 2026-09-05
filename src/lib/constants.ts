@@ -6,16 +6,6 @@ export const SITE = {
   since: 2024,
 } as const;
 
-// Retained for the legacy Header component. The active Navigation component
-// supplies localized labels and paths at render time.
-export const NAV_ITEMS = [
-  { href: "/blog", label: "Blog" },
-  { href: "/research", label: "Research" },
-  { href: "/projects", label: "Projects" },
-  { href: "/media", label: "Media" },
-  { href: "/essays", label: "Essays" },
-] as const;
-
 // ── Social ──
 export const SOCIAL_LINKS = [
   { name: "github", url: "https://github.com/zoran-sid", label: "GitHub" },
@@ -40,34 +30,6 @@ export const COPYRIGHT = {
   license: "CC BY-SA 4.0",
   licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
 } as const;
-
-// ── Homepage: Timeline ──
-export const TIMELINE = [
-  {
-    year: "2025",
-    title: "National Cybersecurity Operations",
-    description:
-      "Participated in national-level security operations. Earned CISP-PTE certification. Studied abroad for cross-cultural technical exchange.",
-  },
-  {
-    year: "2024",
-    title: "Gap Year & Realignment",
-    description:
-      "Stepped back from a planned graduate program. Rebuilt fundamentals, pursued CCIE Enterprise certification, and launched this blog.",
-  },
-  {
-    year: "2022–2023",
-    title: "Enterprise Security Engineering",
-    description:
-      "Managed cybersecurity operations for large-scale enterprise infrastructure. Focused on threat detection, incident response, and security architecture.",
-  },
-  {
-    year: "2020–2021",
-    title: "Network Engineering Foundations",
-    description:
-      "Built expertise in routing, switching, and network automation. Earned Cisco Enterprise certification. Developed a security-first mindset toward infrastructure.",
-  },
-] as const;
 
 // ── Social SVG Icons ──
 export const SOCIAL_ICONS: Record<string, string> = {

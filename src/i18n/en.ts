@@ -2,9 +2,9 @@ import type { UIStrings } from "./utils";
 
 const en: UIStrings = {
   // ── Site ──
-  siteTitle: "Coding the World · Documenting What I Learn",
+  siteTitle: "Zoran Zhou · Engineering & Life Notes",
   siteDescription:
-    "Network & cybersecurity engineer. Building resilient systems, sharing what I learn.",
+    "Notes on security, networks and practical engineering, alongside books, photographs and life beyond the screen.",
   siteAuthor: "Zoran Zhou",
   siteTagline: "Building resilient systems, sharing what I learn.",
 

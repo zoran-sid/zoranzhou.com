@@ -1,5 +1,10 @@
 import type { CollectionEntry } from "astro:content";
 import { localizePath, type Locale } from "../i18n/utils";
+import { findTranslation } from "./content-policy";
+
+export const LAB_ICON_REVISION = "20260905";
+
+export const LAB_CURRENT_FOCUS_KEY = "lab-typescript-foundations";
 
 export const LAB_TYPE_SEGMENTS = {
   learning: "learning",
@@ -27,12 +32,5 @@ export function findLabTranslation(
   entry: LabEntry,
   targetLocale: Locale,
 ): LabEntry | undefined {
-  if (!entry.data.translationKey) return undefined;
-
-  return entries.find(
-    (candidate) =>
-      candidate.data.translationKey === entry.data.translationKey &&
-      candidate.data.lang === targetLocale &&
-      !candidate.data.draft,
-  );
+  return findTranslation(entries, entry, targetLocale);
 }

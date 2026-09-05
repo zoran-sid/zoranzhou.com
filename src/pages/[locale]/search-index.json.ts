@@ -1,6 +1,7 @@
 import { getCollection } from "astro:content";
 import { localizePath, type Locale, locales } from "../../i18n/utils";
 import { getLabEntryPath } from "../../lib/lab";
+import { hasReadableBody } from "../../lib/content-policy";
 
 export async function getStaticPaths() {
   return locales.map((locale) => ({
@@ -10,6 +11,7 @@ export async function getStaticPaths() {
 
 export async function GET(context: { currentLocale?: string }) {
   const blog = await getCollection("blog", ({ data }) => !data.draft);
+  const essays = await getCollection("essays", ({ data }) => !data.draft);
   const research = await getCollection("research", ({ data }) => !data.draft);
   const projects = await getCollection("projects", ({ data }) => !data.draft);
   const routes = await getCollection(
@@ -20,10 +22,22 @@ export async function GET(context: { currentLocale?: string }) {
 
   const locale = (context.currentLocale ?? "zh-CN") as Locale;
 
-  const standardEntries = [...blog, ...research, ...projects, ...routes]
-    .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
+  const standardEntries = [
+    ...blog,
+    ...essays,
+    ...research,
+    ...projects,
+    ...routes,
+  ]
+    .filter(
+      (entry) =>
+        (entry.data.lang ?? "zh-CN") === locale &&
+        (entry.collection === "routes" || hasReadableBody(entry)),
+    )
     .map((entry) => ({
       title: entry.data.title,
+      description: entry.data.description ?? "",
+      tags: entry.data.tags,
       collection: entry.collection === "routes" ? "map" : entry.collection,
       slug: entry.slug,
       url: localizePath(
@@ -37,6 +51,8 @@ export async function GET(context: { currentLocale?: string }) {
     .filter((entry) => entry.data.lang === locale)
     .map((entry) => ({
       title: entry.data.title,
+      description: entry.data.description ?? "",
+      tags: entry.data.tags,
       collection: "lab",
       slug: entry.slug,
       url: getLabEntryPath(entry),

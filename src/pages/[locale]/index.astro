@@ -1,77 +1,131 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import HeroSection from "../../components/HeroSection.astro";
-import AboutSection from "../../components/AboutSection.astro";
-import LatestArticles from "../../components/LatestArticles.astro";
-import FeaturedResearch from "../../components/FeaturedResearch.astro";
-import WorkingOn from "../../components/WorkingOn.astro";
-import ProjectsGrid from "../../components/ProjectsGrid.astro";
-import Skills from "../../components/Skills.astro";
-import ContactSection from "../../components/ContactSection.astro";
-import { locales, getTranslations, type Locale } from "../../i18n/utils";
-
+import ArticleRow from "../../components/ArticleRow.astro";
+import LifeFeature from "../../components/LifeFeature.astro";
+import { getCollection } from "astro:content";
+import {
+  getWriting,
+  selectWriting,
+  entryPath,
+  categoryLabel,
+  displayDate,
+} from "../../lib/writing";
+import { getLabEntryPath, LAB_CURRENT_FOCUS_KEY } from "../../lib/lab";
+import { readingTime } from "../../lib/utils";
+import { editorial } from "../../i18n/editorial";
+import { locales, localizePath, type Locale } from "../../i18n/utils";
+import "../../styles/home.css";
 export async function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
 }
-
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
-const t = getTranslations(locale);
-const siteUrl = new URL(Astro.site ?? "https://zoranzhou.com").href.replace(
-  /\/$/,
-  "",
+const c = editorial(locale);
+const writing = await getWriting(locale);
+const selected = selectWriting(writing, locale);
+const selectedKeys = new Set(
+  selected.map((entry) => `${entry.collection}/${entry.slug}`),
 );
-
+const recent = writing
+  .filter((entry) => !selectedKeys.has(`${entry.collection}/${entry.slug}`))
+  .sort(
+    (a, b) =>
+      (b.data.updated ?? b.data.date).valueOf() -
+      (a.data.updated ?? a.data.date).valueOf(),
+  )
+  .slice(0, 4);
+const labFocus = (await getCollection("lab")).find(entry => !entry.data.draft && entry.data.lang === locale && entry.data.translationKey === LAB_CURRENT_FOCUS_KEY);
+if (!labFocus) throw new Error(`Missing current Lab learning record: ${locale}`);
 const jsonld = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "ZORAN ZHOU",
-  url: siteUrl,
-  description: t.siteDescription,
-  inLanguage: locale === "zh-CN" ? "zh-Hans" : "en",
+  url: new URL(localizePath("/", locale), Astro.site).href,
+  description: c.intro,
+  inLanguage: locale,
   author: { "@type": "Person", name: "Zoran Zhou" },
 };
 ---
 
-<BaseLayout jsonld={jsonld}>
-  <div class="home-experience" data-home-experience>
-    <svg
-      class="home-journey"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="journey-gradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="var(--signal)"></stop>
-          <stop offset="0.48" stop-color="var(--accent)"></stop>
-          <stop offset="1" stop-color="var(--accent-soft)"></stop>
-        </linearGradient>
-      </defs>
-      <path
-        class="home-journey__rail"
-        d="M78 0 C82 7 84 10 67 15 S18 20 24 29 S82 34 73 42 S20 48 29 57 S85 62 70 71 S18 77 27 86 S76 91 63 100"
-        pathLength="1"></path>
-      <path
-        class="home-journey__progress"
-        d="M78 0 C82 7 84 10 67 15 S18 20 24 29 S82 34 73 42 S20 48 29 57 S85 62 70 71 S18 77 27 86 S76 91 63 100"
-        pathLength="1"></path>
-    </svg>
-    <div class="home-journey__beacons" aria-hidden="true">
-      <i class="beacon-a"></i>
-      <i class="beacon-b"></i>
-      <i class="beacon-c"></i>
-      <i class="beacon-d"></i>
-      <i class="beacon-e"></i>
-      <i class="beacon-f"></i>
+<BaseLayout description={c.intro} jsonld={jsonld}>
+  <HeroSection entries={selected} />
+  <section
+    class="editorial-section page-container"
+    id="selected"
+    aria-labelledby="selected-title"
+  >
+    <header class="section-head">
+      <div>
+        <p class="eyebrow">01 / SELECTED WRITING</p><h2 id="selected-title">
+          {c.selected}
+        </h2><p>{c.selectedDeck}</p>
+      </div><a class="text-link" href={localizePath("/blog", locale)}
+        >{c.allWriting}<span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <div class="selected-grid">
+      {
+        selected.map((entry, index) => (
+          <article
+            class:list={[
+              "selected-story",
+              { "selected-story--lead": index === 0 },
+            ]}
+          >
+            <>
+              <div class="selected-story__top">
+                <>
+                  <span>{categoryLabel(entry, locale)}</span>
+                  <span class="story-number" aria-hidden="true">
+                    0{index + 1}
+                  </span>
+                </>
+              </div>
+              <h3>
+                <a href={entryPath(entry)}>{entry.data.title}</a>
+              </h3>
+              <p>{entry.data.description}</p>
+              <div class="selected-story__bottom">
+                <>
+                  <span>
+                    <time datetime={entry.data.date.toISOString()}>{displayDate(entry.data.date, locale)}</time>
+                    <span class="meta-separator">·</span>
+                    {readingTime(entry.body)} {c.reading}
+                  </span>
+                  <span class="story-arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                </>
+              </div>
+            </>
+          </article>
+        ))
+      }
     </div>
-
-    <HeroSection />
-    <AboutSection />
-    <LatestArticles />
-    <FeaturedResearch />
-    <WorkingOn />
-    <ProjectsGrid />
-    <Skills />
-    <ContactSection />
-  </div>
+  </section>
+  <section
+    class="editorial-section page-container recent-section"
+    aria-labelledby="recent-title"
+  >
+    <header class="section-head">
+      <div>
+        <p class="eyebrow">02 / LATEST NOTES</p><h2 id="recent-title">
+          {c.recent}
+        </h2>
+      </div><p class="section-aside">{c.recentDeck}</p>
+    </header><div class="writing-list">
+      {
+        recent.map((entry) => (
+          <ArticleRow entry={entry} locale={locale} updated />
+        ))
+      }
+    </div>
+  </section>
+  <section class="editorial-section page-container">
+    <div class="progress-panel">
+      <div><p class="eyebrow">IN THE WORKS</p><h2>{c.inProgress}</h2><p>{locale === "zh-CN" ? "从 TypeScript 出发，逐步走向 Web3 工程实践。" : "Starting with TypeScript, working towards Web3 engineering."}</p></div>
+      <a class="progress-entry" href={getLabEntryPath(labFocus)}><span class="status-label"><i aria-hidden="true"></i>{locale === "zh-CN" ? "正在学习 · WEB3 LAB" : "LEARNING · WEB3 LAB"}</span><h3>TypeScript <span aria-hidden="true">↗</span></h3><p>{labFocus.data.description}</p><span class="text-link">{locale === "zh-CN" ? "查看学习记录与后续方向" : "Follow the learning notes and next steps"} →</span></a>
+    </div>
+  </section>
+  <LifeFeature locale={locale} />
 </BaseLayout>

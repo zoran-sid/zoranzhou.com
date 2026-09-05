@@ -1,0 +1,77 @@
+---
+import { entryPath, type WritingEntry } from "../lib/writing";
+import { editorial } from "../i18n/editorial";
+import { localizePath, type Locale } from "../i18n/utils";
+interface Props {
+  entries: WritingEntry[];
+  locale: Locale;
+}
+const { entries, locale } = Astro.props;
+const c = editorial(locale);
+const nodes = [
+  {
+    label: c.research,
+    detail: locale === "zh-CN" ? "把好奇写成笔记" : "Notes from curiosity",
+    href: entryPath(entries[0]),
+    number: "01",
+  },
+  {
+    label: c.build,
+    detail: locale === "zh-CN" ? "让想法慢慢成形" : "Ideas taking shape",
+    href: entryPath(entries[1]),
+    number: "02",
+  },
+  {
+    label: c.journey,
+    detail:
+      locale === "zh-CN" ? "阅读 · 摄影 · 行走" : "Books · photos · journeys",
+    href: localizePath("/life", locale),
+    number: "03",
+  },
+];
+---
+
+<div class="exploration" aria-label={c.exploration}>
+  <div class="exploration__eyebrow">
+    <span>{c.exploration}</span><span aria-hidden="true">↗</span>
+  </div>
+  <div class="exploration__canvas">
+    <svg
+      class="exploration__lines"
+      viewBox="0 0 480 350"
+      fill="none"
+      aria-hidden="true"
+      ><path
+        class="exploration__guide"
+        d="M30 295 C105 310 100 35 170 66 S415 97 350 180 S145 322 310 300 L453 280"
+      ></path><path
+        class="exploration__path"
+        pathLength="1"
+        d="M30 295 C105 310 100 35 170 66 S415 97 350 180 S145 322 310 300 L453 280"
+      ></path></svg
+    >
+    {
+      nodes.map((node, index) => (
+        <a
+          class={`exploration__node exploration__node--${index + 1}`}
+          href={node.href}
+        >
+          <>
+            <span class="exploration__dot" aria-hidden="true" />
+            <span class="exploration__number">{node.number}</span>
+            <span>
+              <>
+                <strong>{node.label}</strong>
+                <small>{node.detail}</small>
+              </>
+            </span>
+            <span class="exploration__arrow" aria-hidden="true">
+              ↗
+            </span>
+          </>
+        </a>
+      ))
+    }
+  </div>
+  <p class="exploration__note">{c.routeNote}</p>
+</div>

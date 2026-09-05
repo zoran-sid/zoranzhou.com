@@ -5,6 +5,7 @@ import "../styles/lab.css";
 import LabHeader from "../components/lab/LabHeader.astro";
 import LabFooter from "../components/lab/LabFooter.astro";
 import { getLabTranslations } from "../i18n/lab";
+import { LAB_ICON_REVISION } from "../lib/lab";
 import { hreflangMap, locales, localizePath, type Locale } from "../i18n/utils";
 
 interface Props {
@@ -40,7 +41,7 @@ const safeAlternatePaths = alternatePaths ?? {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#05070d" />
+    <meta name="theme-color" content="#0b1016" />
 
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
@@ -79,17 +80,21 @@ const safeAlternatePaths = alternatePaths ?? {
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
 
-    <link rel="icon" type="image/svg+xml" href="/web3-lab-favicon.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href={`/web3-lab-favicon.svg?v=${LAB_ICON_REVISION}`}
+    />
     <link
       rel="icon"
       type="image/png"
       sizes="64x64"
-      href="/web3-lab-favicon-64.png"
+      href={`/web3-lab-favicon-64.png?v=${LAB_ICON_REVISION}`}
     />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="/web3-lab-apple-touch-icon.png"
+      href={`/web3-lab-apple-touch-icon.png?v=${LAB_ICON_REVISION}`}
     />
 
     {
@@ -97,7 +102,7 @@ const safeAlternatePaths = alternatePaths ?? {
         <script
           is:inline
           type="application/ld+json"
-          set:html={JSON.stringify(jsonld)}
+          set:html={JSON.stringify(jsonld).replace(/</g, "\\u003c")}
         />
       )
     }
@@ -105,48 +110,42 @@ const safeAlternatePaths = alternatePaths ?? {
   <body class="lab-body">
     <div class="lab-backdrop" aria-hidden="true">
       <span class="lab-backdrop__grid"></span>
-      <span class="lab-backdrop__beam lab-backdrop__beam--a"></span>
-      <span class="lab-backdrop__beam lab-backdrop__beam--b"></span>
-      <span class="lab-backdrop__noise"></span>
     </div>
 
     <a class="lab-skip" href="#lab-content">
       {locale === "zh-CN" ? "跳到主要内容" : "Skip to content"}
     </a>
     <LabHeader locale={locale} copy={copy} languageHref={languageHref} />
-    <main id="lab-content" class="lab-main">
+    <main id="lab-content" class="lab-main" tabindex="-1">
       <slot />
     </main>
     <LabFooter locale={locale} copy={copy} />
 
     <script>
-      const header = document.querySelector<HTMLElement>("[data-lab-header]");
-      const updateHeader = () =>
-        header?.classList.toggle("is-scrolled", window.scrollY > 24);
-      updateHeader();
-      window.addEventListener("scroll", updateHeader, { passive: true });
-
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      if (!reducedMotion && matchMedia("(pointer: fine)").matches) {
-        document
-          .querySelectorAll<HTMLElement>("[data-lab-spotlight]")
-          .forEach((panel) => {
-            panel.addEventListener("pointermove", (event) => {
-              const bounds = panel.getBoundingClientRect();
-              panel.style.setProperty(
-                "--spot-x",
-                `${event.clientX - bounds.left}px`,
-              );
-              panel.style.setProperty(
-                "--spot-y",
-                `${event.clientY - bounds.top}px`,
-              );
-            });
+      const links = [
+        ...document.querySelectorAll<HTMLAnchorElement>("[data-lab-nav-link]"),
+      ];
+      const sections = [
+        ...document.querySelectorAll<HTMLElement>(".lab-main > section[id]"),
+      ];
+      const visible = new Set<Element>();
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) visible.add(entry.target);
+            else visible.delete(entry.target);
           });
-      }
+          const active = sections.find((section) => visible.has(section));
+          if (!active) return;
+          links.forEach((link) => {
+            if (link.hash === `#${active.id}`)
+              link.setAttribute("aria-current", "location");
+            else link.removeAttribute("aria-current");
+          });
+        },
+        { rootMargin: "-15% 0px -55% 0px" },
+      );
+      sections.forEach((section) => observer.observe(section));
     </script>
   </body>
 </html>

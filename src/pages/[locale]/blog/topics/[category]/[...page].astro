@@ -1,0 +1,26 @@
+---
+import WritingArchive from "../../../../../components/WritingArchive.astro";
+import { getWriting } from "../../../../../lib/writing";
+import { writingCategory } from "../../../../../lib/content-policy";
+import { paginateEntries } from "../../../../../lib/pagination";
+import { locales } from "../../../../../i18n/utils";
+export async function getStaticPaths() {
+  const entries = await getWriting();
+  return locales.flatMap((locale) =>
+    ["technology", "research", "life"].flatMap((category) =>
+      paginateEntries(
+        entries.filter(
+          (entry) =>
+            entry.data.lang === locale && writingCategory(entry) === category,
+        ),
+        `/blog/topics/${category}`,
+      ).map(({ param, ...props }) => ({
+        params: { locale, category, page: param },
+        props: { ...props, category },
+      })),
+    ),
+  );
+}
+---
+
+<WritingArchive {...Astro.props} />

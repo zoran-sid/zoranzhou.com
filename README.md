@@ -1,81 +1,58 @@
-# Route System v2 修改说明
+# ZORAN ZHOU
 
-项目：`zoranzhou.com`  
-范围：仅 Route / 地图 / 足迹系统  
-版本日期：2026-07-11
+技术写作与个人生活记录的双语博客，线上地址为 [zoranzhou.com](https://zoranzhou.com)。使用 Astro 5、MDX、TypeScript、Tailwind CSS 4 和 MapLibre GL，静态构建至 `dist/`，由 Cloudflare Pages 托管。
 
-## 1. 本次修改目标
+## 网站结构
 
-本次修改在保留网站现有视觉风格和旧路线兼容性的前提下，将 Route 系统升级为适合长期维护的 **Route System v2**。
+- **首页**：个人定位 → 精选文章（含博客构建）→ 最近记录 → TypeScript 学习 → 生活照片 → 联系与订阅。
+- **文章 `/blog`**：聚合 Blog、Essays、Research，按技术、研究、生活筛选，支持静态分页。原有详情地址及 `/essays`、`/research` 列表保留。
+- **实践 `/projects`**：项目、实践文章与研究笔记，并提供独立 WEB3 LAB 入口。
+- **生活 `/life`**：摄影、足迹、随笔、书影音与游戏的统一入口。
+- **关于 `/about`**：个人介绍、工作方式与技能方向。
+- **WEB3 LAB `/lab`**：独立深色子站，以当前 TypeScript 学习为起点，依次展开学习路线、钱包平台规划与安全研究笔记；学习状态与验证状态分别呈现。
 
-核心定位不是运动应用，而是：
+以上路径都带 `/zh-CN` 或 `/en` 语言前缀。根路径仅负责语言选择与跳转。
 
-- Travel Journal（旅行记录）
-- Life Log（生活记录）
-- Photo Story（摄影记录）
+## 本地开发与检查
 
-本次没有修改博客、照片、Media、Research、Projects 等其他页面。
+```sh
+npm ci
+npm run dev
+```
 
-## 2. 架构与兼容策略
+本地预览默认位于 `http://127.0.0.1:4321/zh-CN/`。
 
-### 新旧内容集合并存
+```sh
+npm run lint
+npm run test:editorial
+npm run test:language-routing
+npm run build
+npm run test:site-build
+```
 
-- 新路线 Markdown：`src/content/routes/`
-- 旧路线 Markdown：`src/content/map/`
-- GPX：`public/routes/`
+受限环境中可设置 `ASTRO_TELEMETRY_DISABLED=1` 后运行 Astro 命令。完整维护约束见 [Agent.md](Agent.md)。
 
-页面会同时读取 `routes` 和旧的 `map` 集合，因此：
+## 内容与视觉维护
 
-- 现有 `src/content/map/*.md` 不需要立即迁移。
-- 旧内容已通过一次性迁移命令转换为 `gpx` 字段；运行时只读取 `routes` collection。
-- 新路线优先使用 `gpx` 字段。
-- 旧路线 URL 和现有 Markdown 正文可以继续使用。
-- 若新旧集合出现相同语言和相同 slug，新 `routes` 条目优先，避免重复页面。
+- 正文位于 `src/content/`，在原集合内维护，不为聚合页面复制文章。
+- 首页精选引用配置位于 `src/lib/writing.ts`；标题、摘要和日期从正文读取。引用不存在时构建报错，避免留下空入口。
+- 普通文章的双语版本通过相同 `translationKey` 配对；路线继续通过 `routeId` 配对。缺少译文时切换到目标语言的对应列表，不猜测详情地址。
+- 空正文文章保留原详情地址，并显示整理中说明，不进入文章流、标签、搜索和 RSS。
+- `src/i18n/editorial.ts` 维护主站叙事文案；原集合与工具文案仍位于 `zh-CN.ts` 和 `en.ts`。
+- `global.css` 维护主题与公共组件；`home.css`、`collections.css`、`reading.css` 分别负责首页、入口页面与阅读体验。地图样式在 `maps.css` 内，通过 `BaseLayout` 的 `mapStyles` 按需加载。Lab 样式保持独立。
+- 首页山景来自原有川西游记图片：`https://e5d9f02.webp.fi/b83f5dd6937798b1cae03b3c062f8691.jpg`。本地副本 `src/assets/images/sichuan-mountains.jpg` 由 Astro 生成响应式图片。
 
-### 通用 GPX 解析
+设计依据见 [重构方案](docs/refactor-proposal-2026-09-05.md)，本轮变更与验收记录见 [重构记录](docs/refactor-implementation-2026-09-05.md)。旧 Route v2 修改说明已原文移至 [历史记录](docs/history/route-system-v2-2026-07-11.md)；其中新旧集合并存的描述仅代表历史过程，当前运行时只读取 `routes`。
 
-解析逻辑基于 GPX 内部结构，而不是依赖文件名或特定厂商格式。支持：
+## 文章更新订阅
 
-- 标准 GPX
-- Apple Health 导出的 GPX
-- Keep
-- RunGap
-- Garmin
-- Coros
-- GPX Studio
-- 其他符合 GPX 结构的文件
+`/subscribe` 提供邮件订阅说明和 RSS 阅读器入口。通知源为各语言的 `/rss.xml`，仅收录已发布、非空正文的 Blog / Essays / Research。摄影、跑步路线、项目和 LAB 更新均排除。读者通过 Blogtrottr 的公开页面自行填写邮箱、确认和退订，本站不收集邮箱；免费方案带广告。部署后第三方才能读取新版内容源。
 
-解析内容包括：
+## 发布
 
-- 日期与时间
-- GPS 点和多段轨迹
-- 距离
-- 总耗时
-- 累计爬升与下降
-- 最低和最高海拔
-- 起点与终点
-- Waypoints / 经停点
-- 来源应用与 GPX creator
+构建命令为 `npm run build`，发布目录为 `dist`。`public/_routes.json` 将 Cloudflare Pages Function 限定在根路径 `/`。内容编辑器、备份、导入器和设置文件均为本地维护工具，不属于生产站点。提交、推送和部署由站点维护者明确执行。
 
-文件名只在 GPX 内缺少日期、距离或耗时等信息时作为辅助回退，不作为主要数据来源。
-
-## 3. 修改过的文件
-
-| 文件                                  | 修改内容                                       | 修改原因                                                   |
-| ------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
-| `package.json`                        | 新增 `import:routes` 命令                      | 提供统一的 GPX 导入入口，不增加依赖                        |
-| `scripts/import-route.ts`             | 新增 Route v2 导入器                           | 扫描 GPX、解析数据、反向地理编码、创建或安全更新 Markdown  |
-| `src/content/config.ts`               | 定义唯一的 `routes` collection 和 Route schema | Route 页面只读取已提交的 v2 内容                           |
-| `src/content/routes/.gitkeep`         | 新增空目录占位文件                             | 保证新 Route 内容目录进入版本控制                          |
-| `src/lib/routes/gpx.ts`               | 新增通用 GPX / GeoJSON 解析模块                | 浏览器和导入脚本共用同一套解析逻辑，避免重复实现和格式写死 |
-| `src/lib/routes/content.ts`           | 新增 Route 内容兼容与格式化工具                | 统一处理新旧 collection、字段别名、可见性和显示格式        |
-| `src/components/MapExplorer.astro`    | 改为使用共享解析器，并优化按需加载             | 保持原地图总览风格，同时避免路线增多后一次性下载全部 GPX   |
-| `src/components/RouteMap.astro`       | 新增路线详情地图、起终点、经停点和海拔图       | 提供旅行日志需要的路线视觉信息，不展示敏感运动指标         |
-| `src/layouts/RoutePostLayout.astro`   | 新增 Route 专用详情布局                        | 按旅行记录结构展示封面、摘要、路线信息、Story 和 Photos    |
-| `src/pages/[locale]/map/index.astro`  | 同时读取新旧 Route collection                  | 保持旧内容兼容，并让新导入路线自动进入地图总览             |
-| `src/pages/[locale]/map/[slug].astro` | 改用 Route 专用布局与地图组件                  | 详情页从普通博客文章升级为 Travel Journal 结构             |
-
-## 4. 本地更新 Media
+## 本地更新 Media
 
 Media 数据是构建时读取的静态文件 `src/content/media.md`。网站构建、Cloudflare 部署和页面请求都不会访问豆瓣，也不会运行更新脚本。游戏及其他非电影分区继续手工维护。
 
@@ -111,7 +88,7 @@ npm run lint
 npm run build
 ```
 
-## 5. 本地内容编辑器
+## 本地内容编辑器
 
 Blog、Essays 及相同 Markdown/MDX 内容集合可以通过仅限本机的浏览器编辑器维护：
 
@@ -128,3 +105,10 @@ npm run editor
 - 设置和临时上传文件仅保存在被 Git 忽略的 `tools/content-editor/` 本地文件中，不会进入生产站点。
 
 “快速检查”运行 Astro 内容/schema 与类型检查；“部署前构建”运行完整 `npm run build`，生成 Cloudflare 发布使用的 `dist/`。生产构建不是 GPX 导入命令，日常编辑不必每次运行；远程图片处理可能耗时，编辑器会持续显示运行状态、耗时和增量日志。GPX 转 Route Markdown 请使用编辑器“素材库”，或单独运行 `npm run import:routes`。
+
+## 设计与交付资料
+
+- [重构实现与验收记录](docs/refactor-implementation-2026-09-05.md)
+- [GitHub 个人主页 README](docs/github-profile-README.md)：独立交付文件，由作者手动同步到 `zoran-sid/zoran-sid`。
+- WEB3 LAB 图标以 `public/web3-lab-favicon.svg` 为唯一来源，修改后运行 `npm run icons:lab` 生成 64 px 与 180 px PNG，并更新 `src/lib/lab.ts` 中的 `LAB_ICON_REVISION`。页头与浏览器图标使用同一设计。
+- 长期内容与发布约定见 [Agent.md](Agent.md)。

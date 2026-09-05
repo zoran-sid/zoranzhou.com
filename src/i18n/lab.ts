@@ -1,221 +1,16 @@
 import type { Locale } from "./utils";
 
-export interface LabTrackCopy {
-  code: string;
-  title: string;
-  description: string;
-  topics: string[];
-}
-
-export interface LabCopy {
-  siteName: string;
-  siteTagline: string;
-  returnToSite: string;
-  switchLanguage: string;
-  nav: {
-    overview: string;
-    learning: string;
-    builds: string;
-    security: string;
-    about: string;
-  };
-  hero: {
-    kicker: string;
-    title: string;
-    description: string;
-    primary: string;
-    secondary: string;
-    systemTitle: string;
-    codeBoundary: string;
-    terminalLabel: string;
-    terminalCodeLabel: string;
-    terminalReady: string;
-    routeLabel: string;
-    route: Array<{
-      technology: string;
-      outcome: string;
-    }>;
-  };
-  tracks: {
-    label: string;
-    title: string;
-    description: string;
-    items: LabTrackCopy[];
-  };
-  builds: {
-    label: string;
-    title: string;
-    description: string;
-    featured: string;
-    status: string;
-    phase: string;
-    candidateStack: string;
-    implemented: string;
-    noImplemented: string;
-    view: string;
-  };
-  stack: {
-    groups: Record<
-      "server" | "onchain" | "data" | "contracts" | "network",
-      string
-    >;
-    note: string;
-  };
-  learning: {
-    label: string;
-    title: string;
-    description: string;
-    log: string;
-    evidence: Array<{
-      technology: string;
-      outcome: string;
-    }>;
-    progressLabel: string;
-    currentStage: string;
-    pendingStage: string;
-    noPublicOutcomes: string;
-    nextGate: string;
-  };
-  security: {
-    label: string;
-    title: string;
-    theoryNotice: string;
-    view: string;
-  };
-  about: {
-    label: string;
-    title: string;
-    paragraphs: string[];
-    principles: string[];
-  };
-  detail: {
-    backToLab: string;
-    status: string;
-    verification: string;
-    track: string;
-    phase: string;
-    lastVerified: string;
-    candidateStack: string;
-    technologies: string;
-    implemented: string;
-    noImplemented: string;
-    limitations: string;
-    relatedProject: string;
-    evidenceBoundary: string;
-    evidenceBoundaryText: string;
-  };
-  statusLabels: Record<string, string>;
-  verificationLabels: Record<string, string>;
-  typeLabels: Record<string, string>;
-  trackLabels: Record<string, string>;
-  badges: {
-    educational: string;
-    testnetOnly: string;
-    unaudited: string;
-    noRealFunds: string;
-  };
-  footer: {
-    returnToSite: string;
-  };
-}
-
-const en: LabCopy = {
+const en = {
   siteName: "WEB3 LAB",
-  siteTagline: "Build · Test · Document",
+  siteTagline: "Learn · Build · Document",
   returnToSite: "Zoran Zhou",
   switchLanguage: "中文",
   nav: {
     overview: "Overview",
     learning: "Learning",
-    builds: "Builds",
+    builds: "Plans",
     security: "Security",
     about: "About",
-  },
-  hero: {
-    kicker: "INDEPENDENT TECHNICAL SUBSITE / V1",
-    title: "Building secure systems for the onchain world.",
-    description:
-      "Wallet Integration · Backend Engineering · Product Security · Solution Architecture",
-    primary: "Inspect the featured build",
-    secondary: "View learning outcomes",
-    systemTitle: "SECURE EVENT HANDLER",
-    codeBoundary: "REFERENCE PATTERN · NOT AN IMPLEMENTATION CLAIM",
-    terminalLabel:
-      "Smart contract execution terminal preview; commands are not executed",
-    terminalCodeLabel: "EIP-712 signed-event replay-protection reference flow",
-    terminalReady: "READY",
-    routeLabel: "Web3 technology route",
-    route: [
-      { technology: "TYPESCRIPT", outcome: "TYPE-SAFE EVENTS" },
-      { technology: "VIEM", outcome: "RPC LOG DECODING" },
-      { technology: "SOLIDITY", outcome: "REPLAY PROTECTION" },
-      { technology: "FOUNDRY", outcome: "FUZZ + INVARIANT TESTS" },
-      { technology: "SEPOLIA", outcome: "VERIFY + PUBLISH" },
-    ],
-  },
-  tracks: {
-    label: "04 / TECHNICAL TRACKS",
-    title: "Four technical domains. One engineering system.",
-    description:
-      "The Lab organizes work by the systems being built and validated, not by market narratives or token activity.",
-    items: [
-      {
-        code: "01 / INTEGRATION",
-        title: "Wallet Integration",
-        description:
-          "Connect product workflows to wallet APIs, custody interfaces, RPC providers, webhooks, and transaction lifecycles.",
-        topics: [
-          "Wallet APIs",
-          "Blockchain RPC",
-          "Webhooks",
-          "Transaction lifecycle",
-        ],
-      },
-      {
-        code: "02 / BACKEND",
-        title: "Backend Engineering",
-        description:
-          "Design predictable asset workflows with explicit state, consistency boundaries, retries, and recovery paths.",
-        topics: ["TypeScript", "NestJS", "PostgreSQL", "Idempotency"],
-      },
-      {
-        code: "03 / SECURITY",
-        title: "Product Security",
-        description:
-          "Test authorization, signatures, wallet business logic, threat boundaries, and security regressions.",
-        topics: [
-          "API security",
-          "Threat modeling",
-          "Signature security",
-          "Regression tests",
-        ],
-      },
-      {
-        code: "04 / SOLUTIONS",
-        title: "Solutions",
-        description:
-          "Turn requirements into explainable proofs of concept, architecture decisions, and technical documentation.",
-        topics: [
-          "Architecture",
-          "Integration design",
-          "Proof of concept",
-          "Documentation",
-        ],
-      },
-    ],
-  },
-  builds: {
-    label: "BUILD / 001",
-    title: "Featured build",
-    description:
-      "The long-term center of the Lab: implementations, evidence, constraints, and decisions that can be inspected.",
-    featured: "FEATURED BUILD",
-    status: "STATUS",
-    phase: "CURRENT PHASE",
-    candidateStack: "PLANNED STACK",
-    implemented: "IMPLEMENTED",
-    noImplemented: "No features are claimed as implemented yet.",
-    view: "Open build record",
   },
   stack: {
     groups: {
@@ -227,64 +22,6 @@ const en: LabCopy = {
     },
     note: "PLANNED SELECTION · NOT IMPLEMENTED OR VERIFIED",
   },
-  learning: {
-    label: "LEARNING / PUBLIC OUTCOMES",
-    title: "Learning outcomes, published when they can be verified.",
-    description:
-      "Public entries focus on concrete outputs, problems encountered, security findings, related code, and the date each result was last verified.",
-    log: "WEB3 VERIFICATION ROUTE",
-    evidence: [
-      {
-        technology: "TYPESCRIPT",
-        outcome: "Typed chain-event ingestion",
-      },
-      {
-        technology: "VIEM",
-        outcome: "RPC log decoding and ERC-20 normalization",
-      },
-      {
-        technology: "SOLIDITY",
-        outcome: "Replay-protected event registry",
-      },
-      {
-        technology: "FOUNDRY",
-        outcome: "Unit, fuzz, and invariant tests",
-      },
-      {
-        technology: "SEPOLIA",
-        outcome: "Deployment, transaction hashes, and verification report",
-      },
-    ],
-    progressLabel:
-      "Web3 delivery route from typed ingestion to public verification evidence",
-    currentStage: "CURRENT STAGE",
-    pendingStage: "PENDING",
-    noPublicOutcomes:
-      "No learning outcome is currently claimed as verified. Entries will appear only after there is a concrete implementation or documented result.",
-    nextGate:
-      "TECHNICAL ROUTE / TYPESCRIPT → VIEM → SOLIDITY → FOUNDRY → SEPOLIA EVIDENCE",
-  },
-  security: {
-    label: "SECURITY / ATTACK SURFACE",
-    title: "Security work stays attached to real workflows.",
-    theoryNotice: "THEORETICAL ANALYSIS · NOT IMPLEMENTATION-TESTED",
-    view: "Read the security case",
-  },
-  about: {
-    label: "ABOUT / OPERATING PRINCIPLES",
-    title: "A technical record of builds, validation, and system boundaries.",
-    paragraphs: [
-      "Web3 Lab is an independent technical subsite for documenting wallet integration, digital asset backend engineering, product security, and solution architecture through concrete work.",
-      "The Lab prioritizes practical implementation, security validation, architecture decisions, and documented engineering outcomes. Learning, building, testing, and completed work are labeled separately.",
-      "Current work is educational, testnet-oriented, unaudited, and does not handle real funds.",
-    ],
-    principles: [
-      "Build concrete prototypes",
-      "Validate security claims",
-      "Document decisions and limits",
-      "Keep evidence boundaries explicit",
-    ],
-  },
   detail: {
     backToLab: "Back to Web3 Lab",
     status: "STATUS",
@@ -295,7 +32,8 @@ const en: LabCopy = {
     candidateStack: "PLANNED STACK",
     technologies: "TECHNOLOGIES",
     implemented: "IMPLEMENTED FEATURES",
-    noImplemented: "No implementation is claimed for this entry yet.",
+    noImplemented:
+      "No implementation outcomes are published for this entry yet.",
     limitations: "KNOWN LIMITATIONS",
     relatedProject: "RELATED BUILD",
     evidenceBoundary: "EVIDENCE BOUNDARY",
@@ -342,85 +80,92 @@ const en: LabCopy = {
   footer: {
     returnToSite: "Return to the personal website",
   },
+  home: {
+    kicker: "LEARNING NOTES & ENGINEERING EXPLORATIONS",
+    title: ["Starting with TypeScript.", "Growing into Web3."],
+    intro:
+      "A record of learning blockchain technology: building a foundation in the language, then taking questions into wallet integration, backend engineering and product security.",
+    current: "CURRENT STAGE",
+    learning: "Learning now",
+    pending: "Up next",
+    focusDeck:
+      "Currently learning TypeScript. Building the foundations step by step, with exercises and observations to follow here.",
+    readFocus: "Read the current learning notes",
+    viewRoute: "Explore the route ahead",
+    routeTitle: "Build a foundation. Then take the next step.",
+    routeDeck:
+      "A route to work through gradually. I am at the first stage; later directions will evolve through practice.",
+    stages: [
+      {
+        tech: "TypeScript",
+        title: "Language & types",
+        outcome:
+          "Types, asynchronous flows and modules, followed by typed event handling.",
+      },
+      {
+        tech: "viem",
+        title: "Connect to onchain data",
+        outcome:
+          "RPC interaction, log decoding and ERC-20 event normalization.",
+      },
+      {
+        tech: "Solidity",
+        title: "Understand contracts",
+        outcome: "Contract foundations and a replay-protected event registry.",
+      },
+      {
+        tech: "Foundry",
+        title: "Verify through tests",
+        outcome: "Unit, fuzz and invariant testing.",
+      },
+      {
+        tech: "Sepolia",
+        title: "Document the practice",
+        outcome:
+          "Testnet deployments, transaction hashes and verification reports.",
+      },
+    ],
+    buildTitle: "Take the learning into a concrete project.",
+    buildDeck:
+      "The wallet platform is a direction for future practice, currently a record of scope and architecture plans.",
+    buildLink: "Read the project plan",
+    stack: "CANDIDATE STACK",
+    stackNote: "Future selections, not implemented or verified.",
+    securityTitle: "Keep asking security questions.",
+    securityDeck:
+      "Record the questions first, then reproduce and test them against an actual implementation.",
+    securityLink: "Read the research note",
+    aboutTitle: "Understand. Experiment. Keep a record.",
+    aboutDeck:
+      "WEB3 LAB is an independent space for learning and engineering notes. The current focus is TypeScript, with a longer-term interest in wallet integration, backend engineering, product security and solution design. Learning, planned projects and verified outcomes are labeled separately.",
+    boundary:
+      "Projects are educational, testnet-oriented, unaudited and do not handle real funds.",
+    domains: [
+      "Wallet integration",
+      "Backend engineering",
+      "Product security",
+      "Solution design",
+    ],
+    entryTOC: "ON THIS PAGE",
+    learningNotice: "LEARNING RECORD",
+    learningBoundary:
+      "This page records the current learning stage and next steps. Exercise code and verification results will be added when they exist.",
+  },
 };
+
+export type LabCopy = typeof en;
 
 const zhCN: LabCopy = {
   siteName: "WEB3 LAB",
-  siteTagline: "构建 · 测试 · 记录",
+  siteTagline: "学习 · 构建 · 记录",
   returnToSite: "Zoran Zhou",
   switchLanguage: "English",
   nav: {
     overview: "概览",
     learning: "学习",
-    builds: "构建",
+    builds: "项目规划",
     security: "安全",
     about: "关于",
-  },
-  hero: {
-    kicker: "独立技术子站 / V1",
-    title: "构建并保护面向链上世界的数字资产系统。",
-    description: "钱包集成 · 后端工程 · 产品安全 · 解决方案架构",
-    primary: "查看重点构建",
-    secondary: "查看学习成果",
-    systemTitle: "安全事件处理示例",
-    codeBoundary: "参考模式 · 不代表已完成实现",
-    terminalLabel: "智能合约执行终端预览；命令不会实际执行",
-    terminalCodeLabel: "EIP-712 签名事件防重放参考流程",
-    terminalReady: "就绪",
-    routeLabel: "Web3 技术路线",
-    route: [
-      { technology: "TYPESCRIPT", outcome: "类型化事件" },
-      { technology: "VIEM", outcome: "RPC 日志解析" },
-      { technology: "SOLIDITY", outcome: "防重放校验" },
-      { technology: "FOUNDRY", outcome: "模糊与不变量测试" },
-      { technology: "SEPOLIA", outcome: "验证并发布证据" },
-    ],
-  },
-  tracks: {
-    label: "04 / 技术方向",
-    title: "四个技术能力域，一套工程系统。",
-    description:
-      "Lab 按照正在构建和验证的系统组织内容，而不是围绕市场叙事或代币活动组织。",
-    items: [
-      {
-        code: "01 / 集成",
-        title: "钱包集成",
-        description:
-          "将产品流程连接到钱包 API、托管接口、RPC 服务、Webhook 与交易生命周期。",
-        topics: ["钱包 API", "区块链 RPC", "Webhook", "交易生命周期"],
-      },
-      {
-        code: "02 / 后端",
-        title: "后端工程",
-        description:
-          "通过明确的状态、事务边界、重试与恢复路径，设计可预测的数字资产流程。",
-        topics: ["TypeScript", "NestJS", "PostgreSQL", "幂等性"],
-      },
-      {
-        code: "03 / 安全",
-        title: "产品安全",
-        description: "测试授权、签名、钱包业务逻辑、信任边界与安全回归。",
-        topics: ["API 安全", "威胁建模", "签名安全", "回归测试"],
-      },
-      {
-        code: "04 / 方案",
-        title: "解决方案",
-        description: "把需求转化为可解释的概念验证、架构决策与技术文档。",
-        topics: ["架构设计", "集成设计", "概念验证", "技术文档"],
-      },
-    ],
-  },
-  builds: {
-    label: "构建 / 001",
-    title: "重点构建",
-    description: "Lab 的长期核心：展示可以检查的实现、证据、边界与工程决策。",
-    featured: "重点构建",
-    status: "状态",
-    phase: "当前阶段",
-    candidateStack: "规划技术栈",
-    implemented: "已实现",
-    noImplemented: "目前没有声称任何功能已经实现。",
-    view: "打开构建记录",
   },
   stack: {
     groups: {
@@ -432,63 +177,6 @@ const zhCN: LabCopy = {
     },
     note: "规划选型 · 尚未实现或验证",
   },
-  learning: {
-    label: "学习 / 公开成果",
-    title: "学习成果，仅在可以验证时发布。",
-    description:
-      "公开条目聚焦具体产出、遇到的问题、安全发现、相关代码，以及每项结果的最后验证日期。",
-    log: "WEB3 验证路线",
-    evidence: [
-      {
-        technology: "TYPESCRIPT",
-        outcome: "类型化链上事件采集",
-      },
-      {
-        technology: "VIEM",
-        outcome: "RPC 日志解析与 ERC-20 标准化",
-      },
-      {
-        technology: "SOLIDITY",
-        outcome: "防重放事件登记合约",
-      },
-      {
-        technology: "FOUNDRY",
-        outcome: "单元、模糊与不变量测试",
-      },
-      {
-        technology: "SEPOLIA",
-        outcome: "测试网部署、交易哈希与验证报告",
-      },
-    ],
-    progressLabel: "从类型化事件采集到公开验证成果的 Web3 技术路线",
-    currentStage: "当前阶段",
-    pendingStage: "待推进",
-    noPublicOutcomes:
-      "目前没有学习成果被标记为已验证。只有在存在具体实现或可记录结果后，公开条目才会出现。",
-    nextGate:
-      "技术路线 / TYPESCRIPT → VIEM → SOLIDITY → FOUNDRY → SEPOLIA 验证成果",
-  },
-  security: {
-    label: "安全 / 攻击面",
-    title: "安全工作始终依附于真实流程。",
-    theoryNotice: "理论分析 · 尚未通过实现测试",
-    view: "阅读安全案例",
-  },
-  about: {
-    label: "关于 / 实践原则",
-    title: "记录数字资产系统的构建、验证与工程边界。",
-    paragraphs: [
-      "Web3 Lab 是一个独立技术子站，通过具体工作记录钱包集成、数字资产后端工程、产品安全与解决方案架构。",
-      "Lab 优先展示实践实现、安全验证、架构决策与可记录的工程成果，并明确区分学习、构建、测试和完成状态。",
-      "当前工作用于教育与测试网环境，未经审计，也不处理真实资金。",
-    ],
-    principles: [
-      "构建具体原型",
-      "验证安全结论",
-      "记录决策与限制",
-      "明确证据边界",
-    ],
-  },
   detail: {
     backToLab: "返回 Web3 Lab",
     status: "状态",
@@ -499,7 +187,7 @@ const zhCN: LabCopy = {
     candidateStack: "规划技术栈",
     technologies: "技术",
     implemented: "已实现功能",
-    noImplemented: "此条目目前不声称存在已完成实现。",
+    noImplemented: "此条目尚未发布实现成果。",
     limitations: "已知限制",
     relatedProject: "关联构建",
     evidenceBoundary: "证据边界",
@@ -546,13 +234,68 @@ const zhCN: LabCopy = {
   footer: {
     returnToSite: "返回个人网站",
   },
-};
-
-const labTranslations: Record<Locale, LabCopy> = {
-  "zh-CN": zhCN,
-  en,
+  home: {
+    kicker: "学习笔记与工程探索",
+    title: ["从 TypeScript 出发，", "逐步走进链上世界。"],
+    intro:
+      "这里记录我学习区块链技术的过程：先打好语言基础，再把问题带进钱包集成、后端工程与产品安全的实践中。",
+    current: "当前阶段",
+    learning: "学习中",
+    pending: "后续计划",
+    focusDeck:
+      "当前在学习 TypeScript。一步一步建立基础，练习与思考会在这里持续记录。",
+    readFocus: "阅读当前学习记录",
+    viewRoute: "看看后续方向",
+    routeTitle: "先把基础打牢，再向前一步。",
+    routeDeck:
+      "一条逐步推进的学习路线。当前处于第一阶段，后续方向会随实践继续调整。",
+    stages: [
+      {
+        tech: "TypeScript",
+        title: "语言与类型基础",
+        outcome: "类型系统、异步流程与模块组织；逐步练习类型化事件处理。",
+      },
+      {
+        tech: "viem",
+        title: "连接链上数据",
+        outcome: "RPC 交互、日志解析与 ERC-20 事件标准化。",
+      },
+      {
+        tech: "Solidity",
+        title: "理解合约边界",
+        outcome: "合约基础与防重放事件登记。",
+      },
+      {
+        tech: "Foundry",
+        title: "用测试验证",
+        outcome: "单元测试、模糊测试与不变量测试。",
+      },
+      {
+        tech: "Sepolia",
+        title: "留下实践记录",
+        outcome: "测试网部署、交易哈希与验证报告。",
+      },
+    ],
+    buildTitle: "把学习带进一个具体项目。",
+    buildDeck: "钱包平台是后续实践的载体，目前保留为范围与架构规划。",
+    buildLink: "阅读项目规划",
+    stack: "候选技术栈",
+    stackNote: "后续选型，尚未实现或验证。",
+    securityTitle: "带着安全问题继续学习。",
+    securityDeck: "先记录值得验证的问题，等有实际实现后再复现和测试。",
+    securityLink: "阅读研究笔记",
+    aboutTitle: "理解系统，动手尝试，认真记录。",
+    aboutDeck:
+      "WEB3 LAB 是一个独立的学习与工程记录空间。当前重心是 TypeScript，长期关注钱包集成、后端工程、产品安全与解决方案设计。学习过程、项目规划和已验证的结果会分别标明。",
+    boundary: "项目用于教育与测试网探索，未经审计，不涉及真实资金。",
+    domains: ["钱包集成", "后端工程", "产品安全", "解决方案"],
+    entryTOC: "本页目录",
+    learningNotice: "学习状态记录",
+    learningBoundary:
+      "本页记录当前学习阶段与后续计划。练习代码和验证结果将在实际产出后补充。",
+  },
 };
 
 export function getLabTranslations(locale: Locale): LabCopy {
-  return labTranslations[locale] ?? labTranslations["zh-CN"];
+  return locale === "en" ? en : zhCN;
 }

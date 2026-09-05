@@ -1,0 +1,155 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { locales, localizePath, type Locale } from "../../../i18n/utils";
+import "../../../styles/subscription.css";
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
+const feed = new URL(localizePath("/rss.xml", locale), Astro.site).href;
+const title = zh ? "订阅文章更新" : "Subscribe to writing";
+const description = zh
+  ? "新文章写好时，在邮箱里收到一封提醒。只订阅文章、研究笔记与随笔，不发送摄影、跑步路线或媒体清单的更新。"
+  : "A note in your inbox when new writing is published. Articles, research notes and essays only; no photo, running route or media-list updates.";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="page-container archive-page subscription-page">
+    <header class="page-intro">
+      <p class="eyebrow">LETTERS / {zh ? "保持联系" : "STAY IN TOUCH"}</p><h1>
+        {zh ? "下一篇，" : "The next idea,"}<br />{
+          zh ? "在邮箱里见。" : "in your inbox."
+        }
+      </h1><p>{description}</p>
+    </header>
+    <div class="subscription-grid">
+      <section class="email-subscription" aria-labelledby="email-heading">
+        <p class="eyebrow">01 / EMAIL</p><h2 id="email-heading">
+          {zh ? "用邮件接收更新" : "Get new writing by email"}
+        </h2><p>
+          {
+            zh
+              ? "通过 Blogtrottr 将文章更新送到邮箱。复制下面的地址，然后在订阅页面填写邮箱与接收频率。"
+              : "Blogtrottr can deliver this article feed to your inbox. Copy the address below, then enter it with your email and preferred schedule on its subscription page."
+          }
+        </p>
+        <ol class="subscription-steps">
+          <li>
+            <strong>{zh ? "复制文章订阅地址" : "Copy the article feed"}</strong
+            ><div class="feed-copy">
+              <label class="sr-only" for="article-feed"
+                >{zh ? "文章订阅地址" : "Article feed URL"}</label
+              ><input id="article-feed" readonly value={feed} /><button
+                type="button"
+                data-copy-feed
+                data-feed={feed}
+                data-copied={zh ? "已复制" : "Copied"}
+                >{zh ? "复制地址" : "Copy address"}</button>
+            </div><p
+              class="copy-status"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            >
+            </p>
+          </li><li>
+            <strong
+              >{
+                zh ? "填写邮箱与接收频率" : "Choose your email and schedule"
+              }</strong
+            ><p>
+              {
+                zh
+                  ? "在 Feed URL 中粘贴地址，在 Email address 中填写邮箱；Schedule 可选逐篇提醒或每日汇总。"
+                  : "Paste the address into Feed URL, enter your Email address, and choose a Schedule: individual updates or a daily digest."
+              }
+            </p><a
+              class="button-primary"
+              href="https://blogtrottr.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{zh ? "前往邮件订阅" : "Set up email updates"}<span
+                aria-hidden="true">↗</span
+              ></a>
+          </li><li>
+            <strong
+              >{zh ? "按服务提示完成确认" : "Complete the confirmation"}</strong
+            ><p>
+              {
+                zh
+                  ? "按照页面与邮箱中的提示确认后，即可接收后续文章；每封更新邮件均可退订。"
+                  : "Follow the service's instructions to confirm your subscription. You can unsubscribe through any update email."
+              }
+            </p>
+          </li>
+        </ol>
+        <p class="subscription-provider">
+          {
+            zh
+              ? "邮件由第三方 Blogtrottr 处理和发送，本站不收集订阅邮箱。免费方案包含广告；投递时间取决于服务检查频率。"
+              : "Email addresses and delivery are handled by Blogtrottr. This site does not collect subscriber emails. Its free plan includes ads; delivery timing depends on its feed checks."
+          }
+          <a
+            href="https://blogtrottr.com/legal"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{zh ? "隐私与条款" : "Privacy & terms"} ↗</a>
+        </p>
+      </section>
+      <aside class="rss-subscription">
+        <p class="eyebrow">02 / RSS</p><h2>
+          {zh ? "习惯用阅读器？" : "Prefer a feed reader?"}
+        </h2><p>
+          {
+            zh
+              ? "同一个地址也可以添加到你常用的 RSS 阅读器，在一处阅读新文章。"
+              : "Add the same feed address to your preferred RSS reader and read new articles there."
+          }
+        </p><a class="text-link" href={feed}
+          >{zh ? "查看 RSS 原始文件" : "View the raw RSS feed"}<span
+            aria-hidden="true">↗</span
+          ></a
+        ><div class="subscription-scope">
+          <h3>{zh ? "只发送你选择的内容" : "Just the writing"}</h3><p>
+            {
+              zh
+                ? "包含：技术文章、研究笔记、生活随笔。"
+                : "Includes technical articles, research notes and personal essays."
+            }
+          </p><p>
+            {
+              zh
+                ? "不包含：摄影相册、跑步与徒步路线、项目状态、书影音清单和 LAB 动态。"
+                : "Excludes photo albums, running and hiking routes, project status, media lists and LAB updates."
+            }
+          </p><p>
+            {
+              zh
+                ? "当前为中文文章订阅。右上角可切换英文订阅。"
+                : "This is the English article feed. Use the language switch for Chinese writing."
+            }
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <script>
+    const copy = document.querySelector<HTMLButtonElement>("[data-copy-feed]");
+    copy?.addEventListener("click", async () => {
+      const status = document.querySelector<HTMLElement>("[data-copy-status]")!;
+      try {
+        await navigator.clipboard.writeText(copy.dataset.feed ?? "");
+        status.textContent = copy.dataset.copied ?? "Copied";
+      } catch {
+        const input = document.querySelector<HTMLInputElement>("#article-feed");
+        input?.focus();
+        input?.select();
+        status.textContent =
+          document.documentElement.lang === "zh-CN"
+            ? "请手动复制已选中的地址。"
+            : "Please copy the selected address manually.";
+      }
+    });
+  </script>
+</BaseLayout>

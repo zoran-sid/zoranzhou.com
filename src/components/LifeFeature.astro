@@ -1,0 +1,46 @@
+---
+import { Image } from "astro:assets";
+import mountain from "../assets/images/sichuan-mountains.jpg";
+import { localizePath, type Locale } from "../i18n/utils";
+import { editorial } from "../i18n/editorial";
+interface Props {
+  locale: Locale;
+  overview?: boolean;
+}
+const { locale, overview = false } = Astro.props;
+const c = editorial(locale);
+---
+
+<section class="editorial-section page-container life-feature">
+  <a
+    class="life-feature__image"
+    href={localizePath(
+      locale === "zh-CN" ? "/blog/2025-06-08" : "/photos",
+      locale,
+    )}
+    aria-label={c.fieldLink}
+  >
+    <Image
+      src={mountain}
+      alt={locale === "zh-CN"
+        ? "金色阳光照亮川西的雪山"
+        : "Golden sunlight on the snow-covered mountains of western Sichuan"}
+      widths={[480, 800, 1200]}
+      sizes="(max-width: 760px) 100vw, 55vw"
+      loading="lazy"
+      quality={85}
+    />
+    <span class="life-feature__caption"
+      >{c.fieldCaption}<span aria-hidden="true">↗</span></span
+    >
+  </a>
+  <div class="life-feature__copy">
+    <p class="eyebrow">BEYOND THE SCREEN</p><h2>
+      {c.fieldTitle.split("\n").map((line) => <span>{line}</span>)}
+    </h2><p>{c.fieldDeck}</p><a
+      class="text-link"
+      href={localizePath(overview ? "/photos" : "/life", locale)}
+      >{overview ? c.photos : c.exploreLife}<span aria-hidden="true">↗</span></a
+    >
+  </div>
+</section>

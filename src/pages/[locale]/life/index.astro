@@ -1,0 +1,83 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import LifeFeature from "../../../components/LifeFeature.astro";
+import ArticleRow from "../../../components/ArticleRow.astro";
+import { getWriting } from "../../../lib/writing";
+import { writingCategory } from "../../../lib/content-policy";
+import { editorial } from "../../../i18n/editorial";
+import { locales, localizePath, type Locale } from "../../../i18n/utils";
+import "../../../styles/home.css";
+import "../../../styles/collections.css";
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const c = editorial(locale);
+const writing = (await getWriting(locale))
+  .filter((entry) => writingCategory(entry) === "life")
+  .slice(0, 4);
+const sections = [
+  { label: c.photos, deck: c.photoDeck, href: "/photos", symbol: "01" },
+  { label: c.routes, deck: c.routeDeck, href: "/map", symbol: "02" },
+  { label: c.notes, deck: c.notesDeck, href: "/essays", symbol: "03" },
+  { label: c.media, deck: c.mediaDeck, href: "/media", symbol: "04" },
+];
+---
+
+<BaseLayout title={c.life} description={c.lifeDeck}>
+  <div class="page-container">
+    <header class="page-intro">
+      <p class="eyebrow">LIFE / {c.life}</p><h1>
+        {c.lifeTitle.split("\n").map((line) => <span>{line}</span>)}
+      </h1><p>{c.lifeDeck}</p>
+    </header>
+  </div>
+  <LifeFeature locale={locale} overview />
+  <section class="page-container editorial-section">
+    <div class="collection-grid">
+      {
+        sections.map((section) => (
+          <a href={localizePath(section.href, locale)} class="collection-link">
+            <>
+              <span class="eyebrow">{section.symbol}</span>
+              <h2>
+                {section.label}
+                <span aria-hidden="true">↗</span>
+              </h2>
+              <p>{section.deck}</p>
+            </>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+  {
+    writing.length > 0 && (
+      <section class="page-container editorial-section">
+        <>
+          <header class="section-head">
+            <>
+              <div>
+                <>
+                  <p class="eyebrow">LIFE NOTES</p>
+                  <h2>{c.notes}</h2>
+                </>
+              </div>
+              <a
+                class="text-link"
+                href={localizePath("/blog/topics/life", locale)}
+              >
+                {c.allWriting} ↗
+              </a>
+            </>
+          </header>
+          <div class="writing-list">
+            {writing.map((entry) => (
+              <ArticleRow entry={entry} locale={locale} />
+            ))}
+          </div>
+        </>
+      </section>
+    )
+  }
+</BaseLayout>

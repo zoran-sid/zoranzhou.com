@@ -1,221 +1,30 @@
 ---
-import { getTranslations, localizePath, type Locale } from "../i18n/utils";
-import Web3LabEntry from "./Web3LabEntry.astro";
-
+import ExplorationMap from "./ExplorationMap.astro";
+import { editorial } from "../i18n/editorial";
+import { localizePath, type Locale } from "../i18n/utils";
+import type { WritingEntry } from "../lib/writing";
+interface Props {
+  entries: WritingEntry[];
+}
+const { entries } = Astro.props;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
-const t = getTranslations(locale);
+const c = editorial(locale);
 ---
 
-<section class="home-section surface-hero hero-scene">
-  <div class="page-container relative z-10">
-    <div class="hero-layout">
-      <div class="hero-copy">
-        <div class="hero-status">
-          <span class="hero-status__pulse"></span>
-          <strong>STATUS / ONLINE</strong>
-          <i></i>
-          <span>{t.heroBadge}</span>
-        </div>
-
-        <p class="section-kicker">{t.heroKicker}</p>
-        <h1 class="hero-title">
-          <span>{t.heroTitleLine1}</span>
-          <small>{t.heroTitleLine2}</small>
-        </h1>
-
-        <p class="hero-description">{t.heroDescription}</p>
-
-        <div class="hero-actions">
-          <a
-            href={localizePath("/blog", locale)}
-            class="hero-primary-action group"
-          >
-            <span>{t.heroReadBlog}</span>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              aria-hidden="true"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M5 12h14m-5-5 5 5-5 5"></path>
-            </svg>
-          </a>
-          <a href="#contact" class="hero-secondary-action">
-            <span>{t.heroGetInTouch}</span><i aria-hidden="true"></i>
-          </a>
-          <Web3LabEntry />
-        </div>
-
-        <div class="hero-disciplines" aria-label="Core disciplines">
-          <span><i>01</i>NETWORK</span>
-          <span><i>02</i>SECURITY</span>
-          <span><i>03</i>RESEARCH</span>
-        </div>
-      </div>
-
-      <div class="hero-console" aria-label="System profile visualization">
-        <header class="hero-console__header">
-          <span class="console-lights" aria-hidden="true"
-            ><i></i><i></i><i></i></span
-          >
-          <strong>ZORAN://PROFILE.SYS</strong>
-          <span class="console-live"><i></i>LIVE</span>
-        </header>
-
-        <div class="hero-console__body">
-          <div class="signal-radar" aria-hidden="true">
-            <div class="signal-radar__grid"></div>
-            <div class="signal-radar__sweep" data-radar-sweep></div>
-            <div class="signal-radar__ring ring-one"></div>
-            <div class="signal-radar__ring ring-two"></div>
-            <div class="signal-radar__ring ring-three"></div>
-            <div class="signal-radar__axis axis-x"></div>
-            <div class="signal-radar__axis axis-y"></div>
-            <div class="signal-radar__core"><span></span></div>
-            <i
-              class="radar-node"
-              data-radar-target
-              data-angle="52"
-              data-radius="34"></i>
-            <i
-              class="radar-node"
-              data-radar-target
-              data-angle="178"
-              data-radius="36"></i>
-            <i
-              class="radar-node"
-              data-radar-target
-              data-angle="286"
-              data-radius="35"></i>
-          </div>
-
-          <dl class="console-readouts">
-            <div><dt>ROLE</dt><dd>{t.heroKicker}</dd></div>
-            <div><dt>FOCUS</dt><dd>SECURE SYSTEMS</dd></div>
-            <div><dt>METHOD</dt><dd>BUILD · TEST · DOCUMENT</dd></div>
-            <div>
-              <dt>SIGNAL</dt><dd>
-                <span class="readout-bars" aria-hidden="true"
-                  ><i></i><i></i><i></i><i></i><i></i></span
-                >STABLE
-              </dd>
-            </div>
-          </dl>
-        </div>
-
-        <footer class="hero-console__footer">
-          <span>PACKETS / 2.4K</span><span>LATENCY / 08MS</span><span
-            >UPTIME / 99.99%</span
-          >
-        </footer>
-      </div>
+<section class="editorial-hero page-container">
+  <div class="editorial-hero__copy">
+    <p class="eyebrow">
+      <span class="identity-dot" aria-hidden="true"></span>{c.identity}
+    </p>
+    <h1>{c.headline[0]}<br /><span>{c.headline[1]}</span></h1>
+    <p class="editorial-hero__intro">{c.intro}</p>
+    <div class="hero-actions">
+      <a class="button-primary" href="#selected"
+        >{c.start}<span aria-hidden="true">↓</span></a
+      ><a class="text-link" href={localizePath("/about", locale)}
+        >{c.about}<span aria-hidden="true">↗</span></a
+      >
     </div>
   </div>
+  <ExplorationMap entries={entries} locale={locale} />
 </section>
-
-<script>
-  import {
-    crossedRadarTarget,
-    RADAR_CSS_INITIAL_ROTATION_DEGREES,
-    RADAR_DURATION_MS,
-    radarPosition,
-  } from "../lib/radar";
-
-  let activeRadar: HTMLElement | null = null;
-  let cleanupRadar = () => {};
-
-  function initializeRadar() {
-    const radar = document.querySelector<HTMLElement>(".signal-radar");
-    if (radar === activeRadar) return;
-
-    cleanupRadar();
-    activeRadar = radar;
-    if (!radar) return;
-
-    const sweep = radar.querySelector<HTMLElement>("[data-radar-sweep]");
-
-    const targets = [
-      ...radar.querySelectorAll<HTMLElement>("[data-radar-target]"),
-    ];
-
-    for (const target of targets) {
-      const angle = Number(target.dataset.angle ?? 0);
-      const radius = Number(target.dataset.radius ?? 0);
-      const position = radarPosition(angle, radius);
-
-      target.style.setProperty("--radar-left", `${50 + position.x}%`);
-
-      target.style.setProperty("--radar-top", `${50 + position.y}%`);
-    }
-
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    if (reducedMotion || !sweep) {
-      targets.forEach((target) => target.classList.add("is-detected"));
-      cleanupRadar = () => {
-        activeRadar = null;
-      };
-      return;
-    }
-
-    const animation = sweep.animate(
-      [
-        { transform: `rotate(${RADAR_CSS_INITIAL_ROTATION_DEGREES}deg)` },
-        {
-          transform: `rotate(${RADAR_CSS_INITIAL_ROTATION_DEGREES + 360}deg)`,
-        },
-      ],
-      {
-        duration: RADAR_DURATION_MS,
-        iterations: Infinity,
-        easing: "linear",
-      },
-    );
-
-    let frame = 0;
-    let previousTime = 0;
-
-    const detect = () => {
-      const currentTime = Number(animation.currentTime ?? 0);
-
-      for (const target of targets) {
-        if (target.classList.contains("is-detected")) continue;
-
-        const angle = Number(target.dataset.angle ?? 0);
-        if (
-          crossedRadarTarget(
-            previousTime,
-            currentTime,
-            angle,
-            RADAR_DURATION_MS,
-          )
-        ) {
-          target.classList.add("is-detected");
-        }
-      }
-
-      previousTime = currentTime;
-      if (targets.some((target) => !target.classList.contains("is-detected"))) {
-        frame = requestAnimationFrame(detect);
-      }
-    };
-
-    frame = requestAnimationFrame(detect);
-    cleanupRadar = () => {
-      cancelAnimationFrame(frame);
-      animation.cancel();
-      activeRadar = null;
-      cleanupRadar = () => {};
-    };
-  }
-
-  initializeRadar();
-  document.addEventListener("astro:page-load", initializeRadar);
-  document.addEventListener("astro:before-swap", () => cleanupRadar());
-</script>

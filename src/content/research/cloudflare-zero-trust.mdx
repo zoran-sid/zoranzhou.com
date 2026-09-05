@@ -1,25 +1,32 @@
-﻿---
-title: "Cloudflare Zero Trust Security Model"
-description: "Analyzing Cloudflare's Zero Trust architecture and its implications for enterprise security."
+---
+title: "Cloudflare Zero Trust 安全模型"
+description: "梳理 Cloudflare Zero Trust 的架构、访问控制与 DNS 过滤机制。"
 date: 2026-06-15
 tags: ["security", "cloudflare", "zero-trust"]
 status: completed
 lang: zh-CN
+translationKey: cloudflare-zero-trust
 ---
 
-## Overview
+<span id="overview" />
 
-Cloudflare's Zero Trust platform replaces the traditional perimeter-based security model with identity-aware access controls.
+## 概览
 
-### Architecture
+Cloudflare Zero Trust 平台以身份感知的访问控制，替代传统依赖网络边界的安全模型。
 
-The Zero Trust model operates on three core principles:
+<span id="architecture" />
 
-1. **Verify Explicitly** — Authenticate and authorize based on all available data points
-2. **Use Least Privilege** — Limit user access with Just-In-Time and Just-Enough-Access
-3. **Assume Breach** — Minimize blast radius and segment access
+### 架构原则
 
-### Key Components
+零信任模型围绕三个核心原则展开：
+
+1. **显式验证**：结合可用的上下文信息进行身份认证与授权。
+2. **最小权限**：通过即时、按需授权，限制用户的访问范围。
+3. **假设已被入侵**：限制影响范围，对访问进行分段。
+
+<span id="key-components" />
+
+### 关键组件
 
 ```mermaid
 graph TD
@@ -32,13 +39,15 @@ graph TD
     F --> H[Browser Isolation]
 ```
 
-### DNS Filtering
+<span id="dns-filtering" />
 
-Cloudflare Gateway provides DNS-layer security that blocks:
+### DNS 过滤
 
-- Malware domains
-- Phishing sites
-- Command & control servers
-- Content categories
+Cloudflare Gateway 在 DNS 层提供安全过滤，可拦截：
 
-This operates at the DNS resolution level, meaning protection applies before any connection is established.
+- 恶意软件域名
+- 钓鱼网站
+- 命令与控制服务器
+- 指定内容类别
+
+这些策略作用于 DNS 解析阶段，在建立后续连接前执行过滤。

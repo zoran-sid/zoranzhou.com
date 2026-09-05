@@ -71,7 +71,7 @@ The deployment artifact is `dist/`. Cloudflare must never publish the repository
 | `src/lib/media/list.ts`             | Read-only parser used by the production Media page                       |
 | `src/lib/photos.ts`                 | Local photo discovery and album filename conventions                     |
 | `src/data/legacy-photos.ts`         | Older manually described remote photo albums                             |
-| `src/styles/global.css`             | Global tokens, typography, shared layout, and map styling                |
+| `src/styles/global.css`             | Global tokens, typography and shared layout; maps in maps.css            |
 | `public/`                           | Assets copied to `dist/` without application logic                       |
 | `public/routes/`                    | Public GPX source files and optional display-only GeoJSON                |
 | `scripts/`                          | Explicit importers, migrations, validators, tests, and Astro launcher    |
@@ -222,7 +222,7 @@ normalize that union casually; existing migrated content depends on it.
 ### Page generation
 
 Public page families under `src/pages/[locale]/` include Home, Blog, Essays, Research,
-Projects, Media, Photos, Map, Web3 Lab, Tags, RSS, search data, and locale 404 pages.
+Projects, Life, About, Media, Photos, Map, Web3 Lab, Tags, RSS, search data, and locale 404 pages.
 
 The usual collection flow is:
 
@@ -239,8 +239,8 @@ Static generation is important: a path that looks dynamic in source still has no
 handler after build. When adding a detail view, verify `getStaticPaths()` emits every
 intended locale/slug combination.
 
-`BlogPostLayout.astro` computes headings, word count, reading time, and an `h2`/`h3` TOC.
-It finds related entries in the same collection and locale using shared tags, calculates
+`BlogPostLayout.astro` computes headings, reading time, and an `h2`/`h3` TOC.
+It finds related writing across Blog, Essays and Research in the same locale using shared tags and categories, calculates
 previous/next entries in date order, and emits Article and Breadcrumb JSON-LD.
 
 `BaseLayout.astro` owns canonical and alternate locale links, Open Graph/Twitter fields,
@@ -267,12 +267,111 @@ Read `src/i18n/utils.ts` before editing locale behavior. It owns:
 Navigation uses a deliberate translation policy:
 
 - listing pages switch to the equivalent listing in the target locale;
-- most detail pages return to the target collection listing when no safe translated slug
-  can be proven;
+- ordinary detail pages use a unique public `translationKey` match in the same collection;
+  when none can be proven, navigation falls back to the target collection listing;
 - Route details use stable `routeId` to locate the corresponding translated Route entry.
 
 Do not create a target-locale URL by blindly reusing an ordinary source slug. That can
 produce a statically nonexistent page.
+
+### Main-site editorial structure (2026-09)
+
+The primary navigation is Writing (`/blog`), Practice (`/projects`), Life (`/life`),
+About (`/about`), plus the independent WEB3 LAB. Existing collection detail URLs remain.
+The homepage follows identity -> selected writing -> latest notes -> current work ->
+life photograph -> footer contact. `ExplorationMap.astro` replaces the former radar with
+three real content links; do not add simulated metrics or perpetual scan animation.
+
+The map uses personal, everyday labels rather than technical job categories:
+
+| Node | Chinese | English | Target |
+| ---- | ------- | ------- | ------ |
+| 01 | 学习与思考 / 把好奇写成笔记 | Learning & ideas / Notes from curiosity | First selected article (currently AgentShield analysis) |
+| 02 | 尝试与创造 / 让想法慢慢成形 | Making & trying / Ideas taking shape | Blog construction article |
+| 03 | 生活记录 / 阅读 · 摄影 · 行走 | Everyday life / Books · photos · journeys | Localized Life index |
+
+Labels live in `src/i18n/editorial.ts`; node subtitles and destinations live in
+`ExplorationMap.astro`. A label describes the reader's entry point, not a skill score.
+Keep both languages and their targets aligned when editing them. On narrow screens,
+show the three labels as compact links, allow English labels to wrap, and hide the
+subtitles; keep each arrow inside its card. The homepage selections
+currently include AgentShield and blog construction in both locales, plus the year-end
+review in Chinese and Minecraft deployment in English. Do not substitute OpenWrt into
+that blog-construction position without the author's request.
+
+`src/lib/writing.ts` aggregates Blog, Essays and Research; it preserves source collection
+URLs. `content-policy.ts` owns publication, readable-body, category and translation rules.
+`/blog/topics/{technology,research,life}` uses complete static pagination, not a client-only
+filter of one page. `pagination.ts` is shared by the writing archives. Empty text entries
+keep their original detail paths but are excluded from reading indexes, tags, search and
+RSS. Metadata-only Routes remain searchable.
+
+`/subscribe` explains email delivery via Blogtrottr and retains the RSS-reader option.
+The article feed only includes Blog / Essays / Research: never add Photos, Routes,
+Projects, Media or Lab to this notification feed. Do not collect emails or add an email
+backend without an explicit architectural change. Readers confirm and unsubscribe with
+the provider; the main site must clearly explain the third-party delivery and free-plan ads.
+
+Homepage selections reference translation keys or source slugs in `writing.ts` and must
+resolve to public writing in the current locale. Latest notes exclude the selections.
+Current work references the public bilingual Lab entry selected by `LAB_CURRENT_FOCUS_KEY`.
+The current focus is TypeScript learning; do not substitute an unrelated project or
+advance its stage without author confirmation. NetGuard is a preserved draft, excluded
+from public views. Search includes essays
+and indexes title, description and tags; both search and RSS filter by locale.
+
+Keep the warm paper / ink / restrained blue main-site palette in `global.css` consistent
+in light and dark themes. `home.css`, `collections.css`, `reading.css` and `prose.css` own
+scoped responsibilities. `maps.css` preserves the Journey Explorer rules and loads only
+with `mapStyles`; do not mix main-site or map CSS into `LabLayout`.
+
+Run `npm run test:editorial` for content/pagination rules and, after a full build,
+`npm run test:site-build` for internal links, translated routes, metadata, localized
+search/RSS and the static-production boundary. Browser verification still covers mobile
+navigation, search focus and Escape, reading TOC, light/dark layouts, and maps.
+
+### Standalone GitHub profile handoff
+
+`docs/github-profile-README.md` is a finished replacement for the author's GitHub profile
+README in `zoran-sid/zoran-sid`. It is a handoff artifact, distinct from this blog's root
+`README.md`, and must stay outside `public/` and Astro's content collections. The author
+will copy it to GitHub manually. Keep the original `BLOG-POST-LIST:START/END` comment
+markers around selected writing for compatibility with the profile's existing format. Do not update or push to that separate repository unless
+a later user instruction explicitly authorizes it.
+
+The profile keeps English as its primary language with a short Chinese personal line.
+Preserve supported network/security experience, put TypeScript under current learning,
+and describe viem, Solidity, Foundry and Sepolia as future directions. Do not invent
+credentials, employment, proficiency levels, usage numbers or completed projects. NetGuard
+must remain absent. Website links use absolute production URLs and should be checked
+against the built routes after a structural site change.
+
+### Publishing and verification for editorial changes
+
+Keep the existing Astro static output and Cloudflare Pages integration. The only root
+Pages Function remains the language redirect. UI/content work does not authorize adding
+an email database, production editor, live trading/wallet connection, or separate hosting
+service. For article subscription changes, test the generated XML allowlist and both
+locales; do not send real subscription emails as a substitute for local verification.
+
+Before delivering a redesign, verify the complete navigation path from a main-site entry
+to the relevant detail and back, desktop/mobile layouts in both themes, and the Lab's
+independent metadata. Test search Escape with a nonempty query: native search inputs can
+consume Escape to clear their value, so the dialog explicitly closes on that key and then
+restores focus and scrolling. A cleared input alone is not a successful close.
+
+Run the appropriate checks listed in the validation matrix. `test:site-build` requires a
+fresh, completed `dist/`; do not browse pages while the static build is clearing/recreating
+them and interpret a transient missing page as a navigation defect. Refresh the preview
+following a completed build and verify the final artifact. Run `git diff --check` and
+`git diff --cached --check` because the latter also includes new files after staging.
+
+Only commit/push or publish when the user has authorized it in the active session. Such
+authorization remains valid across continuations. The September 2026 refactor explicitly
+authorizes `git add .`, a descriptive commit and `git push origin main`; this is a record
+of that session, not permanent permission to push future unrelated changes. Fetch and
+check remote divergence before pushing, preserve other user changes, and never force-push
+as part of routine delivery.
 
 ### Content change checklist
 
@@ -336,22 +435,22 @@ note         -> notes
 ```
 
 Use `getLabEntryPath()` and `getLabHomePath()` instead of rebuilding these paths. Lab
-entries remain part of the shared search index and sitemap. The personal-site hero has a
-Web3 Lab entry button on wider screens; below the mobile breakpoint it is hidden from the
-hero and the `WEB3 LAB` entry remains available in the mobile navigation. Do not remove
-one entry point without proving that the other remains reachable and localized.
+entries remain part of the shared search index and sitemap, but are excluded from article
+notifications. The main navigation, Practice page and current-learning card provide
+localized Lab entry points on desktop and mobile.
 
-The Lab has a fixed dark visual system rather than inheriting the personal-site theme.
-Its CSS tokens start with a `#05070d` background and cyan, violet, magenta, green, and
-amber signals. It uses Inter, JetBrains Mono, and an explicit CJK font stack. Preserve
-the `lab-*` class namespace, grid/beam/noise backdrop, translucent sticky header, and
-isolated focus/selection treatments; do not move these rules into the global theme.
+The Lab has an independent fixed dark palette: `#0b1016` background, slate panels,
+cyan `#89d7e8` focus, blue `#9cb6ff`, and readable muted text. It uses Inter, JetBrains
+Mono and an explicit CJK font stack. Preserve the `lab-*` namespace, subtle grid,
+sticky header, and isolated focus/selection treatments. Do not mix in main-site CSS.
 
-The home-page section order is Hero, technical tracks, featured build, learning route,
-security cases, About, and the Lab footer. Detail pages use a large entry header and
-boundary badges followed by a sticky facts rail, evidence notice, and prose column.
-Cards with `data-lab-spotlight` track the pointer only for a fine pointer when reduced
-motion has not been requested.
+Following the author's September 2026 redesign request, the home sequence is current
+TypeScript focus -> five-stage learning route -> project plans -> security notes ->
+About -> footer. The former simulated contract terminal and fishbone diagram are removed.
+Detail pages place prose first and a sticky contents/facts rail to the right. Mobile
+uses a collapsible contents list above prose and facts below. Learning entries show
+learning status and a learning-specific notice; build/security entries retain their
+implementation and verification boundaries.
 
 ### Brand and metadata boundary
 
@@ -378,10 +477,26 @@ Lab routes use only these Lab-specific icon assets:
 /web3-lab-apple-touch-icon.png
 ```
 
-The main site continues to use `/favicon.png` and `/apple-touch-icon.png`. The Lab icon
-matches the header's cyan, violet, and magenta diamond mark. When the mark changes,
-update the CSS mark, SVG source, 64 px fallback, and 180 px touch icon together; do not
-silently reuse the portrait favicon.
+The main site continues to use `/favicon.png` and `/apple-touch-icon.png`. The Lab uses
+its own connected-W mark: a continuous cyan-to-blue W, an isolated cyan dot above it,
+and a dark rounded tile. This replaces the former multicolored diamond mark. The SVG
+is the authoritative source; the header renders that same SVG rather than recreating it
+with CSS or copying the path into another component.
+
+Icon maintenance is a single-source workflow:
+
+1. Edit `public/web3-lab-favicon.svg` in its 64 × 64 coordinate system. Keep the broad
+   stroke readable at 16 and 32 px; avoid text, web fonts, external references or filters.
+2. Run `npm run icons:lab`. `scripts/generate-lab-icons.mjs` derives the 64 px favicon
+   and 180 px touch icon from the SVG with the pinned Sharp development dependency.
+3. Update `LAB_ICON_REVISION` in `src/lib/lab.ts` to a new revision whenever the mark
+   changes. Both `LabHeader` and `LabLayout` use this version in their asset URLs to
+   avoid returning a cached old icon after deployment. The underlying filenames stay
+   stable for external bookmarks.
+4. Inspect the SVG at favicon/header scale and the generated PNGs. The mark should be
+   recognizable on light browser chrome and on the Lab's dark surface.
+5. Commit the SVG, both PNGs, revision and any generation changes together. Rebuild and
+   check both home/detail pages in both languages. Never use the personal portrait for Lab.
 
 Brand separation must not remove locale and discovery metadata. Preserve canonical
 links, both locale alternates, and the `x-default` link to `/en/lab/`.
@@ -407,89 +522,27 @@ At the header breakpoint, Lab navigation becomes a horizontally scrollable secon
 Do not make the brand, language switch, or return target overlap in order to preserve all
 desktop labels on a narrow screen.
 
-### Hero route and execution preview
+### Current focus and learning route
 
-The hero route replaces the former four-box promotional list (`BUILDING IN PUBLIC`,
-`STATIC TECH LAB`, `TESTNET PROJECTS`, and `NO REAL FUNDS`). Do not restore generic
-promotional boundary cards. `copy.hero.route` presents a concrete engineering sequence:
+`LAB_CURRENT_FOCUS_KEY` in `src/lib/lab.ts` selects the bilingual current-learning entry
+for both main-site and Lab home. It currently points to `lab-typescript-foundations`.
+The author's confirmed state is TypeScript learning; no completed prototype, published
+exercise or test result is claimed. The TS focus card links to that real learning record.
 
-```text
-TypeScript typed events
-  -> viem RPC log decoding
-  -> Solidity replay protection
-  -> Foundry fuzz and invariant tests
-  -> Sepolia verification and published evidence
-```
+`copy.home.stages` contains five explicit, bilingual technology/outcome pairs:
 
-The hero code panel is a static blockchain control preview, not an executable console or
-a source-file viewer. Its accessible label must state that commands are not run. The
-visual contract is:
+1. TypeScript: language foundations, then typed event handling.
+2. viem: RPC interaction, log parsing and ERC-20 normalization.
+3. Solidity: contract foundations and replay-protected event registration.
+4. Foundry: unit, fuzz and invariant tests.
+5. Sepolia: testnet deployment, transaction records and verification reports.
 
-- present `ReplayGuard` as six fixed, numbered rule rows: `TYPEHASH`, `DIGEST`, `AUTH`,
-  `EXPIRY`, `REPLAY`, and `AUDIT`;
-- use the expressions to demonstrate EIP-712 typed-data hashing, ERC-1271-compatible
-  signature checking, deadline enforcement, an atomic replay-state transition, and audit
-  event recording;
-- use a responsive structured grid rather than a literal multiline source-code block;
-- use the blockchain test command
-  `forge test --match-test testReplayProtection -vvvv`;
-- show `READY`/`就绪`, not an instruction to press Enter;
-- do not show `npm run build`, `cat ReplayGuard.sol`, `等待回车`, `Press Enter`, or a
-  separate low-value prompt-only line;
-- use the cursor and status signal to suggest a pending execution state without claiming
-  that a command is actually running;
-- keep the rule rows within the panel without horizontal scrolling; on mobile, stack each
-  expression below its rule label and hide the path before shrinking command text below a
-  readable size.
-
-The concern labels remain `EIP-712`, `ERC-1271`, `DEADLINE`, and `ATOMIC CONSUME`. They
-describe the controls being previewed; do not replace them with generic build labels.
-
-Cursor and status pulse animations run only when the media query permits motion
-(`prefers-reduced-motion: no-preference`). The reduced-motion branch must suppress them.
-The preview must never contain secrets, live credentials, or a UI that implies remote
-command execution.
-
-### Fishbone learning route
-
-The learning progress visualization is an ordered fishbone route driven by
-`copy.learning.evidence`, not a generic checklist. Its five steps are specific and
-bilingual:
-
-1. TypeScript: typed onchain event ingestion.
-2. viem: RPC log decoding and ERC-20 normalization.
-3. Solidity: a replay-protected event registry.
-4. Foundry: unit, fuzz, and invariant tests.
-5. Sepolia: deployment, transaction hashes, and a verification report.
-
-`currentLearningStage` is a zero-based index and currently remains `0` (TypeScript) until
-evidence supports advancing it. Exactly one item may have
-`data-state="current"` and `aria-current="step"`; all other steps remain pending until
-evidence supports a state change. Current state is expressed with text and ARIA as well
-as cyan `#47e7ff`; pending nodes use the readable gray fishbone token `#718198`. Maintain
-their contrast against the Lab background and never style a pending stage so that it
-appears completed.
-
-On wide containers, the five cards alternate above and below a horizontal spine. Branch
-lines occupy only the gap between a card edge and the spine: they must be clipped beneath
-the card layer and must never cross into or through a stage card. When the learning-route
-container is narrower than `46rem`, the visualization changes to a vertical spine. The
-diagonal SVG branches disappear and short horizontal connectors join the vertical spine
-to each full-width card.
-
-When the route changes, update all of the following as one bilingual change:
-
-```text
-copy.hero.route
-copy.learning.evidence
-copy.learning.nextGate
-currentLearningStage and its evidence-backed state
-desktop and narrow-container geometry
-```
-
-Do not replace the concrete technology/outcome pairs with labels such as
-`implementation`, `test results`, `security review`, or `documentation`. Those labels do
-not describe an engineering route.
+Exactly one stage has `data-state="current"` and `aria-current="step"`; the other four
+have `data-state="pending"`. This is a study direction, not a progress percentage or
+completion schedule. Text and ARIA communicate state as well as color. Change the source
+record, bilingual copy, both entry points and verification tests together when the author
+advances the learning stage. Desktop shows an ordered horizontal sequence; below 900 px
+it becomes a vertical list with a simple left rule. Keep all pending text readable.
 
 ### Planned stack and evidence semantics
 
@@ -534,10 +587,8 @@ Those safety boundaries still belong in entry badges, the About section, entry c
 and evidence notices where they have context. They should not be repeated as a thin
 full-width footer sentence.
 
-The Security section header intentionally has no generic explanatory paragraph;
-`security.description` is not part of `LabCopy`. Keep concrete boundaries in the
-security cards, theory notice, and entry evidence instead of restoring the removed
-header copy.
+The Security section explains that existing material is research notes and preserves its
+source verification label. Do not present theoretical material as a tested security case.
 
 Localized Lab copy lives in `src/i18n/lab.ts`. Keep English and Chinese structure,
 technical order, status meaning, and accessibility labels synchronized. Lab detail
@@ -547,22 +598,16 @@ a translated slug.
 
 ### Responsive and motion contract
 
-The responsive transitions are part of the design, not optional cleanup:
+The responsive transitions are part of the design:
 
-- below `74rem`, Hero, learning, and About move to one column while technical tracks use
-  two columns;
-- below `56rem`, the header becomes two rows with horizontally scrollable navigation,
-  and featured-build and detail two-column layouts collapse;
-- below `40rem`, routes, candidate-stack groups, track cards, and the footer become one
-  column; the terminal hides its path and the security flow becomes vertical;
-- the learning fishbone also responds to its own `46rem` container threshold, independent
-  of the viewport breakpoints.
+- below 1100 px, shell spacing and hero/detail gaps tighten;
+- below 900 px, the header becomes two rows, the roadmap becomes vertical, and the detail
+  rail moves below prose with a separate collapsible mobile contents list;
+- below 640 px, hero, project plans, About and footer become single-column.
 
-At each transition, verify long text in both locales, terminal overflow, fishbone
-connectors, touch targets, and the detail facts rail. When the user requests reduced
-motion (`prefers-reduced-motion: reduce`), disable smooth scrolling, spotlight, hover
-translation, cursor blink, and continuous status animations without removing state text
-or focus feedback.
+At each transition, verify both languages, long titles, code/table overflow, touch
+targets and the facts rail. Reduced motion disables smooth scrolling and transitions
+without removing state text or focus feedback. Avoid continuous decorative animations.
 
 ## Route and map subsystem
 
@@ -1201,11 +1246,11 @@ Use Prettier on the intended file(s) when unrelated user formatting must be pres
    Lab components, and `src/styles/lab.css` as one system.
 2. Change structured content or schema before its visual consumers; do not encode planned
    stack or progress evidence only in CSS or page markup.
-3. Keep `hero.route`, `learning.evidence`, `learning.nextGate`, candidate-stack groups,
-   and both locales semantically aligned.
+3. Keep `LAB_CURRENT_FOCUS_KEY`, its bilingual learning record, `home.stages`,
+   candidate-stack groups and both locale entry points semantically aligned.
 4. Preserve the independent title, Open Graph, JSON-LD, favicon, canonical, and
    `hreflang` contract.
-5. Check the header and detail return targets, terminal overflow, fishbone connector
+5. Check the header and detail return targets, code/table overflow, roadmap state and
    geometry, current/pending contrast, and text wrapping at desktop and mobile widths.
 6. Verify planned tools are not presented as implemented and that verification claims
    match checked-in evidence.

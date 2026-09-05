@@ -14,7 +14,8 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content, headings } = await entry.render();
+const toc = headings.filter((heading) => heading.depth === 2);
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const copy = getLabTranslations(locale);
 const allEntries = await getCollection("lab", ({ data }) => !data.draft);
@@ -34,7 +35,11 @@ const relatedProject =
           candidate.data.lang === locale &&
           !candidate.data.draft,
       );
-const statusLabel = copy.statusLabels[entry.data.status] ?? entry.data.status;
+const isLearning = entry.data.type === "learning";
+const statusLabel =
+  isLearning && entry.data.status === "building"
+    ? copy.home.learning
+    : copy.statusLabels[entry.data.status];
 const verificationLabel =
   copy.verificationLabels[entry.data.verificationStatus] ??
   entry.data.verificationStatus;
@@ -86,16 +91,82 @@ const jsonld = {
       <h1>{entry.data.title}</h1>
       {entry.data.description && <p>{entry.data.description}</p>}
 
-      <div class="lab-entry__boundary-row" aria-label="Project boundaries">
-        <span>{copy.badges.educational}</span>
-        {entry.data.testnetOnly && <span>{copy.badges.testnetOnly}</span>}
-        {!entry.data.audited && <span>{copy.badges.unaudited}</span>}
-        {!entry.data.realFunds && <span>{copy.badges.noRealFunds}</span>}
+      <div class="lab-entry__status">
+        <span class:list={["lab-signal", `lab-signal--${entry.data.status}`]}
+          ><i aria-hidden="true"></i>{statusLabel}</span
+        >
+        <span
+          class:list={[
+            "lab-signal",
+            `lab-signal--${entry.data.verificationStatus}`,
+          ]}><i aria-hidden="true"></i>{verificationLabel}</span
+        >
+        <time datetime={entry.data.date.toISOString()}
+          >{entry.data.date.toLocaleDateString(dateLocale)}</time
+        >
       </div>
+      {
+        !isLearning && (
+          <div
+            class="lab-entry__boundary-row"
+            aria-label={locale === "zh-CN" ? "项目边界" : "Project boundaries"}
+          >
+            <span>{copy.badges.educational}</span>
+            {entry.data.testnetOnly && <span>{copy.badges.testnetOnly}</span>}
+            {!entry.data.audited && <span>{copy.badges.unaudited}</span>}
+            {!entry.data.realFunds && <span>{copy.badges.noRealFunds}</span>}
+          </div>
+        )
+      }
+      {
+        toc.length > 0 && (
+          <details class="lab-mobile-toc">
+            <>
+              <summary>{copy.home.entryTOC}</summary>
+              <nav aria-label={copy.home.entryTOC}>
+                {toc.map((heading) => (
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                ))}
+              </nav>
+            </>
+          </details>
+        )
+      }
     </header>
 
     <div class="lab-entry__layout">
+      <div class="lab-entry__content">
+        <div class="lab-entry__evidence">
+          <strong
+            >{
+              isLearning
+                ? copy.home.learningNotice
+                : copy.detail.evidenceBoundary
+            }</strong
+          >
+          <p>
+            {
+              isLearning
+                ? copy.home.learningBoundary
+                : copy.detail.evidenceBoundaryText
+            }
+          </p>
+        </div>
+        <div class="lab-prose">
+          <Content />
+        </div>
+      </div>
       <aside class="lab-entry__rail">
+        {
+          toc.length > 0 && (
+            <nav class="lab-toc" aria-label={copy.home.entryTOC}>
+              <h2>{copy.home.entryTOC}</h2>
+              {toc.map((heading) => (
+                <a href={`#${heading.slug}`}>{heading.text}</a>
+              ))}
+            </nav>
+          )
+        }
         <dl class="lab-entry__facts">
           <div>
             <dt>{copy.detail.status}</dt>
@@ -171,20 +242,22 @@ const jsonld = {
           )
         }
 
-        <section class="lab-entry__rail-section">
-          <h2>{copy.detail.implemented}</h2>
-          {
-            entry.data.implementedFeatures.length > 0 ? (
-              <ul>
-                {entry.data.implementedFeatures.map((feature) => (
-                  <li>{feature}</li>
-                ))}
-              </ul>
-            ) : (
-              <p class="lab-entry__empty">{copy.detail.noImplemented}</p>
-            )
-          }
-        </section>
+        {
+          (!isLearning || entry.data.implementedFeatures.length > 0) && (
+            <section class="lab-entry__rail-section">
+              <h2>{copy.detail.implemented}</h2>
+              {entry.data.implementedFeatures.length > 0 ? (
+                <ul>
+                  {entry.data.implementedFeatures.map((feature) => (
+                    <li>{feature}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="lab-entry__empty">{copy.detail.noImplemented}</p>
+              )}
+            </section>
+          )
+        }
 
         {
           entry.data.knownLimitations.length > 0 && (
@@ -213,16 +286,6 @@ const jsonld = {
           )
         }
       </aside>
-
-      <div class="lab-entry__content">
-        <div class="lab-entry__evidence">
-          <strong>{copy.detail.evidenceBoundary}</strong>
-          <p>{copy.detail.evidenceBoundaryText}</p>
-        </div>
-        <div class="lab-prose">
-          <Content />
-        </div>
-      </div>
     </div>
   </article>
 </LabLayout>

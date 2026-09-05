@@ -105,8 +105,8 @@ const jsonld = {
   description={t.mediaDescription}
   jsonld={jsonld}
 >
-  <main class="page-container py-14 md:py-20">
-    <header class="max-w-3xl">
+  <div class="page-container archive-page">
+    <header class="page-intro">
       <p class="text-sm font-medium uppercase text-gray-500 dark:text-gray-400">
         {t.navMedia}
       </p>
@@ -167,9 +167,7 @@ const jsonld = {
           </p>
         ) : (
           <>
-            <div
-              class="media-desktop-grid media-header hidden rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400 md:grid"
-            >
+            <div class="media-desktop-grid media-header hidden rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400 md:grid">
               <span class="px-4 py-3 text-center">{t.mediaType}</span>
               <span class="px-4 py-3">{t.mediaName}</span>
               <span class="px-4 py-3 text-center">{t.mediaYear}</span>
@@ -183,12 +181,8 @@ const jsonld = {
                   data-category={item.category}
                   class="media-row group transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-900/50"
                 >
-                  <div
-                    class="media-desktop-grid hidden items-center text-sm md:grid"
-                  >
-                    <span
-                      class="media-type inline-flex min-w-0 items-center justify-center gap-2 px-4 py-4 text-xs font-medium text-gray-500 dark:text-gray-400"
-                    >
+                  <div class="media-desktop-grid hidden items-center text-sm md:grid">
+                    <span class="media-type inline-flex min-w-0 items-center justify-center gap-2 px-4 py-4 text-xs font-medium text-gray-500 dark:text-gray-400">
                       <span
                         class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}
                       />
@@ -266,7 +260,7 @@ const jsonld = {
         )
       }
     </section>
-  </main>
+  </div>
 </BaseLayout>
 
 <style>

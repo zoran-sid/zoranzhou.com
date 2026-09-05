@@ -1,0 +1,45 @@
+---
+import {
+  categoryLabel,
+  displayDate,
+  entryPath,
+  type WritingEntry,
+} from "../lib/writing";
+import { writingCategory } from "../lib/content-policy";
+import { readingTime } from "../lib/utils";
+import { editorial } from "../i18n/editorial";
+import type { Locale } from "../i18n/utils";
+interface Props {
+  entry: WritingEntry;
+  locale: Locale;
+  updated?: boolean;
+}
+const { entry, locale, updated = false } = Astro.props;
+const c = editorial(locale);
+const date =
+  updated && entry.data.updated ? entry.data.updated : entry.data.date;
+---
+
+<article
+  class="writing-row"
+  data-writing-item
+  data-category={writingCategory(entry)}
+>
+  <div class="writing-row__meta">
+    <time datetime={date.toISOString()}
+      >{updated && entry.data.updated ? `${c.updated} ` : ""}{
+        displayDate(date, locale)
+      }</time
+    ><span>{categoryLabel(entry, locale)}</span>
+  </div>
+  <div class="writing-row__body">
+    <h3>
+      <a href={entryPath(entry)}
+        >{entry.data.title}<span class="row-arrow" aria-hidden="true">↗</span
+        ></a
+      >
+    </h3>{entry.data.description && <p>{entry.data.description}</p>}<span
+      class="reading-time">{readingTime(entry.body)} {c.reading}</span
+    >
+  </div>
+</article>

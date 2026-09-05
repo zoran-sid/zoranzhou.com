@@ -1,449 +1,186 @@
 ---
 import SearchModal from "./SearchModal.astro";
 import BrandPortrait from "./BrandPortrait.astro";
-import { getCollection } from "astro:content";
-import {
-  getTranslations,
-  type Locale,
-  localeLabels,
-  locales,
-  localizePath,
-  LANG_COOKIE,
-} from "../i18n/utils";
-
-const path = Astro.url.pathname;
-const currentSearch = Astro.url.search;
+import { editorial } from "../i18n/editorial";
+import { localizePath, LANG_COOKIE, type Locale } from "../i18n/utils";
+interface Props {
+  alternateHref: string;
+}
+const { alternateHref } = Astro.props;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
-const t = getTranslations(locale);
-
-const primaryNavItems = [
-  { label: t.navBlog, href: localizePath("/blog", locale) },
-  { label: t.navResearch, href: localizePath("/research", locale) },
-  { label: t.navProjects, href: localizePath("/projects", locale) },
-  { label: t.navMedia, href: localizePath("/media", locale) },
-  { label: t.navEssays, href: localizePath("/essays", locale) },
-];
-
-const personalNavItems = [
-  {
-    label: t.navPhotos,
-    href: localizePath("/photos", locale),
-    icon: "photos",
-  },
-  {
-    label: t.navMap,
-    href: localizePath("/map", locale),
-    icon: "map",
-  },
-];
-
-const labNavItem = {
-  label: "WEB3 LAB",
-  href: localizePath("/lab", locale),
-};
-
-const languageSwitchSections = new Set([
-  "blog",
-  "research",
-  "projects",
-  "media",
-  "essays",
-  "photos",
-  "map",
-  "tags",
-]);
-
-function getLanguageSwitchHref(targetLocale: Locale): string {
-  const pathWithoutLocale = path.replace(/^\/(?:zh-CN|en)(?=\/|$)/, "") || "/";
-
-  const segments = pathWithoutLocale.split("/").filter(Boolean);
-
-  let targetPath = "/";
-  let preserveSearch = false;
-
-  // 首页或顶级栏目页可以直接切换到相同路径。
-  if (segments.length <= 1) {
-    targetPath = pathWithoutLocale;
-    preserveSearch = true;
-  } else {
-    // 详情页回到目标语言下相同栏目，防止没有对应翻译而出现 404。
-    const section = segments[0];
-
-    if (section && languageSwitchSections.has(section)) {
-      targetPath = `/${section}/`;
-    }
-  }
-
-  const localizedPath = localizePath(targetPath, targetLocale);
-
-  return preserveSearch ? `${localizedPath}${currentSearch}` : localizedPath;
-}
-
-const routeDetailMatch = /^\/(?:zh-CN|en)\/map\/([^/]+)\/?$/.exec(path);
-let translatedRouteHref: string | undefined;
-if (routeDetailMatch) {
-  const routes = await getCollection(
-    "routes",
-    ({ data }) => data.draft !== true && data.published !== false,
-  );
-  const current = routes.find(
-    (entry) => entry.slug === routeDetailMatch[1] && entry.data.lang === locale,
-  );
-  const translated =
-    current &&
-    routes.find(
-      (entry) =>
-        entry.data.routeId === current.data.routeId &&
-        entry.data.lang !== locale,
-    );
-  if (translated)
-    translatedRouteHref = localizePath(
-      `/map/${translated.slug}`,
-      translated.data.lang,
-    );
-}
-
+const c = editorial(locale);
 const alternateLocale: Locale = locale === "zh-CN" ? "en" : "zh-CN";
-
-const alternateLocaleHref =
-  translatedRouteHref ?? getLanguageSwitchHref(alternateLocale);
+const section = Astro.url.pathname.split("/").filter(Boolean)[1] ?? "";
+const items = [
+  {
+    label: c.writing,
+    href: "/blog",
+    active: ["blog", "essays", "research", "tags"].includes(section),
+  },
+  { label: c.work, href: "/projects", active: section === "projects" },
+  {
+    label: c.life,
+    href: "/life",
+    active: ["life", "photos", "map", "media"].includes(section),
+  },
+  { label: c.about, href: "/about", active: section === "about" },
+  { label: "WEB3 LAB", href: "/lab", active: false },
+];
 ---
 
 <header class="site-header" data-site-header data-language-cookie={LANG_COOKIE}>
-  <svg aria-hidden="true" class="hidden">
-    <symbol id="nav-icon-photos" viewBox="0 0 24 24">
-      <path
-        d="M4.75 7.75A2.75 2.75 0 0 1 7.5 5h1.6l1.15-1.5h3.5L14.9 5h1.6a2.75 2.75 0 0 1 2.75 2.75v8.5A2.75 2.75 0 0 1 16.5 19H7.5a2.75 2.75 0 0 1-2.75-2.75v-8.5Z"
-      ></path>
-      <path d="M12 15.5a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"></path>
-    </symbol>
-
-    <symbol id="nav-icon-map" viewBox="0 0 24 24">
-      <path
-        d="M9 18.75 4.75 20.5V6.25L9 4.5l6 1.75 4.25-1.75v14.25L15 20.5l-6-1.75Z"
-      ></path>
-      <path d="M9 4.5v14.25M15 6.25V20.5"></path>
-      <path
-        d="M12 8.75c1.1 0 2 .9 2 2 0 1.5-2 3.5-2 3.5s-2-2-2-3.5c0-1.1.9-2 2-2Z"
-      ></path>
-    </symbol>
-  </svg>
-
-  <div class="site-header__frame page-container">
-    <nav class="site-nav" aria-label="Primary navigation">
-      <a
-        href={localizePath("/", locale)}
-        class="site-brand"
-        aria-label="Zoran Zhou home"
+  <nav
+    class="site-nav page-container"
+    aria-label={locale === "zh-CN" ? "主导航" : "Main navigation"}
+  >
+    <a
+      href={localizePath("/", locale)}
+      class="site-brand"
+      aria-label={locale === "zh-CN" ? "Zoran Zhou 首页" : "Zoran Zhou home"}
+      ><span class="site-brand__mark"><BrandPortrait /></span><span
+        ><strong>ZORAN ZHOU<span class="brand-period">.</span></strong><small
+          >{
+            locale === "zh-CN"
+              ? "构建 · 观察 · 记录"
+              : "BUILD · OBSERVE · WRITE"
+          }</small
+        ></span
+      ></a
+    >
+    <div class="site-nav__links">
+      {
+        items.map((item) => (
+          <a
+            href={localizePath(item.href, locale)}
+            class:list={[
+              "site-nav__link",
+              { active: item.active, "site-nav__lab": item.href === "/lab" },
+            ]}
+            aria-current={item.active ? "page" : undefined}
+          >
+            {item.label}
+            {item.href === "/lab" && <span aria-hidden="true">↗</span>}
+          </a>
+        ))
+      }
+    </div>
+    <div class="site-nav__tools">
+      <SearchModal locale={locale} /><a
+        class="site-nav__language"
+        href={alternateHref}
+        data-language-switch
+        data-target-locale={alternateLocale}
+        aria-label={locale === "zh-CN" ? "Switch to English" : "切换为中文"}
+        >{locale === "zh-CN" ? "EN" : "中文"}</a
+      ><button
+        type="button"
+        id="theme-toggle"
+        class="icon-button"
+        aria-label={locale === "zh-CN" ? "切换深浅主题" : "Toggle color theme"}
+        ><svg
+          class="theme-sun"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+          ><circle cx="12" cy="12" r="4"></circle><path
+            d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"
+          ></path></svg
+        ><svg
+          class="theme-moon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+          ><path d="M20.5 14.5A9 9 0 0 1 9.5 3.5a9 9 0 1 0 11 11Z"></path></svg
+        ></button
+      ><button
+        type="button"
+        id="mobile-menu-toggle"
+        class="icon-button site-nav__menu"
+        aria-label={locale === "zh-CN" ? "打开或关闭导航" : "Toggle navigation"}
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        ><svg
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"><path d="M4 8h16M4 16h16"></path></svg
+        ></button
       >
-        <span class="site-brand__mark" aria-hidden="true">
-          <BrandPortrait />
-        </span>
-
-        <span class="site-brand__copy">
-          <strong>ZORAN ZHOU</strong>
-          <small>NETWORK / SECURITY</small>
-        </span>
-      </a>
-
-      <div class="site-nav__links">
-        {
-          primaryNavItems.map((item) => {
-            const active =
-              path === item.href || path.startsWith(item.href + "/");
-
-            return (
-              <a
-                href={item.href}
-                class:list={["site-nav__link", { active }]}
-                aria-current={active ? "page" : undefined}
-              >
-                {item.label}
-              </a>
-            );
-          })
-        }
-      </div>
-
-      <div class="site-nav__tools">
-        <div class="site-nav__personal" aria-label="Personal sections">
-          {
-            personalNavItems.map((item) => {
-              const active =
-                path === item.href || path.startsWith(item.href + "/");
-
-              return (
-                <a
-                  href={item.href}
-                  class:list={["site-nav__icon", { active }]}
-                  aria-label={item.label}
-                  title={item.label}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <svg
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.7"
-                  >
-                    <use href={`#nav-icon-${item.icon}`} />
-                  </svg>
-                </a>
-              );
-            })
-          }
-        </div>
-
-        <div class="site-search">
-          <SearchModal locale={locale} />
-        </div>
-
-        <a
-          href={alternateLocaleHref}
-          class="site-nav__language"
-          aria-label={t.langLabel}
+    </div>
+  </nav>
+  <div id="mobile-menu" class="site-mobile-menu" hidden>
+    <div class="page-container">
+      {
+        items.map((item, index) => (
+          <a
+            href={localizePath(item.href, locale)}
+            aria-current={item.active ? "page" : undefined}
+          >
+            <span class="menu-number">0{index + 1}</span>
+            {item.label}
+            <span aria-hidden="true">↗</span>
+          </a>
+        ))
+      }<div class="mobile-secondary">
+        <a href={localizePath("/photos", locale)}>{c.photos}</a><a
+          href={localizePath("/map", locale)}>{c.routes}</a
+        ><a href={localizePath("/media", locale)}>{c.media}</a><a
+          href={alternateHref}
           data-language-switch
           data-target-locale={alternateLocale}
+          >{locale === "zh-CN" ? "English" : "中文"}</a
         >
-          {localeLabels[alternateLocale]}
-        </a>
-
-        <button
-          id="theme-toggle"
-          class="site-nav__control"
-          aria-label="Toggle dark mode"
-        >
-          <svg
-            class="hidden dark:block"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            viewBox="0 0 24 24"
-          >
-            <circle cx="12" cy="12" r="3.5"></circle>
-            <path
-              stroke-linecap="round"
-              d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7 5.3 5.3"
-            ></path>
-          </svg>
-
-          <svg
-            class="block dark:hidden"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M20.2 15.5A8.8 8.8 0 0 1 8.5 3.8 8.8 8.8 0 1 0 20.2 15.5Z"
-            ></path>
-          </svg>
-        </button>
-
-        <button
-          id="mobile-menu-toggle"
-          class="site-nav__control site-nav__menu"
-          aria-label="Toggle mobile menu"
-          aria-expanded="false"
-          aria-controls="mobile-menu"
-        >
-          <svg
-            id="menu-icon-open"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" d="M5 8h14M5 16h14"></path>
-          </svg>
-
-          <svg
-            id="menu-icon-close"
-            class="hidden"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" d="m7 7 10 10M17 7 7 17"></path>
-          </svg>
-        </button>
-      </div>
-    </nav>
-  </div>
-
-  <div id="mobile-menu" class="site-mobile-menu" hidden>
-    <div class="page-container site-mobile-menu__inner">
-      <div class="site-mobile-menu__links">
-        {
-          primaryNavItems.map((item) => {
-            const active =
-              path === item.href || path.startsWith(item.href + "/");
-
-            return (
-              <a
-                href={item.href}
-                class:list={["site-mobile-menu__link", { active }]}
-                aria-current={active ? "page" : undefined}
-              >
-                <>
-                  <strong>{item.label}</strong>
-                  <i>↗</i>
-                </>
-              </a>
-            );
-          })
-        }
-
-        {
-          personalNavItems.map((item) => {
-            const active =
-              path === item.href || path.startsWith(item.href + "/");
-
-            return (
-              <a
-                href={item.href}
-                class:list={["site-mobile-menu__link", { active }]}
-                aria-current={active ? "page" : undefined}
-              >
-                <>
-                  <strong>{item.label}</strong>
-                  <i>↗</i>
-                </>
-              </a>
-            );
-          })
-        }
-
-        <a
-          href={labNavItem.href}
-          class="site-mobile-menu__link site-mobile-menu__link--lab"
-        >
-          <strong><span aria-hidden="true">W3</span>{labNavItem.label}</strong>
-          <i>→</i>
-        </a>
-      </div>
-
-      <div class="site-mobile-menu__languages">
-        {
-          locales.map((targetLocale) => (
-            <a
-              href={getLanguageSwitchHref(targetLocale)}
-              class:list={{
-                active: targetLocale === locale,
-              }}
-              aria-current={targetLocale === locale ? "page" : undefined}
-              data-language-switch
-              data-target-locale={targetLocale}
-            >
-              {localeLabels[targetLocale]}
-            </a>
-          ))
-        }
       </div>
     </div>
   </div>
 </header>
-
 <script>
-  function toggleDarkMode() {
-    const html = document.documentElement;
-
-    const nextTheme = html.classList.contains("dark") ? "light" : "dark";
-
-    html.classList.toggle("dark", nextTheme === "dark");
-
-    localStorage.setItem("pref-theme", nextTheme);
-  }
-
+  import { toggleTheme } from "../lib/theme";
   document
     .getElementById("theme-toggle")
-    ?.addEventListener("click", toggleDarkMode);
-
-  const menuToggle = document.getElementById("mobile-menu-toggle");
-
-  const mobileMenu = document.getElementById("mobile-menu");
-
-  const menuIconOpen = document.getElementById("menu-icon-open");
-
-  const menuIconClose = document.getElementById("menu-icon-close");
-
+    ?.addEventListener("click", toggleTheme);
+  const toggle = document.getElementById("mobile-menu-toggle");
+  const menu = document.getElementById("mobile-menu");
   function setMenu(open: boolean) {
-    if (mobileMenu) {
-      mobileMenu.hidden = !open;
-    }
-
-    menuToggle?.setAttribute("aria-expanded", String(open));
-
-    menuIconOpen?.classList.toggle("hidden", open);
-    menuIconClose?.classList.toggle("hidden", !open);
-
-    document.body.classList.toggle("menu-open", open);
+    if (menu) menu.hidden = !open;
+    toggle?.setAttribute("aria-expanded", String(open));
   }
-
-  menuToggle?.addEventListener("click", () =>
-    setMenu(mobileMenu?.hidden ?? true),
-  );
-
-  mobileMenu
+  toggle?.addEventListener("click", () => setMenu(menu?.hidden ?? true));
+  menu
     ?.querySelectorAll("a")
     .forEach((link) => link.addEventListener("click", () => setMenu(false)));
-
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && menu && !menu.hidden) {
       setMenu(false);
+      toggle?.focus();
     }
   });
-
-  const siteHeader = document.querySelector<HTMLElement>("[data-site-header]");
-
-  /**
-   * 用户点击语言切换按钮时保存语言偏好。
-   *
-   * Cookie 保存一年；
-   * 本地开发使用 HTTP 时不添加 Secure；
-   * 正式 HTTPS 网站自动添加 Secure。
-   */
-  const languageCookieName = siteHeader?.dataset.languageCookie ?? "pref-lang";
-
+  window
+    .matchMedia("(min-width: 1024px)")
+    .addEventListener("change", (event) => {
+      if (event.matches) setMenu(false);
+    });
+  document.addEventListener("click", (event) => {
+    if (
+      event.target instanceof Node &&
+      !document.querySelector(".site-header")?.contains(event.target)
+    )
+      setMenu(false);
+  });
   document
     .querySelectorAll<HTMLAnchorElement>("[data-language-switch]")
-    .forEach((link) => {
+    .forEach((link) =>
       link.addEventListener("click", () => {
-        const targetLocale = link.dataset.targetLocale;
-
-        if (targetLocale !== "zh-CN" && targetLocale !== "en") {
-          return;
-        }
-
-        const secureAttribute =
-          window.location.protocol === "https:" ? "; Secure" : "";
-
-        document.cookie =
-          `${encodeURIComponent(languageCookieName)}` +
-          `=${encodeURIComponent(targetLocale)}` +
-          "; Path=/" +
-          "; Max-Age=31536000" +
-          "; SameSite=Lax" +
-          secureAttribute;
-      });
-    });
-
-  let headerFrame = 0;
-  const updateHeaderState = () => {
-    siteHeader?.classList.toggle("is-scrolled", window.scrollY > 12);
-    headerFrame = 0;
-  };
-
-  const requestHeaderUpdate = () => {
-    if (!headerFrame)
-      headerFrame = window.requestAnimationFrame(updateHeaderState);
-  };
-
-  window.addEventListener("scroll", requestHeaderUpdate, { passive: true });
-
-  updateHeaderState();
+        const language = link.dataset.targetLocale;
+        if (language !== "zh-CN" && language !== "en") return;
+        const key =
+          document.querySelector<HTMLElement>("[data-language-cookie]")?.dataset
+            .languageCookie ?? "pref-lang";
+        document.cookie = `${encodeURIComponent(key)}=${language}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+      }),
+    );
 </script>

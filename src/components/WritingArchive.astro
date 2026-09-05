@@ -1,0 +1,109 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleRow from "./ArticleRow.astro";
+import { editorial } from "../i18n/editorial";
+import { localizePath, type Locale } from "../i18n/utils";
+import type { WritingEntry } from "../lib/writing";
+import type { PageLinks } from "../lib/pagination";
+interface Props {
+  entries: WritingEntry[];
+  page: PageLinks;
+  category?: string;
+  title?: string;
+  description?: string;
+}
+const { entries, page, category = "all", title, description } = Astro.props;
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const c = editorial(locale);
+const filters = [
+  { key: "all", label: c.all },
+  { key: "technology", label: c.technology },
+  { key: "research", label: c.researchFilter },
+  { key: "life", label: c.essays },
+];
+---
+
+<BaseLayout
+  title={title ?? c.writing}
+  description={description ?? c.writingDeck}
+>
+  <div class="page-container archive-page">
+    <header class="page-intro">
+      <div class="page-intro__line">
+        <p class="eyebrow">THE NOTEBOOK / {c.writing}</p><a
+          class="text-link"
+          href={localizePath("/subscribe", locale)}
+          >{c.subscribe} <span aria-hidden="true">↗</span></a
+        >
+      </div><h1>
+        {
+          (title ?? c.writingTitle)
+            .split("\n")
+            .map((line) => <span>{line}</span>)
+        }
+      </h1><p>{description ?? c.writingDeck}</p>
+    </header>
+    <div class="archive-toolbar">
+      <nav class="filter-buttons" aria-label={c.filter}>
+        {
+          filters.map((filter) => (
+            <a
+              class:list={{ "is-current": category === filter.key }}
+              aria-current={category === filter.key ? "page" : undefined}
+              href={localizePath(
+                filter.key === "all" ? "/blog" : `/blog/topics/${filter.key}`,
+                locale,
+              )}
+            >
+              {filter.label}
+            </a>
+          ))
+        }
+      </nav><span class="archive-count">{page.total} {c.results}</span>
+    </div>
+    {
+      entries.length > 0 ? (
+        <div class="writing-list">
+          {entries.map((entry) => (
+            <ArticleRow entry={entry} locale={locale} />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-note">
+          <>
+            <p>{c.empty}</p>
+            <a class="text-link" href={localizePath("/blog", locale)}>
+              {c.browse} ↗
+            </a>
+          </>
+        </div>
+      )
+    }
+    {
+      page.last > 1 && (
+        <nav
+          class="pagination"
+          aria-label={locale === "zh-CN" ? "文章分页" : "Writing pages"}
+        >
+          {page.prev ? (
+            <a href={localizePath(page.prev, locale)}>
+              ← {locale === "zh-CN" ? "上一页" : "Previous"}
+            </a>
+          ) : (
+            <span />
+          )}
+          <span>
+            {page.current} / {page.last}
+          </span>
+          {page.next ? (
+            <a href={localizePath(page.next, locale)}>
+              {locale === "zh-CN" ? "下一页" : "Next"} →
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )
+    }
+  </div>
+</BaseLayout>

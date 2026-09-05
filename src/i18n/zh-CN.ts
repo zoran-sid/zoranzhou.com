@@ -2,8 +2,9 @@ import type { UIStrings } from "./utils";
 
 const zhCN: UIStrings = {
   // ── Site ──
-  siteTitle: "Coding构筑世界 · 以文字记录一路所学",
-  siteDescription: "网络与网络安全工程师。构建弹性系统，分享一路所学。",
+  siteTitle: "Zoran Zhou · 技术与生活手记",
+  siteDescription:
+    "网络与安全工程师的个人博客。记录安全研究、技术实践，以及阅读、摄影和行走中的见闻。",
   siteAuthor: "Zoran Zhou",
   siteTagline: "构建弹性系统，分享一路所学。",
 

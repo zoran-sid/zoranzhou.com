@@ -129,7 +129,7 @@ assert.doesNotMatch(
 );
 console.log("PASS nearby start and finish markers retain their true positions");
 
-const globalCss = readFileSync("src/styles/global.css", "utf8");
+const globalCss = readFileSync("src/styles/maps.css", "utf8");
 assert.match(
   globalCss,
   /\.journey-endpoint-marker\s*\{[^}]*position:\s*absolute/s,

@@ -1,12 +1,49 @@
 ---
-import { COPYRIGHT } from "../lib/constants";
+import { COPYRIGHT, SOCIAL_LINKS } from "../lib/constants";
+import { editorial } from "../i18n/editorial";
+import { localizePath, type Locale } from "../i18n/utils";
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const c = editorial(locale);
+const email = SOCIAL_LINKS.find((link) => link.name === "email")!;
 ---
 
-<footer class="site-footer surface-footer">
-  <div class="site-footer__frame page-container">
-    <span>&copy; {new Date().getFullYear()} ZORAN ZHOU</span>
-    <a href={COPYRIGHT.licenseUrl} target="_blank" rel="noopener noreferrer">
-      {COPYRIGHT.license}
-    </a>
+<footer class="site-footer" id="contact">
+  <div class="page-container">
+    <div class="footer-contact">
+      <div>
+        <p class="eyebrow">LET'S CONNECT</p><h2>{c.contact}</h2><p>
+          {c.contactDeck}
+        </p>
+      </div><a class="button-primary" href={email.url}
+        >{c.email}<span aria-hidden="true">↗</span></a
+      >
+    </div>
+    <div class="footer-links">
+      <a href={localizePath("/subscribe", locale)}
+        >{c.subscribe}<span aria-hidden="true">↗</span></a
+      ><div>
+        {
+          SOCIAL_LINKS.filter(
+            (link) => link.url !== "#" && link.name !== "email",
+          ).map((link) => (
+            <a href={link.url} target="_blank" rel="noopener noreferrer">
+              {link.label}
+              <span aria-hidden="true">↗</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© {new Date().getFullYear()} ZORAN ZHOU</span><span
+        >{
+          locale === "zh-CN"
+            ? "保持好奇，持续记录。"
+            : "Stay curious. Keep a record."
+        }</span
+      ><a href={COPYRIGHT.licenseUrl} target="_blank" rel="noopener noreferrer"
+        >{COPYRIGHT.license}</a
+      >
+    </div>
   </div>
 </footer>

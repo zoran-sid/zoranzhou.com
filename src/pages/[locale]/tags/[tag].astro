@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import { hasReadableBody } from "../../../lib/content-policy";
+import { editorial } from "../../../i18n/editorial";
 import {
   getTranslations,
   localizePath,
@@ -15,7 +17,10 @@ export async function getStaticPaths() {
     ...(await getCollection("research", ({ data }) => !data.draft)),
     ...(await getCollection("projects", ({ data }) => !data.draft)),
     ...(await getCollection("photos", ({ data }) => !data.draft)),
-    ...(await getCollection("routes", ({ data }) => !data.draft && data.published !== false)),
+    ...(await getCollection(
+      "routes",
+      ({ data }) => !data.draft && data.published !== false,
+    )),
   ];
 
   // Build per-locale tag sets
@@ -23,6 +28,11 @@ export async function getStaticPaths() {
   for (const locale of locales) tagsByLocale[locale] = new Set();
 
   for (const entry of allContent) {
+    if (
+      ["blog", "essays", "research"].includes(entry.collection) &&
+      !hasReadableBody(entry)
+    )
+      continue;
     const entryLocale = entry.data.lang ?? "zh-CN";
     for (const t of entry.data.tags) {
       tagsByLocale[entryLocale].add(
@@ -43,6 +53,7 @@ export async function getStaticPaths() {
 const { tag } = Astro.params;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
+const c = editorial(locale);
 const dateLocale = locale === "zh-CN" ? "zh-CN" : "en-US";
 
 const allContent = [
@@ -51,10 +62,18 @@ const allContent = [
   ...(await getCollection("research", ({ data }) => !data.draft)),
   ...(await getCollection("projects", ({ data }) => !data.draft)),
   ...(await getCollection("photos", ({ data }) => !data.draft)),
-  ...(await getCollection("routes", ({ data }) => !data.draft && data.published !== false)),
+  ...(await getCollection(
+    "routes",
+    ({ data }) => !data.draft && data.published !== false,
+  )),
 ];
 
 const filtered = allContent
+  .filter(
+    (entry) =>
+      !["blog", "essays", "research"].includes(entry.collection) ||
+      hasReadableBody(entry),
+  )
   .filter((entry) => (entry.data.lang ?? "zh-CN") === locale)
   .filter((entry) =>
     entry.data.tags.some(
@@ -68,10 +87,13 @@ const displayTag = tag.replace(/-/g, " ");
 
 <BaseLayout
   title={`#${displayTag}`}
-  description={`Posts tagged with ${displayTag}`}
+  description={locale === "zh-CN"
+    ? `与 ${displayTag} 有关的文章与记录`
+    : `Writing and records about ${displayTag}`}
 >
-  <div class="page-container py-16 md:py-24">
-    <header class="mb-12">
+  <div class="page-container archive-page">
+    <header class="page-intro">
+      <p class="eyebrow">TOPICS / {t.tagsTitle}</p>
       <h1
         class="text-4xl font-bold tracking-tight text-gray-900 md:text-5xl dark:text-gray-100"
       >
@@ -90,12 +112,24 @@ const displayTag = tag.replace(/-/g, " ");
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((entry) => (
             <a
-              href={localizePath(`/${entry.collection === "routes" ? "map" : entry.collection}/${entry.slug}`, locale)}
+              href={localizePath(
+                `/${entry.collection === "routes" ? "map" : entry.collection}/${entry.slug}`,
+                locale,
+              )}
               class="group flex flex-col rounded-xl border border-gray-100 bg-white p-6 no-underline shadow-card transition-all duration-200 hover:border-gray-200 hover:shadow-card-hover dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
             >
               <div class="mb-3">
                 <span class="rounded-md bg-gray-50 px-2 py-0.5 text-xs font-medium uppercase text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                  {entry.collection === "routes" ? "map" : entry.collection}
+                  {
+                    {
+                      blog: c.writing,
+                      essays: c.notes,
+                      research: c.notebook,
+                      projects: c.work,
+                      photos: c.photos,
+                      routes: c.routes,
+                    }[entry.collection]
+                  }
                 </span>
               </div>
               <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 dark:text-gray-100 dark:group-hover:text-blue-400">
