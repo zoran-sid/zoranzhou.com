@@ -13,6 +13,8 @@
     "lint": "astro check",
     "format": "prettier --write .",
     "media:update": "tsx scripts/media-update.ts",
+    "translate": "tsx scripts/translate.ts",
+    "test:translation": "tsx --test scripts/translation.test.ts",
     "test:media-update": "tsx --test scripts/media-update.test.ts",
     "test:editor": "node tools/content-editor/smoke-test.mjs",
     "import:apple-health": "npx tsx scripts/import-apple-health.ts",
@@ -45,12 +47,18 @@
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
+    "fflate": "^0.8.3",
     "prettier": "^3.0.0",
     "prettier-plugin-astro": "^0.14.0",
     "prettier-plugin-tailwindcss": "^0.6.0",
+    "remark-gfm": "^4.0.1",
+    "remark-mdx": "^3.1.1",
+    "remark-parse": "^11.0.0",
     "sharp": "0.34.5",
     "tsx": "^4.22.4",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "unified": "^11.0.5",
+    "yaml": "^2.9.1"
   },
   "allowScripts": {
     "sharp@0.34.5": true,

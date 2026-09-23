@@ -10,6 +10,16 @@ const baseSchema = z.object({
   author: z.string().default("Zoran"),
   lang: z.enum(["zh-CN", "en"]).default("zh-CN"),
   translationKey: z.string().optional(),
+  // Local translation provenance; never credentials or provider request payloads.
+  translation: z
+    .object({
+      provider: z.literal("deepl"),
+      sourceHash: z.string(),
+      outputHash: z.string(),
+      rulesVersion: z.string(),
+      translatedAt: z.coerce.date(),
+    })
+    .optional(),
   cover: z
     .object({
       src: z.string(),

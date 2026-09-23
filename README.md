@@ -48,6 +48,19 @@ npm run test:site-build
 
 `/subscribe` 提供邮件订阅说明和 RSS 阅读器入口。通知源为各语言的 `/rss.xml`，仅收录已发布、非空正文的 Blog / Essays / Research。摄影、跑步路线、项目和 LAB 更新均排除。读者通过 Blogtrottr 的公开页面自行填写邮箱、确认和退订，本站不收集邮箱；免费方案带广告。部署后第三方才能读取新版内容源。
 
+## 手动翻译与对照导出
+
+中文写好后手动触发，默认只导出中英对照 HTML 报告、英文文件和 ZIP 包，不修改网站中的中英文原文件：
+
+```sh
+npm run translate -- --all --dry-run
+npm run translate -- --all --max-characters 50000
+```
+
+支持 Blog、Essays、Research、Lab；报告集中提示遗漏、术语、否定和规划状态等问题。结果位于 `.local/translation/exports/`，可直接打开 HTML 阅读，无需逐篇检查 Markdown。相同内容复用缓存，减少重复 API 请求。需要写入网站时必须明确加 `--write`；替换已有英文需指定 `--file "中文路径" --retranslate --write`。
+
+密钥只在本机 `.env.translation` 中配置，该文件和 `.local/translation/` 均被 Git 忽略。工具不自动提交、推送或部署，构建也不触发翻译。完整用法、保护边界及恢复方式见 [翻译维护说明](docs/translation.md)。
+
 ## 发布
 
 构建命令为 `npm run build`，发布目录为 `dist`。`public/_routes.json` 将 Cloudflare Pages Function 限定在根路径 `/`。内容编辑器、备份、导入器和设置文件均为本地维护工具，不属于生产站点。提交、推送和部署由站点维护者明确执行。

@@ -7,12 +7,13 @@ This repository is an Astro 5 static bilingual website. The two public locales a
 provide the main runtime and deployment layers. There is no production database and no
 general production application server.
 
-The repository also contains two explicit local maintenance programs:
+The repository also contains explicit local maintenance programs:
 
 - `scripts/media-update.ts` updates the static Media Markdown file.
 - `tools/content-editor/` edits repository content from a loopback-only browser UI.
+- `scripts/translate.ts` manually generates or refreshes English article files with DeepL.
 
-Neither program belongs to the production website runtime.
+These programs do not belong to the production website runtime.
 
 ```text
 Versioned source files
@@ -36,6 +37,7 @@ Local-only processes
   +-- media updater -> verified temporary file -> src/content/media.md
   +-- content editor -> allowlisted repository files only
   +-- route importer -> Route Markdown; original GPX remains unchanged
+  +-- manual translator -> DeepL -> validated English Markdown/MDX and pairing keys
 ```
 
 ### Runtime boundaries
@@ -48,6 +50,7 @@ Local-only processes
 | Media update      | `scripts/media-update.ts`         | Manually started local Node process | Only its selected Media output         |
 | Content editor    | `tools/content-editor/server.mjs` | Local Node, `127.0.0.1` only        | Only explicit allowlists               |
 | Route import      | `scripts/import-route.ts`         | Manually started local Node process | Route content after preview/validation |
+| Translation       | `scripts/translate.ts`            | Manually started local Node + DeepL  | Article translations and missing pairing keys |
 
 The deployment artifact is `dist/`. Cloudflare must never publish the repository root,
 `tools/content-editor/`, scripts, settings, backups, or file-writing APIs.
@@ -165,6 +168,7 @@ All collections extend the base schema:
 | `author`         | string, default `Zoran`          | Byline and structured metadata               |
 | `lang`           | `zh-CN` or `en`, default `zh-CN` | Entry locale                                 |
 | `translationKey` | optional string                  | Connects ordinary translated entries         |
+| `translation` | optional object | Local DeepL provenance and source/output hashes; no credentials |
 | `cover`          | optional `{src, alt?, caption?}` | Standard cover image                         |
 
 The schema intentionally accepts several migrated Hugo fields such as `categories`,
@@ -1146,6 +1150,101 @@ node --check tools/content-editor/server.mjs
 node --check tools/content-editor/public/editor.js
 ```
 
+## Manual Chinese-to-English translation
+
+Read `docs/translation.md` before changing this workflow. The user maintains Chinese
+source files and explicitly runs `npm run translate`, following the `media:update`
+maintenance pattern. This is a local CLI, not a content-editor button or a background
+job. Never wire it into save, dev, build, deployment, CI, Git hooks or GitHub Actions.
+
+Ownership:
+
+- `scripts/translate.ts`: allowlisted collection discovery, pairing, incremental status,
+  character budget, credential loading, lock, backup journal and guarded file writes.
+- `scripts/translation/content.ts`: YAML documents, Markdown/MDX AST text extraction,
+  structural/numerical validation, hashes, translated fields and `RULES_VERSION`.
+- `scripts/translation/deepl.ts`: official HTTPS endpoints, header authentication,
+  batching, timeout and sanitized provider errors.
+- `scripts/translation.test.ts`: offline fixtures and mocked network; never real keys.
+- `src/content/config.ts`: optional `translation` provenance in the shared base schema.
+
+### Credentials and deployment boundary
+
+`DEEPL_AUTH_KEY` comes from the local process environment or root `.env.translation`.
+The environment value takes precedence. `.env.translation.example` contains only a
+placeholder. `.env.translation` and `.local/translation/` are Git-ignored; local secrets
+should be owner-readable/writable only. Never put credentials in tracked files, content,
+test fixtures, URLs, public assets, browser code, logs or GitHub Secrets. Never use a
+`PUBLIC_` prefix. Never print API response bodies, request headers or nested fetch errors.
+Do not force-add ignored local files or copy them into deployment directories.
+
+Only the official `api-free.deepl.com` (`:fx` keys) and `api.deepl.com` endpoints are
+allowed, with redirects rejected. Keys go in the Authorization header. A run with CI or
+CF_PAGES set is rejected. The tool never calls Git, commits, pushes or deploys.
+
+### Scope, identity and manual edits
+
+- Allowlisted collections: blog, essays, research, lab; Chinese only. Drafts and empty
+  bodies are skipped. No photos, routes, projects, Media or shared UI translation.
+- `--dry-run` needs no credential, performs no API calls and writes no files or locks.
+- `--file` takes one source path; `--collection` narrows the scope. Default total character
+  budget is 20,000, checked before API use; `--max-characters` explicitly changes it.
+- Reuse a unique same-collection `translationKey`; include drafts in ambiguity checks.
+  Recognize conventional `.en.md`/`.en.mdx` pairs when keys are absent. Nonconventional
+  existing pairs must first receive explicit matching keys to avoid duplicate entries.
+- When missing, generate a key once from collection + relative-path SHA-256 prefix,
+  persist only after translation succeeds, and copy it to English. Renames do not change
+  persisted keys. Do not regenerate them from titles, slugs or translated content.
+- Existing English filenames/slugs stay fixed. New explicit slugs gain `-en`. Dates and
+  factual source metadata sync from Chinese, while target-only unknown fields remain.
+- English `translation` stores provider, sourceHash, outputHash, rulesVersion and
+  translatedAt, never credentials. Output hash excludes the translation record itself.
+- `new` and `stale` entries are eligible; `synced` entries make no API requests.
+  `existing-preserved` means untracked legacy English; `manual-preserved` means the
+  generated output changed. Both are skipped by default, even when Chinese changes.
+- `--retranslate` requires `--file` and explicitly replaces that one existing English
+  body, including manual revisions; it is not a paragraph merge or a batch force flag.
+
+### Translation and integrity contract
+
+Translate Chinese text nodes, title, description, cover alt/caption and Lab currentPhase,
+implementedFeatures and knownLimitations. Retain code, images, link targets, HTML and
+MDX code/components byte-for-byte. JSX children and HTML-block prose are intentionally
+not extracted; tags, enums, stack, unknown fields and image Markdown alt text stay as-is.
+Use parsed YAML documents to preserve unknown metadata and comments. Do not replace
+this with broad regular-expression frontmatter/Markdown rewriting.
+
+Source/target are ZH/EN-US. Title and description supply bounded context. Requests batch
+at 50 strings and below 120,000 bytes. Missing/empty translations, altered Arabic digits,
+or changed Markdown/MDX structure abort writing. These checks do not establish semantic
+accuracy: review terms, quotations, negation, planned/completed claims, inline-formatting
+fragments and heading-anchor links. No glossary or second-model semantic review is
+implemented. Bump `RULES_VERSION` when extraction or translation behavior changes.
+
+### Writes, failure and recovery
+
+Acquire an exclusive `.local/translation/lock`. Check source and target snapshots again
+after the API request and before writing; concurrent editor changes must not be lost.
+Keep originals in `.local/translation/backups/<id>/journal.json`. Prepare same-directory
+temporary files; replace existing files atomically and create new destinations with an
+exclusive hard link. Roll back caught partial-write failures. Mark success with `complete`.
+This is atomic per file, not a crash-proof multi-file transaction: after forced termination,
+inspect journals without `complete` and Git diffs before recovering the stale lock.
+
+Batch execution stops at the first failure; earlier successful articles remain, later
+articles are untouched. No source key is saved when provider/validation fails. Retry only
+429 responses, at most three attempts; timeouts/network failures are not retried because
+the request may already have been billed. API success followed by local rejection may
+still consume quota. Do not claim rollback of remote usage.
+
+Focused validation: `npm run test:translation`, CLI dry-run, and explicit script typecheck
+(`npx tsc --noEmit --module nodenext --moduleResolution nodenext --target es2022
+--skipLibCheck --strict scripts/translate.ts scripts/translation.test.ts`). The main
+tsconfig does not include scripts. If content/schema changes, also run lint, language
+routing checks, static build and site-build checks; scan distributable and tracked files
+for credentials without displaying any matching secret. The editor must continue to
+preserve the nested translation provenance as unknown frontmatter.
+
 ## Production and Cloudflare boundary
 
 Deployment contract:
@@ -1191,6 +1290,9 @@ production function is explicitly requested.
 | `npm run format`                | Format repository-supported files             | Yes, broad mechanical rewrite      | No                             |
 | `npm run media:update`          | Update Movies table                           | Yes unless dry-run/output changed  | Yes for live mode              |
 | `npm run test:media-update`     | Test Media updater                            | Test artifacts only                | No expected live Douban        |
+| `npm run translate -- --dry-run` | Preview Chinese-to-English changes | No | No |
+| `npm run translate -- ...` | Manually update English articles | Yes, with backups | DeepL for pending entries |
+| `npm run test:translation` | Test translation integrity and preservation | Temporary fixtures only | Mocked API only |
 | `npm run import:routes:preview` | Preview GPX import                            | No content publish                 | No geocoding                   |
 | `npm run import:routes -- ...`  | Import selected GPX into Route content        | Yes                                | Optional geocoding             |
 | `npm run migrate:routes`        | Explicit Route migration                      | Yes                                | Inspect script before use      |
@@ -1297,6 +1399,7 @@ unless it belongs to the removed public feature.
 | Route importer                         | Dry-run preview, body/manual-field preservation inspection, Route tests    |
 | Route/map CSS                          | Desktop and narrow mobile maps, closed-loop marker overlap, light/dark     |
 | Media parser/updater                   | `npm run test:media-update`, dry-run, manual-field diff, build             |
+| Manual translator | `npm run test:translation`, explicit script typecheck, dry-run, key-ignore check; content/schema changes also need lint/build/site-build |
 | Media table CSS                        | Long Type/Status labels at desktop/mobile, both locales                    |
 | Web3 Lab layout/content/metadata       | Lint/build; both locales; home/detail title, favicon, touch targets, route |
 | Local editor/API                       | `npm run test:editor`, both Node syntax checks, interactive Windows smoke  |
