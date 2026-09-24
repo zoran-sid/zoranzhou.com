@@ -316,6 +316,29 @@ Projects, Media or Lab to this notification feed. Do not collect emails or add a
 backend without an explicit architectural change. Readers confirm and unsubscribe with
 the provider; the main site must clearly explain the third-party delivery and free-plan ads.
 
+RSS delivery contract (`src/lib/writing-feed.ts`, `[locale]/rss.xml.ts`):
+
+- Resolve the locale from static route params. Chinese and English are independent feeds;
+  never mix languages or silently alter a reader's existing subscription. Show the full
+  feed URL and explain that changing website language does not subscribe the other feed.
+- Feed publication time is the latest of `date`, explicit `updated`, and English
+  `translation.translatedAt`. Sort by that time; retain source dates on article pages.
+  Local translation exports do not publish anything: only deployed content enters RSS.
+- For entries whose effective time is later than `date`, override Astro's permalink GUID
+  with a non-permalink revision GUID based on canonical URL and a SHA-256 of title,
+  description and normalized body. Leave unrevised legacy GUIDs unchanged. Do not use
+  build time, file mtime, random values, or translation provenance in revision identities.
+  Repeated builds and identical translations must retain the same identity. Preserve
+  canonical article links separately; never append fake query strings to force delivery.
+- Authors declare meaningful manual revisions with `updated`; retain that timestamp on
+  future edits. Machine translations already carry `translatedAt`. Further content edits
+  to an entry with revision metadata change its identity; typo-only edits may therefore
+  also be notified. Do not promise only major changes without a publication approval step.
+- Emit a localized channel link, language, Atom self-link and content-derived lastBuildDate.
+  Initial adoption can notify existing revised/translated articles once. RSS identifiers
+  signal updates, but provider filters, polling, deduplication and inbox delivery remain
+  external; do not claim a real email was delivered without evidence.
+
 Homepage selections reference translation keys or source slugs in `writing.ts` and must
 resolve to public writing in the current locale. Latest notes exclude the selections.
 Current work references the public bilingual Lab entry selected by `LAB_CURRENT_FOCUS_KEY`.

@@ -10,8 +10,8 @@ const zh = locale === "zh-CN";
 const feed = new URL(localizePath("/rss.xml", locale), Astro.site).href;
 const title = zh ? "订阅文章更新" : "Subscribe to writing";
 const description = zh
-  ? "新文章写好时，在邮箱里收到一封提醒。只订阅文章、研究笔记与随笔，不发送摄影、跑步路线或媒体清单的更新。"
-  : "A note in your inbox when new writing is published. Articles, research notes and essays only; no photo, running route or media-list updates.";
+  ? "新文章、新译文与正式修订，在邮箱里收到提醒。只订阅文章、研究笔记与随笔，不发送摄影、跑步路线或媒体清单的更新。"
+  : "A note in your inbox for new writing, translations and published revisions. Articles, research notes and essays only; no photo, running route or media-list updates.";
 ---
 
 <BaseLayout title={title} description={description}>
@@ -33,6 +33,14 @@ const description = zh
               ? "通过 Blogtrottr 将文章更新送到邮箱。复制下面的地址，然后在订阅页面填写邮箱与接收频率。"
               : "Blogtrottr can deliver this article feed to your inbox. Copy the address below, then enter it with your email and preferred schedule on its subscription page."
           }
+        </p>
+        <p>
+          <strong>{zh ? "当前订阅：中文文章" : "Selected feed: English articles"}</strong><br />
+          {zh
+            ? "中英文需要分别订阅；切换网页语言不会更改已有邮件订阅。两种语言都想接收，请分别添加两个地址。"
+            : "Chinese and English require separate subscriptions. Changing the website language does not change an existing email subscription. Subscribe to both feeds to receive both languages."}
+          <a class="text-link" href={localizePath("/subscribe", zh ? "en" : "zh-CN")}
+            >{zh ? "订阅英文文章 →" : "Subscribe to Chinese writing →"}</a>
         </p>
         <ol class="subscription-steps">
           <li>
@@ -61,8 +69,8 @@ const description = zh
             ><p>
               {
                 zh
-                  ? "在 Feed URL 中粘贴地址，在 Email address 中填写邮箱；Schedule 可选逐篇提醒或每日汇总。"
-                  : "Paste the address into Feed URL, enter your Email address, and choose a Schedule: individual updates or a daily digest."
+                  ? "在 Feed URL 中粘贴上面的完整地址（不要填写网站首页），在 Email address 中填写邮箱；Schedule 可选逐篇提醒或每日汇总。"
+                  : "Paste the full feed address above into Feed URL (not the website homepage), enter your Email address, and choose a Schedule: individual updates or a daily digest."
               }
             </p><a
               class="button-primary"
@@ -126,10 +134,19 @@ const description = zh
           </p><p>
             {
               zh
-                ? "当前为中文文章订阅。右上角可切换英文订阅。"
-                : "This is the English article feed. Use the language switch for Chinese writing."
+                ? "当前为中文文章订阅，英文文章使用独立地址 /en/rss.xml。"
+                : "This is the English article feed at /en/rss.xml. Chinese writing has a separate feed."
             }
           </p>
+        </div>
+        <div class="subscription-scope">
+          <h3>{zh ? "没有收到更新？" : "Missing an update?"}</h3>
+          <p>{zh
+            ? "在 Blogtrottr 中检查订阅地址、确认状态、接收频率和过滤条件。免费方案通常每小时检查一次；每日汇总要等到汇总时间。也请查看垃圾邮件。"
+            : "In Blogtrottr, check your feed URL, confirmation status, schedule and filters. The free plan normally checks hourly; daily digests wait until their scheduled time. Check your spam folder too."}</p>
+          <p>{zh
+            ? "订阅服务读取的是已上线内容；本地修改和翻译导出不会发送邮件。旧文章是否补发由服务决定。"
+            : "The service reads the live website. Local edits and translation exports do not send emails. Delivery of older articles depends on the provider."}</p>
         </div>
       </aside>
     </div>
