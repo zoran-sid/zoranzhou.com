@@ -4,6 +4,14 @@ date: 2026-07-13
 tags: ["摄影"]
 lang: zh-CN
 gallery:
+  - src: https://e5d9f02.webp.fi/DSC02338-2.jpg
+    alt: ""
+  - src: https://e5d9f02.webp.fi/DSC02291.jpg
+    alt: ""
+  - src: https://e5d9f02.webp.fi/DSC02279.jpg
+    alt: ""
+  - src: https://e5d9f02.webp.fi/DSC02269.jpg
+    alt: ""
   - src: https://e5d9f02.webp.fi/%E5%9B%BE%E7%89%87_20260703001241_8_35.jpg
     alt: ""
   - src: https://e5d9f02.webp.fi/%E5%9B%BE%E7%89%87_20260703001238_7_35.jpg
