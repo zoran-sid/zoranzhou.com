@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "../../../components/ArrowIcon.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import LifeFeature from "../../../components/LifeFeature.astro";
 import ArticleRow from "../../../components/ArticleRow.astro";
@@ -25,24 +26,27 @@ const sections = [
 ---
 
 <BaseLayout title={c.life} description={c.lifeDeck}>
-  <div class="page-container">
-    <header class="page-intro">
-      <p class="eyebrow">LIFE / {c.life}</p><h1>
-        {c.lifeTitle.split("\n").map((line) => <span>{line}</span>)}
-      </h1><p>{c.lifeDeck}</p>
-    </header>
+  <div class="life-overview">
+    <div class="page-container">
+      <header class="page-intro">
+        <h1>
+          {c.lifeTitle.split("\n").map((line) => <span>{line}</span>)}
+        </h1><p>{c.lifeDeck}</p>
+      </header>
+    </div>
+    <LifeFeature locale={locale} overview />
   </div>
-  <LifeFeature locale={locale} overview />
-  <section class="page-container editorial-section">
-    <div class="collection-grid">
+  <section class="life-directory">
+    <div class="collection-grid page-container">
       {
         sections.map((section) => (
           <a href={localizePath(section.href, locale)} class="collection-link">
             <>
-              <span class="eyebrow">{section.symbol}</span>
               <h2>
                 {section.label}
-                <span aria-hidden="true">↗</span>
+                <span aria-hidden="true">
+                  <ArrowIcon direction="up-right" />
+                </span>
               </h2>
               <p>{section.deck}</p>
             </>
@@ -59,7 +63,6 @@ const sections = [
             <>
               <div>
                 <>
-                  <p class="eyebrow">LIFE NOTES</p>
                   <h2>{c.notes}</h2>
                 </>
               </div>
@@ -67,7 +70,7 @@ const sections = [
                 class="text-link"
                 href={localizePath("/blog/topics/life", locale)}
               >
-                {c.allWriting} ↗
+                {c.allWriting} <ArrowIcon direction="up-right" />
               </a>
             </>
           </header>

@@ -1,6 +1,9 @@
 import { defineCollection, z } from "astro:content";
 
 const baseSchema = z.object({
+  format: z.enum(["note", "guide", "essay"]).optional(),
+  maturity: z.enum(["seed", "growing", "evergreen"]).optional(),
+  publication: z.enum(["draft", "approved"]).optional(),
   title: z.string(),
   description: z.string().optional(),
   date: z.coerce.date(),

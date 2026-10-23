@@ -96,3 +96,24 @@ test("filtered pagination preserves all entries and valid return links", () => {
   assert.equal(empty[0].page.last, 1);
   assert.equal(empty[0].page.next, undefined);
 });
+
+test("new-format writing needs explicit approval while legacy publication stays compatible", () => {
+  const entry = {
+    collection: "blog",
+    slug: "a-note",
+    body: "Three sentences.",
+    data: { lang: "zh-CN", format: "note" as const },
+  };
+  assert.equal(isPublished(entry), false);
+  assert.equal(
+    isPublished({ ...entry, data: { ...entry.data, publication: "approved" } }),
+    true,
+  );
+  assert.equal(
+    isPublished({
+      ...entry,
+      data: { ...entry.data, publication: "approved", draft: true },
+    }),
+    false,
+  );
+});

@@ -1,0 +1,46 @@
+---
+import { localizePath, type Locale } from "../i18n/utils";
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
+const current = Astro.url.pathname.split("/").filter(Boolean)[1];
+const links = [
+  { key: "life", label: zh ? "生活记录" : "Life" },
+  { key: "photos", label: zh ? "摄影" : "Photographs" },
+  { key: "map", label: zh ? "足迹" : "Journeys" },
+  { key: "media", label: zh ? "书影音与游戏" : "Books, films & games" },
+];
+---
+
+<nav class="life-navigation" aria-label={zh ? "生活记录导航" : "Explore life"}>
+  {
+    links.map((link) => (
+      <a
+        href={localizePath(`/${link.key}`, locale)}
+        aria-current={current === link.key ? "page" : undefined}
+      >
+        {link.label}
+      </a>
+    ))
+  }
+</nav>
+<style>
+  .life-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+    padding-block: 1rem;
+  }
+  .life-navigation a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .life-navigation a:hover,
+  .life-navigation a[aria-current] {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.4em;
+  }
+</style>

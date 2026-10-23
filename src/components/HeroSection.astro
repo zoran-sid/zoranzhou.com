@@ -1,30 +1,75 @@
 ---
-import ExplorationMap from "./ExplorationMap.astro";
-import { editorial } from "../i18n/editorial";
+import ArrowIcon from "./ArrowIcon.astro";
 import { localizePath, type Locale } from "../i18n/utils";
-import type { WritingEntry } from "../lib/writing";
-interface Props {
-  entries: WritingEntry[];
-}
-const { entries } = Astro.props;
+import { getCollection } from "astro:content";
+import { getLabEntryPath, LAB_CURRENT_FOCUS_KEY } from "../lib/lab";
+import { isPublished } from "../lib/content-policy";
+import { now } from "../data/now";
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
-const c = editorial(locale);
+const zh = locale === "zh-CN";
+const labFocus = (await getCollection("lab")).find(
+  (entry) =>
+    isPublished(entry) &&
+    entry.data.lang === locale &&
+    entry.data.translationKey === LAB_CURRENT_FOCUS_KEY,
+);
 ---
 
-<section class="editorial-hero page-container">
-  <div class="editorial-hero__copy">
-    <p class="eyebrow">
-      <span class="identity-dot" aria-hidden="true"></span>{c.identity}
+<section class="garden-hero page-container">
+  <h1>Zoran Zhou</h1>
+  <div class="garden-introduction">
+    <p class="garden-deck">
+      {
+        zh
+          ? "你好，我是 Zoran。这里记录我在网络安全、软件开发、数据与 AI 方面的学习和实践，也收集摄影、旅途和生活里的想法。"
+          : "I’m Zoran. I write about learning and working with security, software, data and AI, alongside photographs, journeys and everyday life."
+      }
     </p>
-    <h1>{c.headline[0]}<br /><span>{c.headline[1]}</span></h1>
-    <p class="editorial-hero__intro">{c.intro}</p>
     <div class="hero-actions">
-      <a class="button-primary" href="#selected"
-        >{c.start}<span aria-hidden="true">↓</span></a
-      ><a class="text-link" href={localizePath("/about", locale)}
-        >{c.about}<span aria-hidden="true">↗</span></a
+      <a class="button-primary" href={localizePath("/blog", locale)}
+        >{zh ? "阅读文章" : "Read the writing"}</a
+      >
+      <a class="text-link" href={localizePath("/about", locale)}
+        >{zh ? "更多关于我" : "More about me"}</a
       >
     </div>
   </div>
-  <ExplorationMap entries={entries} locale={locale} />
+  <div class="garden-index">
+    <aside class="garden-now" aria-labelledby="now-heading">
+      <h2 id="now-heading">{zh ? "近况" : "At the moment"}</h2>
+      <p>{now[locale].body}</p>
+      <a
+        class="text-link"
+        href={labFocus
+          ? getLabEntryPath(labFocus)
+          : localizePath("/lab", locale)}
+        >{now[locale].linkLabel}<span aria-hidden="true"
+          ><ArrowIcon direction="up-right" /></span
+        ></a
+      >
+    </aside>
+    <nav
+      class="garden-paths"
+      aria-label={zh ? "从兴趣出发" : "Explore by interest"}
+    >
+      <a href={localizePath("/blog/formats/guide", locale)}
+        ><span>{zh ? "技术与实践" : "Technical practice"}</span><span
+          >{
+            zh
+              ? "指南、研究与问题的解法"
+              : "Guides, research and working things out"
+          }</span
+        ></a
+      >
+      <a href={localizePath("/life", locale)}
+        ><span>{zh ? "生活记录" : "Life beyond work"}</span><span
+          >{
+            zh
+              ? "摄影、行走与日常所想"
+              : "Photography, journeys and everyday thoughts"
+          }</span
+        ></a
+      >
+    </nav>
+  </div>
 </section>

@@ -1,4 +1,5 @@
 ---
+import LifeNavigation from "../../../components/LifeNavigation.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import CategoryTabs from "../../../components/media/CategoryTabs.astro";
 import {
@@ -107,9 +108,7 @@ const jsonld = {
 >
   <div class="page-container archive-page">
     <header class="page-intro">
-      <p class="text-sm font-medium uppercase text-gray-500 dark:text-gray-400">
-        {t.navMedia}
-      </p>
+      <LifeNavigation />
       <h1
         class="mt-3 text-4xl font-bold text-gray-950 dark:text-gray-50 md:text-5xl"
       >
@@ -122,37 +121,18 @@ const jsonld = {
       </p>
     </header>
 
-    <section
-      class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-      aria-label={t.mediaType}
-    >
-      {
-        categoryOrder.map((category) => (
-          <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
-            <div class="flex items-center justify-between gap-4">
-              <div class="flex items-center gap-3">
-                <span
-                  class={`h-2.5 w-2.5 rounded-full ${categoryAccent[category]}`}
-                />
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {categoryLabelMap[category]}
-                </span>
-              </div>
-              <span class="text-2xl font-semibold text-gray-950 dark:text-gray-50">
-                {countByCategory[category]}
-              </span>
-            </div>
-          </div>
-        ))
-      }
-    </section>
-
     <section class="mt-10">
       <div
         class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
       >
         <CategoryTabs categories={categories} activeCategory="all" />
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p
+          id="media-visible-count"
+          data-template={t.mediaTotal}
+          aria-live="polite"
+          aria-atomic="true"
+          class="text-sm text-gray-500 dark:text-gray-400"
+        >
           {formatTotal(allItems.length)}
         </p>
       </div>
@@ -167,7 +147,7 @@ const jsonld = {
           </p>
         ) : (
           <>
-            <div class="media-desktop-grid media-header hidden rounded-t-lg border border-b-0 border-gray-200 bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400 md:grid">
+            <div class="media-desktop-grid media-header hidden text-[13px] md:grid">
               <span class="px-4 py-3 text-center">{t.mediaType}</span>
               <span class="px-4 py-3">{t.mediaName}</span>
               <span class="px-4 py-3 text-center">{t.mediaYear}</span>
@@ -175,14 +155,14 @@ const jsonld = {
               <span class="px-4 py-3 text-center">{t.mediaStatus}</span>
             </div>
 
-            <div class="media-list divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+            <div class="media-list">
               {allItems.map((item: MediaListItem) => (
                 <div
                   data-category={item.category}
                   class="media-row group transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-900/50"
                 >
                   <div class="media-desktop-grid hidden items-center text-sm md:grid">
-                    <span class="media-type inline-flex min-w-0 items-center justify-center gap-2 px-4 py-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span class="media-type inline-flex min-w-0 items-center justify-center gap-2 px-4 py-4 text-[13px] font-medium text-gray-500 dark:text-gray-400">
                       <span
                         class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}
                       />
@@ -192,7 +172,7 @@ const jsonld = {
                     </span>
                     <div class="px-4 py-4" style="min-width:0">
                       <p
-                        class="text-[15px] font-medium leading-snug text-gray-950 dark:text-gray-50"
+                        class="text-base font-medium leading-snug text-gray-950 dark:text-gray-50"
                         style="overflow-wrap:anywhere;word-break:normal"
                       >
                         {item.name}
@@ -208,7 +188,7 @@ const jsonld = {
                       {item.rating > 0 ? renderRating(item.rating) : "-"}
                     </span>
                     <span class="flex items-center justify-center px-4 py-4">
-                      <span class="media-status-chip inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                      <span class="media-status-chip inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-[13px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                         {statusLabelMap[item.status] ?? item.status}
                       </span>
                     </span>
@@ -216,13 +196,13 @@ const jsonld = {
 
                   <div class="flex flex-col gap-1 px-4 py-3 md:hidden">
                     <div class="flex items-center justify-between gap-2">
-                      <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+                      <span class="inline-flex items-center gap-1.5 text-[13px] font-medium text-gray-500 dark:text-gray-400">
                         <span
                           class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}
                         />
                         {categoryLabelMap[item.category]}
                       </span>
-                      <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+                      <div class="flex items-center gap-2 text-[13px] text-gray-400 dark:text-gray-500">
                         <span class="media-year tabular-nums">
                           {item.year ?? "-"}
                         </span>
@@ -234,13 +214,13 @@ const jsonld = {
                     </div>
                     <div>
                       <p
-                        class="media-name-mobile text-[15px] font-medium leading-snug text-gray-950 dark:text-gray-50"
+                        class="media-name-mobile text-base font-medium leading-snug text-gray-950 dark:text-gray-50"
                         style="display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:100%;overflow-wrap:anywhere;word-break:normal"
                       >
                         {item.name}
                       </p>
                       {item.rating > 0 && (
-                        <span class="mt-1 inline-block text-xs tracking-wide text-yellow-600 dark:text-yellow-400">
+                        <span class="mt-1 inline-block text-[13px] tracking-wide text-yellow-600 dark:text-yellow-400">
                           {renderRating(item.rating)}
                         </span>
                       )}
@@ -264,6 +244,19 @@ const jsonld = {
 </BaseLayout>
 
 <style>
+  .media-row:nth-child(odd),
+  .media-header {
+    background: var(--surface-soft);
+  }
+  .media-row p {
+    color: var(--ink);
+  }
+  .media-status-chip {
+    background: none;
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
+
   .media-list {
     overflow: hidden;
   }
@@ -291,7 +284,7 @@ const jsonld = {
   /* Mobile: name clamping */
   @media (max-width: 767px) {
     .media-name-mobile {
-      font-size: 15px;
+      font-size: 16px;
     }
   }
 </style>

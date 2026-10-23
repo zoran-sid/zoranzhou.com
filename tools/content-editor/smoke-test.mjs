@@ -393,7 +393,7 @@ async function main() {
     assert.equal(taskFinished.status, "succeeded", taskFinished.output);
     assert.equal(taskFinished.ok, true, taskFinished.output);
     assert.equal(taskFinished.code, 0, taskFinished.output);
-    assert.match(taskFinished.output, /> astro check/u);
+    assert.match(taskFinished.output, /Getting diagnostics for Astro files/u);
     assert.equal(taskFinished.outputTruncated, false);
     assert.doesNotMatch(taskFinished.output, /spawn EINVAL/iu);
     await request(origin, config.token, "/api/tasks", {

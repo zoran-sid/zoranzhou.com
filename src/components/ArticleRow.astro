@@ -1,11 +1,7 @@
 ---
-import {
-  categoryLabel,
-  displayDate,
-  entryPath,
-  type WritingEntry,
-} from "../lib/writing";
-import { writingCategory } from "../lib/content-policy";
+import ArrowIcon from "./ArrowIcon.astro";
+import { displayDate, entryPath, type WritingEntry } from "../lib/writing";
+import { formatLabel, writingCategory } from "../lib/content-policy";
 import { readingTime } from "../lib/utils";
 import { editorial } from "../i18n/editorial";
 import type { Locale } from "../i18n/utils";
@@ -30,12 +26,13 @@ const date =
       >{updated && entry.data.updated ? `${c.updated} ` : ""}{
         displayDate(date, locale)
       }</time
-    ><span>{categoryLabel(entry, locale)}</span>
+    ><span>{formatLabel(entry, locale)}</span>
   </div>
   <div class="writing-row__body">
     <h3>
       <a href={entryPath(entry)}
-        >{entry.data.title}<span class="row-arrow" aria-hidden="true">↗</span
+        >{entry.data.title}<span class="row-arrow" aria-hidden="true"
+          ><ArrowIcon direction="up-right" /></span
         ></a
       >
     </h3>{entry.data.description && <p>{entry.data.description}</p>}<span

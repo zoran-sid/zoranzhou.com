@@ -1,6 +1,6 @@
 ---
+import ArrowIcon from "./ArrowIcon.astro";
 import SearchModal from "./SearchModal.astro";
-import BrandPortrait from "./BrandPortrait.astro";
 import { editorial } from "../i18n/editorial";
 import { localizePath, LANG_COOKIE, type Locale } from "../i18n/utils";
 interface Props {
@@ -37,15 +37,7 @@ const items = [
       href={localizePath("/", locale)}
       class="site-brand"
       aria-label={locale === "zh-CN" ? "Zoran Zhou 首页" : "Zoran Zhou home"}
-      ><span class="site-brand__mark"><BrandPortrait /></span><span
-        ><strong>ZORAN ZHOU<span class="brand-period">.</span></strong><small
-          >{
-            locale === "zh-CN"
-              ? "构建 · 观察 · 记录"
-              : "BUILD · OBSERVE · WRITE"
-          }</small
-        ></span
-      ></a
+      ><strong>Zoran Zhou</strong></a
     >
     <div class="site-nav__links">
       {
@@ -59,7 +51,11 @@ const items = [
             aria-current={item.active ? "page" : undefined}
           >
             {item.label}
-            {item.href === "/lab" && <span aria-hidden="true">↗</span>}
+            {item.href === "/lab" && (
+              <span aria-hidden="true">
+                <ArrowIcon direction="up-right" />
+              </span>
+            )}
           </a>
         ))
       }
@@ -115,14 +111,15 @@ const items = [
   <div id="mobile-menu" class="site-mobile-menu" hidden>
     <div class="page-container">
       {
-        items.map((item, index) => (
+        items.map((item) => (
           <a
             href={localizePath(item.href, locale)}
             aria-current={item.active ? "page" : undefined}
           >
-            <span class="menu-number">0{index + 1}</span>
             {item.label}
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">
+              <ArrowIcon direction="up-right" />
+            </span>
           </a>
         ))
       }<div class="mobile-secondary">

@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "../components/ArrowIcon.astro";
 import "../styles/global.css";
 import mapStylesUrl from "../styles/maps.css?url";
 import { resolveAlternatePaths } from "../lib/translations";
@@ -160,7 +161,8 @@ const alternateHref =
     <button
       id="back-to-top"
       class="back-to-top"
-      aria-label={locale === "zh-CN" ? "回到顶部" : "Back to top"}>↑</button
+      aria-label={locale === "zh-CN" ? "回到顶部" : "Back to top"}
+      ><ArrowIcon direction="up" /></button
     >
     <script>
       const bar = document.getElementById("progress-bar");

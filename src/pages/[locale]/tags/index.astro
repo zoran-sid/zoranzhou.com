@@ -1,4 +1,5 @@
 ---
+import { isPublicData } from "../../../lib/content-policy";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import { hasReadableBody } from "../../../lib/content-policy";
@@ -17,14 +18,14 @@ const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
 
 const allContent = [
-  ...(await getCollection("blog", ({ data }) => !data.draft)),
-  ...(await getCollection("essays", ({ data }) => !data.draft)),
-  ...(await getCollection("research", ({ data }) => !data.draft)),
-  ...(await getCollection("projects", ({ data }) => !data.draft)),
-  ...(await getCollection("photos", ({ data }) => !data.draft)),
+  ...(await getCollection("blog", ({ data }) => isPublicData(data))),
+  ...(await getCollection("essays", ({ data }) => isPublicData(data))),
+  ...(await getCollection("research", ({ data }) => isPublicData(data))),
+  ...(await getCollection("projects", ({ data }) => isPublicData(data))),
+  ...(await getCollection("photos", ({ data }) => isPublicData(data))),
   ...(await getCollection(
     "routes",
-    ({ data }) => !data.draft && data.published !== false,
+    ({ data }) => isPublicData(data) && data.published !== false,
   )),
 ];
 
@@ -50,7 +51,7 @@ const sortedTags = [...tagMap.entries()]
 <BaseLayout title={t.tagsTitle} description={t.tagsDescription}>
   <div class="page-container archive-page">
     <header class="page-intro">
-      <p class="eyebrow">TOPICS / {t.tagsTitle}</p>
+
       <h1
         class="text-4xl font-bold tracking-tight text-gray-900 md:text-5xl dark:text-gray-100"
       >

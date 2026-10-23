@@ -30,6 +30,7 @@ const failures: string[] = [];
 for (const file of htmlFiles) {
   const html = readFileSync(file, "utf8");
   const path = "/" + relative(root, file).replace(/index\.html$/, "");
+  assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${path}: one page title`);
   assert.ok(
     !/netguard/i.test(html),
     `${path}: excluded project must remain private`,
@@ -59,12 +60,12 @@ assert.deepEqual(
 for (const locale of ["zh-CN", "en"]) {
   const home = htmlAt(locale);
   assert.equal((home.match(/<h1\b/g) ?? []).length, 1);
-  assert.ok(home.indexOf('id="selected"') < home.indexOf("recent-section"));
+  // Notes and standalone project sections appear only when they contain published entries.
   assert.ok(home.includes("<dialog"));
   assert.ok(!home.includes("hero-radar"));
   const selected = home.slice(
     home.indexOf('id="selected"'),
-    home.indexOf("recent-section"),
+    home.indexOf("life-feature"),
   );
   assert.ok(
     selected.includes("/blog/building-blog"),
@@ -86,6 +87,9 @@ for (const locale of ["zh-CN", "en"]) {
     "subscribe",
     "life",
     "projects",
+    "blog/formats/note",
+    "blog/formats/guide",
+    "blog/formats/essay",
     "blog/topics/technology",
     "blog/topics/research",
     "blog/topics/life",

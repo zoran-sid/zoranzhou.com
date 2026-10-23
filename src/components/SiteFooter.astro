@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "./ArrowIcon.astro";
 import { COPYRIGHT, SOCIAL_LINKS } from "../lib/constants";
 import { editorial } from "../i18n/editorial";
 import { localizePath, type Locale } from "../i18n/utils";
@@ -11,16 +12,20 @@ const email = SOCIAL_LINKS.find((link) => link.name === "email")!;
   <div class="page-container">
     <div class="footer-contact">
       <div>
-        <p class="eyebrow">LET'S CONNECT</p><h2>{c.contact}</h2><p>
+        <h2>{locale === "zh-CN" ? "保持联系" : "Stay in touch"}</h2><p>
           {c.contactDeck}
         </p>
       </div><a class="button-primary" href={email.url}
-        >{c.email}<span aria-hidden="true">↗</span></a
+        >{c.email}<span aria-hidden="true"
+          ><ArrowIcon direction="up-right" /></span
+        ></a
       >
     </div>
     <div class="footer-links">
       <a href={localizePath("/subscribe", locale)}
-        >{c.subscribe}<span aria-hidden="true">↗</span></a
+        >{c.subscribe}<span aria-hidden="true"
+          ><ArrowIcon direction="up-right" /></span
+        ></a
       ><div>
         {
           SOCIAL_LINKS.filter(
@@ -28,7 +33,9 @@ const email = SOCIAL_LINKS.find((link) => link.name === "email")!;
           ).map((link) => (
             <a href={link.url} target="_blank" rel="noopener noreferrer">
               {link.label}
-              <span aria-hidden="true">↗</span>
+              <span aria-hidden="true">
+                <ArrowIcon direction="up-right" />
+              </span>
             </a>
           ))
         }

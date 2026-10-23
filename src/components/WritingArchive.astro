@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "./ArrowIcon.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleRow from "./ArticleRow.astro";
 import { editorial } from "../i18n/editorial";
@@ -9,12 +10,41 @@ interface Props {
   entries: WritingEntry[];
   page: PageLinks;
   category?: string;
+  format?: string;
   title?: string;
   description?: string;
 }
-const { entries, page, category = "all", title, description } = Astro.props;
+const {
+  entries,
+  page,
+  category = "all",
+  format,
+  title,
+  description,
+} = Astro.props;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const c = editorial(locale);
+const formatTitles: Record<string, string> =
+  locale === "zh-CN"
+    ? { note: "短笔记", guide: "指南", essay: "文章与随笔" }
+    : { note: "Notes", guide: "Guides", essay: "Essays" };
+const formatDescriptions: Record<string, string> =
+  locale === "zh-CN"
+    ? {
+        note: "短小的记录、问题和发现，不必等想法完整再写下。",
+        guide: "持续整理的技术文档、部署步骤与实践记录。",
+        essay: "技术分析、阅读感想，以及生活中慢慢形成的思考。",
+      }
+    : {
+        note: "Small observations, questions and discoveries. Ideas can begin before they are complete.",
+        guide:
+          "Technical documentation, deployment steps and records of practice.",
+        essay:
+          "Technical analysis, reflections on books and thoughts from everyday life.",
+      };
+const pageTitle = title ?? (format ? formatTitles[format] : c.writingTitle);
+const pageDescription =
+  description ?? (format ? formatDescriptions[format] : c.writingDeck);
 const filters = [
   { key: "all", label: c.all },
   { key: "technology", label: c.technology },
@@ -23,87 +53,125 @@ const filters = [
 ];
 ---
 
-<BaseLayout
-  title={title ?? c.writing}
-  description={description ?? c.writingDeck}
->
+<BaseLayout title={pageTitle} description={pageDescription}>
   <div class="page-container archive-page">
     <header class="page-intro">
-      <div class="page-intro__line">
-        <p class="eyebrow">THE NOTEBOOK / {c.writing}</p><a
-          class="text-link"
-          href={localizePath("/subscribe", locale)}
-          >{c.subscribe} <span aria-hidden="true">↗</span></a
+      <div class="archive-heading">
+        <div>
+          <h1>{pageTitle.split("\n").map((line) => <span>{line}</span>)}</h1><p>
+            {pageDescription}
+          </p>
+        </div>
+        <a class="text-link" href={localizePath("/subscribe", locale)}
+          >{c.subscribe}</a
         >
-      </div><h1>
-        {
-          (title ?? c.writingTitle)
-            .split("\n")
-            .map((line) => <span>{line}</span>)
-        }
-      </h1><p>{description ?? c.writingDeck}</p>
+      </div>
     </header>
-    <div class="archive-toolbar">
-      <nav class="filter-buttons" aria-label={c.filter}>
-        {
-          filters.map((filter) => (
-            <a
-              class:list={{ "is-current": category === filter.key }}
-              aria-current={category === filter.key ? "page" : undefined}
-              href={localizePath(
-                filter.key === "all" ? "/blog" : `/blog/topics/${filter.key}`,
-                locale,
-              )}
-            >
-              {filter.label}
-            </a>
-          ))
-        }
-      </nav><span class="archive-count">{page.total} {c.results}</span>
-    </div>
-    {
-      entries.length > 0 ? (
-        <div class="writing-list">
-          {entries.map((entry) => (
-            <ArticleRow entry={entry} locale={locale} />
-          ))}
-        </div>
-      ) : (
-        <div class="empty-note">
-          <>
-            <p>{c.empty}</p>
-            <a class="text-link" href={localizePath("/blog", locale)}>
-              {c.browse} ↗
-            </a>
-          </>
-        </div>
-      )
-    }
-    {
-      page.last > 1 && (
+    <div class="archive-layout">
+      <aside class="archive-navigation">
+        <h2>{locale === "zh-CN" ? "按形式阅读" : "By format"}</h2>
         <nav
-          class="pagination"
-          aria-label={locale === "zh-CN" ? "文章分页" : "Writing pages"}
+          class="format-tabs"
+          aria-label={locale === "zh-CN" ? "内容形式" : "Writing format"}
         >
-          {page.prev ? (
-            <a href={localizePath(page.prev, locale)}>
-              ← {locale === "zh-CN" ? "上一页" : "Previous"}
-            </a>
-          ) : (
-            <span />
-          )}
-          <span>
-            {page.current} / {page.last}
-          </span>
-          {page.next ? (
-            <a href={localizePath(page.next, locale)}>
-              {locale === "zh-CN" ? "下一页" : "Next"} →
-            </a>
-          ) : (
-            <span />
-          )}
+          {
+            [
+              { key: "all", zh: "全部文章", en: "All writing" },
+              { key: "note", zh: "短笔记", en: "Notes" },
+              { key: "guide", zh: "技术指南", en: "Guides" },
+              { key: "essay", zh: "文章与随笔", en: "Essays" },
+            ].map((item) => (
+              <a
+                aria-current={
+                  (format ?? "all") === item.key && category === "all"
+                    ? "page"
+                    : undefined
+                }
+                href={localizePath(
+                  item.key === "all" ? "/blog" : `/blog/formats/${item.key}`,
+                  locale,
+                )}
+              >
+                {locale === "zh-CN" ? item.zh : item.en}
+              </a>
+            ))
+          }
         </nav>
-      )
-    }
+        <h2>{locale === "zh-CN" ? "按主题浏览" : "By subject"}</h2>
+        <nav class="topic-navigation" aria-label={c.filter}>
+          {
+            filters
+              .filter((filter) => filter.key !== "all")
+              .map((filter) => (
+                <a
+                  aria-current={category === filter.key ? "page" : undefined}
+                  href={localizePath(`/blog/topics/${filter.key}`, locale)}
+                >
+                  {filter.label}
+                </a>
+              ))
+          }
+          <a href={localizePath("/tags", locale)}
+            >{locale === "zh-CN" ? "全部标签" : "All tags"}</a
+          >
+        </nav>
+        <p class="archive-hint">
+          {
+            locale === "zh-CN"
+              ? "记录可以很短，问题也可以慢慢展开。"
+              : "Some entries begin as a small observation. Others take more room."
+          }
+        </p>
+      </aside>
+      <div class="archive-records">
+        <p class="archive-count">{page.total} {c.results}</p>
+        {
+          entries.length > 0 ? (
+            <div class="writing-list">
+              {entries.map((entry) => (
+                <ArticleRow entry={entry} locale={locale} />
+              ))}
+            </div>
+          ) : (
+            <div class="empty-note">
+              <>
+                <p>{c.empty}</p>
+                <a class="text-link" href={localizePath("/blog", locale)}>
+                  {c.browse} <ArrowIcon direction="up-right" />
+                </a>
+              </>
+            </div>
+          )
+        }
+        {
+          page.last > 1 && (
+            <nav
+              class="pagination"
+              aria-label={locale === "zh-CN" ? "文章分页" : "Writing pages"}
+            >
+              {page.prev ? (
+                <a href={localizePath(page.prev, locale)}>
+                  <ArrowIcon direction="left" />{" "}
+                  {locale === "zh-CN" ? "上一页" : "Previous"}
+                </a>
+              ) : (
+                <span />
+              )}
+              <span>
+                {page.current} / {page.last}
+              </span>
+              {page.next ? (
+                <a href={localizePath(page.next, locale)}>
+                  {locale === "zh-CN" ? "下一页" : "Next"}{" "}
+                  <ArrowIcon direction="right" />
+                </a>
+              ) : (
+                <span />
+              )}
+            </nav>
+          )
+        }
+      </div>
+    </div>
   </div>
 </BaseLayout>

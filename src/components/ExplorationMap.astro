@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "./ArrowIcon.astro";
 import { entryPath, type WritingEntry } from "../lib/writing";
 import { editorial } from "../i18n/editorial";
 import { localizePath, type Locale } from "../i18n/utils";
@@ -33,7 +34,9 @@ const nodes = [
 
 <div class="exploration" aria-label={c.exploration}>
   <div class="exploration__eyebrow">
-    <span>{c.exploration}</span><span aria-hidden="true">↗</span>
+    <span>{c.exploration}</span><span aria-hidden="true"
+      ><ArrowIcon direction="up-right" /></span
+    >
   </div>
   <div class="exploration__canvas">
     <svg
@@ -66,7 +69,7 @@ const nodes = [
               </>
             </span>
             <span class="exploration__arrow" aria-hidden="true">
-              ↗
+              <ArrowIcon direction="up-right" />
             </span>
           </>
         </a>

@@ -42,15 +42,15 @@ Local-only processes
 
 ### Runtime boundaries
 
-| Surface           | Entry point                       | Network/runtime                     | May write repository files?            |
-| ----------------- | --------------------------------- | ----------------------------------- | -------------------------------------- |
-| Static site       | `src/pages/[locale]/`             | Browser, from `dist/`               | No                                     |
-| Root redirect     | `functions/index.ts`              | Cloudflare Pages Function, `/` only | No                                     |
-| Astro development | `scripts/run-astro.mjs`           | Local Node + Astro dev server       | No content writes                      |
-| Media update      | `scripts/media-update.ts`         | Manually started local Node process | Only its selected Media output         |
-| Content editor    | `tools/content-editor/server.mjs` | Local Node, `127.0.0.1` only        | Only explicit allowlists               |
-| Route import      | `scripts/import-route.ts`         | Manually started local Node process | Route content after preview/validation |
-| Translation       | `scripts/translate.ts`            | Manually started local Node + DeepL  | Article translations and missing pairing keys |
+| Surface           | Entry point                       | Network/runtime                     | May write repository files?                   |
+| ----------------- | --------------------------------- | ----------------------------------- | --------------------------------------------- |
+| Static site       | `src/pages/[locale]/`             | Browser, from `dist/`               | No                                            |
+| Root redirect     | `functions/index.ts`              | Cloudflare Pages Function, `/` only | No                                            |
+| Astro development | `scripts/run-astro.mjs`           | Local Node + Astro dev server       | No content writes                             |
+| Media update      | `scripts/media-update.ts`         | Manually started local Node process | Only its selected Media output                |
+| Content editor    | `tools/content-editor/server.mjs` | Local Node, `127.0.0.1` only        | Only explicit allowlists                      |
+| Route import      | `scripts/import-route.ts`         | Manually started local Node process | Route content after preview/validation        |
+| Translation       | `scripts/translate.ts`            | Manually started local Node + DeepL | Article translations and missing pairing keys |
 
 The deployment artifact is `dist/`. Cloudflare must never publish the repository root,
 `tools/content-editor/`, scripts, settings, backups, or file-writing APIs.
@@ -157,19 +157,19 @@ redirects, or sample content unless explicitly requested. The directory
 
 All collections extend the base schema:
 
-| Field            | Type/default                     | Meaning                                      |
-| ---------------- | -------------------------------- | -------------------------------------------- |
-| `title`          | required string                  | Visible title                                |
-| `description`    | optional string                  | Summary and metadata description             |
-| `date`           | required, coerced to `Date`      | Publication date                             |
-| `updated`        | optional, coerced to `Date`      | Last meaningful content update               |
-| `tags`           | string array, default `[]`       | Tags, related-content matching, tag pages    |
-| `draft`          | boolean, default `false`         | Excluded from public lists/details when true |
-| `author`         | string, default `Zoran`          | Byline and structured metadata               |
-| `lang`           | `zh-CN` or `en`, default `zh-CN` | Entry locale                                 |
-| `translationKey` | optional string                  | Connects ordinary translated entries         |
-| `translation` | optional object | Local DeepL provenance and source/output hashes; no credentials |
-| `cover`          | optional `{src, alt?, caption?}` | Standard cover image                         |
+| Field            | Type/default                     | Meaning                                                         |
+| ---------------- | -------------------------------- | --------------------------------------------------------------- |
+| `title`          | required string                  | Visible title                                                   |
+| `description`    | optional string                  | Summary and metadata description                                |
+| `date`           | required, coerced to `Date`      | Publication date                                                |
+| `updated`        | optional, coerced to `Date`      | Last meaningful content update                                  |
+| `tags`           | string array, default `[]`       | Tags, related-content matching, tag pages                       |
+| `draft`          | boolean, default `false`         | Excluded from public lists/details when true                    |
+| `author`         | string, default `Zoran`          | Byline and structured metadata                                  |
+| `lang`           | `zh-CN` or `en`, default `zh-CN` | Entry locale                                                    |
+| `translationKey` | optional string                  | Connects ordinary translated entries                            |
+| `translation`    | optional object                  | Local DeepL provenance and source/output hashes; no credentials |
+| `cover`          | optional `{src, alt?, caption?}` | Standard cover image                                            |
 
 The schema intentionally accepts several migrated Hugo fields such as `categories`,
 `ShowToc`, `ShowReadingTime`, `word_count`, and `reading_time`. Their presence does not
@@ -288,11 +288,11 @@ three real content links; do not add simulated metrics or perpetual scan animati
 
 The map uses personal, everyday labels rather than technical job categories:
 
-| Node | Chinese | English | Target |
-| ---- | ------- | ------- | ------ |
-| 01 | 学习与思考 / 把好奇写成笔记 | Learning & ideas / Notes from curiosity | First selected article (currently AgentShield analysis) |
-| 02 | 尝试与创造 / 让想法慢慢成形 | Making & trying / Ideas taking shape | Blog construction article |
-| 03 | 生活记录 / 阅读 · 摄影 · 行走 | Everyday life / Books · photos · journeys | Localized Life index |
+| Node | Chinese                       | English                                   | Target                                                  |
+| ---- | ----------------------------- | ----------------------------------------- | ------------------------------------------------------- |
+| 01   | 学习与思考 / 把好奇写成笔记   | Learning & ideas / Notes from curiosity   | First selected article (currently AgentShield analysis) |
+| 02   | 尝试与创造 / 让想法慢慢成形   | Making & trying / Ideas taking shape      | Blog construction article                               |
+| 03   | 生活记录 / 阅读 · 摄影 · 行走 | Everyday life / Books · photos · journeys | Localized Life index                                    |
 
 Labels live in `src/i18n/editorial.ts`; node subtitles and destinations live in
 `ExplorationMap.astro`. A label describes the reader's entry point, not a skill score.
@@ -347,8 +347,9 @@ advance its stage without author confirmation. NetGuard is a preserved draft, ex
 from public views. Search includes essays
 and indexes title, description and tags; both search and RSS filter by locale.
 
-Keep the warm paper / ink / restrained blue main-site palette in `global.css` consistent
-in light and dark themes. `home.css`, `collections.css`, `reading.css` and `prose.css` own
+Keep the cool paper / evergreen ink / pale leaf palette in `global.css` consistent
+in light and dark themes. `DESIGN.md` and `.impeccable/design.json` document the current
+visual system; older blue-palette descriptions are historical. `home.css`, `collections.css`, `reading.css` and `prose.css` own
 scoped responsibilities. `maps.css` preserves the Journey Explorer rules and loads only
 with `mapStyles`; do not mix main-site or map CSS into `LabLayout`.
 
@@ -466,10 +467,12 @@ entries remain part of the shared search index and sitemap, but are excluded fro
 notifications. The main navigation, Practice page and current-learning card provide
 localized Lab entry points on desktop and mobile.
 
-The Lab has an independent fixed dark palette: `#0b1016` background, slate panels,
-cyan `#89d7e8` focus, blue `#9cb6ff`, and readable muted text. It uses Inter, JetBrains
-Mono and an explicit CJK font stack. Preserve the `lab-*` namespace, subtle grid,
-sticky header, and isolated focus/selection treatments. Do not mix in main-site CSS.
+The Lab uses a fixed dark study surface in the same evergreen family as the main site:
+`#15221e` background, `#1d3028` panels, `#edf3ed` text and `#a8d4bd` actions.
+It shares the self-hosted Newsreader / Inter Variable / JetBrains Mono Variable font
+contracts with explicit CJK fallbacks. Preserve the `lab-*` namespace, its sticky header
+and isolated focus/selection treatments. The decorative grid and glow are removed.
+Do not import main-site layout CSS into Lab; synchronize semantic token values deliberately.
 
 Following the author's September 2026 redesign request, the home sequence is current
 TypeScript focus -> five-stage learning route -> project plans -> security notes ->
@@ -1302,27 +1305,27 @@ production function is explicitly requested.
 
 ## Supported commands
 
-| Command                         | Purpose                                       | Writes content?                    | May use network?               |
-| ------------------------------- | --------------------------------------------- | ---------------------------------- | ------------------------------ |
-| `npm run dev`                   | Start local Astro development                 | No                                 | May load remote assets         |
-| `npm run editor`                | Start loopback content manager                | Yes, through explicit user actions | PicGo only when used           |
-| `npm run build`                 | Generate `dist/`                              | Generated output only              | Possibly remote image metadata |
-| `npm run preview`               | Serve built static output                     | No                                 | No normal external fetch       |
-| `npm run lint`                  | Astro schema/type/component check             | No                                 | No                             |
-| `npx tsc --noEmit`              | Independent TypeScript check                  | No                                 | No after install               |
-| `npm run format`                | Format repository-supported files             | Yes, broad mechanical rewrite      | No                             |
-| `npm run media:update`          | Update Movies table                           | Yes unless dry-run/output changed  | Yes for live mode              |
-| `npm run test:media-update`     | Test Media updater                            | Test artifacts only                | No expected live Douban        |
-| `npm run translate -- --dry-run` | Preview Chinese-to-English changes | No | No |
-| `npm run translate -- ...` | Manually update English articles | Yes, with backups | DeepL for pending entries |
-| `npm run test:translation` | Test translation integrity and preservation | Temporary fixtures only | Mocked API only |
-| `npm run import:routes:preview` | Preview GPX import                            | No content publish                 | No geocoding                   |
-| `npm run import:routes -- ...`  | Import selected GPX into Route content        | Yes                                | Optional geocoding             |
-| `npm run migrate:routes`        | Explicit Route migration                      | Yes                                | Inspect script before use      |
-| `npm run validate:routes`       | Validate Route content/source consistency     | No intended content writes         | No                             |
-| `npm run test:route-logic`      | Route parsing/identity/split regression tests | Test artifacts only                | No                             |
-| `npm run test:language-routing` | Locale redirect/path regression checks        | Test artifacts only                | No                             |
-| `npm run test:editor`           | Editor CRUD/security/runtime smoke tests      | Temporary test files, cleaned      | No external service required   |
+| Command                          | Purpose                                       | Writes content?                    | May use network?               |
+| -------------------------------- | --------------------------------------------- | ---------------------------------- | ------------------------------ |
+| `npm run dev`                    | Start local Astro development                 | No                                 | May load remote assets         |
+| `npm run editor`                 | Start loopback content manager                | Yes, through explicit user actions | PicGo only when used           |
+| `npm run build`                  | Generate `dist/`                              | Generated output only              | Possibly remote image metadata |
+| `npm run preview`                | Serve built static output                     | No                                 | No normal external fetch       |
+| `npm run lint`                   | Astro schema/type/component check             | No                                 | No                             |
+| `npx tsc --noEmit`               | Independent TypeScript check                  | No                                 | No after install               |
+| `npm run format`                 | Format repository-supported files             | Yes, broad mechanical rewrite      | No                             |
+| `npm run media:update`           | Update Movies table                           | Yes unless dry-run/output changed  | Yes for live mode              |
+| `npm run test:media-update`      | Test Media updater                            | Test artifacts only                | No expected live Douban        |
+| `npm run translate -- --dry-run` | Preview Chinese-to-English changes            | No                                 | No                             |
+| `npm run translate -- ...`       | Manually update English articles              | Yes, with backups                  | DeepL for pending entries      |
+| `npm run test:translation`       | Test translation integrity and preservation   | Temporary fixtures only            | Mocked API only                |
+| `npm run import:routes:preview`  | Preview GPX import                            | No content publish                 | No geocoding                   |
+| `npm run import:routes -- ...`   | Import selected GPX into Route content        | Yes                                | Optional geocoding             |
+| `npm run migrate:routes`         | Explicit Route migration                      | Yes                                | Inspect script before use      |
+| `npm run validate:routes`        | Validate Route content/source consistency     | No intended content writes         | No                             |
+| `npm run test:route-logic`       | Route parsing/identity/split regression tests | Test artifacts only                | No                             |
+| `npm run test:language-routing`  | Locale redirect/path regression checks        | Test artifacts only                | No                             |
+| `npm run test:editor`            | Editor CRUD/security/runtime smoke tests      | Temporary test files, cleaned      | No external service required   |
 
 Do not run broad `npm run format` merely to format one edited file in a dirty worktree.
 Use Prettier on the intended file(s) when unrelated user formatting must be preserved.
@@ -1412,23 +1415,23 @@ unless it belongs to the removed public feature.
 
 ## Validation matrix
 
-| Change                                 | Minimum focused validation                                                 |
-| -------------------------------------- | -------------------------------------------------------------------------- |
-| Markdown/MDX content                   | `npm run lint`; relevant locale page; build if deployment-bound            |
-| Astro page/component/layout            | `npm run lint`, `npm run build`                                            |
-| TypeScript library                     | `npx tsc --noEmit` plus focused tests                                      |
-| Navigation/i18n/root redirect          | `npm run test:language-routing`, build                                     |
-| Route parser/identity/endpoints/splits | `npm run test:route-logic`, `npm run validate:routes`, build               |
-| Route importer                         | Dry-run preview, body/manual-field preservation inspection, Route tests    |
-| Route/map CSS                          | Desktop and narrow mobile maps, closed-loop marker overlap, light/dark     |
-| Media parser/updater                   | `npm run test:media-update`, dry-run, manual-field diff, build             |
-| Manual translator | `npm run test:translation`, explicit script typecheck, dry-run, key-ignore check; content/schema changes also need lint/build/site-build |
-| Media table CSS                        | Long Type/Status labels at desktop/mobile, both locales                    |
-| Web3 Lab layout/content/metadata       | Lint/build; both locales; home/detail title, favicon, touch targets, route |
-| Local editor/API                       | `npm run test:editor`, both Node syntax checks, interactive Windows smoke  |
-| Cloudflare/build boundary              | Build, `dist` secret/editor scan, inspect `_routes.json`                   |
-| Feature removal                        | Repository-wide stale-reference searches plus build                        |
-| Documentation only                     | Prettier/check formatting, verify every named path/command exists          |
+| Change                                 | Minimum focused validation                                                                                                               |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Markdown/MDX content                   | `npm run lint`; relevant locale page; build if deployment-bound                                                                          |
+| Astro page/component/layout            | `npm run lint`, `npm run build`                                                                                                          |
+| TypeScript library                     | `npx tsc --noEmit` plus focused tests                                                                                                    |
+| Navigation/i18n/root redirect          | `npm run test:language-routing`, build                                                                                                   |
+| Route parser/identity/endpoints/splits | `npm run test:route-logic`, `npm run validate:routes`, build                                                                             |
+| Route importer                         | Dry-run preview, body/manual-field preservation inspection, Route tests                                                                  |
+| Route/map CSS                          | Desktop and narrow mobile maps, closed-loop marker overlap, light/dark                                                                   |
+| Media parser/updater                   | `npm run test:media-update`, dry-run, manual-field diff, build                                                                           |
+| Manual translator                      | `npm run test:translation`, explicit script typecheck, dry-run, key-ignore check; content/schema changes also need lint/build/site-build |
+| Media table CSS                        | Long Type/Status labels at desktop/mobile, both locales                                                                                  |
+| Web3 Lab layout/content/metadata       | Lint/build; both locales; home/detail title, favicon, touch targets, route                                                               |
+| Local editor/API                       | `npm run test:editor`, both Node syntax checks, interactive Windows smoke                                                                |
+| Cloudflare/build boundary              | Build, `dist` secret/editor scan, inspect `_routes.json`                                                                                 |
+| Feature removal                        | Repository-wide stale-reference searches plus build                                                                                      |
+| Documentation only                     | Prettier/check formatting, verify every named path/command exists                                                                        |
 
 Final hygiene:
 
@@ -1462,3 +1465,85 @@ worktree changes; assume they belong to the user.
 - Do not broaden Cloudflare runtime capability while implementing a local tool.
 - Run checks proportional to risk, inspect the final diff, and report limitations rather
   than weakening safety or data-integrity checks.
+
+## Digital Garden workflow (2026-10)
+
+This section supersedes the old homepage order and adds publication rules. Read
+`docs/digital-garden.md`, `PRODUCT.md`, and `DESIGN.md` for the current workflow.
+
+- Preserve old collections, filenames, slugs and bilingual identities. `format` is optional:
+  note/guide/essay; `maturity` is optional seed/growing/evergreen. Neither requires a cover,
+  description, tags or translation. Legacy technical Blog resolves to guide; other writing
+  resolves to essay. Never relabel an old long article as a Note simply to fill the homepage.
+- New format-bearing entries require `publication: approved`; legacy entries without
+  format/publication retain existing semantics. `draft: true` always excludes an entry.
+  Keep detail paths, indexes, tags, alternates, search and RSS aligned with this rule.
+- The GitHub repository is PUBLIC. Private Inbox and prepared packages MUST be outside it.
+  `.env.content` configures a local path and is ignored. Never enumerate an entire Vault.
+  Tools accept one explicit Markdown file and referenced images only. Do not add private
+  assets to public/ or src/assets/photos/, which are public by design.
+- `content:new` creates a private Note. `content:prepare` creates a new external review
+  package without changing its source. `content:check` checks metadata/links/images and
+  flags possible credentials. `content:approve --confirm` explicitly promotes the reviewed
+  article and referenced images; it does not commit, push, send email or deploy. Images
+  are encoded as WebP with EXIF removed. Existing slugs/files are protected from overwrite.
+- AI editing belongs to an explicit Codex conversation over the chosen file. Preserve code,
+  factual qualifications, uncertainty and author voice. List unverified claims in review.md;
+  do not manufacture experiences, findings or inferred personal details. Secret heuristics
+  are advisory coverage, not a guarantee that a document is safe to publish.
+- npm prebuild runs the draft-resource guard. Draft images/MDX imports can be compiled even
+  without routes, so guard them before Astro runs. A hidden route/noindex does not protect
+  Git history or public assets. Existing tracked placeholder drafts are not private storage.
+- Homepage order: identity + Now, actual Notes when published notes exist, selected long
+  writing led by blog construction, published projects when present, life photography,
+  contact. Hide empty homepage sections; keep Notes available through Writing and Lab
+  reachable from Now. Never manufacture cards to fill a section.
+  `src/data/now.ts` owns current focus copy. No auto-updating dates or invented projects.
+- Writing formats live at /blog/formats/{note,guide,essay}; old /blog/topics/* stay intact.
+  Notes have no TOC/sidebar; Guides/Essays reuse tested long reading controls.
+- This request requires separate confirmation before Git commit, branch push or PR creation;
+  never automatically push main or merge. Cloudflare production configuration is unchanged.
+- Test content imports in temporary external Inbox/repository fixtures. Test privacy against
+  production output, and remove synthetic articles/assets before the final deliverable.
+
+
+### October 2026 design and verification contract
+
+- Treat `DESIGN.md` as the human-readable visual authority, `.impeccable/design.json` as
+  its machine-readable counterpart, and `src/styles/global.css` / `lab.css` as the runtime
+  tokens. `design-system/zoran-journal/MASTER.md` records the reconciled UI UX Pro Max
+  research. Do not restore the research tool's rejected brutalist/blue recommendation.
+- Home is an author index with a full-width name; Writing is a browsable reference list;
+  Life is led by a real photograph; About pairs a portrait with open text; Projects links
+  actual practice; Lab is an explicitly staged learning space. Share type, colour, spacing
+  and interactions while preserving these different compositions.
+- `public/fonts/newsreader-regular.ttf` is self-hosted under SIL OFL; retain the adjacent
+  license and attribution. Use the exact installed family names `Inter Variable` and
+  `JetBrains Mono Variable`. Chinese display text uses the documented serif fallbacks.
+  Do not add a font CDN or replace the display font with an unlicensed download.
+- Display/copy comes from real content. Blog construction remains the lead selection.
+  Its historical Hugo guide is labelled as an early construction record in Projects;
+  the current site is Astro. Keep article titles verbatim even when mobile wrapping
+  exceeds a landing-page headline heuristic.
+- Format and topic navigation are separate routes, not combinable live filters.
+  `languageCounterpart()` preserves a format or topic route when switching languages.
+- `src/lib/markdown/heading-levels.mjs` normalizes legacy Markdown that starts with H1
+  to H2+ at render time. Source Markdown, heading IDs and translation keys stay intact.
+  Each built page has exactly one H1. Reading width is 42rem, with desktop side contents
+  and mobile disclosure; code/tables scroll inside the reading column.
+- `src/data/now.ts` owns both languages of the homepage's current-learning copy.
+  `LAB_CURRENT_FOCUS_KEY` chooses its linked published Lab entry. Update them together
+  when the author actually changes learning stage; future plans remain labelled planned.
+- Life sections share `LifeNavigation`. Media filtering updates the visible item count
+  and `aria-pressed`; photo lightbox retains focus and keyboard controls. Route geometry,
+  source GPX and route statistics remain owned by the existing map modules.
+- Review actual production preview as well as development. Check 1440px desktop, 768px
+  tablet and 390px phone, English/Chinese, light/dark, long titles and real images. Check
+  search, Escape/focus, mobile menu, code copy, contents, media filters, lightbox, route
+  selection and RSS copying. Build-time checks do not prove third-party email delivery.
+- `.taste-skill/direction-notes.md` records design decisions and deliberate inspector
+  exceptions. `.taste-skill/before`, `round-*` and `.impeccable/review` are ignored local
+  screenshots/review evidence. Do not claim that picture/video/motion quotas passed
+  when they were intentionally waived for this reading site.
+- Preserve unrelated user edits. At the beginning of this redesign, `src/content/media.md`
+  already contained two new movie rows; the redesign preserves those changes.

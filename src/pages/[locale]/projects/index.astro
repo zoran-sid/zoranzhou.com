@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "../../../components/ArrowIcon.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import ArticleRow from "../../../components/ArticleRow.astro";
 import { getCollection } from "astro:content";
@@ -32,7 +33,7 @@ const statuses = {
 <BaseLayout title={c.work} description={c.workDeck}
   ><div class="page-container">
     <header class="page-intro">
-      <p class="eyebrow">PRACTICE / {c.work}</p><h1>
+      <h1>
         {c.workTitle.split("\n").map((line) => <span>{line}</span>)}
       </h1><p>{c.workDeck}</p>
     </header>
@@ -45,7 +46,10 @@ const statuses = {
                 <span class="status-label">{statuses[entry.data.status]}</span>
                 <h2>
                   <a href={entryPath(entry)}>
-                    {entry.data.title} <span aria-hidden="true">↗</span>
+                    {entry.data.title}{" "}
+                    <span aria-hidden="true">
+                      <ArrowIcon direction="up-right" />
+                    </span>
                   </a>
                 </h2>
                 <p>{entry.data.description}</p>
@@ -60,7 +64,7 @@ const statuses = {
                   {locale === "zh-CN"
                     ? "阅读项目记录"
                     : "Read the project notes"}{" "}
-                  ↗
+                  <ArrowIcon direction="up-right" />
                 </a>
                 {entry.data.repo && (
                   <a
@@ -69,7 +73,8 @@ const statuses = {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {locale === "zh-CN" ? "项目仓库" : "Repository"} ↗
+                    {locale === "zh-CN" ? "项目仓库" : "Repository"}{" "}
+                    <ArrowIcon direction="up-right" />
                   </a>
                 )}
               </div>
@@ -78,15 +83,43 @@ const statuses = {
         </section>
       )
     }
-    <section class="editorial-section">
-      <header class="section-head">
-        <div>
-          <p class="eyebrow">BUILD & DOCUMENT</p><h2>
-            {locale === "zh-CN" ? "动手实践的记录" : "Notes from building"}
-          </h2>
-        </div>
-      </header><div class="writing-list">
-        {practice.map((entry) => <ArticleRow entry={entry} locale={locale} />)}
+    <section class="builds-overview editorial-section">
+      <article class="builds-feature">
+        <h2>{locale === "zh-CN" ? "这个网站" : "This website"}</h2>
+        <p>
+          {
+            locale === "zh-CN"
+              ? "用 Markdown 记录，借助 Astro 构建，通过 GitHub 和 Cloudflare 发布。它也是我持续实践前端、整理内容和改进阅读体验的地方。"
+              : "Written in Markdown, built with Astro, and published through GitHub and Cloudflare. This site is also where I practice frontend development and improve how I organise and share ideas."
+          }
+        </p>
+        {
+          practice.find(
+            (entry) => entry.data.translationKey === "building-blog",
+          ) && (
+            <a
+              class="text-link"
+              href={entryPath(
+                practice.find(
+                  (entry) => entry.data.translationKey === "building-blog",
+                )!,
+              )}
+            >
+              {locale === "zh-CN" ? "早期搭建记录" : "Earlier building notes"}
+              <span aria-hidden="true">
+                <ArrowIcon direction="up-right" />
+              </span>
+            </a>
+          )
+        }
+      </article>
+      <div class="builds-records">
+        <h2>{locale === "zh-CN" ? "更多实践记录" : "More from building"}</h2>
+        {
+          practice
+            .filter((entry) => entry.data.translationKey !== "building-blog")
+            .map((entry) => <ArticleRow entry={entry} locale={locale} />)
+        }
       </div>
     </section>
     {
@@ -96,7 +129,6 @@ const statuses = {
             <header class="section-head">
               <div>
                 <>
-                  <p class="eyebrow">RESEARCH NOTES</p>
                   <h2>{c.notebook}</h2>
                 </>
               </div>
@@ -113,10 +145,20 @@ const statuses = {
     <section class="editorial-section">
       <a class="lab-portal" href={localizePath("/lab", locale)}
         ><div>
-          <p class="eyebrow">INDEPENDENT LAB</p><h2>
-            WEB3 LAB <span aria-hidden="true">↗</span>
-          </h2><p>{c.labDeck}</p>
-        </div><span class="text-link">{c.labLink} →</span></a
+          <h2>
+            WEB3 LAB <span aria-hidden="true"
+              ><ArrowIcon direction="up-right" /></span
+            >
+          </h2><p>
+            {
+              locale === "zh-CN"
+                ? "正在学习 TypeScript。这里保存学习笔记，以及后续区块链与 Web3 项目的计划。"
+                : "Currently learning TypeScript. A place for learning notes and plans for blockchain and Web3 projects."
+            }
+          </p>
+        </div><span class="text-link"
+          >{c.labLink} <ArrowIcon direction="right" /></span
+        ></a
       >
     </section>
   </div></BaseLayout

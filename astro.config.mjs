@@ -6,6 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
+import headingLevels from "./src/lib/markdown/heading-levels.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -130,10 +131,11 @@ export default defineConfig({
   },
 
   markdown: {
-    syntaxHighlight: false,
+    remarkPlugins: [headingLevels],
+    syntaxHighlight: "shiki",
     shikiConfig: {
-      theme: "github-dark",
-      wrap: true,
+      themes: { light: "github-light", dark: "github-dark" },
+      wrap: false,
     },
   },
 

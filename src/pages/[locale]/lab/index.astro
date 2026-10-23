@@ -1,4 +1,6 @@
 ---
+import ArrowIcon from "../../../components/ArrowIcon.astro";
+import { isPublicData } from "../../../lib/content-policy";
 import { getCollection } from "astro:content";
 import LabLayout from "../../../layouts/LabLayout.astro";
 import { getLabTranslations } from "../../../i18n/lab";
@@ -12,7 +14,7 @@ const copy = getLabTranslations(locale),
   c = copy.home;
 const entries = await getCollection(
   "lab",
-  ({ data }) => !data.draft && data.lang === locale,
+  ({ data }) => isPublicData(data) && data.lang === locale,
 );
 const focus = entries.find(
   (entry) => entry.data.translationKey === LAB_CURRENT_FOCUS_KEY,
@@ -43,14 +45,18 @@ const jsonld = {
 >
   <section id="overview" class="lab-shell lab-hero">
     <div>
-      <p class="lab-kicker"><span class="lab-dot"></span>{c.kicker}</p><h1>
-        {c.title.map((line) => <span>{line}</span>)}
+      <h1>
+        {locale === "zh-CN" ? "从 TypeScript 开始" : "Starting with TypeScript"}
       </h1><p class="lab-hero__intro">{c.intro}</p><div
         class="lab-hero__actions"
       >
         <a class="lab-button lab-button--primary" href={getLabEntryPath(focus)}
-          >{c.readFocus}<span aria-hidden="true">↗</span></a
-        ><a class="lab-text-link" href="#learning">{c.viewRoute} ↓</a>
+          >{c.readFocus}<span aria-hidden="true"
+            ><ArrowIcon direction="up-right" /></span
+          ></a
+        ><a class="lab-text-link" href="#learning"
+          >{c.viewRoute} <ArrowIcon direction="down" /></a
+        >
       </div>
     </div>
     <a class="lab-focus" href={getLabEntryPath(focus)}
@@ -58,17 +64,24 @@ const jsonld = {
         <span>{c.current}</span><span class="lab-signal lab-signal--building"
           ><i></i>{c.learning}</span
         >
-      </div><div class="lab-focus__symbol" aria-hidden="true">
-        TS<span>01</span>
+      </div><div class="lab-focus__sample" aria-hidden="true">
+        <pre><code><span>type</span> LearningNote = &lbrace;
+  topic: <span>string</span>;
+  questions: <span>string</span>[];
+  nextStep: <span>string</span>;
+&rbrace;;</code></pre>
       </div><div class="lab-focus__bottom">
-        <h2>TypeScript<span aria-hidden="true">↗</span></h2><p>{c.focusDeck}</p>
+        <h2>
+          TypeScript<span aria-hidden="true"
+            ><ArrowIcon direction="up-right" /></span>
+        </h2><p>{c.focusDeck}</p>
       </div></a
     >
   </section>
   <section id="learning" class="lab-shell lab-section">
     <header class="lab-section__header">
       <div>
-        <p class="lab-kicker">01 / LEARNING PATH</p><h2>{c.routeTitle}</h2>
+        <h2>{c.routeTitle}</h2>
       </div><p>{c.routeDeck}</p>
     </header>
     <ol
@@ -100,7 +113,7 @@ const jsonld = {
   <section id="builds" class="lab-shell lab-section">
     <header class="lab-section__header">
       <div>
-        <p class="lab-kicker">02 / PROJECT PLANS</p><h2>{c.buildTitle}</h2>
+        <h2>{c.buildTitle}</h2>
       </div><p>{c.buildDeck}</p>
     </header>
     {
@@ -122,13 +135,12 @@ const jsonld = {
                 </h3>
                 <p>{entry.data.description}</p>
                 <a class="lab-text-link" href={getLabEntryPath(entry)}>
-                  {c.buildLink} ↗
+                  {c.buildLink} <ArrowIcon direction="up-right" />
                 </a>
               </>
             </div>
             <div class="lab-project-plan__stack">
               <>
-                <p class="lab-kicker">{c.stack}</p>
                 <dl>
                   {entry.data.candidateStack.map((group) => (
                     <div>
@@ -148,7 +160,7 @@ const jsonld = {
   <section id="security" class="lab-shell lab-section">
     <header class="lab-section__header">
       <div>
-        <p class="lab-kicker">03 / SECURITY NOTES</p><h2>{c.securityTitle}</h2>
+        <h2>{c.securityTitle}</h2>
       </div><p>{c.securityDeck}</p>
     </header><div class="lab-note-list">
       {
@@ -163,12 +175,14 @@ const jsonld = {
               <h3>
                 <a href={getLabEntryPath(entry)}>
                   {entry.data.title}
-                  <span aria-hidden="true">↗</span>
+                  <span aria-hidden="true">
+                    <ArrowIcon direction="up-right" />
+                  </span>
                 </a>
               </h3>
               <p>{entry.data.description}</p>
               <a class="lab-text-link" href={getLabEntryPath(entry)}>
-                {c.securityLink} →
+                {c.securityLink} <ArrowIcon direction="right" />
               </a>
             </>
           </article>
@@ -178,7 +192,7 @@ const jsonld = {
   </section>
   <section id="about" class="lab-shell lab-section lab-about">
     <div>
-      <p class="lab-kicker">04 / ABOUT THIS LAB</p><h2>{c.aboutTitle}</h2>
+      <h2>{c.aboutTitle}</h2>
     </div><div>
       <p>{c.aboutDeck}</p><div class="lab-domains">
         {c.domains.map((domain) => <span>{domain}</span>)}

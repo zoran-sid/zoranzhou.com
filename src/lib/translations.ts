@@ -15,7 +15,7 @@ export async function resolveAlternatePaths(
   if (
     segments.length <= 1 ||
     (segments[0] === "blog" &&
-      segments[1] === "topics" &&
+      ["topics", "formats"].includes(segments[1]) &&
       segments.length === 3)
   )
     return Object.fromEntries(

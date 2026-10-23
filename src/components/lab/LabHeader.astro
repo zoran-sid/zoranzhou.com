@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "../ArrowIcon.astro";
 import type { LabCopy } from "../../i18n/lab";
 import { getLabHomePath, LAB_ICON_REVISION } from "../../lib/lab";
 import { localizePath, type Locale } from "../../i18n/utils";
@@ -28,7 +29,7 @@ const navItems = [
       href={mainHome}
       aria-label={`${copy.footer.returnToSite}: ${copy.returnToSite}`}
     >
-      <span aria-hidden="true">←</span>
+      <span aria-hidden="true"><ArrowIcon direction="left" /></span>
       <span>{copy.returnToSite}</span>
     </a>
 

@@ -1,4 +1,5 @@
 import type { CollectionEntry } from "astro:content";
+import { isPublicData } from "../content-policy";
 
 export type RouteContentEntry = CollectionEntry<"routes">;
 
@@ -11,7 +12,7 @@ export interface RouteCoordinate {
 type RouteData = RouteContentEntry["data"] & Record<string, unknown>;
 
 export function isRouteVisible(data: RouteData) {
-  return data.draft !== true && data.published !== false;
+  return isPublicData(data);
 }
 
 export function getRouteFile(data: RouteData) {

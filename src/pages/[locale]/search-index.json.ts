@@ -1,3 +1,4 @@
+import { isPublicData } from "../../lib/content-policy";
 import { getCollection } from "astro:content";
 import { localizePath, type Locale, locales } from "../../i18n/utils";
 import { getLabEntryPath } from "../../lib/lab";
@@ -10,15 +11,21 @@ export async function getStaticPaths() {
 }
 
 export async function GET(context: { currentLocale?: string }) {
-  const blog = await getCollection("blog", ({ data }) => !data.draft);
-  const essays = await getCollection("essays", ({ data }) => !data.draft);
-  const research = await getCollection("research", ({ data }) => !data.draft);
-  const projects = await getCollection("projects", ({ data }) => !data.draft);
+  const blog = await getCollection("blog", ({ data }) => isPublicData(data));
+  const essays = await getCollection("essays", ({ data }) =>
+    isPublicData(data),
+  );
+  const research = await getCollection("research", ({ data }) =>
+    isPublicData(data),
+  );
+  const projects = await getCollection("projects", ({ data }) =>
+    isPublicData(data),
+  );
   const routes = await getCollection(
     "routes",
-    ({ data }) => !data.draft && data.published !== false,
+    ({ data }) => isPublicData(data) && data.published !== false,
   );
-  const lab = await getCollection("lab", ({ data }) => !data.draft);
+  const lab = await getCollection("lab", ({ data }) => isPublicData(data));
 
   const locale = (context.currentLocale ?? "zh-CN") as Locale;
 

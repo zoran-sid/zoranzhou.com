@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "./ArrowIcon.astro";
 import { Image } from "astro:assets";
 import mountain from "../assets/images/sichuan-mountains.jpg";
 import { localizePath, type Locale } from "../i18n/utils";
@@ -31,16 +32,20 @@ const c = editorial(locale);
       quality={85}
     />
     <span class="life-feature__caption"
-      >{c.fieldCaption}<span aria-hidden="true">↗</span></span
+      >{c.fieldCaption}<span aria-hidden="true"
+        ><ArrowIcon direction="up-right" /></span
+      ></span
     >
   </a>
   <div class="life-feature__copy">
-    <p class="eyebrow">BEYOND THE SCREEN</p><h2>
-      {c.fieldTitle.split("\n").map((line) => <span>{line}</span>)}
+    <h2>
+      {locale === "zh-CN" ? "在路上" : "Out in the world"}
     </h2><p>{c.fieldDeck}</p><a
       class="text-link"
       href={localizePath(overview ? "/photos" : "/life", locale)}
-      >{overview ? c.photos : c.exploreLife}<span aria-hidden="true">↗</span></a
+      >{overview ? c.photos : c.exploreLife}<span aria-hidden="true"
+        ><ArrowIcon direction="up-right" /></span
+      ></a
     >
   </div>
 </section>

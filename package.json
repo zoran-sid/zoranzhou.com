@@ -26,7 +26,13 @@
     "test:route-logic": "npx tsx scripts/test-route-logic.ts",
     "test:editorial": "tsx --test scripts/test-editorial.ts",
     "test:site-build": "tsx scripts/test-site-build.ts",
-    "icons:lab": "node scripts/generate-lab-icons.mjs"
+    "icons:lab": "node scripts/generate-lab-icons.mjs",
+    "content:new": "node scripts/content/cli.mjs new",
+    "content:prepare": "node scripts/content/cli.mjs prepare",
+    "content:check": "node scripts/content/cli.mjs check",
+    "content:approve": "node scripts/content/cli.mjs approve",
+    "test:content": "node --test scripts/content/content.test.mjs",
+    "prebuild": "node scripts/content/privacy.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

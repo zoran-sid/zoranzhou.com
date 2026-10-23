@@ -8,21 +8,22 @@ const { categories, activeCategory } = Astro.props;
 ---
 
 <div id="media-grid-root" data-active={activeCategory}>
-  <div class="flex flex-wrap items-center gap-2" role="tablist" aria-label="Media categories">
+  <div
+    class="flex flex-wrap items-center gap-2"
+    role="group"
+    aria-label="Media categories"
+  >
     {
       categories.map((cat) => (
         <button
           type="button"
-          role="tab"
-          aria-selected={cat.key === activeCategory ? "true" : "false"}
+          aria-pressed={cat.key === activeCategory ? "true" : "false"}
           data-cat={cat.key}
-          class="cat-tab inline-flex h-9 items-center gap-2 rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-500 transition-colors hover:border-gray-300 hover:text-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:text-gray-100"
+          class="cat-tab"
         >
           <span>{cat.label}</span>
           {typeof cat.count === "number" && (
-            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 text-[11px] leading-none text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-              {cat.count}
-            </span>
+            <span class="category-count">{cat.count}</span>
           )}
         </button>
       ))
@@ -31,25 +32,37 @@ const { categories, activeCategory } = Astro.props;
 </div>
 
 <style>
-  .cat-tab[aria-selected="true"] {
-    border-color: rgb(17 24 39);
-    background: rgb(17 24 39);
-    color: white;
+  .cat-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+    border: 0;
+    color: var(--muted);
+    background: var(--surface-soft);
+    font-size: 0.875rem;
   }
-
-  :global(.dark) .cat-tab[aria-selected="true"] {
-    border-color: rgb(243 244 246);
-    background: rgb(243 244 246);
-    color: rgb(17 24 39);
+  .cat-tab[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--page);
+  }
+  .cat-tab:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+  .category-count {
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
   }
 </style>
 
 <script>
   function setActiveTab(btn: HTMLButtonElement) {
     document.querySelectorAll<HTMLButtonElement>(".cat-tab").forEach((tab) => {
-      tab.setAttribute("aria-selected", "false");
+      tab.setAttribute("aria-pressed", "false");
     });
-    btn.setAttribute("aria-selected", "true");
+    btn.setAttribute("aria-pressed", "true");
   }
 
   function filterItems(cat: string) {
@@ -64,6 +77,13 @@ const { categories, activeCategory } = Astro.props;
 
     const emptyEl = document.getElementById("media-empty");
     if (emptyEl) emptyEl.classList.toggle("hidden", visibleCount > 0);
+    const countEl = document.getElementById("media-visible-count");
+    if (countEl) {
+      countEl.textContent = (countEl.dataset.template ?? "{count}").replace(
+        "{count}",
+        String(visibleCount),
+      );
+    }
   }
 
   const params = new URLSearchParams(window.location.search);
@@ -71,7 +91,9 @@ const { categories, activeCategory } = Astro.props;
   const root = document.getElementById("media-grid-root");
 
   if (initialCat !== "all") {
-    const targetBtn = document.querySelector<HTMLButtonElement>(`.cat-tab[data-cat="${initialCat}"]`);
+    const targetBtn = Array.from(
+      document.querySelectorAll<HTMLButtonElement>(".cat-tab"),
+    ).find((button) => button.dataset.cat === initialCat);
     if (targetBtn) {
       setActiveTab(targetBtn);
       filterItems(initialCat);

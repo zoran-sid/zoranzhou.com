@@ -1,4 +1,6 @@
 ---
+import { isPublicData } from "../../../lib/content-policy";
+import LifeNavigation from "../../../components/LifeNavigation.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
@@ -14,7 +16,7 @@ const t = getTranslations(locale);
 
 const photoEntries = await getCollection(
   "photos",
-  ({ data }) => !data.draft && data.lang === locale,
+  ({ data }) => isPublicData(data) && data.lang === locale,
 );
 
 const markdownAlbums = photoEntries
@@ -86,7 +88,7 @@ const copy =
   <div class="photo-page">
     <header class="photo-page__header">
       <div>
-        <p class="section-kicker">{copy.library}</p>
+        <LifeNavigation />
         <h1 class="photo-page__title">{t.photosPageTitle}</h1>
         <p class="photo-page__description">{t.photosPageDescription}</p>
       </div>
@@ -117,7 +119,7 @@ const copy =
                   src={photo.image}
                   alt={photo.alt}
                   widths={[240, 400, 640]}
-                  sizes="(max-width: 640px) 33vw, (max-width: 1100px) 20vw, 16vw"
+                  sizes="(max-width: 640px) 50vw, 25vw"
                   loading={index < 6 ? "eager" : "lazy"}
                   decoding="async"
                 />
@@ -282,35 +284,16 @@ const copy =
     position: relative;
     padding: clamp(2.5rem, 7vw, 6.5rem) clamp(0.25rem, 2vw, 2rem)
       clamp(2rem, 5vw, 4.5rem);
-    border-bottom: 1px solid rgb(var(--accent-rgb) / 0.15);
-  }
-  .photo-page__header::before {
-    position: absolute;
-    top: 1.5rem;
-    right: clamp(0.25rem, 2vw, 2rem);
-    color: var(--faint);
-    content: "VISUAL ARCHIVE / GRID MODE";
-    font-family: var(--font-mono);
-    font-size: 0.52rem;
-    letter-spacing: 0.14em;
+    border-bottom: 0;
   }
   .photo-page__title {
-    margin: 0.7rem 0 0;
-    padding-right: 0.08em;
-    padding-bottom: 0.05em;
-    background: linear-gradient(
-      105deg,
-      var(--ink),
-      var(--accent) 72%,
-      var(--signal)
-    );
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    font-size: clamp(3.2rem, 9vw, 8.8rem);
-    font-weight: 650;
-    letter-spacing: -0.075em;
-    line-height: 0.85;
+    font-family: var(--font-display);
+    color: var(--ink);
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    margin: 1rem 0;
   }
   .photo-page__description {
     max-width: 42rem;
@@ -323,18 +306,18 @@ const copy =
     overflow: visible;
     border-radius: 0;
     background: transparent;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 3px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
   }
   .photo-tile {
     position: relative;
     display: block;
-    aspect-ratio: 1;
+    aspect-ratio: 4 / 3;
     min-width: 0;
     padding: 0;
     overflow: hidden;
-    border: 1px solid rgb(var(--accent-rgb) / 0.1);
-    border-radius: 0.28rem;
+    border: 0;
+    border-radius: 0;
     background: var(--surface-soft);
     cursor: zoom-in;
   }
@@ -371,7 +354,7 @@ const copy =
   }
   .photo-tile__shade time {
     color: rgb(255 255 255 / 0.66);
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.55rem;
   }
   .photo-tile:hover img {
@@ -381,7 +364,7 @@ const copy =
   .photo-tile:hover {
     z-index: 2;
     border-color: rgb(var(--accent-rgb) / 0.45);
-    box-shadow: 0 14px 38px rgb(var(--accent-rgb) / 0.16);
+    box-shadow: none;
   }
   .photo-tile:hover .photo-tile__shade,
   .photo-tile:focus-visible .photo-tile__shade {
@@ -432,7 +415,7 @@ const copy =
       max(0.8rem, env(safe-area-inset-left));
     background: linear-gradient(rgb(2 4 9 / 0.72), transparent);
     color: rgb(255 255 255 / 0.68);
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.72rem;
   }
   .photo-lightbox__close,
@@ -504,13 +487,13 @@ const copy =
     max-width: 40rem;
     margin: 0.2rem 0 0;
     color: rgb(255 255 255 / 0.58);
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     line-height: 1.45;
   }
   .photo-lightbox__meta {
     text-align: right;
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
   }
   .photo-empty {
     padding: 6rem 1.25rem;
@@ -519,7 +502,7 @@ const copy =
   }
   @media (max-width: 1100px) {
     .photo-grid {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   :global(html.photo-lightbox-open),
@@ -529,7 +512,7 @@ const copy =
   }
   @media (max-width: 720px) {
     .photo-page {
-      padding-inline: 3px;
+      padding-inline: 20px;
     }
     .photo-page__header {
       padding-inline: 1.25rem;
@@ -538,11 +521,11 @@ const copy =
       right: 1.25rem;
     }
     .photo-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 2px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
     }
     .photo-tile {
-      border-radius: 0.16rem;
+      border-radius: 0;
     }
     .photo-tile__shade {
       display: none;

@@ -10,7 +10,7 @@
   margin: 1rem 0;
 }
 .subscription-grid p {
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.9;
 }
 .subscription-steps {
@@ -34,11 +34,11 @@
   color: var(--accent);
 }
 .subscription-steps strong {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 550;
 }
 .subscription-steps p {
-  font-size: 0.85rem;
+  font-size: 1rem;
   margin: 0.65rem 0 1rem;
 }
 .feed-copy {
@@ -75,7 +75,9 @@
   color: var(--accent);
 }
 .rss-subscription {
-  border-left: 1px solid var(--line);
+  background: var(--surface-soft);
+  padding: 2rem;
+  border-left: 0;
   padding-left: 2.5rem;
 }
 .subscription-scope {
@@ -87,11 +89,11 @@
   font-size: 1rem;
 }
 .subscription-scope p {
-  font-size: 0.85rem;
+  font-size: 1rem;
   margin-top: 1rem;
 }
 .subscription-grid .subscription-provider {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   border-top: 1px solid var(--line);
   padding-top: 1.5rem;
   color: var(--faint);
@@ -106,6 +108,8 @@
     gap: 2.5rem;
   }
   .rss-subscription {
+    background: var(--surface-soft);
+    padding: 2rem;
     border-left: 0;
     padding-left: 0;
     border-top: 1px solid var(--line);

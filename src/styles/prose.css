@@ -190,3 +190,10 @@
   border-left: 3px solid var(--accent);
   background: rgb(var(--accent-rgb) / 0.15);
 }
+
+/* Astro's static Shiki tokens follow the site's existing theme toggle. */
+.dark .astro-code,
+.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}

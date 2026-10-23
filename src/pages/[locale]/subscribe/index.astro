@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "../../../components/ArrowIcon.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { locales, localizePath, type Locale } from "../../../i18n/utils";
 import "../../../styles/subscription.css";
@@ -17,7 +18,7 @@ const description = zh
 <BaseLayout title={title} description={description}>
   <div class="page-container archive-page subscription-page">
     <header class="page-intro">
-      <p class="eyebrow">LETTERS / {zh ? "保持联系" : "STAY IN TOUCH"}</p><h1>
+      <h1>
         {zh ? "下一篇，" : "The next idea,"}<br />{
           zh ? "在邮箱里见。" : "in your inbox."
         }
@@ -25,7 +26,7 @@ const description = zh
     </header>
     <div class="subscription-grid">
       <section class="email-subscription" aria-labelledby="email-heading">
-        <p class="eyebrow">01 / EMAIL</p><h2 id="email-heading">
+        <h2 id="email-heading">
           {zh ? "用邮件接收更新" : "Get new writing by email"}
         </h2><p>
           {
@@ -35,12 +36,22 @@ const description = zh
           }
         </p>
         <p>
-          <strong>{zh ? "当前订阅：中文文章" : "Selected feed: English articles"}</strong><br />
-          {zh
-            ? "中英文需要分别订阅；切换网页语言不会更改已有邮件订阅。两种语言都想接收，请分别添加两个地址。"
-            : "Chinese and English require separate subscriptions. Changing the website language does not change an existing email subscription. Subscribe to both feeds to receive both languages."}
-          <a class="text-link" href={localizePath("/subscribe", zh ? "en" : "zh-CN")}
-            >{zh ? "订阅英文文章 →" : "Subscribe to Chinese writing →"}</a>
+          <strong
+            >{
+              zh ? "当前订阅：中文文章" : "Selected feed: English articles"
+            }</strong
+          ><br />
+          {
+            zh
+              ? "中英文需要分别订阅；切换网页语言不会更改已有邮件订阅。两种语言都想接收，请分别添加两个地址。"
+              : "Chinese and English require separate subscriptions. Changing the website language does not change an existing email subscription. Subscribe to both feeds to receive both languages."
+          }
+          <a
+            class="text-link"
+            href={localizePath("/subscribe", zh ? "en" : "zh-CN")}
+            >{zh ? "订阅英文文章" : "Subscribe to Chinese writing"}
+            <ArrowIcon direction="right" /></a
+          >
         </p>
         <ol class="subscription-steps">
           <li>
@@ -53,7 +64,8 @@ const description = zh
                 data-copy-feed
                 data-feed={feed}
                 data-copied={zh ? "已复制" : "Copied"}
-                >{zh ? "复制地址" : "Copy address"}</button>
+                >{zh ? "复制地址" : "Copy address"}</button
+              >
             </div><p
               class="copy-status"
               role="status"
@@ -78,8 +90,9 @@ const description = zh
               target="_blank"
               rel="noopener noreferrer"
               >{zh ? "前往邮件订阅" : "Set up email updates"}<span
-                aria-hidden="true">↗</span
-              ></a>
+                aria-hidden="true"><ArrowIcon direction="up-right" /></span
+              ></a
+            >
           </li><li>
             <strong
               >{zh ? "按服务提示完成确认" : "Complete the confirmation"}</strong
@@ -102,11 +115,13 @@ const description = zh
             href="https://blogtrottr.com/legal"
             target="_blank"
             rel="noopener noreferrer"
-            >{zh ? "隐私与条款" : "Privacy & terms"} ↗</a>
+            >{zh ? "隐私与条款" : "Privacy & terms"}
+            <ArrowIcon direction="up-right" /></a
+          >
         </p>
       </section>
       <aside class="rss-subscription">
-        <p class="eyebrow">02 / RSS</p><h2>
+        <h2>
           {zh ? "习惯用阅读器？" : "Prefer a feed reader?"}
         </h2><p>
           {
@@ -116,7 +131,7 @@ const description = zh
           }
         </p><a class="text-link" href={feed}
           >{zh ? "查看 RSS 原始文件" : "View the raw RSS feed"}<span
-            aria-hidden="true">↗</span
+            aria-hidden="true"><ArrowIcon direction="up-right" /></span
           ></a
         ><div class="subscription-scope">
           <h3>{zh ? "只发送你选择的内容" : "Just the writing"}</h3><p>
@@ -141,12 +156,20 @@ const description = zh
         </div>
         <div class="subscription-scope">
           <h3>{zh ? "没有收到更新？" : "Missing an update?"}</h3>
-          <p>{zh
-            ? "在 Blogtrottr 中检查订阅地址、确认状态、接收频率和过滤条件。免费方案通常每小时检查一次；每日汇总要等到汇总时间。也请查看垃圾邮件。"
-            : "In Blogtrottr, check your feed URL, confirmation status, schedule and filters. The free plan normally checks hourly; daily digests wait until their scheduled time. Check your spam folder too."}</p>
-          <p>{zh
-            ? "订阅服务读取的是已上线内容；本地修改和翻译导出不会发送邮件。旧文章是否补发由服务决定。"
-            : "The service reads the live website. Local edits and translation exports do not send emails. Delivery of older articles depends on the provider."}</p>
+          <p>
+            {
+              zh
+                ? "在 Blogtrottr 中检查订阅地址、确认状态、接收频率和过滤条件。免费方案通常每小时检查一次；每日汇总要等到汇总时间。也请查看垃圾邮件。"
+                : "In Blogtrottr, check your feed URL, confirmation status, schedule and filters. The free plan normally checks hourly; daily digests wait until their scheduled time. Check your spam folder too."
+            }
+          </p>
+          <p>
+            {
+              zh
+                ? "订阅服务读取的是已上线内容；本地修改和翻译导出不会发送邮件。旧文章是否补发由服务决定。"
+                : "The service reads the live website. Local edits and translation exports do not send emails. Delivery of older articles depends on the provider."
+            }
+          </p>
         </div>
       </aside>
     </div>

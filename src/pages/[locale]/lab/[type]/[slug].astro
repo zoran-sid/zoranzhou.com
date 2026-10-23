@@ -1,10 +1,11 @@
 ---
+import { isPublicData } from "../../../../lib/content-policy";
 import { getCollection } from "astro:content";
 import LabEntryLayout from "@layouts/LabEntryLayout.astro";
 import { LAB_TYPE_SEGMENTS } from "@lib/lab";
 
 export async function getStaticPaths() {
-  const entries = await getCollection("lab", ({ data }) => !data.draft);
+  const entries = await getCollection("lab", ({ data }) => isPublicData(data));
 
   return entries.map((entry) => ({
     params: {

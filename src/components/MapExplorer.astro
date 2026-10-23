@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "./ArrowIcon.astro";
 interface MapPoint {
   lat: number;
   lng: number;
@@ -180,7 +181,7 @@ const initialItem =
           data-map-previous
           aria-label={locale === "zh-CN" ? "上一段足迹" : "Previous journey"}
         >
-          <span aria-hidden="true">←</span>
+          <span aria-hidden="true"><ArrowIcon direction="left" /></span>
         </button>
 
         <output class="journey-switcher__position" aria-live="polite">
@@ -195,7 +196,7 @@ const initialItem =
           data-map-next
           aria-label={locale === "zh-CN" ? "下一段足迹" : "Next journey"}
         >
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true"><ArrowIcon direction="right" /></span>
         </button>
       </div>
     </aside>
@@ -251,7 +252,7 @@ const initialItem =
         >
           {labels.details}
 
-          <span aria-hidden="true"> ↗ </span>
+          <span aria-hidden="true"> <ArrowIcon direction="up-right" /> </span>
         </a>
       </header>
 

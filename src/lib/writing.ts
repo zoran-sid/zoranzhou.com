@@ -53,8 +53,8 @@ export function displayDate(date: Date, locale: Locale): string {
 }
 // References only: titles, dates and summaries are read from the original entries.
 const selections = {
-  "zh-CN": ["agentshield-deep-analysis", "building-blog", "2025-12-31"],
-  en: ["agentshield-deep-analysis", "building-blog", "minecraft-local-project"],
+  "zh-CN": ["building-blog", "agentshield-deep-analysis", "2025-12-31"],
+  en: ["building-blog", "agentshield-deep-analysis", "minecraft-local-project"],
 } as const;
 export function selectWriting(
   entries: WritingEntry[],

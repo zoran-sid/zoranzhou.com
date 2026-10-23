@@ -6,3 +6,11 @@ dist/
 .local/translation/
 .DS_Store
 *.log
+
+.env.content
+.local/content/
+.local/review/
+
+.taste-skill/before/
+.taste-skill/round-*/
+.impeccable/review/

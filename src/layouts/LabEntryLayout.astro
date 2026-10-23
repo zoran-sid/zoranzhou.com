@@ -1,4 +1,6 @@
 ---
+import ArrowIcon from "../components/ArrowIcon.astro";
+import { isPublicData } from "../lib/content-policy";
 import { getCollection, type CollectionEntry } from "astro:content";
 import LabLayout from "./LabLayout.astro";
 import { getLabTranslations } from "../i18n/lab";
@@ -18,7 +20,7 @@ const { Content, headings } = await entry.render();
 const toc = headings.filter((heading) => heading.depth === 2);
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const copy = getLabTranslations(locale);
-const allEntries = await getCollection("lab", ({ data }) => !data.draft);
+const allEntries = await getCollection("lab", ({ data }) => isPublicData(data));
 const otherLocale: Locale = locale === "zh-CN" ? "en" : "zh-CN";
 const translation = findLabTranslation(allEntries, entry, otherLocale);
 const alternatePaths = {
@@ -78,18 +80,18 @@ const jsonld = {
   <article class="lab-entry lab-shell">
     <header class="lab-entry__header">
       <a class="lab-entry__back" href={getLabHomePath(locale)}>
-        <span aria-hidden="true">←</span>
+        <span aria-hidden="true"><ArrowIcon direction="left" /></span>
         {copy.detail.backToLab}
       </a>
 
-      <div class="lab-entry__eyebrow">
+      <h1>{entry.data.title}</h1>
+      {entry.data.description && <p>{entry.data.description}</p>}
+
+      <div class="lab-entry__context">
         <span>{typeLabel}</span>
         <i></i>
         <span>{trackLabel}</span>
       </div>
-
-      <h1>{entry.data.title}</h1>
-      {entry.data.description && <p>{entry.data.description}</p>}
 
       <div class="lab-entry__status">
         <span class:list={["lab-signal", `lab-signal--${entry.data.status}`]}
@@ -280,7 +282,10 @@ const jsonld = {
                 class="lab-entry__related"
                 href={getLabEntryPath(relatedProject)}
               >
-                {relatedProject.data.title} <span aria-hidden="true">↗</span>
+                {relatedProject.data.title}{" "}
+                <span aria-hidden="true">
+                  <ArrowIcon direction="up-right" />
+                </span>
               </a>
             </section>
           )

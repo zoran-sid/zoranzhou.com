@@ -1,0 +1,26 @@
+---
+import WritingArchive from "../../../../../components/WritingArchive.astro";
+import { getWriting } from "../../../../../lib/writing";
+import { writingFormat } from "../../../../../lib/content-policy";
+import { paginateEntries } from "../../../../../lib/pagination";
+import { locales } from "../../../../../i18n/utils";
+export async function getStaticPaths() {
+  const entries = await getWriting();
+  return locales.flatMap((locale) =>
+    ["note", "guide", "essay"].flatMap((format) =>
+      paginateEntries(
+        entries.filter(
+          (entry) =>
+            entry.data.lang === locale && writingFormat(entry) === format,
+        ),
+        `/blog/formats/${format}`,
+      ).map(({ param, ...props }) => ({
+        params: { locale, format, page: param },
+        props: { ...props, format },
+      })),
+    ),
+  );
+}
+---
+
+<WritingArchive {...Astro.props} />

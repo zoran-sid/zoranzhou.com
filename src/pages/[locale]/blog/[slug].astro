@@ -1,9 +1,10 @@
 ---
+import { isPublicData } from "../../../lib/content-policy";
 import BlogPostLayout from "../../../layouts/BlogPostLayout.astro";
 import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  const posts = await getCollection("blog", ({ data }) => isPublicData(data));
   return posts.map((post) => ({
     params: { locale: post.data.lang ?? "zh-CN", slug: post.slug },
     props: { entry: post },

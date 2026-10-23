@@ -130,3 +130,8 @@ npm run editor
 - [GitHub 个人主页 README](docs/github-profile-README.md)：独立交付文件，由作者手动同步到 `zoran-sid/zoran-sid`。
 - WEB3 LAB 图标以 `public/web3-lab-favicon.svg` 为唯一来源，修改后运行 `npm run icons:lab` 生成 64 px 与 180 px PNG，并更新 `src/lib/lab.ts` 中的 `LAB_ICON_REVISION`。页头与浏览器图标使用同一设计。
 - 长期内容与发布约定见 [Agent.md](Agent.md)。
+
+## Digital Garden：低摩擦记录
+
+日常流程与发布确认见 [从手机笔记到个人网站](docs/digital-garden.md)。支持仓库外的私人 Markdown Inbox，使用 `content:new`、`content:prepare`、`content:check`，审核后再运行 `content:approve --confirm`。工具不执行 Git 或生产部署。
+Writing 支持 Notes / Guides / Essays；原文章 URL 保留，成熟度可选。近期关注在 `src/data/now.ts` 维护。

@@ -6,6 +6,8 @@ export interface ContentRecord {
   data: {
     lang?: string;
     draft?: boolean;
+    publication?: string;
+    format?: "note" | "guide" | "essay";
     published?: boolean;
     translationKey?: string;
     routeId?: string;
@@ -13,8 +15,15 @@ export interface ContentRecord {
     status?: string;
   };
 }
+export function isPublicData(data: ContentRecord["data"]): boolean {
+  return (
+    !data.draft &&
+    (data.publication === "approved" || (!data.publication && !data.format)) &&
+    data.published !== false
+  );
+}
 export function isPublished(entry: ContentRecord): boolean {
-  return !entry.data.draft && entry.data.published !== false;
+  return isPublicData(entry.data);
 }
 export function hasReadableBody(entry: ContentRecord): boolean {
   return Boolean(entry.body?.replace(/<!--[\s\S]*?-->/g, "").trim());
@@ -48,4 +57,25 @@ export function writingCategory(entry: ContentRecord): WritingCategory {
   )
     return "life";
   return "technology";
+}
+
+export function writingFormat(
+  entry: ContentRecord,
+): "note" | "guide" | "essay" {
+  return (
+    entry.data.format ??
+    (entry.collection === "blog" &&
+    writingCategory(entry) === "technology" &&
+    entry.data.translationKey !== "agentshield-deep-analysis"
+      ? "guide"
+      : "essay")
+  );
+}
+export function formatLabel(entry: ContentRecord, locale: string): string {
+  const format = writingFormat(entry);
+  return (
+    locale === "zh-CN"
+      ? { note: "短笔记", guide: "指南", essay: "文章与随笔" }
+      : { note: "Notes", guide: "Guides", essay: "Essays" }
+  )[format];
 }
