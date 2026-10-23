@@ -44,6 +44,8 @@
   text-underline-offset: 0.3em;
 }
 .about-portrait {
+  padding: 1.25rem;
+  background: var(--cover);
   width: min(100%, 20rem);
   justify-self: end;
 }
@@ -166,7 +168,11 @@
 }
 .builds-feature {
   padding: 2.5rem;
-  background: var(--surface-soft);
+  background: var(--field);
+  --ink: var(--field-ink);
+  --muted: var(--field-muted);
+  --accent: var(--field-ink);
+  color: var(--field-ink);
 }
 .builds-feature h2 {
   font-family: var(--font-display);
@@ -212,7 +218,7 @@
   display: none;
 }
 .life-directory {
-  background: var(--surface-soft);
+  background: transparent;
   padding-block: 2rem;
 }
 @media (max-width: 900px) {
@@ -241,6 +247,8 @@
     padding-top: 2rem;
   }
   .about-portrait {
+    padding: 1.25rem;
+    background: var(--cover);
     width: 8rem;
     justify-self: start;
     grid-row: 1;

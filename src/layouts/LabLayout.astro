@@ -1,4 +1,5 @@
 ---
+import ScrollAtmosphere from "../components/ScrollAtmosphere.astro";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "../styles/lab.css";
@@ -41,7 +42,7 @@ const safeAlternatePaths = alternatePaths ?? {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#15221e" />
+    <meta name="theme-color" content="#111c32" />
 
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
@@ -108,6 +109,7 @@ const safeAlternatePaths = alternatePaths ?? {
     }
   </head>
   <body class="lab-body">
+    <ScrollAtmosphere dark />
     <div class="lab-backdrop" aria-hidden="true">
       <span class="lab-backdrop__grid"></span>
     </div>

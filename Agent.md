@@ -278,30 +278,17 @@ Navigation uses a deliberate translation policy:
 Do not create a target-locale URL by blindly reusing an ordinary source slug. That can
 produce a statically nonexistent page.
 
-### Main-site editorial structure (2026-09)
+### Main-site editorial structure (2026-10)
 
-The primary navigation is Writing (`/blog`), Practice (`/projects`), Life (`/life`),
-About (`/about`), plus the independent WEB3 LAB. Existing collection detail URLs remain.
-The homepage follows identity -> selected writing -> latest notes -> current work ->
-life photograph -> footer contact. `ExplorationMap.astro` replaces the former radar with
-three real content links; do not add simulated metrics or perpetual scan animation.
+Navigation is Writing (/blog), Projects (/projects), Life (/life), About (/about),
+and the independent Web3 Lab. Home is identity + Now -> real Notes when published ->
+selected writing led by blog construction -> published projects when present -> Life
+photography -> contact. HeroSection owns the identity and actual TypeScript-learning
+entry. The former radar / ExplorationMap is not the homepage composition.
 
-The map uses personal, everyday labels rather than technical job categories:
-
-| Node | Chinese                       | English                                   | Target                                                  |
-| ---- | ----------------------------- | ----------------------------------------- | ------------------------------------------------------- |
-| 01   | 学习与思考 / 把好奇写成笔记   | Learning & ideas / Notes from curiosity   | First selected article (currently AgentShield analysis) |
-| 02   | 尝试与创造 / 让想法慢慢成形   | Making & trying / Ideas taking shape      | Blog construction article                               |
-| 03   | 生活记录 / 阅读 · 摄影 · 行走 | Everyday life / Books · photos · journeys | Localized Life index                                    |
-
-Labels live in `src/i18n/editorial.ts`; node subtitles and destinations live in
-`ExplorationMap.astro`. A label describes the reader's entry point, not a skill score.
-Keep both languages and their targets aligned when editing them. On narrow screens,
-show the three labels as compact links, allow English labels to wrap, and hide the
-subtitles; keep each arrow inside its card. The homepage selections
-currently include AgentShield and blog construction in both locales, plus the year-end
-review in Chinese and Minecraft deployment in English. Do not substitute OpenWrt into
-that blog-construction position without the author's request.
+Keep original article titles and both locales. Blog construction is the lead selection,
+followed by AgentShield and an existing personal/practice article. Empty Notes/Projects
+sections stay hidden; do not invent projects or metrics to fill a layout.
 
 `src/lib/writing.ts` aggregates Blog, Essays and Research; it preserves source collection
 URLs. `content-policy.ts` owns publication, readable-body, category and translation rules.
@@ -467,12 +454,13 @@ entries remain part of the shared search index and sitemap, but are excluded fro
 notifications. The main navigation, Practice page and current-learning card provide
 localized Lab entry points on desktop and mobile.
 
-The Lab uses a fixed dark study surface in the same evergreen family as the main site:
-`#15221e` background, `#1d3028` panels, `#edf3ed` text and `#a8d4bd` actions.
-It shares the self-hosted Newsreader / Inter Variable / JetBrains Mono Variable font
-contracts with explicit CJK fallbacks. Preserve the `lab-*` namespace, its sticky header
-and isolated focus/selection treatments. The decorative grid and glow are removed.
-Do not import main-site layout CSS into Lab; synchronize semantic token values deliberately.
+The Lab uses a dark blue-grey study surface: #111c32 base, #1d2940 panels,
+#eff2ff text and #becdff actions. ScrollAtmosphere supplies a muted blue/purple-grey
+scroll gradient and viewport-wide ambient light points; the homepage adds slow orbit
+geometry. It shares Newsreader / Inter Variable / JetBrains Mono Variable with CJK
+fallbacks. Preserve the lab-* namespace and isolated focus/selection treatments.
+Do not import main-site layout CSS into Lab; share only the atmosphere components and
+synchronize semantic token values deliberately.
 
 Following the author's September 2026 redesign request, the home sequence is current
 TypeScript focus -> five-stage learning route -> project plans -> security notes ->
@@ -508,8 +496,8 @@ Lab routes use only these Lab-specific icon assets:
 ```
 
 The main site continues to use `/favicon.png` and `/apple-touch-icon.png`. The Lab uses
-its own connected-W mark: a continuous cyan-to-blue W, an isolated cyan dot above it,
-and a dark rounded tile. This replaces the former multicolored diamond mark. The SVG
+its own connected-W mark: a continuous pale-blue W, an isolated pale-cyan dot above it,
+and a dark blue rounded tile. This replaces the former multicolored diamond mark. The SVG
 is the authoritative source; the header renders that same SVG rather than recreating it
 with CSS or copying the path into another component.
 
@@ -1512,7 +1500,8 @@ This section supersedes the old homepage order and adds publication rules. Read
 - Treat `DESIGN.md` as the human-readable visual authority, `.impeccable/design.json` as
   its machine-readable counterpart, and `src/styles/global.css` / `lab.css` as the runtime
   tokens. `design-system/zoran-journal/MASTER.md` records the reconciled UI UX Pro Max
-  research. Do not restore the research tool's rejected brutalist/blue recommendation.
+  research. Keep the final low-saturation scroll palette; do not restore earlier fixed green
+  or burgundy palettes or the research tool's unrelated Brutalism layout.
 - Home is an author index with a full-width name; Writing is a browsable reference list;
   Life is led by a real photograph; About pairs a portrait with open text; Projects links
   actual practice; Lab is an explicitly staged learning space. Share type, colour, spacing
@@ -1547,3 +1536,29 @@ This section supersedes the old homepage order and adds publication rules. Read
   when they were intentionally waived for this reading site.
 - Preserve unrelated user edits. At the beginning of this redesign, `src/content/media.md`
   already contained two new movie rows; the redesign preserves those changes.
+
+### Scroll atmosphere and section motion (current design)
+
+- User direction: viewport-wide moving light points, very pale scroll-driven gradients,
+  and different section effects, especially on the homepage. No burgundy. Main gradient:
+  #eef4fa -> #f3f0f8 -> #faf1ed -> #f9f6ed. Stable reading/control colours live in global.css.
+- ScrollAtmosphere.astro is mounted once by each document layout. AmbientLights.astro
+  generates 108 deterministic SVG points in 9 groups across the fixed viewport, not a
+  hero-only ornament. No React/Canvas/WebGL or new animation dependency is required.
+- src/lib/scroll-atmosphere.ts owns pure interpolation and page/section progress. The
+  shared controller batches geometry reads, smooths with a 140ms time constant and
+  schedules frames only while scroll state needs updating. Native CSS animates light
+  groups; do not add a perpetual JavaScript render loop.
+- SectionAtmosphere has lines, light and orbit variants. Add scene-section to its parent
+  to isolate the negative decorative layer. Selected writing uses lines; LifeFeature uses
+  light; actual project sections and Lab home use orbit. Read-mode paragraphs stay static.
+- System reduced motion is respected. Decoration is aria-hidden, pointer-events:none,
+  outside normal layout.
+  Without JavaScript it stays static and content remains visible. Print hides all effects.
+- Pause section loops offscreen, all loops on hidden tabs, and resume correctly after
+  back/forward cache restoration. Releasing the page disconnects observers/listeners.
+  Phone layouts reduce point density and movement, and keep all content actionable.
+- Checks: npm run test:atmosphere (bounds, continuous colour, text contrast with light-point
+  overlay), npm run lint, npm run build, npm run test:site-build, git diff --check.
+  Current user requested code/build checks only and will inspect locally; no final browser
+  or performance pass is implied by these tests. Do not deploy or push without authorization.

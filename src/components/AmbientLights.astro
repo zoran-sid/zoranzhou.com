@@ -1,0 +1,40 @@
+---
+// Deterministic positions keep the light field identical before and after hydration.
+const groups = Array.from({ length: 9 }, (_, group) =>
+  Array.from({ length: 108 }, (_, index) => index)
+    .filter((index) => index % 9 === group)
+    .map((index) => ({
+      x: 50 + (index % 12) * 100 + ((index * 37) % 47) - 23,
+      y: 45 + Math.floor(index / 12) * 100 + ((index * 53) % 43) - 21,
+      radius: 3 + (index % 5) * 0.65,
+    })),
+);
+---
+
+<svg
+  class="atmosphere-lights"
+  viewBox="0 0 1200 900"
+  preserveAspectRatio="xMidYMid slice"
+  focusable="false"
+  aria-hidden="true"
+>
+  <defs>
+    <radialGradient id="ambient-light-glow">
+      <stop offset="0" stop-color="currentColor" stop-opacity="0.7"></stop>
+      <stop offset="0.35" stop-color="currentColor" stop-opacity="0.25"></stop>
+      <stop offset="1" stop-color="currentColor" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  {
+    groups.map((lights, group) => (
+      <g class="ambient-light-group" style={`--light-group: ${group}`}>
+        {lights.map(({ x, y, radius }) => (
+          <g>
+            <circle cx={x} cy={y} r={radius} fill="url(#ambient-light-glow)" />
+            <circle cx={x} cy={y} r="0.85" fill="currentColor" opacity="0.5" />
+          </g>
+        ))}
+      </g>
+    ))
+  }
+</svg>

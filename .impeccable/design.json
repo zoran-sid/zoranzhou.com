@@ -1,0 +1,552 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-23T06:32:19.445Z",
+  "title": "Design System: Zoran’s Personal Journal",
+  "extensions": {
+    "colorMeta": {
+      "page": {
+        "role": "neutral",
+        "displayName": "page",
+        "tonalRamp": [
+          "oklch(15.0% 0.0057 264.5)",
+          "oklch(26.4% 0.0057 264.5)",
+          "oklch(37.9% 0.0057 264.5)",
+          "oklch(49.3% 0.0057 264.5)",
+          "oklch(60.7% 0.0057 264.5)",
+          "oklch(72.1% 0.0057 264.5)",
+          "oklch(83.6% 0.0057 264.5)",
+          "oklch(95.0% 0.0057 264.5)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "surface",
+        "tonalRamp": [
+          "oklch(15.0% 0.0000 89.9)",
+          "oklch(26.4% 0.0000 89.9)",
+          "oklch(37.9% 0.0000 89.9)",
+          "oklch(49.3% 0.0000 89.9)",
+          "oklch(60.7% 0.0000 89.9)",
+          "oklch(72.1% 0.0000 89.9)",
+          "oklch(83.6% 0.0000 89.9)",
+          "oklch(95.0% 0.0000 89.9)"
+        ]
+      },
+      "surface-soft": {
+        "role": "neutral",
+        "displayName": "surface-soft",
+        "tonalRamp": [
+          "oklch(15.0% 0.0000 89.9)",
+          "oklch(26.4% 0.0000 89.9)",
+          "oklch(37.9% 0.0000 89.9)",
+          "oklch(49.3% 0.0000 89.9)",
+          "oklch(60.7% 0.0000 89.9)",
+          "oklch(72.1% 0.0000 89.9)",
+          "oklch(83.6% 0.0000 89.9)",
+          "oklch(95.0% 0.0000 89.9)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0480 264.2)",
+          "oklch(26.4% 0.0480 264.2)",
+          "oklch(37.9% 0.0480 264.2)",
+          "oklch(49.3% 0.0480 264.2)",
+          "oklch(60.7% 0.0480 264.2)",
+          "oklch(72.1% 0.0480 264.2)",
+          "oklch(83.6% 0.0480 264.2)",
+          "oklch(95.0% 0.0480 264.2)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "muted",
+        "tonalRamp": [
+          "oklch(15.0% 0.0421 267.8)",
+          "oklch(26.4% 0.0421 267.8)",
+          "oklch(37.9% 0.0421 267.8)",
+          "oklch(49.3% 0.0421 267.8)",
+          "oklch(60.7% 0.0421 267.8)",
+          "oklch(72.1% 0.0421 267.8)",
+          "oklch(83.6% 0.0421 267.8)",
+          "oklch(95.0% 0.0421 267.8)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "accent",
+        "tonalRamp": [
+          "oklch(15.0% 0.1307 270.9)",
+          "oklch(26.4% 0.1307 270.9)",
+          "oklch(37.9% 0.1307 270.9)",
+          "oklch(49.3% 0.1307 270.9)",
+          "oklch(60.7% 0.1307 270.9)",
+          "oklch(72.1% 0.1307 270.9)",
+          "oklch(83.6% 0.1307 270.9)",
+          "oklch(95.0% 0.1307 270.9)"
+        ]
+      },
+      "accent-ink": {
+        "role": "primary",
+        "displayName": "accent-ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0000 89.9)",
+          "oklch(26.4% 0.0000 89.9)",
+          "oklch(37.9% 0.0000 89.9)",
+          "oklch(49.3% 0.0000 89.9)",
+          "oklch(60.7% 0.0000 89.9)",
+          "oklch(72.1% 0.0000 89.9)",
+          "oklch(83.6% 0.0000 89.9)",
+          "oklch(95.0% 0.0000 89.9)"
+        ]
+      },
+      "cover": {
+        "role": "neutral",
+        "displayName": "cover",
+        "tonalRamp": [
+          "oklch(15.0% 0.0000 89.9)",
+          "oklch(26.4% 0.0000 89.9)",
+          "oklch(37.9% 0.0000 89.9)",
+          "oklch(49.3% 0.0000 89.9)",
+          "oklch(60.7% 0.0000 89.9)",
+          "oklch(72.1% 0.0000 89.9)",
+          "oklch(83.6% 0.0000 89.9)",
+          "oklch(95.0% 0.0000 89.9)"
+        ]
+      },
+      "cover-ink": {
+        "role": "neutral",
+        "displayName": "cover-ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0480 264.2)",
+          "oklch(26.4% 0.0480 264.2)",
+          "oklch(37.9% 0.0480 264.2)",
+          "oklch(49.3% 0.0480 264.2)",
+          "oklch(60.7% 0.0480 264.2)",
+          "oklch(72.1% 0.0480 264.2)",
+          "oklch(83.6% 0.0480 264.2)",
+          "oklch(95.0% 0.0480 264.2)"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "field",
+        "tonalRamp": [
+          "oklch(15.0% 0.0000 89.9)",
+          "oklch(26.4% 0.0000 89.9)",
+          "oklch(37.9% 0.0000 89.9)",
+          "oklch(49.3% 0.0000 89.9)",
+          "oklch(60.7% 0.0000 89.9)",
+          "oklch(72.1% 0.0000 89.9)",
+          "oklch(83.6% 0.0000 89.9)",
+          "oklch(95.0% 0.0000 89.9)"
+        ]
+      },
+      "field-ink": {
+        "role": "neutral",
+        "displayName": "field-ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0480 264.2)",
+          "oklch(26.4% 0.0480 264.2)",
+          "oklch(37.9% 0.0480 264.2)",
+          "oklch(49.3% 0.0480 264.2)",
+          "oklch(60.7% 0.0480 264.2)",
+          "oklch(72.1% 0.0480 264.2)",
+          "oklch(83.6% 0.0480 264.2)",
+          "oklch(95.0% 0.0480 264.2)"
+        ]
+      },
+      "field-muted": {
+        "role": "neutral",
+        "displayName": "field-muted",
+        "tonalRamp": [
+          "oklch(15.0% 0.0421 267.8)",
+          "oklch(26.4% 0.0421 267.8)",
+          "oklch(37.9% 0.0421 267.8)",
+          "oklch(49.3% 0.0421 267.8)",
+          "oklch(60.7% 0.0421 267.8)",
+          "oklch(72.1% 0.0421 267.8)",
+          "oklch(83.6% 0.0421 267.8)",
+          "oklch(95.0% 0.0421 267.8)"
+        ]
+      },
+      "dark-page": {
+        "role": "neutral",
+        "displayName": "dark-page",
+        "tonalRamp": [
+          "oklch(15.0% 0.0458 263.1)",
+          "oklch(26.4% 0.0458 263.1)",
+          "oklch(37.9% 0.0458 263.1)",
+          "oklch(49.3% 0.0458 263.1)",
+          "oklch(60.7% 0.0458 263.1)",
+          "oklch(72.1% 0.0458 263.1)",
+          "oklch(83.6% 0.0458 263.1)",
+          "oklch(95.0% 0.0458 263.1)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "dark-surface",
+        "tonalRamp": [
+          "oklch(15.0% 0.0458 262.7)",
+          "oklch(26.4% 0.0458 262.7)",
+          "oklch(37.9% 0.0458 262.7)",
+          "oklch(49.3% 0.0458 262.7)",
+          "oklch(60.7% 0.0458 262.7)",
+          "oklch(72.1% 0.0458 262.7)",
+          "oklch(83.6% 0.0458 262.7)",
+          "oklch(95.0% 0.0458 262.7)"
+        ]
+      },
+      "dark-surface-soft": {
+        "role": "neutral",
+        "displayName": "dark-surface-soft",
+        "tonalRamp": [
+          "oklch(15.0% 0.0000 89.9)",
+          "oklch(26.4% 0.0000 89.9)",
+          "oklch(37.9% 0.0000 89.9)",
+          "oklch(49.3% 0.0000 89.9)",
+          "oklch(60.7% 0.0000 89.9)",
+          "oklch(72.1% 0.0000 89.9)",
+          "oklch(83.6% 0.0000 89.9)",
+          "oklch(95.0% 0.0000 89.9)"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "dark-ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0177 275.6)",
+          "oklch(26.4% 0.0177 275.6)",
+          "oklch(37.9% 0.0177 275.6)",
+          "oklch(49.3% 0.0177 275.6)",
+          "oklch(60.7% 0.0177 275.6)",
+          "oklch(72.1% 0.0177 275.6)",
+          "oklch(83.6% 0.0177 275.6)",
+          "oklch(95.0% 0.0177 275.6)"
+        ]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "dark-muted",
+        "tonalRamp": [
+          "oklch(15.0% 0.0362 264.4)",
+          "oklch(26.4% 0.0362 264.4)",
+          "oklch(37.9% 0.0362 264.4)",
+          "oklch(49.3% 0.0362 264.4)",
+          "oklch(60.7% 0.0362 264.4)",
+          "oklch(72.1% 0.0362 264.4)",
+          "oklch(83.6% 0.0362 264.4)",
+          "oklch(95.0% 0.0362 264.4)"
+        ]
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "dark-accent",
+        "tonalRamp": [
+          "oklch(15.0% 0.0718 271.8)",
+          "oklch(26.4% 0.0718 271.8)",
+          "oklch(37.9% 0.0718 271.8)",
+          "oklch(49.3% 0.0718 271.8)",
+          "oklch(60.7% 0.0718 271.8)",
+          "oklch(72.1% 0.0718 271.8)",
+          "oklch(83.6% 0.0718 271.8)",
+          "oklch(95.0% 0.0718 271.8)"
+        ]
+      },
+      "dark-accent-ink": {
+        "role": "primary",
+        "displayName": "dark-accent-ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0458 263.1)",
+          "oklch(26.4% 0.0458 263.1)",
+          "oklch(37.9% 0.0458 263.1)",
+          "oklch(49.3% 0.0458 263.1)",
+          "oklch(60.7% 0.0458 263.1)",
+          "oklch(72.1% 0.0458 263.1)",
+          "oklch(83.6% 0.0458 263.1)",
+          "oklch(95.0% 0.0458 263.1)"
+        ]
+      },
+      "dark-cover": {
+        "role": "neutral",
+        "displayName": "dark-cover",
+        "tonalRamp": [
+          "oklch(15.0% 0.0000 89.9)",
+          "oklch(26.4% 0.0000 89.9)",
+          "oklch(37.9% 0.0000 89.9)",
+          "oklch(49.3% 0.0000 89.9)",
+          "oklch(60.7% 0.0000 89.9)",
+          "oklch(72.1% 0.0000 89.9)",
+          "oklch(83.6% 0.0000 89.9)",
+          "oklch(95.0% 0.0000 89.9)"
+        ]
+      },
+      "dark-cover-ink": {
+        "role": "neutral",
+        "displayName": "dark-cover-ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0177 275.6)",
+          "oklch(26.4% 0.0177 275.6)",
+          "oklch(37.9% 0.0177 275.6)",
+          "oklch(49.3% 0.0177 275.6)",
+          "oklch(60.7% 0.0177 275.6)",
+          "oklch(72.1% 0.0177 275.6)",
+          "oklch(83.6% 0.0177 275.6)",
+          "oklch(95.0% 0.0177 275.6)"
+        ]
+      },
+      "atmosphere-0": {
+        "role": "secondary",
+        "displayName": "atmosphere-0",
+        "tonalRamp": [
+          "oklch(15.0% 0.0103 247.9)",
+          "oklch(26.4% 0.0103 247.9)",
+          "oklch(37.9% 0.0103 247.9)",
+          "oklch(49.3% 0.0103 247.9)",
+          "oklch(60.7% 0.0103 247.9)",
+          "oklch(72.1% 0.0103 247.9)",
+          "oklch(83.6% 0.0103 247.9)",
+          "oklch(95.0% 0.0103 247.9)"
+        ]
+      },
+      "atmosphere-1": {
+        "role": "secondary",
+        "displayName": "atmosphere-1",
+        "tonalRamp": [
+          "oklch(15.0% 0.0111 303.1)",
+          "oklch(26.4% 0.0111 303.1)",
+          "oklch(37.9% 0.0111 303.1)",
+          "oklch(49.3% 0.0111 303.1)",
+          "oklch(60.7% 0.0111 303.1)",
+          "oklch(72.1% 0.0111 303.1)",
+          "oklch(83.6% 0.0111 303.1)",
+          "oklch(95.0% 0.0111 303.1)"
+        ]
+      },
+      "atmosphere-2": {
+        "role": "secondary",
+        "displayName": "atmosphere-2",
+        "tonalRamp": [
+          "oklch(15.0% 0.0111 45.7)",
+          "oklch(26.4% 0.0111 45.7)",
+          "oklch(37.9% 0.0111 45.7)",
+          "oklch(49.3% 0.0111 45.7)",
+          "oklch(60.7% 0.0111 45.7)",
+          "oklch(72.1% 0.0111 45.7)",
+          "oklch(83.6% 0.0111 45.7)",
+          "oklch(95.0% 0.0111 45.7)"
+        ]
+      },
+      "atmosphere-3": {
+        "role": "secondary",
+        "displayName": "atmosphere-3",
+        "tonalRamp": [
+          "oklch(15.0% 0.0123 91.5)",
+          "oklch(26.4% 0.0123 91.5)",
+          "oklch(37.9% 0.0123 91.5)",
+          "oklch(49.3% 0.0123 91.5)",
+          "oklch(60.7% 0.0123 91.5)",
+          "oklch(72.1% 0.0123 91.5)",
+          "oklch(83.6% 0.0123 91.5)",
+          "oklch(95.0% 0.0123 91.5)"
+        ]
+      },
+      "dark-atmosphere-0": {
+        "role": "secondary",
+        "displayName": "dark-atmosphere-0",
+        "tonalRamp": [
+          "oklch(15.0% 0.0458 263.1)",
+          "oklch(26.4% 0.0458 263.1)",
+          "oklch(37.9% 0.0458 263.1)",
+          "oklch(49.3% 0.0458 263.1)",
+          "oklch(60.7% 0.0458 263.1)",
+          "oklch(72.1% 0.0458 263.1)",
+          "oklch(83.6% 0.0458 263.1)",
+          "oklch(95.0% 0.0458 263.1)"
+        ]
+      },
+      "dark-atmosphere-1": {
+        "role": "secondary",
+        "displayName": "dark-atmosphere-1",
+        "tonalRamp": [
+          "oklch(15.0% 0.0520 282.2)",
+          "oklch(26.4% 0.0520 282.2)",
+          "oklch(37.9% 0.0520 282.2)",
+          "oklch(49.3% 0.0520 282.2)",
+          "oklch(60.7% 0.0520 282.2)",
+          "oklch(72.1% 0.0520 282.2)",
+          "oklch(83.6% 0.0520 282.2)",
+          "oklch(95.0% 0.0520 282.2)"
+        ]
+      },
+      "dark-atmosphere-2": {
+        "role": "secondary",
+        "displayName": "dark-atmosphere-2",
+        "tonalRamp": [
+          "oklch(15.0% 0.0381 285.9)",
+          "oklch(26.4% 0.0381 285.9)",
+          "oklch(37.9% 0.0381 285.9)",
+          "oklch(49.3% 0.0381 285.9)",
+          "oklch(60.7% 0.0381 285.9)",
+          "oklch(72.1% 0.0381 285.9)",
+          "oklch(83.6% 0.0381 285.9)",
+          "oklch(95.0% 0.0381 285.9)"
+        ]
+      },
+      "dark-atmosphere-3": {
+        "role": "secondary",
+        "displayName": "dark-atmosphere-3",
+        "tonalRamp": [
+          "oklch(15.0% 0.0318 243.6)",
+          "oklch(26.4% 0.0318 243.6)",
+          "oklch(37.9% 0.0318 243.6)",
+          "oklch(49.3% 0.0318 243.6)",
+          "oklch(60.7% 0.0318 243.6)",
+          "oklch(72.1% 0.0318 243.6)",
+          "oklch(83.6% 0.0318 243.6)",
+          "oklch(95.0% 0.0318 243.6)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "作者署名",
+        "purpose": "首页封面；其他页不复用该尺度。"
+      },
+      "body": {
+        "displayName": "正文",
+        "purpose": "技术与生活内容。"
+      }
+    },
+    "shadows": [
+      {
+        "name": "mobile-menu",
+        "value": "0 20px 40px #0000000c",
+        "purpose": "导航菜单浮层。"
+      }
+    ],
+    "motion": [
+      {
+        "name": "scroll-follow",
+        "value": "140ms time constant",
+        "purpose": "渐变和章节位置平滑跟随滚动，停止后不再申请帧。"
+      },
+      {
+        "name": "ambient-lights",
+        "value": "18–28.4s",
+        "purpose": "全屏微光点分九组缓慢漂移；手机减量，后台与用户暂停时停止。"
+      },
+      {
+        "name": "section-scenes",
+        "value": "11s / 16s / 28s / 36s",
+        "purpose": "精选流线、生活日光、Lab 轨道各自成段。"
+      },
+      {
+        "name": "entrance",
+        "value": "650ms / 850ms",
+        "purpose": "署名与文章整体入场，摄影裁切展开；正文默认可见。"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "640px"
+      },
+      {
+        "name": "tablet",
+        "value": "768px"
+      },
+      {
+        "name": "wide",
+        "value": "1024px"
+      },
+      {
+        "name": "reading-toc",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "阅读和主行动入口。",
+      "html": "<button class=\"ds-button\">阅读文章</button>",
+      "css": ".ds-button{background:var(--accent,#3e50a0);color:var(--accent-ink,#fff);border:1px solid var(--accent,#3e50a0);border-radius:4px;min-height:3.1rem;padding:.8rem 1.3rem;font:500 .875rem sans-serif}.ds-button:hover{background:var(--ink,#25314a);border-color:var(--ink,#25314a)}.ds-button:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:5px}"
+    },
+    {
+      "name": "Text link",
+      "kind": "button",
+      "description": "内容之间的轻量入口。",
+      "html": "<a class=\"ds-link\" href=\"#\">全部文章 <svg width=\"16\" height=\"16\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"M5 15 15 5M5 5h10v10\"/></svg></a>",
+      "css": ".ds-link{display:inline-flex;gap:1rem;align-items:center;min-height:44px;color:var(--ink,#25314a);font:500 .875rem sans-serif;text-decoration:none}.ds-link:hover{color:var(--accent,#3e50a0)}.ds-link:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:5px}"
+    },
+    {
+      "name": "Search field",
+      "kind": "input",
+      "description": "全站文章搜索输入。",
+      "html": "<label class=\"ds-label\">搜索文章<input class=\"ds-input\" type=\"search\" placeholder=\"标题、描述或标签\"></label>",
+      "css": ".ds-label{display:grid;gap:8px;color:var(--ink,#25314a);font:14px sans-serif}.ds-input{color:var(--ink,#25314a);background:var(--surface,#fff);border:1px solid var(--line-strong,#25314a38);border-radius:4px;padding:12px;font:16px sans-serif;min-height:44px}.ds-input:hover{border-color:var(--accent,#3e50a0)}.ds-input:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:3px}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "description": "常规导航保持轻量，当前栏目可识别。",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">文章</a><a href=\"#\">项目</a><a href=\"#\">生活</a></nav>",
+      "css": ".ds-nav{display:flex;gap:1.7rem;font:14px sans-serif}.ds-nav a{padding:.8rem 0;color:var(--muted,#566079);text-decoration:none}.ds-nav a[aria-current]{border-bottom:2px solid var(--accent,#3e50a0);color:var(--ink,#25314a)}.ds-nav a:hover{color:var(--ink,#25314a)}.ds-nav a:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:5px}"
+    },
+    {
+      "name": "Article tag",
+      "kind": "chip",
+      "refersTo": "article-tag",
+      "description": "文章主题链接，点击区域至少44px。",
+      "html": "<a class=\"ds-tag\" href=\"#\">Technology</a>",
+      "css": ".ds-tag{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:.25rem .65rem;font:13px sans-serif;color:var(--ink,#25314a);background:var(--surface-soft,#ffffff59);text-decoration:none}.ds-tag:hover{color:var(--accent,#3e50a0)}.ds-tag:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:5px}"
+    },
+    {
+      "name": "Selected writing",
+      "kind": "card",
+      "refersTo": "feature-story",
+      "description": "只用于重点文章，形成阅读层级。",
+      "html": "<article class=\"ds-story\"><h3><a href=\"#\">从零开始搭建博客</a></h3><p>一份可以回看的实践记录。</p></article>",
+      "css": ".ds-story{background:var(--field,#ffffff80);padding:2.5rem;color:var(--field-ink,#25314a)}.ds-story h3{font:400 2rem/1.55 Newsreader,Georgia,serif;margin:0 0 1rem}.ds-story a{color:inherit;text-decoration:none}.ds-story p{font:16px/1.85 sans-serif;color:var(--field-muted,#566079)}.ds-story a:hover{text-decoration:underline}.ds-story a:focus-visible{outline:2px solid currentColor;outline-offset:5px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "随阅读展开的个人刊物",
+    "overview": "用接近白色的浅蓝、浅紫、暖白渐变连接全站，微光点覆盖整个视口并缓慢漂移。首页的精选文章、生活与学习区域各有细线、日光和轨道的变化。字体、真实照片与文章结构保持清晰；技术正文沿用稳定的阅读排版。",
+    "keyCharacteristics": [
+      "全屏浅色渐变随阅读位置变化，微光点持续缓慢移动",
+      "板块各自表达内容，整体共享字体、颜色与动态节奏",
+      "真实文章、头像与摄影主导页面，原始摄影保持原色"
+    ],
+    "rules": [
+      {
+        "name": "The Reading Rule",
+        "body": "颜色可随位置变化，阅读对比度保持稳定。test:atmosphere 在每个主题 301 个进度点检查正文、次要文字和链接，并计算光点最强叠加处的对比度。此计算覆盖指定颜色模型，实际合成效果由本地浏览器检查。",
+        "section": "colors"
+      },
+      {
+        "name": "The Motion Rule",
+        "body": "动态服务章节节奏。全屏光点串联阅读；精选文章使用细线随滚动延展，生活部分使用柔和日光漂移，项目与 Lab 使用慢速轨道。正文段落不逐段动画。内容默认可见，JavaScript 失败时仍可阅读。",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do 保留文章标题、照片原色和真实学习状态。",
+      "Do 使用语义颜色变量，检查整个渐变区间的文字对比度。",
+      "Do 保留减少动态效果支持和后台暂停。",
+      "Do 为主要按钮和文章标签保留至少 44px 点击高度。"
+    ],
+    "donts": [
+      "Don’t 用空卡片或虚构项目填满首页。",
+      "Don’t 把微动画复制到每个正文段落或制造逐段阅读等待。",
+      "Don’t 用光点承载信息，或让装饰层接收点击、影响布局。",
+      "Don’t 为这些动效引入 React、WebGL 或新的动画运行时。"
+    ]
+  }
+}

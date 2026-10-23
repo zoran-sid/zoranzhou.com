@@ -1,5 +1,6 @@
 ---
 import ArrowIcon from "./ArrowIcon.astro";
+import SectionAtmosphere from "./SectionAtmosphere.astro";
 import { Image } from "astro:assets";
 import mountain from "../assets/images/sichuan-mountains.jpg";
 import { localizePath, type Locale } from "../i18n/utils";
@@ -12,9 +13,11 @@ const { locale, overview = false } = Astro.props;
 const c = editorial(locale);
 ---
 
-<section class="editorial-section page-container life-feature">
+<section class="editorial-section page-container life-feature scene-section">
+  <SectionAtmosphere kind="light" />
   <a
     class="life-feature__image"
+    data-motion="photo"
     href={localizePath(
       locale === "zh-CN" ? "/blog/2025-06-08" : "/photos",
       locale,

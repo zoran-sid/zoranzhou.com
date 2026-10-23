@@ -2,7 +2,7 @@ import type { CollectionEntry } from "astro:content";
 import { localizePath, type Locale } from "../i18n/utils";
 import { findTranslation } from "./content-policy";
 
-export const LAB_ICON_REVISION = "20260905";
+export const LAB_ICON_REVISION = "20261023-scroll";
 
 export const LAB_CURRENT_FOCUS_KEY = "lab-typescript-foundations";
 

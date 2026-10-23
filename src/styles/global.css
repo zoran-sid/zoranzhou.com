@@ -21,40 +21,52 @@
 }
 :root {
   color-scheme: light;
-  --page: #f7f9f8;
+  --page: #f5f7fb;
   --surface: #fff;
-  --surface-soft: #e4eee6;
+  --cover: #ffffff80;
+  --cover-ink: #25314a;
+  --field: #ffffff80;
+  --field-ink: #25314a;
+  --field-muted: #566079;
+  --accent-ink: #fff;
+  --surface-soft: #ffffff59;
   --surface-raised: #ffffffd9;
-  --ink: #243b36;
-  --muted: #536b63;
-  --faint: #536b63;
-  --line: #243b3620;
-  --line-strong: #243b3638;
-  --accent: #28634f;
-  --accent-soft: #7d9c8b;
-  --accent-rgb: 40 99 79;
-  --signal: #4b938b;
-  --shadow-card: 0 12px 36px #243b3608;
-  --shadow-hover: 0 18px 42px #243b3610;
+  --ink: #25314a;
+  --muted: #566079;
+  --faint: #566079;
+  --line: #25314a20;
+  --line-strong: #25314a38;
+  --accent: #3e50a0;
+  --accent-soft: #7083b6;
+  --accent-rgb: 62 80 160;
+  --signal: #53799b;
+  --shadow-card: 0 12px 36px #25314a08;
+  --shadow-hover: 0 18px 42px #25314a10;
   --font-display:
     "Newsreader", Georgia, "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 .dark {
   color-scheme: dark;
-  --page: #15221e;
-  --surface: #1d3028;
-  --surface-soft: #24382e;
-  --surface-raised: #1d3028ed;
-  --ink: #edf3ed;
-  --muted: #b1c5b8;
-  --faint: #b1c5b8;
+  --page: #111c32;
+  --surface: #1d2940;
+  --cover: #ffffff0c;
+  --cover-ink: #eff2ff;
+  --field: #1d2940b3;
+  --field-ink: #eff2ff;
+  --field-muted: #bac6de;
+  --accent-ink: #111c32;
+  --surface-soft: #ffffff0c;
+  --surface-raised: #1d2940ed;
+  --ink: #eff2ff;
+  --muted: #bac6de;
+  --faint: #bac6de;
   --line: #e4e9eb24;
   --line-strong: #e4e9eb40;
-  --accent: #a8d4bd;
-  --accent-soft: #88ad99;
-  --accent-rgb: 168 212 189;
-  --signal: #87bbb0;
+  --accent: #becdff;
+  --accent-soft: #859acc;
+  --accent-rgb: 190 205 255;
+  --signal: #9cbdd9;
   --shadow-card: 0 12px 36px #00000012;
 }
 * {
@@ -172,10 +184,10 @@ p {
   gap: 1.8rem;
   min-height: 3.1rem;
   padding: 0.8rem 1.3rem;
-  background: var(--ink);
-  border: 1px solid var(--ink);
+  background: var(--accent);
+  border: 1px solid var(--accent);
   border-radius: 4px;
-  color: var(--page);
+  color: var(--accent-ink);
   font-size: 0.875rem;
   font-weight: 500;
   transition:
@@ -183,9 +195,9 @@ p {
     color 0.2s;
 }
 .button-primary:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--page);
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--accent-ink);
 }
 .skip-link {
   position: fixed;
@@ -445,6 +457,7 @@ p {
   margin-bottom: 1.5rem;
 }
 .page-intro h1 {
+  color: var(--accent);
   font-family: var(--font-display);
   font-size: clamp(2.75rem, 5vw, 4.5rem);
   line-height: 1.25;
@@ -524,9 +537,9 @@ p {
   margin-bottom: 0.75rem;
 }
 .site-footer {
-  border-top: 0;
+  border-top: 1px solid var(--line);
   margin-top: 3rem;
-  background: var(--surface-soft);
+  background: transparent;
 }
 .footer-contact {
   display: flex;

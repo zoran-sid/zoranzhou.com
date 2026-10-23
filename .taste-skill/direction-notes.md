@@ -1,5 +1,11 @@
 # Zoran: personal writing index
 
+## Current direction — supersedes earlier colour and motion notes
+
+User rejected burgundy and requested very pale scrolling gradients, viewport-wide moving light points, and distinct section effects. Implemented near-white blue/lilac/warm-white/ivory stops, a shared full-screen SVG light field, selected-writing lines, Life daylight, and Lab orbit geometry. Original typography and real content remain. The point field is not limited to the hero. Motion is optional, paused offscreen/hidden and reduced on phones. User explicitly limits final verification to code/build; the screenshots and inspector results below predate this direction and do not verify the current animation. See DESIGN.md for current tokens.
+
+## Earlier design exploration (historical)
+
 ## Product inventory
 Network and security background; software development; data science and AI; current TypeScript learning; future Web3 work; blog construction guide; AgentShield analysis; personal essays; Sichuan mountain photograph; photography library; GPS routes; hand-maintained books/films/games; bilingual articles with translationKey. No finished NetGuard project; no fabricated career claims or metrics.
 

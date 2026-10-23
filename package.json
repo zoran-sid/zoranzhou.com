@@ -32,7 +32,8 @@
     "content:check": "node scripts/content/cli.mjs check",
     "content:approve": "node scripts/content/cli.mjs approve",
     "test:content": "node --test scripts/content/content.test.mjs",
-    "prebuild": "node scripts/content/privacy.mjs"
+    "prebuild": "node scripts/content/privacy.mjs",
+    "test:atmosphere": "tsx --test scripts/test-atmosphere.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

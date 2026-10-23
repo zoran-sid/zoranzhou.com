@@ -1,0 +1,150 @@
+/* Scene effects live behind a section, with independent compositor-only loops. */
+.scene-section {
+  position: relative;
+  isolation: isolate;
+}
+.section-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--accent, var(--lab-accent));
+  contain: paint;
+}
+.scene-field {
+  position: absolute;
+  transform: translateY(var(--scene-shift, 0px));
+}
+.scene-field svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.section-atmosphere--lines .scene-field {
+  top: 0.5rem;
+  right: 10%;
+  width: min(44%, 29rem);
+  height: 6rem;
+  opacity: 0.27;
+}
+.scene-line-base {
+  opacity: 0.28;
+}
+.scene-line-trace {
+  stroke-width: 1.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--scene-progress, 0.5));
+}
+.scene-line-echo {
+  opacity: 0.4;
+  animation: line-breathe 11s ease-in-out infinite alternate;
+}
+@keyframes line-breathe {
+  from {
+    transform: translateY(-3px);
+    opacity: 0.2;
+  }
+  to {
+    transform: translateY(3px);
+    opacity: 0.6;
+  }
+}
+.section-atmosphere--light .scene-field {
+  inset: 1rem 0 1rem -4%;
+}
+.scene-light {
+  position: absolute;
+  width: 28rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  animation: daylight-drift 16s ease-in-out infinite alternate;
+}
+.scene-light--day {
+  top: -5%;
+  left: -6%;
+  background: radial-gradient(ellipse, #f8fff4a6, #f8fff400 70%);
+}
+.scene-light--warm {
+  bottom: -15%;
+  left: 12%;
+  background: radial-gradient(ellipse, #fff1c970, #fff1c900 70%);
+  animation-delay: -8s;
+  animation-direction: alternate-reverse;
+}
+.dark .scene-light,
+.lab-body .scene-light {
+  opacity: 0.06;
+}
+@keyframes daylight-drift {
+  from {
+    transform: translate(-8px, 4px) scale(0.94);
+  }
+  to {
+    transform: translate(14px, -10px) scale(1.04);
+  }
+}
+.section-atmosphere--orbit .scene-field {
+  top: 0;
+  right: 0;
+  width: min(50%, 26rem);
+  height: 18rem;
+  opacity: 0.19;
+}
+.scene-orbit-ring {
+  transform-origin: 180px 140px;
+  animation: orbit-turn 28s linear infinite;
+}
+.scene-orbit-ring--inner {
+  animation-duration: 36s;
+  animation-direction: reverse;
+}
+@keyframes orbit-turn {
+  from {
+    transform: rotate(-18deg);
+  }
+  to {
+    transform: rotate(342deg);
+  }
+}
+/* No script = static art. Only visible sections run; the global control also pauses. */
+.section-atmosphere *,
+html[data-motion-paused] .section-atmosphere * {
+  animation-play-state: paused;
+}
+html:not([data-motion-paused]) .section-atmosphere[data-active="true"] * {
+  animation-play-state: running;
+}
+@media (max-width: 639px) {
+  .section-atmosphere--lines .scene-field {
+    right: 0;
+    width: 50%;
+    opacity: 0.16;
+  }
+  .section-atmosphere--orbit .scene-field {
+    opacity: 0.1;
+  }
+  .scene-light {
+    width: 19rem;
+  }
+  .scene-field {
+    transform: translateY(calc(var(--scene-shift, 0px) * 0.4));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-atmosphere .scene-field {
+    transform: none;
+  }
+  .section-atmosphere * {
+    animation: none !important;
+  }
+  .scene-line-trace {
+    stroke-dashoffset: 0.5;
+  }
+}
+@media print {
+  .section-atmosphere {
+    display: none;
+  }
+}

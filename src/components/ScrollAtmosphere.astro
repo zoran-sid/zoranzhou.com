@@ -1,0 +1,233 @@
+---
+import "../styles/atmosphere.css";
+import AmbientLights from "./AmbientLights.astro";
+interface Props {
+  dark?: boolean;
+}
+const { dark = false } = Astro.props;
+---
+
+<div
+  class="scroll-atmosphere"
+  data-scroll-atmosphere
+  data-dark={String(dark)}
+  aria-hidden="true"
+>
+  <AmbientLights />
+</div>
+
+<script>
+  import {
+    atmosphereColor,
+    scrollProgress,
+    sectionProgress,
+  } from "../lib/scroll-atmosphere";
+
+  const layer = document.querySelector<HTMLElement>("[data-scroll-atmosphere]");
+  if (layer) {
+    const root = document.documentElement;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    const scenes = [
+      ...document.querySelectorAll<HTMLElement>("[data-scenery]"),
+    ];
+    const visibleScenes = new Set<HTMLElement>();
+    let frame = 0;
+    let current = 0;
+    let target = 0;
+    let lastTime = 0;
+    let isDark = false;
+    let stopped = false;
+    const activeAnimations = new Set<Animation>();
+    const motionAllowed = () => !reduced.matches;
+
+    function syncScenes() {
+      const running = motionAllowed() && !document.hidden && !stopped;
+      root.toggleAttribute("data-motion-ready", !stopped);
+      root.toggleAttribute("data-motion-paused", !running);
+      for (const scene of scenes) {
+        scene.dataset.active = String(running && visibleScenes.has(scene));
+      }
+    }
+
+    function paint() {
+      const p = reduced.matches ? 0 : current * 0.72;
+      layer!.style.setProperty("--tone-a", atmosphereColor(p, isDark));
+      layer!.style.setProperty("--tone-b", atmosphereColor(p + 0.14, isDark));
+      layer!.style.setProperty("--tone-c", atmosphereColor(p + 0.28, isDark));
+      layer!.style.setProperty("--tone-angle", `${130 + p * 75}deg`);
+      layer!.style.setProperty("--spark-shift", `${(p * 20).toFixed(2)}px`);
+    }
+    function tick(time: number) {
+      frame = 0;
+      if (stopped || document.hidden || !motionAllowed()) return;
+      const delta = Math.min(64, lastTime ? time - lastTime : 16);
+      lastTime = time;
+      current += (target - current) * (1 - Math.exp(-delta / 140));
+      if (Math.abs(target - current) < 0.0005) current = target;
+      // Batch geometry reads before writes; only sections in view participate.
+      const scrollOffset =
+        window.scrollY - current * Math.max(0, root.scrollHeight - innerHeight);
+      const positions = [...visibleScenes].map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          element,
+          progress: sectionProgress(
+            rect.top + scrollOffset,
+            rect.height,
+            innerHeight,
+          ),
+        };
+      });
+      paint();
+      for (const { element, progress } of positions) {
+        element.style.setProperty("--scene-progress", progress.toFixed(4));
+        element.style.setProperty(
+          "--scene-shift",
+          `${((progress - 0.5) * 36).toFixed(2)}px`,
+        );
+      }
+      if (current !== target) frame = requestAnimationFrame(tick);
+    }
+    function update() {
+      if (stopped || !motionAllowed()) return;
+      target = scrollProgress(
+        window.scrollY,
+        root.scrollHeight,
+        window.innerHeight,
+      );
+      if (!frame && !document.hidden) {
+        lastTime = 0;
+        frame = requestAnimationFrame(tick);
+      }
+    }
+    function theme() {
+      isDark =
+        layer!.dataset.dark === "true" || root.classList.contains("dark");
+      if (!motionAllowed()) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        for (const animation of activeAnimations) animation.cancel();
+        activeAnimations.clear();
+      }
+      syncScenes();
+      paint();
+      update();
+    }
+    function visibility() {
+      if (document.hidden) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        activeAnimations.forEach((animation) => animation.pause());
+      } else if (motionAllowed()) {
+        activeAnimations.forEach((animation) => animation.play());
+      }
+      syncScenes();
+      update();
+    }
+
+    const scenery =
+      "IntersectionObserver" in window
+        ? new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+              const element = entry.target as HTMLElement;
+              if (entry.isIntersecting) visibleScenes.add(element);
+              else visibleScenes.delete(element);
+            }
+            syncScenes();
+            update();
+          })
+        : null;
+    scenes.forEach((element) => scenery?.observe(element));
+
+    // One cover sequence, then a photographic aperture and a grouped writing entrance.
+    // Elements remain visible if JavaScript or IntersectionObserver is unavailable.
+    const observer =
+      "IntersectionObserver" in window
+        ? new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                observer?.unobserve(entry.target);
+                if (!motionAllowed() || !entry.target.animate) continue;
+                const element = entry.target as HTMLElement;
+                const kind = element.dataset.motion;
+                const keyframes =
+                  kind === "photo"
+                    ? [
+                        {
+                          clipPath: "inset(8% 0 8% 0)",
+                          transform: "scale(0.97)",
+                        },
+                        { clipPath: "inset(0)", transform: "scale(1)" },
+                      ]
+                    : kind === "cover"
+                      ? [
+                          { opacity: 0.65, transform: "translateY(24px)" },
+                          { opacity: 1, transform: "translateY(0)" },
+                        ]
+                      : [
+                          { opacity: 0.7, transform: "translateY(16px)" },
+                          { opacity: 1, transform: "translateY(0)" },
+                        ];
+                const animation = element.animate(keyframes, {
+                  duration: kind === "photo" ? 850 : 650,
+                  easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+                  delay: Math.min(
+                    150,
+                    Number(element.dataset.motionDelay) || 0,
+                  ),
+                  fill: "backwards",
+                });
+                activeAnimations.add(animation);
+                animation.finished
+                  .catch(() => {})
+                  .finally(() => activeAnimations.delete(animation));
+              }
+            },
+            { threshold: 0.12 },
+          )
+        : null;
+    document
+      .querySelectorAll<HTMLElement>("[data-motion]")
+      .forEach((element) => observer?.observe(element));
+    const themes = new MutationObserver(theme);
+    themes.observe(root, { attributes: true, attributeFilter: ["class"] });
+    const resize =
+      "ResizeObserver" in window ? new ResizeObserver(update) : null;
+    resize?.observe(document.body);
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    window.addEventListener("pageshow", visibility);
+    document.addEventListener("visibilitychange", visibility);
+    reduced.addEventListener("change", theme);
+    current = target = scrollProgress(
+      window.scrollY,
+      root.scrollHeight,
+      window.innerHeight,
+    );
+    theme();
+    function cleanup() {
+      stopped = true;
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      scenery?.disconnect();
+      themes.disconnect();
+      resize?.disconnect();
+      activeAnimations.forEach((animation) => animation.cancel());
+      syncScenes();
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      window.removeEventListener("pageshow", visibility);
+      document.removeEventListener("visibilitychange", visibility);
+      reduced.removeEventListener("change", theme);
+    }
+    document.addEventListener("astro:before-swap", cleanup, { once: true });
+    window.addEventListener(
+      "pagehide",
+      (event) => {
+        if (!event.persisted) cleanup();
+      },
+      { once: true },
+    );
+  }
+</script>

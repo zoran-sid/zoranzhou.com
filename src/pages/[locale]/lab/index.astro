@@ -1,5 +1,6 @@
 ---
 import ArrowIcon from "../../../components/ArrowIcon.astro";
+import SectionAtmosphere from "../../../components/SectionAtmosphere.astro";
 import { isPublicData } from "../../../lib/content-policy";
 import { getCollection } from "astro:content";
 import LabLayout from "../../../layouts/LabLayout.astro";
@@ -43,8 +44,9 @@ const jsonld = {
   alternatePaths={alternatePaths}
   jsonld={jsonld}
 >
-  <section id="overview" class="lab-shell lab-hero">
-    <div>
+  <section id="overview" class="lab-shell lab-hero scene-section">
+    <SectionAtmosphere kind="orbit" />
+    <div data-motion="cover">
       <h1>
         {locale === "zh-CN" ? "从 TypeScript 开始" : "Starting with TypeScript"}
       </h1><p class="lab-hero__intro">{c.intro}</p><div
@@ -59,7 +61,7 @@ const jsonld = {
         >
       </div>
     </div>
-    <a class="lab-focus" href={getLabEntryPath(focus)}
+    <a class="lab-focus" data-motion="writing" href={getLabEntryPath(focus)}
       ><div class="lab-focus__top">
         <span>{c.current}</span><span class="lab-signal lab-signal--building"
           ><i></i>{c.learning}</span
@@ -73,7 +75,8 @@ const jsonld = {
       </div><div class="lab-focus__bottom">
         <h2>
           TypeScript<span aria-hidden="true"
-            ><ArrowIcon direction="up-right" /></span>
+            ><ArrowIcon direction="up-right" /></span
+          >
         </h2><p>{c.focusDeck}</p>
       </div></a
     >

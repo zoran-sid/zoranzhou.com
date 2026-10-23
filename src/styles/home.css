@@ -1,13 +1,16 @@
 .garden-hero {
   padding-block: 3rem 1.5rem;
+  background: transparent;
+  color: var(--ink);
 }
 .garden-hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(5rem, 11.3vw, 10rem);
+  font-size: clamp(5rem, 13vw, 11.5rem);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1;
   letter-spacing: -0.035em;
   margin: 0 0 2.5rem;
+  color: var(--cover-ink);
 }
 .garden-introduction {
   display: grid;
@@ -32,9 +35,10 @@
 .garden-index {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 5rem;
-  margin-top: 3.75rem;
-  padding-block: 2.25rem;
+  gap: 3rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line-strong);
 }
 .garden-now {
   display: grid;
@@ -112,7 +116,11 @@
 .selected-story--lead {
   grid-row: span 2;
   padding: 2.5rem;
-  background: var(--surface-soft);
+  background: var(--field);
+  --ink: var(--field-ink);
+  --muted: var(--field-muted);
+  --accent: var(--field-ink);
+  color: var(--field-ink);
 }
 .selected-story__top {
   color: var(--muted);
@@ -126,7 +134,9 @@
   margin-bottom: 0.75rem;
 }
 .selected-story--lead h3 {
-  font-size: clamp(1.7rem, 2.3vw, 2.25rem);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 2.8vw, 2.6rem);
 }
 .selected-story h3 a::after {
   content: "";
@@ -171,6 +181,7 @@
   padding-block: 4.5rem;
 }
 .life-feature__image {
+  overflow: hidden;
   display: block;
   grid-column: 2;
   grid-row: 1;
@@ -195,6 +206,8 @@
 .life-feature__copy {
   grid-column: 1;
   grid-row: 1;
+  padding-block: 1rem;
+  color: var(--ink);
 }
 .life-feature__copy h2 {
   font-family: var(--font-display);
@@ -243,7 +256,7 @@
 }
 @media (max-width: 639px) {
   .garden-hero {
-    padding-top: 2.2rem;
+    padding-block: 2.2rem 1rem;
   }
   .garden-hero h1 {
     font-size: clamp(3.4rem, 15.8vw, 5.8rem);
@@ -261,8 +274,7 @@
     gap: 2rem;
   }
   .garden-now {
-    padding: 1.4rem;
-    background: var(--surface-soft);
+    padding: 0;
   }
   .garden-paths {
     gap: 1.4rem;
@@ -278,7 +290,7 @@
     font-size: 1.35rem;
   }
   .selected-story--lead h3 {
-    font-size: 1.65rem;
+    font-size: 1.85rem;
   }
   .selected-story {
     padding-block: 1.5rem;
@@ -301,18 +313,5 @@
   }
   .garden-projects .section-head {
     flex-wrap: wrap;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .garden-hero h1 {
-    animation: name-arrive 650ms var(--ease-out) both;
-  }
-  @keyframes name-arrive {
-    from {
-      transform: translateY(14px);
-    }
-    to {
-      transform: translateY(0);
-    }
   }
 }

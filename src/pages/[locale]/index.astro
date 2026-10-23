@@ -1,5 +1,6 @@
 ---
 import ArrowIcon from "../../components/ArrowIcon.astro";
+import SectionAtmosphere from "../../components/SectionAtmosphere.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import HeroSection from "../../components/HeroSection.astro";
 import ArticleRow from "../../components/ArticleRow.astro";
@@ -82,10 +83,11 @@ const jsonld = {
     )
   }
   <section
-    class="editorial-section page-container"
+    class="editorial-section page-container scene-section"
     id="selected"
     aria-labelledby="selected-title"
   >
+    <SectionAtmosphere kind="lines" />
     <header class="section-head">
       <div>
         <h2 id="selected-title">
@@ -97,7 +99,7 @@ const jsonld = {
         ></a
       >
     </header>
-    <div class="selected-grid">
+    <div class="selected-grid" data-motion="writing">
       {
         selected.map((entry, index) => (
           <article
@@ -134,9 +136,10 @@ const jsonld = {
   {
     projects.length > 0 && (
       <section
-        class="editorial-section page-container garden-projects"
+        class="editorial-section page-container garden-projects scene-section"
         aria-labelledby="projects-heading"
       >
+        <SectionAtmosphere kind="orbit" />
         <header class="section-head">
           <>
             <div>

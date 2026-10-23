@@ -1,0 +1,102 @@
+/* Continuous colour belongs to the page; reading ink remains stable. */
+.site-body,
+.lab-body {
+  isolation: isolate;
+}
+.scroll-atmosphere {
+  --tone-a: #eef4fa;
+  --tone-b: #f0f2f9;
+  --tone-c: #f3f0f8;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(
+    var(--tone-angle, 130deg),
+    var(--tone-a),
+    var(--tone-b) 54%,
+    var(--tone-c)
+  );
+}
+.dark .scroll-atmosphere,
+.scroll-atmosphere[data-dark="true"] {
+  --tone-a: #111c32;
+  --tone-b: #181e37;
+  --tone-c: #20203c;
+}
+.atmosphere-lights {
+  position: absolute;
+  inset: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  color: #7183a0;
+  opacity: 0.24;
+  transform: translateY(var(--spark-shift, 0px));
+}
+.dark .atmosphere-lights,
+[data-dark="true"] .atmosphere-lights {
+  color: #cad8f1;
+  opacity: 0.2;
+}
+.ambient-light-group {
+  animation: ambient-light-drift calc(18s + var(--light-group) * 1.3s)
+    ease-in-out infinite alternate;
+  animation-delay: calc(var(--light-group) * -2.4s);
+  animation-play-state: paused;
+}
+html[data-motion-ready]:not([data-motion-paused]) .ambient-light-group {
+  animation-play-state: running;
+}
+@keyframes ambient-light-drift {
+  from {
+    transform: translate(-6px, 9px);
+    opacity: 0.5;
+  }
+  to {
+    transform: translate(10px, -12px);
+    opacity: 1;
+  }
+}
+@media (max-width: 639px) {
+  .ambient-light-group:nth-of-type(even) {
+    display: none;
+  }
+  @keyframes ambient-light-drift {
+    from {
+      transform: translate(-3px, 4px);
+      opacity: 0.5;
+    }
+    to {
+      transform: translate(5px, -6px);
+      opacity: 1;
+    }
+  }
+}
+.site-body .site-header,
+.lab-body .lab-header {
+  background: transparent;
+}
+.site-body .garden-hero,
+.site-body .site-footer,
+.site-body .life-directory,
+.lab-body .lab-footer {
+  background: transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere-lights {
+    transform: none;
+  }
+  .ambient-light-group {
+    animation: none !important;
+  }
+  [data-motion] {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+@media print {
+  .scroll-atmosphere {
+    display: none;
+  }
+}
