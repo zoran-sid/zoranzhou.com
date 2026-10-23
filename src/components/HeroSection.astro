@@ -16,7 +16,17 @@ const labFocus = (await getCollection("lab")).find(
 ---
 
 <section class="garden-hero page-container">
-  <h1 data-motion="cover">Zoran Zhou</h1>
+  <div class="hero-name-stage">
+    <h1 data-motion="cover" data-hero-title aria-label="Zoran Zhou">
+      {
+        "Zoran Zhou".split("").map((character) => (
+          <span class="hero-name-letter" aria-hidden="true">
+            {character === " " ? "\u00a0" : character}
+          </span>
+        ))
+      }
+    </h1>
+  </div>
   <div class="garden-introduction" data-motion="cover" data-motion-delay="100">
     <p class="garden-deck">
       {
@@ -73,3 +83,47 @@ const labFocus = (await getCollection("lab")).find(
     </nav>
   </div>
 </section>
+<script>
+  const title = document.querySelector<HTMLElement>("[data-hero-title]");
+  const stage = document.querySelector<HTMLElement>(".hero-name-stage");
+  const letters = title
+    ? [...title.querySelectorAll<HTMLElement>(".hero-name-letter")]
+    : [];
+  let frame = 0;
+  let pointer: { x: number; y: number } | null = null;
+
+  function resetLetters() {
+    letters.forEach((letter) => {
+      letter.style.removeProperty("transform");
+      letter.style.removeProperty("font-weight");
+    });
+  }
+
+  function paintLetters() {
+    frame = 0;
+    if (!pointer) return;
+    letters.forEach((letter) => {
+      const rect = letter.getBoundingClientRect();
+      const distance = Math.hypot(
+        pointer!.x - (rect.left + rect.width / 2),
+        pointer!.y - (rect.top + rect.height / 2),
+      );
+      const influence = Math.max(0, 1 - distance / 180);
+      const lift = influence * -8;
+      const width = 1 + influence * 0.2;
+      const skew = (pointer!.x - (rect.left + rect.width / 2)) * 0.025 * influence;
+      letter.style.transform = `translateY(${lift.toFixed(2)}px) scaleX(${width.toFixed(3)}) skewX(${skew.toFixed(2)}deg)`;
+      letter.style.fontWeight = String(Math.round(400 + influence * 140));
+    });
+  }
+
+  stage?.addEventListener("pointermove", (event) => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    pointer = { x: event.clientX, y: event.clientY };
+    if (!frame) frame = requestAnimationFrame(paintLetters);
+  });
+  stage?.addEventListener("pointerleave", () => {
+    pointer = null;
+    resetLetters();
+  });
+</script>

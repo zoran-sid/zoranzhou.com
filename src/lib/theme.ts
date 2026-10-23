@@ -31,12 +31,24 @@ export function applyTheme(theme: Theme): void {
   }
 }
 
+export function transitionTheme(theme: Theme): void {
+  const root = document.documentElement;
+  const nextTransition = theme === DARK ? "to-dark" : "to-light";
+  root.dataset.themeTransition = nextTransition;
+  applyTheme(theme);
+  window.setTimeout(() => {
+    if (root.dataset.themeTransition === nextTransition) {
+      delete root.dataset.themeTransition;
+    }
+  }, 2600);
+}
+
 export function toggleTheme(): Theme {
   const current = document.documentElement.classList.contains(DARK)
     ? DARK
     : LIGHT;
   const next = current === DARK ? LIGHT : DARK;
-  applyTheme(next);
+  transitionTheme(next);
   setStoredTheme(next);
   return next;
 }

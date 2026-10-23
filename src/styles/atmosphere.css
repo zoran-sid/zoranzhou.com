@@ -18,12 +18,104 @@
     var(--tone-b) 54%,
     var(--tone-c)
   );
+  transition:
+    background-color 2.4s ease,
+    filter 2.4s ease;
+}
+.scroll-atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #8b847b;
+  opacity: 0;
+  pointer-events: none;
+}
+html[data-theme-transition="to-dark"] .scroll-atmosphere::after {
+  animation: dusk-wash 2.4s ease-in-out both;
+}
+html[data-theme-transition="to-light"] .scroll-atmosphere::after {
+  animation: dawn-wash 2.4s ease-in-out both;
+}
+@keyframes dusk-wash {
+  0% {
+    opacity: 1;
+    background: #f5f7fb;
+  }
+  24% {
+    opacity: 0.78;
+    background: #b4aa9b;
+  }
+  48% {
+    opacity: 0.5;
+    background: #817a73;
+  }
+  72% {
+    opacity: 0.22;
+    background: #383a3a;
+  }
+  100% {
+    opacity: 0;
+    background: #14181c;
+  }
+}
+@keyframes dawn-wash {
+  0% {
+    opacity: 1;
+    background: #14181c;
+  }
+  28% {
+    opacity: 0.78;
+    background: #383a3a;
+  }
+  52% {
+    opacity: 0.5;
+    background: #817a73;
+  }
+  76% {
+    opacity: 0.2;
+    background: #b4aa9b;
+  }
+  100% {
+    opacity: 0;
+    background: #f5f7fb;
+  }
+}
+.sunset-orb {
+  opacity: 0;
+  pointer-events: none;
+}
+.sunset-orb {
+  fill: #d4551d;
+  color: #f6b35e;
+}
+.sunset-orb__halo {
+  opacity: 0.75;
+}
+.sunset-orb__core {
+  fill: #f6b35e;
+  stroke: #fff2c7;
+  stroke-width: 1.5;
+}
+html[data-theme-transition="to-dark"] .sunset-orb--dusk,
+html[data-theme-transition="to-dark"] .sunset-orb--dusk {
+  animation: sun-rise 1.2s ease-out both;
+}
+@keyframes sun-rise {
+  0% {
+    opacity: 0.18;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 .dark .scroll-atmosphere,
 .scroll-atmosphere[data-dark="true"] {
-  --tone-a: #111c32;
-  --tone-b: #181e37;
-  --tone-c: #20203c;
+  --tone-a: #14181c;
+  --tone-b: #1b2024;
+  --tone-c: #23292e;
 }
 .atmosphere-lights {
   position: absolute;
@@ -36,8 +128,26 @@
 }
 .dark .atmosphere-lights,
 [data-dark="true"] .atmosphere-lights {
-  color: #cad8f1;
-  opacity: 0.2;
+  color: #eceae2;
+  opacity: 0.22;
+}
+.dark .ambient-star {
+  opacity: 1;
+  animation: star-twinkle 8s ease-in-out infinite alternate;
+}
+.dark .ambient-star circle:first-child {
+  opacity: 0.95;
+}
+.dark .ambient-star circle:last-child {
+  opacity: 0.85;
+}
+@keyframes star-twinkle {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .ambient-light-group {
   animation: ambient-light-drift calc(18s + var(--light-group) * 1.3s)
@@ -88,6 +198,17 @@ html[data-motion-ready]:not([data-motion-paused]) .ambient-light-group {
     transform: none;
   }
   .ambient-light-group {
+    animation: none !important;
+  }
+  .ambient-star {
+    animation: none !important;
+  }
+  .sunset-orb {
+    animation: none !important;
+  }
+  .scroll-atmosphere,
+  .scroll-atmosphere::after {
+    transition: none;
     animation: none !important;
   }
   [data-motion] {

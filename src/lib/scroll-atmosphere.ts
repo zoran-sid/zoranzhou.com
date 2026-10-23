@@ -1,7 +1,7 @@
 /** Background colours are tied to reading progress, never to a clock. */
 export const atmospherePalettes = {
   light: ["#eef4fa", "#f3f0f8", "#faf1ed", "#f9f6ed"],
-  dark: ["#111c32", "#20203c", "#29283d", "#20303d"],
+  dark: ["#14181c", "#20252a", "#292e33", "#203238"],
 } as const;
 
 export function scrollProgress(

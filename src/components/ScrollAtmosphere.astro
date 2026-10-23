@@ -37,8 +37,16 @@ const { dark = false } = Astro.props;
     let lastTime = 0;
     let isDark = false;
     let stopped = false;
+    let lastThemeTransition = "";
     const activeAnimations = new Set<Animation>();
     const motionAllowed = () => !reduced.matches;
+    const duskMotion =
+      document.querySelector<SVGAnimateMotionElement>("#sunset-dusk-motion");
+
+    function playSunset(direction: "to-dark" | "to-light") {
+      if (!motionAllowed()) return;
+      if (direction === "to-dark") duskMotion?.beginElement();
+    }
 
     function syncScenes() {
       const running = motionAllowed() && !document.hidden && !stopped;
@@ -103,6 +111,15 @@ const { dark = false } = Astro.props;
     function theme() {
       isDark =
         layer!.dataset.dark === "true" || root.classList.contains("dark");
+      const transition = root.dataset.themeTransition;
+      if (
+        transition &&
+        transition !== lastThemeTransition &&
+        (transition === "to-dark" || transition === "to-light")
+      ) {
+        playSunset(transition);
+        lastThemeTransition = transition;
+      }
       if (!motionAllowed()) {
         cancelAnimationFrame(frame);
         frame = 0;
@@ -191,7 +208,10 @@ const { dark = false } = Astro.props;
       .querySelectorAll<HTMLElement>("[data-motion]")
       .forEach((element) => observer?.observe(element));
     const themes = new MutationObserver(theme);
-    themes.observe(root, { attributes: true, attributeFilter: ["class"] });
+    themes.observe(root, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme-transition"],
+    });
     const resize =
       "ResizeObserver" in window ? new ResizeObserver(update) : null;
     resize?.observe(document.body);

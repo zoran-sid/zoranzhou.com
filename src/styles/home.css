@@ -3,6 +3,9 @@
   background: transparent;
   color: var(--ink);
 }
+.hero-name-stage {
+  position: relative;
+}
 .garden-hero h1 {
   font-family: var(--font-display);
   font-size: clamp(5rem, 13vw, 11.5rem);
@@ -11,6 +14,18 @@
   letter-spacing: -0.035em;
   margin: 0 0 2.5rem;
   color: var(--cover-ink);
+  position: relative;
+  z-index: 2;
+  white-space: nowrap;
+  cursor: default;
+}
+.hero-name-letter {
+  display: inline-block;
+  transform-origin: center bottom;
+  transition:
+    transform 360ms var(--ease-out),
+    font-weight 360ms var(--ease-out);
+  will-change: transform;
 }
 .garden-introduction {
   display: grid;
@@ -262,6 +277,9 @@
     font-size: clamp(3.4rem, 15.8vw, 5.8rem);
     letter-spacing: -0.035em;
     margin-bottom: 1.5rem;
+  }
+  .hero-name-letter {
+    transition-duration: 240ms;
   }
   .garden-deck {
     font-size: 1.125rem;
