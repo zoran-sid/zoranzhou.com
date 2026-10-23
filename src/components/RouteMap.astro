@@ -638,11 +638,10 @@ const mobileSplitLabels =
   .route-map-card,
   .elevation-card,
   .route-splits {
-    overflow: visible;
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--line);
     border-radius: 1.25rem;
-    background: var(--surface-color);
+    background: var(--surface);
     box-shadow: 0 18px 55px rgb(15 23 42 / 0.08);
   }
 
@@ -700,7 +699,7 @@ const mobileSplitLabels =
 
   .route-map-shell {
     position: relative;
-    border-block: 1px solid var(--border-color);
+    border-block: 1px solid var(--line);
   }
 
   .route-map {
@@ -713,9 +712,9 @@ const mobileSplitLabels =
     inset: auto 1rem 1rem;
     margin: 0;
     padding: 0.8rem 1rem;
-    border: 1px solid color-mix(in srgb, #ee4f67 40%, var(--border-color));
+    border: 1px solid color-mix(in srgb, #ee4f67 40%, var(--line));
     border-radius: 0.8rem;
-    background: color-mix(in srgb, var(--surface-color) 92%, #ee4f67);
+    background: color-mix(in srgb, var(--surface) 92%, #ee4f67);
     color: var(--text-muted);
     font-size: 0.82rem;
   }
@@ -788,11 +787,7 @@ const mobileSplitLabels =
     margin: 0 clamp(1rem, 3vw, 1.4rem);
     overflow: hidden;
     border-radius: 0.8rem;
-    background: color-mix(
-      in srgb,
-      var(--surface-color) 86%,
-      var(--border-color)
-    );
+    background: color-mix(in srgb, var(--surface) 86%, var(--line));
   }
 
   .elevation-chart :global(svg) {
@@ -817,7 +812,7 @@ const mobileSplitLabels =
   .elevation-empty {
     margin: 0;
     padding: 1rem;
-    border: 1px dashed var(--border-color);
+    border: 1px dashed var(--line);
     border-radius: 1rem;
     color: var(--text-muted);
     text-align: center;
@@ -856,7 +851,7 @@ const mobileSplitLabels =
     overflow-x: auto;
     overflow-y: visible;
     padding-bottom: 0.45rem;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--line);
   }
 
   .route-splits table {
@@ -871,7 +866,7 @@ const mobileSplitLabels =
   .route-splits th,
   .route-splits :global(td) {
     padding: 0.72rem 1rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--line);
     text-align: center;
     vertical-align: middle;
     white-space: nowrap;

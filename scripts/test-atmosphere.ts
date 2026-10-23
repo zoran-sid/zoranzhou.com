@@ -1,11 +1,39 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   atmosphereColor,
   atmospherePalettes,
   scrollProgress,
   sectionProgress,
 } from "../src/lib/scroll-atmosphere";
+
+// Read live theme tokens so a palette change cannot silently leave stale tests.
+const globalCss = readFileSync(
+  new URL("../src/styles/global.css", import.meta.url),
+  "utf8",
+);
+const atmosphereCss = readFileSync(
+  new URL("../src/styles/atmosphere.css", import.meta.url),
+  "utf8",
+);
+const token = (dark: boolean, name: string) => {
+  const block = globalCss.match(
+    dark ? /\.dark \{([\s\S]*?)\n\}/ : /:root \{([\s\S]*?)\n\}/,
+  )![1];
+  return block.match(new RegExp(`--${name}: (#[\\da-f]+)`))![1];
+};
+const lightStyle = (dark: boolean) => {
+  const block = atmosphereCss.match(
+    dark
+      ? /\[data-dark="true"\] \.atmosphere-lights \{([\s\S]*?)\n\}/
+      : /\.atmosphere-lights \{([\s\S]*?)\n\}/,
+  )![1];
+  return {
+    color: block.match(/color: (#[\da-f]+)/)![1],
+    opacity: Number(block.match(/opacity: ([\d.]+)/)![1]),
+  };
+};
 
 const luminance = (hex: string) => {
   const channels = [1, 3, 5]
@@ -47,14 +75,14 @@ test("colour transitions retain endpoints and stay continuous across stops", () 
 
 test("text retains AA contrast through scroll, including the brightest light point", () => {
   for (const dark of [false, true]) {
-    const inks = dark
-      ? ["#eff2ff", "#bac6de", "#becdff"]
-      : ["#25314a", "#566079", "#3e50a0"];
+    const inks = ["ink", "muted", "accent"].map((name) => token(dark, name));
     for (let i = 0; i <= 300; i++) {
       const base = atmosphereColor(i / 300, dark);
-      const point = dark ? "#cad8f1" : "#7183a0";
+      const { color: point, opacity } = lightStyle(dark);
       // Halo (0.7) and core (0.5) overlap inside the field's opacity.
-      const alpha = (1 - (1 - 0.7) * (1 - 0.5)) * (dark ? 0.2 : 0.24);
+      const alpha =
+        (dark ? 1 - (1 - 0.7 * 0.95) * (1 - 0.85) : 1 - (1 - 0.7) * (1 - 0.5)) *
+        opacity;
       const overlay =
         "#" +
         [1, 3, 5]

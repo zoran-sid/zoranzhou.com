@@ -84,46 +84,74 @@ const labFocus = (await getCollection("lab")).find(
   </div>
 </section>
 <script>
-  const title = document.querySelector<HTMLElement>("[data-hero-title]");
   const stage = document.querySelector<HTMLElement>(".hero-name-stage");
-  const letters = title
-    ? [...title.querySelectorAll<HTMLElement>(".hero-name-letter")]
-    : [];
+  const letters = [
+    ...(stage?.querySelectorAll<HTMLElement>(".hero-name-letter") ?? []),
+  ];
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   let frame = 0;
   let pointer: { x: number; y: number } | null = null;
+  let centers: { x: number; y: number }[] = [];
 
   function resetLetters() {
-    letters.forEach((letter) => {
-      letter.style.removeProperty("transform");
-      letter.style.removeProperty("font-weight");
+    cancelAnimationFrame(frame);
+    frame = 0;
+    pointer = null;
+    letters.forEach((letter) => letter.style.removeProperty("transform"));
+  }
+  function measureLetters() {
+    if (!stage) return;
+    const bounds = stage.getBoundingClientRect();
+    centers = letters.map((letter) => {
+      const rect = letter.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2 - bounds.left,
+        y: rect.top + rect.height / 2 - bounds.top,
+      };
     });
   }
-
   function paintLetters() {
     frame = 0;
-    if (!pointer) return;
-    letters.forEach((letter) => {
-      const rect = letter.getBoundingClientRect();
-      const distance = Math.hypot(
-        pointer!.x - (rect.left + rect.width / 2),
-        pointer!.y - (rect.top + rect.height / 2),
+    if (!stage || !pointer || reduced.matches) return;
+    // One layout read per frame; letter transforms never feed back into their origins.
+    const bounds = stage.getBoundingClientRect();
+    const x = pointer.x - bounds.left,
+      y = pointer.y - bounds.top;
+    letters.forEach((letter, index) => {
+      const center = centers[index];
+      if (!center) return;
+      const influence = Math.max(
+        0,
+        1 - Math.hypot(x - center.x, y - center.y) / 180,
       );
-      const influence = Math.max(0, 1 - distance / 180);
-      const lift = influence * -8;
-      const width = 1 + influence * 0.2;
-      const skew = (pointer!.x - (rect.left + rect.width / 2)) * 0.025 * influence;
-      letter.style.transform = `translateY(${lift.toFixed(2)}px) scaleX(${width.toFixed(3)}) skewX(${skew.toFixed(2)}deg)`;
-      letter.style.fontWeight = String(Math.round(400 + influence * 140));
+      letter.style.transform = `translateY(${(-8 * influence).toFixed(2)}px) scaleX(${(1 + influence * 0.2).toFixed(3)}) skewX(${((x - center.x) * 0.025 * influence).toFixed(2)}deg)`;
     });
   }
-
+  stage?.addEventListener("pointerenter", measureLetters);
   stage?.addEventListener("pointermove", (event) => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reduced.matches || event.pointerType === "touch") return;
     pointer = { x: event.clientX, y: event.clientY };
     if (!frame) frame = requestAnimationFrame(paintLetters);
   });
-  stage?.addEventListener("pointerleave", () => {
-    pointer = null;
+  stage?.addEventListener("pointerleave", resetLetters);
+  reduced.addEventListener("change", resetLetters);
+  const resize = () => {
     resetLetters();
-  });
+    measureLetters();
+  };
+  window.addEventListener("resize", resize, { passive: true });
+  const hidden = () => {
+    if (document.hidden) resetLetters();
+  };
+  document.addEventListener("visibilitychange", hidden);
+  document.addEventListener(
+    "astro:before-swap",
+    () => {
+      resetLetters();
+      window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", hidden);
+      reduced.removeEventListener("change", resetLetters);
+    },
+    { once: true },
+  );
 </script>

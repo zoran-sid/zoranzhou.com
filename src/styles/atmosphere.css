@@ -4,118 +4,76 @@
   isolation: isolate;
 }
 .scroll-atmosphere {
-  --tone-a: #eef4fa;
-  --tone-b: #f0f2f9;
-  --tone-c: #f3f0f8;
+  --day-a: #eef4fa;
+  --day-b: #f0f2f9;
+  --day-c: #f3f0f8;
+  --night-a: #14181c;
+  --night-b: #1b2024;
+  --night-c: #23292e;
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  background: linear-gradient(
-    var(--tone-angle, 130deg),
-    var(--tone-a),
-    var(--tone-b) 54%,
-    var(--tone-c)
-  );
-  transition:
-    background-color 2.4s ease,
-    filter 2.4s ease;
 }
-.scroll-atmosphere::after {
-  content: "";
+.atmosphere-day,
+.atmosphere-dusk,
+.atmosphere-night,
+.theme-sun-scene {
   position: absolute;
   inset: 0;
-  background: #858b91;
+}
+.atmosphere-day {
+  background: linear-gradient(
+    var(--tone-angle, 130deg),
+    var(--day-a),
+    var(--day-b) 54%,
+    var(--day-c)
+  );
+}
+.atmosphere-dusk {
   opacity: 0;
-  pointer-events: none;
+  background: linear-gradient(
+    170deg,
+    #dddce9 0%,
+    #ecd7cf 50%,
+    #f6d9b5 86%,
+    #f5e8d4
+  );
 }
-html[data-theme-transition="to-dark"] .scroll-atmosphere::after {
-  animation: dusk-wash 2.4s ease-in-out both;
-}
-html[data-theme-transition="to-light"] .scroll-atmosphere::after {
-  animation: dawn-wash 2.4s ease-in-out both;
-}
-@keyframes dusk-wash {
-  0% {
-    opacity: 1;
-    background: #f5f7fb;
-  }
-  24% {
-    opacity: 0.72;
-    background: #d0d1cf;
-  }
-  48% {
-    opacity: 0.42;
-    background: #92999d;
-  }
-  72% {
-    opacity: 0.16;
-    background: #41494f;
-  }
-  100% {
-    opacity: 0;
-    background: #14181c;
-  }
-}
-@keyframes dawn-wash {
-  0% {
-    opacity: 1;
-    background: #14181c;
-  }
-  28% {
-    opacity: 0.16;
-    background: #41494f;
-  }
-  52% {
-    opacity: 0.42;
-    background: #92999d;
-  }
-  76% {
-    opacity: 0.72;
-    background: #d0d1cf;
-  }
-  100% {
-    opacity: 0;
-    background: #f5f7fb;
-  }
-}
-.sunset-orb {
+.atmosphere-night {
   opacity: 0;
-  pointer-events: none;
+  background: linear-gradient(
+    var(--tone-angle, 130deg),
+    var(--night-a),
+    var(--night-b) 54%,
+    var(--night-c)
+  );
 }
-.sunset-orb {
-  fill: #d4551d;
-  color: #f6b35e;
+.dark .atmosphere-night,
+[data-dark="true"] .atmosphere-night {
+  opacity: 1;
 }
-.sunset-orb__halo {
-  opacity: 0.75;
+.theme-sun-scene {
+  overflow: hidden;
+  mask-image: linear-gradient(#000 66%, transparent 89%);
 }
-.sunset-orb__core {
-  fill: #f6b35e;
-  stroke: #fff2c7;
-  stroke-width: 1.5;
+.theme-solar-disc {
+  position: absolute;
+  top: 26%;
+  right: 16%;
+  width: clamp(3.5rem, 7vw, 7rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle at 42% 35%, #fff7d7, #ffe0a3 55%, #efb387);
 }
-html[data-theme-transition="to-dark"] .sunset-orb--dusk,
-html[data-theme-transition="to-dark"] .sunset-orb--dusk {
-  animation: sun-rise 1.2s ease-out both;
-}
-@keyframes sun-rise {
-  0% {
-    opacity: 0.18;
-  }
-  60% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-.dark .scroll-atmosphere,
-.scroll-atmosphere[data-dark="true"] {
-  --tone-a: #14181c;
-  --tone-b: #1b2024;
-  --tone-c: #23292e;
+.theme-solar-disc::before {
+  content: "";
+  position: absolute;
+  inset: -90%;
+  border-radius: inherit;
+  background: radial-gradient(circle, #ffd99a45, #ffd99a00 67%);
 }
 .atmosphere-lights {
   position: absolute;
@@ -129,11 +87,16 @@ html[data-theme-transition="to-dark"] .sunset-orb--dusk {
 .dark .atmosphere-lights,
 [data-dark="true"] .atmosphere-lights {
   color: #eceae2;
-  opacity: 0.22;
+  opacity: 0.14;
 }
-.dark .ambient-star {
+.dark .ambient-star,
+[data-dark="true"] .ambient-star {
   opacity: 1;
   animation: star-twinkle 8s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+html[data-motion-ready]:not([data-motion-paused]) .ambient-star {
+  animation-play-state: running;
 }
 .dark .ambient-star circle:first-child {
   opacity: 0.95;
@@ -203,13 +166,8 @@ html[data-motion-ready]:not([data-motion-paused]) .ambient-light-group {
   .ambient-star {
     animation: none !important;
   }
-  .sunset-orb {
-    animation: none !important;
-  }
-  .scroll-atmosphere,
-  .scroll-atmosphere::after {
-    transition: none;
-    animation: none !important;
+  .theme-sun-scene {
+    display: none;
   }
   [data-motion] {
     animation: none !important;

@@ -13,6 +13,12 @@ const { dark = false } = Astro.props;
   data-dark={String(dark)}
   aria-hidden="true"
 >
+  <div class="atmosphere-day"></div>
+  <div class="atmosphere-dusk" data-sky-dusk></div>
+  <div class="atmosphere-night" data-sky-night></div>
+  <div class="theme-sun-scene">
+    <span class="theme-solar-disc" data-theme-sun></span>
+  </div>
   <AmbientLights />
 </div>
 
@@ -35,19 +41,9 @@ const { dark = false } = Astro.props;
     let current = 0;
     let target = 0;
     let lastTime = 0;
-    let isDark = false;
     let stopped = false;
-    let lastThemeTransition = "";
     const activeAnimations = new Set<Animation>();
     const motionAllowed = () => !reduced.matches;
-    const duskMotion =
-      document.querySelector<SVGAnimateMotionElement>("#sunset-dusk-motion");
-
-    function playSunset(direction: "to-dark" | "to-light") {
-      if (!motionAllowed()) return;
-      if (direction === "to-dark") duskMotion?.beginElement();
-    }
-
     function syncScenes() {
       const running = motionAllowed() && !document.hidden && !stopped;
       root.toggleAttribute("data-motion-ready", !stopped);
@@ -59,9 +55,15 @@ const { dark = false } = Astro.props;
 
     function paint() {
       const p = reduced.matches ? 0 : current * 0.72;
-      layer!.style.setProperty("--tone-a", atmosphereColor(p, isDark));
-      layer!.style.setProperty("--tone-b", atmosphereColor(p + 0.14, isDark));
-      layer!.style.setProperty("--tone-c", atmosphereColor(p + 0.28, isDark));
+      for (const dark of [false, true]) {
+        const prefix = dark ? "night" : "day";
+        for (const [index, stop] of ["a", "b", "c"].entries()) {
+          layer!.style.setProperty(
+            `--${prefix}-${stop}`,
+            atmosphereColor(p + index * 0.14, dark),
+          );
+        }
+      }
       layer!.style.setProperty("--tone-angle", `${130 + p * 75}deg`);
       layer!.style.setProperty("--spark-shift", `${(p * 20).toFixed(2)}px`);
     }
@@ -108,18 +110,7 @@ const { dark = false } = Astro.props;
         frame = requestAnimationFrame(tick);
       }
     }
-    function theme() {
-      isDark =
-        layer!.dataset.dark === "true" || root.classList.contains("dark");
-      const transition = root.dataset.themeTransition;
-      if (
-        transition &&
-        transition !== lastThemeTransition &&
-        (transition === "to-dark" || transition === "to-light")
-      ) {
-        playSunset(transition);
-        lastThemeTransition = transition;
-      }
+    function preferences() {
       if (!motionAllowed()) {
         cancelAnimationFrame(frame);
         frame = 0;
@@ -207,11 +198,6 @@ const { dark = false } = Astro.props;
     document
       .querySelectorAll<HTMLElement>("[data-motion]")
       .forEach((element) => observer?.observe(element));
-    const themes = new MutationObserver(theme);
-    themes.observe(root, {
-      attributes: true,
-      attributeFilter: ["class", "data-theme-transition"],
-    });
     const resize =
       "ResizeObserver" in window ? new ResizeObserver(update) : null;
     resize?.observe(document.body);
@@ -219,19 +205,18 @@ const { dark = false } = Astro.props;
     window.addEventListener("resize", update, { passive: true });
     window.addEventListener("pageshow", visibility);
     document.addEventListener("visibilitychange", visibility);
-    reduced.addEventListener("change", theme);
+    reduced.addEventListener("change", preferences);
     current = target = scrollProgress(
       window.scrollY,
       root.scrollHeight,
       window.innerHeight,
     );
-    theme();
+    preferences();
     function cleanup() {
       stopped = true;
       cancelAnimationFrame(frame);
       observer?.disconnect();
       scenery?.disconnect();
-      themes.disconnect();
       resize?.disconnect();
       activeAnimations.forEach((animation) => animation.cancel());
       syncScenes();
@@ -239,7 +224,7 @@ const { dark = false } = Astro.props;
       window.removeEventListener("resize", update);
       window.removeEventListener("pageshow", visibility);
       document.removeEventListener("visibilitychange", visibility);
-      reduced.removeEventListener("change", theme);
+      reduced.removeEventListener("change", preferences);
     }
     document.addEventListener("astro:before-swap", cleanup, { once: true });
     window.addEventListener(

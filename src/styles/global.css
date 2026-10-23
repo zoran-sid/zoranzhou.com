@@ -63,9 +63,9 @@
   --faint: #8b9188;
   --line: #2e343a;
   --line-strong: #2e343acc;
-  --accent: #ef7a52;
+  --accent: #ffae91;
   --accent-soft: #b9bcb2;
-  --accent-rgb: 239 122 82;
+  --accent-rgb: 255 174 145;
   --signal: #b9bcb2;
   --shadow-card: 0 12px 36px #00000012;
 }

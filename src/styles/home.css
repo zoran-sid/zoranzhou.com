@@ -22,10 +22,7 @@
 .hero-name-letter {
   display: inline-block;
   transform-origin: center bottom;
-  transition:
-    transform 360ms var(--ease-out),
-    font-weight 360ms var(--ease-out);
-  will-change: transform;
+  transition: transform 360ms var(--ease-out);
 }
 .garden-introduction {
   display: grid;

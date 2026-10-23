@@ -14,23 +14,23 @@ colors:
   field: "#ffffff80"
   field-ink: "#25314a"
   field-muted: "#566079"
-  dark-page: "#111c32"
-  dark-surface: "#1d2940"
+  dark-page: "#14181c"
+  dark-surface: "#1d2226"
   dark-surface-soft: "#ffffff0c"
-  dark-ink: "#eff2ff"
-  dark-muted: "#bac6de"
-  dark-accent: "#becdff"
-  dark-accent-ink: "#111c32"
+  dark-ink: "#eceae2"
+  dark-muted: "#b9bcb2"
+  dark-accent: "#ffae91"
+  dark-accent-ink: "#14181c"
   dark-cover: "#ffffff0c"
-  dark-cover-ink: "#eff2ff"
+  dark-cover-ink: "#eceae2"
   atmosphere-0: "#eef4fa"
   atmosphere-1: "#f3f0f8"
   atmosphere-2: "#faf1ed"
   atmosphere-3: "#f9f6ed"
-  dark-atmosphere-0: "#111c32"
-  dark-atmosphere-1: "#20203c"
-  dark-atmosphere-2: "#29283d"
-  dark-atmosphere-3: "#20303d"
+  dark-atmosphere-0: "#14181c"
+  dark-atmosphere-1: "#20252a"
+  dark-atmosphere-2: "#292e33"
+  dark-atmosphere-3: "#203238"
 typography:
   display:
     fontFamily: Newsreader, Georgia, Songti SC, STSong, serif
@@ -107,7 +107,7 @@ components:
 
 ## Colors
 
-颜色角色取自前置 tokens；渐变色序列由 src/lib/scroll-atmosphere.ts 管理。浅色由雾蓝经浅紫、暖白过渡到象牙白；深色与 Lab 保留蓝灰、紫灰的连续变化。操作文字和正文墨色保持稳定。透明内容底允许渐变自然贯穿页面。
+颜色角色取自前置 tokens；渐变色序列由 src/lib/scroll-atmosphere.ts 管理。浅色由雾蓝经浅紫、暖白过渡到象牙白；夜间使用炭灰到青灰的低饱和渐变；主站为暖白正文和浅珊瑚操作色，Lab 保留独立蓝灰面板与浅蓝操作色。操作文字和正文墨色保持稳定。透明内容底允许渐变自然贯穿页面。
 
 **The Reading Rule.** 颜色可随位置变化，阅读对比度保持稳定。test:atmosphere 在每个主题 301 个进度点检查正文、次要文字和链接，并计算光点最强叠加处的对比度。此计算覆盖指定颜色模型，实际合成效果由本地浏览器检查。
 
@@ -131,7 +131,11 @@ Newsreader 400 用于姓名和显示标题，中文回退 Songti SC、STSong；I
 
 **The Motion Rule.** 动态服务章节节奏。全屏光点串联阅读；精选文章使用细线随滚动延展，生活部分使用柔和日光漂移，项目与 Lab 使用慢速轨道。正文段落不逐段动画。内容默认可见，JavaScript 失败时仍可阅读。
 
-尊重 prefers-reduced-motion，保留静态渐变和光点。离开视口的章节动画暂停，隐藏标签页暂停所有动画；滚动补间只在需要更新时申请帧。打印隐藏全部装饰。
+尊重 prefers-reduced-motion，保留静态渐变和光点。离开视口的章节动画暂停，隐藏标签页暂停光点、星光和章节循环。主题切换在隐藏页面时直接完成；滚动补间只在需要更新时申请帧。打印隐藏全部装饰。
+
+日夜切换为 1.8s：日光 → 浅杏与灰紫余晖 → 炭灰夜色，太阳沿右侧天空落下；切回浅色时反向升起。背景由日间、黄昏、夜间三层透明度组合，太阳独立于低透明度光点层。阅读主题在日落 62% / 日出 38% 时切换，避免一开始就把白字放上白天背景。快速重复点击直接完成最后选择，清理旧计时器和动画；减少动态设置下立即切换。
+
+Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，集中主题切换生命周期；标题悬停每帧只读取一次容器几何，不动态更改字体宽度；滚动指示器复用进度函数并合并逐帧更新。
 
 ## Shapes
 
@@ -139,7 +143,7 @@ Newsreader 400 用于姓名和显示标题，中文回退 Songti SC、STSong；I
 
 ## Components
 
-- Primary button：浅色为蓝墨底浅字，深色为浅蓝底深字；focus 使用 2px 轮廓。
+- Primary button：浅色为蓝墨底浅字，深色为浅珊瑚底深字；focus 使用 2px 轮廓。
 - Text link：使用共用 ArrowIcon，20×20 viewBox、1.5px 笔画、实际 1em。
 - Selected writing：半透明浅色面突出博客构建文章，入场 650ms；细线仅在章节顶部。
 - Article tag：至少 44×44px，格式与成熟度位于标题后的元数据。

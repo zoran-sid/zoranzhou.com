@@ -334,10 +334,9 @@ advance its stage without author confirmation. NetGuard is a preserved draft, ex
 from public views. Search includes essays
 and indexes title, description and tags; both search and RSS filter by locale.
 
-Keep the cool paper / evergreen ink / pale leaf palette in `global.css` consistent
-in light and dark themes. `DESIGN.md` and `.impeccable/design.json` document the current
-visual system; older blue-palette descriptions are historical. `home.css`, `collections.css`, `reading.css` and `prose.css` own
-scoped responsibilities. `maps.css` preserves the Journey Explorer rules and loads only
+Keep the near-white scrolling palette, charcoal night surfaces and shared semantic
+colours consistent. DESIGN.md and .impeccable/design.json document the current system.
+home.css, collections.css, reading.css and prose.css own scoped responsibilities. `maps.css` preserves the Journey Explorer rules and loads only
 with `mapStyles`; do not mix main-site or map CSS into `LabLayout`.
 
 Run `npm run test:editorial` for content/pagination rules and, after a full build,
@@ -455,7 +454,7 @@ notifications. The main navigation, Practice page and current-learning card prov
 localized Lab entry points on desktop and mobile.
 
 The Lab uses a dark blue-grey study surface: #111c32 base, #1d2940 panels,
-#eff2ff text and #becdff actions. ScrollAtmosphere supplies a muted blue/purple-grey
+#eff2ff text and #becdff actions. ScrollAtmosphere supplies a muted charcoal/blue-grey
 scroll gradient and viewport-wide ambient light points; the homepage adds slow orbit
 geometry. It shares Newsreader / Inter Variable / JetBrains Mono Variable with CJK
 fallbacks. Preserve the lab-* namespace and isolated focus/selection treatments.
@@ -1562,3 +1561,44 @@ This section supersedes the old homepage order and adds publication rules. Read
   overlay), npm run lint, npm run build, npm run test:site-build, git diff --check.
   Current user requested code/build checks only and will inspect locally; no final browser
   or performance pass is implied by these tests. Do not deploy or push without authorization.
+
+### Day / dusk / night theme lifecycle
+
+- src/lib/theme.ts owns theme persistence, OS preference, and the 1800ms sunset/dawn
+  timeline. Navigation calls initTheme once. ThemeScript remains a tiny synchronous
+  pre-paint bootstrap; both validate stored values and tolerate unavailable localStorage.
+- ScrollAtmosphere renders day, dusk, night and a separate solar disc. Its scroll controller
+  writes both day/night gradient stops; CSS or theme animations choose opacity. Do not
+  restore the old SMIL sun, pseudo-element wash or an independent theme timeout there.
+- Theme switching uses three bounded Web Animations (night opacity, dusk opacity, sun
+  transform/opacity). Commit text/control theme at 62% of sunset or 38% of dawn.
+  The sun must remain separate from the faint particle SVG, so its brightness is independent.
+- Read active.target when toggling during a transition. Repeated clicks finish/cancel the
+  current sequence and apply the latest request; no stale timer may flip it back. On hidden
+  tabs, pagehide or reduced-motion changes, settle the target and release animation work.
+  Theme button aria-pressed mirrors the committed dark state. Lab stays independently dark.
+- test:theme covers sequence completion, reverse playback, repeated clicks, reduced motion,
+  visibility/navigation cancellation, storage restrictions and the pre-paint bootstrap.
+- test:atmosphere reads actual CSS tokens and particle intensity, including dark star peaks,
+  rather than hardcoding an old palette. A failed contrast test requires a colour/intensity
+  fix, never a lower threshold. This checks stable scroll colours, not every sunset frame.
+
+### Karpathy Guidelines maintenance pass
+
+- Read and apply the installed karpathy-guidelines SKILL.md: explicit success criteria,
+  minimum needed implementation, surgical edits, and testable completion. Do not rewrite
+  working content/import/translation code just to increase the number of changed files.
+- Homepage pointer effects batch measurements and animate transforms only. Newsreader is
+  the installed 400-weight font; do not synthesize per-pointer font weights or alternate
+  geometry reads/writes for each letter. Reduce Motion cancels pending pointer work.
+- BaseLayout caches the comet element and batches scroll indicator writes in animation
+  frames; use shared scrollProgress instead of another clamp implementation.
+- RouteMap / RoutePostLayout use --line and --surface. Removed legacy --border-color and
+  --surface-color references had no definitions; preserve real route geometry and statistics.
+- Static generation builds each ambient point once. Stars and floating light groups share
+  visibility/reduced-motion lifecycle. Avoid permanent will-change and unnecessary observers.
+- Full checks for this maintenance pass: lint, targeted script typecheck, test:theme,
+  test:atmosphere, test:editorial, test:content, test:language-routing, test:route-logic,
+  validate:routes, test:translation (mocked), test:media-update (fixtures), test:editor,
+  build, test:site-build, and diff whitespace. Browser and production checks remain with
+  the user as requested. Do not claim measured rendering performance from code inspection.

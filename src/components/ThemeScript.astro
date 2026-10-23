@@ -1,7 +1,13 @@
 <script is:inline>
   (function () {
     const key = "pref-theme";
-    const stored = localStorage.getItem(key);
+    let stored = null;
+    try {
+      const value = localStorage.getItem(key);
+      if (value === "dark" || value === "light") stored = value;
+    } catch {
+      // Use the system theme when browser storage is unavailable.
+    }
     const prefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)",
     ).matches;

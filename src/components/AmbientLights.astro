@@ -1,13 +1,13 @@
 ---
 // Deterministic positions keep the light field identical before and after hydration.
 const groups = Array.from({ length: 9 }, (_, group) =>
-  Array.from({ length: 108 }, (_, index) => index)
-    .filter((index) => index % 9 === group)
-    .map((index) => ({
+  Array.from({ length: 12 }, (_, offset) => offset * 9 + group).map(
+    (index) => ({
       x: 50 + (index % 12) * 100 + ((index * 37) % 47) - 23,
       y: 45 + Math.floor(index / 12) * 100 + ((index * 53) % 43) - 21,
       radius: 3 + (index % 5) * 0.65,
-    })),
+    }),
+  ),
 );
 ---
 
@@ -24,24 +24,7 @@ const groups = Array.from({ length: 9 }, (_, group) =>
       <stop offset="0.35" stop-color="currentColor" stop-opacity="0.25"></stop>
       <stop offset="1" stop-color="currentColor" stop-opacity="0"></stop>
     </radialGradient>
-    <radialGradient id="sunset-orb-glow">
-      <stop offset="0" stop-color="#fff2c7" stop-opacity="0.95"></stop>
-      <stop offset="0.42" stop-color="#f6b35e" stop-opacity="0.8"></stop>
-      <stop offset="0.78" stop-color="#d4551d" stop-opacity="0.3"></stop>
-      <stop offset="1" stop-color="#d4551d" stop-opacity="0"></stop>
-    </radialGradient>
   </defs>
-  <g class="sunset-orb sunset-orb--dusk" transform="translate(600 440)">
-    <circle class="sunset-orb__halo" r="28" fill="url(#sunset-orb-glow)" />
-    <circle class="sunset-orb__core" r="10" />
-    <animateMotion
-      id="sunset-dusk-motion"
-      begin="indefinite"
-      dur="1.2s"
-      fill="freeze"
-      path="M 0 0 C 80 -360 300 -360 450 250"
-    />
-  </g>
   {
     groups.map((lights, group) => (
       <g class="ambient-light-group" style={`--light-group: ${group}`}>

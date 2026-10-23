@@ -72,7 +72,8 @@ const items = [
         type="button"
         id="theme-toggle"
         class="icon-button"
-        aria-label={locale === "zh-CN" ? "切换深浅主题" : "Toggle color theme"}
+        aria-label={locale === "zh-CN" ? "深色模式" : "Dark mode"}
+        aria-pressed="false"
         ><svg
           class="theme-sun"
           viewBox="0 0 24 24"
@@ -136,7 +137,8 @@ const items = [
   </div>
 </header>
 <script>
-  import { toggleTheme } from "../lib/theme";
+  import { initTheme, toggleTheme } from "../lib/theme";
+  initTheme();
   document
     .getElementById("theme-toggle")
     ?.addEventListener("click", toggleTheme);

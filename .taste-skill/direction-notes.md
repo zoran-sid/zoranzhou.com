@@ -2,7 +2,7 @@
 
 ## Current direction — supersedes earlier colour and motion notes
 
-User rejected burgundy and requested very pale scrolling gradients, viewport-wide moving light points, and distinct section effects. Implemented near-white blue/lilac/warm-white/ivory stops, a shared full-screen SVG light field, selected-writing lines, Life daylight, and Lab orbit geometry. Original typography and real content remain. The point field is not limited to the hero. Motion is optional, paused offscreen/hidden and reduced on phones. User explicitly limits final verification to code/build; the screenshots and inspector results below predate this direction and do not verify the current animation. See DESIGN.md for current tokens.
+User rejected burgundy and requested very pale scrolling gradients, viewport-wide moving light points, and distinct section effects. Implemented near-white blue/lilac/warm-white/ivory stops, a shared full-screen SVG light field, selected-writing lines, Life daylight, and Lab orbit geometry. Original typography and real content remain. The point field is not limited to the hero. Motion respects system reduction, pauses offscreen/hidden and is reduced on phones. User explicitly limits final verification to code/build; the screenshots and inspector results below predate this direction and do not verify the current animation. See DESIGN.md for current tokens.
 
 ## Earlier design exploration (historical)
 
@@ -73,3 +73,6 @@ and close with Escape; Hiking selects the West Lake route and updates distance/d
 English RSS copying reports Copied. Media filters show seven books; a discovered stale
 total-count label is corrected to report the current filtered count. Desktop and mobile
 main surfaces, dark mobile reading and Lab are captured for independent finish review.
+
+## Sunset/dawn and code maintenance
+The current charcoal night palette is retained with a lighter coral action colour for contrast. A bounded 1.8s day/dusk/night sequence replaces the old SMIL sun and grey wash. The sun is independent of the particle opacity. Karpathy Guidelines informed a focused cleanup of theme state, event lifecycles, letter geometry, scroll indicators and stale route colour variables. Code-only verification remains the final scope.

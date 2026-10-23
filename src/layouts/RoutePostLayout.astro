@@ -69,13 +69,18 @@ const articleUrl = new URL(
   localizePath(`/map/${entry.slug}`, locale),
   Astro.site,
 ).href;
-const translations = await getCollection("routes", ({ data: candidate }) =>
-  candidate.draft !== true && candidate.published !== false,
+const translations = await getCollection(
+  "routes",
+  ({ data: candidate }) =>
+    candidate.draft !== true && candidate.published !== false,
 );
 const alternatePaths = Object.fromEntries(
   translations
     .filter((candidate) => candidate.data.routeId === data.routeId)
-    .map((candidate) => [candidate.data.lang, localizePath(`/map/${candidate.slug}`, candidate.data.lang)]),
+    .map((candidate) => [
+      candidate.data.lang,
+      localizePath(`/map/${candidate.slug}`, candidate.data.lang),
+    ]),
 );
 const jsonld = {
   "@context": "https://schema.org",
@@ -246,9 +251,9 @@ const jsonld = {
   .route-cover {
     margin: 0 0 clamp(2rem, 5vw, 4rem);
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--line);
     border-radius: 1.5rem;
-    background: var(--surface-color);
+    background: var(--surface);
     box-shadow: 0 22px 70px rgb(15 23 42 / 0.1);
   }
 
@@ -318,9 +323,9 @@ const jsonld = {
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     margin: clamp(2rem, 5vw, 3rem) 0 0;
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--line);
     border-radius: 1.1rem;
-    background: var(--surface-color);
+    background: var(--surface);
   }
 
   .route-facts > div {
@@ -328,7 +333,7 @@ const jsonld = {
     gap: 0.35rem;
     min-height: 92px;
     padding: 1rem 1.15rem;
-    border-right: 1px solid var(--border-color);
+    border-right: 1px solid var(--line);
   }
 
   .route-facts > div:last-child {
@@ -357,7 +362,7 @@ const jsonld = {
 
   .route-tags a {
     padding: 0.34rem 0.7rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--line);
     border-radius: 999px;
     color: var(--text-muted);
     font-size: 0.72rem;
@@ -380,7 +385,7 @@ const jsonld = {
   .route-section-header {
     margin-bottom: 1.25rem;
     padding-bottom: 0.8rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--line);
   }
 
   .route-photo-grid {
@@ -392,9 +397,9 @@ const jsonld = {
   .route-photo-grid figure {
     margin: 0;
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--line);
     border-radius: 1rem;
-    background: var(--surface-color);
+    background: var(--surface);
   }
 
   .route-photo-grid img {
@@ -419,7 +424,7 @@ const jsonld = {
     }
 
     .route-facts > div:nth-child(n + 3) {
-      border-top: 1px solid var(--border-color);
+      border-top: 1px solid var(--line);
     }
 
     .route-photo-grid {
