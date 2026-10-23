@@ -164,24 +164,53 @@ const alternateHref =
       id="back-to-top"
       class="back-to-top"
       aria-label={locale === "zh-CN" ? "回到顶部" : "Back to top"}
-      ><ArrowIcon direction="up" /></button
+      style="--scroll-progress: 0; --comet-angle: 0deg"
+      ><svg
+        class="back-to-top-orbit"
+        viewBox="0 0 72 72"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          class="back-to-top-orbit__track"
+          d="M 5 36 A 31 31 0 0 1 67 36"
+        ></path>
+        <path
+          class="back-to-top-orbit__progress"
+          d="M 5 36 A 31 31 0 0 1 67 36"
+        ></path>
+        <g class="back-to-top-orbit__comet">
+          <line x1="0" y1="2.5" x2="0" y2="5"></line>
+          <circle cx="0" cy="0" r="2.2"></circle>
+        </g>
+      </svg><span class="back-to-top__icon"><ArrowIcon direction="up" /></span></button
     >
     <script>
       const bar = document.getElementById("progress-bar");
       const back = document.getElementById("back-to-top");
-      let frame = 0;
       function update() {
         const total = document.documentElement.scrollHeight - innerHeight;
-        if (bar)
-          bar.style.transform = `scaleX(${total > 0 ? scrollY / total : 0})`;
+        const progress = total > 0 ? Math.min(1, Math.max(0, scrollY / total)) : 0;
+        if (bar) bar.style.transform = `scaleX(${progress})`;
+        back?.style.setProperty("--scroll-progress", progress.toFixed(4));
+        if (back) {
+          const angle = Math.PI * (1 - progress);
+          const x = 36 + 31 * Math.cos(angle);
+          const y = 36 - 31 * Math.sin(angle);
+          const radialRotation =
+            (Math.atan2(-Math.sin(angle), Math.cos(angle)) * 180) / Math.PI + 90;
+          back
+            .querySelector<SVGGElement>(".back-to-top-orbit__comet")
+            ?.setAttribute(
+              "transform",
+              `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${radialRotation.toFixed(2)})`,
+            );
+        }
         back?.classList.toggle("visible", scrollY > 600);
-        frame = 0;
       }
       window.addEventListener(
         "scroll",
-        () => {
-          if (!frame) frame = requestAnimationFrame(update);
-        },
+        update,
         { passive: true },
       );
       back?.addEventListener("click", () =>

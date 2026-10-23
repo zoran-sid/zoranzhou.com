@@ -26,7 +26,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: #8b847b;
+  background: #858b91;
   opacity: 0;
   pointer-events: none;
 }
@@ -42,16 +42,16 @@ html[data-theme-transition="to-light"] .scroll-atmosphere::after {
     background: #f5f7fb;
   }
   24% {
-    opacity: 0.78;
-    background: #b4aa9b;
+    opacity: 0.72;
+    background: #d0d1cf;
   }
   48% {
-    opacity: 0.5;
-    background: #817a73;
+    opacity: 0.42;
+    background: #92999d;
   }
   72% {
-    opacity: 0.22;
-    background: #383a3a;
+    opacity: 0.16;
+    background: #41494f;
   }
   100% {
     opacity: 0;
@@ -64,16 +64,16 @@ html[data-theme-transition="to-light"] .scroll-atmosphere::after {
     background: #14181c;
   }
   28% {
-    opacity: 0.78;
-    background: #383a3a;
+    opacity: 0.16;
+    background: #41494f;
   }
   52% {
-    opacity: 0.5;
-    background: #817a73;
+    opacity: 0.42;
+    background: #92999d;
   }
   76% {
-    opacity: 0.2;
-    background: #b4aa9b;
+    opacity: 0.72;
+    background: #d0d1cf;
   }
   100% {
     opacity: 0;
