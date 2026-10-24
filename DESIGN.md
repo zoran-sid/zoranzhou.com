@@ -8,6 +8,8 @@ colors:
   ink: "#25314a"
   muted: "#566079"
   accent: "#3e50a0"
+  brand-magenta: "#b0148b"
+  brand-leaf: "#22635b"
   accent-ink: "#fff"
   cover: "#ffffff80"
   cover-ink: "#25314a"
@@ -20,6 +22,8 @@ colors:
   dark-ink: "#eceae2"
   dark-muted: "#b9bcb2"
   dark-accent: "#ffae91"
+  dark-brand-magenta: "#ed94d4"
+  dark-brand-leaf: "#8cc7bb"
   dark-accent-ink: "#14181c"
   dark-cover: "#ffffff0c"
   dark-cover-ink: "#eceae2"
@@ -33,37 +37,40 @@ colors:
   dark-atmosphere-3: "#203238"
 typography:
   brand:
-    fontFamily: Cormorant Garamond, Georgia, serif
+    fontFamily: Canela, Georgia, serif
     fontSize: 65px
-    fontWeight: 600
+    fontWeight: 400
     lineHeight: 1
     letterSpacing: -2px
   display:
-    fontFamily: Newsreader, Georgia, Songti SC, STSong, serif
+    fontFamily: Canela, Noto Serif SC, Songti SC, STSong, serif
     fontSize: clamp(4.5rem, 12vw, 10.5rem)
     fontWeight: 400
     lineHeight: 1
     letterSpacing: -0.035em
   headline:
-    fontFamily: Newsreader, Georgia, Songti SC, STSong, serif
+    fontFamily: Canela Deck, Noto Serif SC, Songti SC, STSong, serif
     fontSize: clamp(2rem, 3.1vw, 3rem)
     fontWeight: 400
     lineHeight: 1.4
-    letterSpacing: -0.035em
+    letterSpacing: 0
   body:
-    fontFamily: Inter Variable, PingFang SC, Microsoft YaHei, Noto Sans SC,
-      system-ui, sans-serif
+    fontFamily: Canela Text, Georgia, serif
     fontSize: 1rem
-    lineHeight: 1.75
+    lineHeight: 1.8
+  body-zh:
+    fontFamily: PingFang SC, Microsoft YaHei, Noto Sans SC, system-ui, sans-serif
+    fontSize: 1rem
+    lineHeight: 1.9
   label:
-    fontFamily: Inter Variable, PingFang SC, sans-serif
+    fontFamily: Lato, PingFang SC, Microsoft YaHei, sans-serif
     fontSize: 0.8125rem
   small:
-    fontFamily: Inter Variable, PingFang SC, sans-serif
+    fontFamily: Lato, PingFang SC, Microsoft YaHei, sans-serif
     fontSize: 0.875rem
     lineHeight: 1.65
   subheading:
-    fontFamily: Newsreader, Georgia, Songti SC, STSong, serif
+    fontFamily: Canela Deck, Noto Serif SC, Songti SC, STSong, serif
     fontSize: 1.25rem
     lineHeight: 1.5
   code:
@@ -129,9 +136,9 @@ Taste 的调色库与真实案例研究用于比较方向；用户已否决其�
 
 ## Typography
 
-Newsreader 400 用于姓名和显示标题，中文回退 Songti SC、STSong；Inter Variable 用于正文，JetBrains Mono Variable 用于代码。字体自托管，Newsreader 的 SIL OFL 许可证位于 public/fonts。
+使用项目已有的三款 Canela 字体：Canela Regular 用于 zoran 字标和首页署名，Canela Deck Regular 用于英文栏目与文章标题，Canela Text Regular 用于英文正文。中文标题由 Noto Serif SC 承接，正文用系统中文黑体；Lato 与系统黑体用于导航、按钮、日期和路线数据。JetBrains Mono Variable 用于代码。所有字体均本地提供并使用 swap；只引用实际存在的 Regular 文件，不假设截图中的 Light、Medium 已在项目中。
 
-首页署名最大 11.5rem；手机使用 clamp(3.4rem, 15.8vw, 5.8rem)。文章标题最大 3rem；正文 1rem，阅读行高约 1.9，次要信息至少 13px。保留原始长标题，允许自然换行。
+标题使用 Regular 400，以字号和留白建立层级。中文标题字距为 0，行高 1.4；英文标题字距 -0.018em，行高 1.25。正文中文行高 1.9、英文 1.8。首页署名保留艺术字变化与乒乓球动画；手机字号为 clamp(2.8rem, 13.8vw, 5.8rem)。手机栏目标题约 30–36px，文章列表约 19–24px，正文至少 16px，日期等辅助信息至少 13px。保留原始长标题，允许自然换行。
 
 ## Layout
 
@@ -200,26 +207,35 @@ Library 为独立双语书架，Media 是可按类型、关键词筛选的海报
 
 Continue the pale scroll atmosphere, with a more personal masthead and a single focal
 intro. The navigation wordmark reads **zoran**, with three leaves attached above the
-first and last letters like small antlers. Its serif is Cormorant Garamond Semibold,
-a self-hosted open-license counterpart to the reference site’s Canela Deck.
-The hero retains **Zoran Zhou**: an understated white ping-pong ball hops over the
-actual glyph tops, from Z through u, then disappears. Each load adds bounded
+first and last letters like small antlers. Its serif is the project's Canela Regular.
+Only the word is magenta (deep magenta by day, lighter magenta at night). The leaves
+retain their existing green in each theme and stay still, including on hover/focus.
+The hero currently reads **Zoran**: an understated white ping-pong ball hops over the
+actual glyph tops in order, then disappears. Each load adds bounded
 variation to the hops while retaining those landing positions. Serif/italic lettering and one
 sans-serif o give the name character without loading additional fonts. This is an
 original typographic sequence inspired by the requested animated-film opening idea.
 
-The Garden links directly to Writing; a separate animated chevron opens a two-column
-content directory without row icons. Now is a dated writing/journey timeline; About is a public CV with
-sector-level employer descriptions. On phones, navigation occupies the whole viewport,
-with large serif links, a close control, safe-area padding and native modal focus.
+The Garden links directly to Writing; a separate animated chevron opens a compact
+single-column directory with Blog, Essays, Library and Photography, without row icons.
+The mobile drawer has six links: Blog, Essays, Library, Photography, Now and About.
+Essays opens the existing `/blog/formats/essay` index. Projects and other collections
+stay in the full footer directory and relevant collection pages.
+Language switching appears once, in the toolbar, including on narrow phones.
+Now is a dated writing/journey timeline; About is a public CV with
+sector-level employer descriptions. On phones, the existing toolbar stays at the top,
+while the directory beneath it slides from the right. It uses large serif links, a
+thin close cross in the original menu button, safe-area padding and native modal focus.
 
 The supplied Maggie Appleton screenshots guide the three-leaf framing, four-petal /
 inner-arc circular glyphs, and prominent elliptical subscription control. Glyphs change
 shape on link hover/focus. The footer ends with an envelope, subscription and social
 icons, plus copyright/licence. No motivational sentence is appended.
+The mobile footer displays the full directory in two columns after copyright,
+with 44px link targets; secondary collections remain reachable without crowding the drawer.
 
-Headings share the main ink in both themes. Cormorant Garamond and Newsreader,
-with a Chinese Kai fallback, create section differences through type, scale and rhythm.
+Headings share the main ink in both themes. Canela, Canela Deck and Noto Serif SC
+create section differences through type, scale and rhythm.
 Existing accent tokens remain available for controls and the small geometric icons.
 Mobile sections retain distinct spacing and visual leads, avoiding one continuous wall
 of equally weighted text. The route list uses geometric hover glyphs and text metadata;
@@ -227,6 +243,30 @@ it never fetches preview routes. Cinema uses clickable covers and titles; dates 
 internal sort metadata, and only neighbouring covers blur during pointer selection.
 
 Source lint exceptions are limited to the real dropdown's elevation and the structural
-Now timeline connector. The user's ball/leaf animation, mixed wordmark lettering and
+Now timeline connector. The user's ball animation, static leaf wordmark, mixed lettering and
 existing gradients take precedence over generic skill style restrictions. Final checks
 remain code and build only; visual timing and rendering acceptance stay with the user.
+
+## Mobile reading layout — 2026-10-25
+
+The supplied Picsew PDF guides the single-column reading order and two-column book
+shelf. At widths below 640px, homepage section headings, descriptions and collection
+links stack; descriptions keep the full reading width. Sections use 3rem vertical
+padding, while titles and their descriptions stay close. The current-learning text
+sits in the page flow instead of an inset tinted box.
+
+Little moments groups the landscape image, location/date, article title and summary
+into one featured entry. Recent reflections form a separate list with titles first,
+dates second and subtle separators. The collection link follows both groups. Desktop
+keeps the feature and the list beside each other; below 768px they stack in that order.
+
+Route details show date/location in one row and available distance/duration/elevation
+in a separate equal-width row. Their shared container uses only top/bottom rules, with
+no clipped grid or empty fifth tile. The article's own Markdown heading introduces
+the story; the layout adds no duplicate STORY label and no extra first-heading rule.
+
+The mobile modal temporarily contains the existing toolbar so its controls and focus
+stay usable. Only the independently scrollable directory animates (320ms in / 240ms
+out). Close, Escape, desktop resizing, page exit and reduced-motion changes restore
+scrolling and the toolbar. The logo, language, search and theme controls remain the
+same DOM elements. Reduced motion skips the slide.

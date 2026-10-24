@@ -17,14 +17,14 @@
 }
 .article-title {
   font-weight: 400;
-  letter-spacing: -0.035em;
+  letter-spacing: var(--font-title-tracking);
   text-wrap: pretty;
 }
 .article-description {
   font-family: var(--font-body);
   color: var(--muted);
   font-size: 1.08rem;
-  line-height: 1.65;
+  line-height: var(--font-prose-leading);
   max-width: 43rem;
 }
 .article-meta {
@@ -151,7 +151,7 @@
 .prose h2 {
   font-size: 1.65rem;
   line-height: 1.5;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--font-title-tracking);
   margin-top: 2.8em;
 }
 .prose h3 {
@@ -245,7 +245,7 @@
   }
   .article-title {
     font-size: clamp(1.95rem, 8.8vw, 2.45rem);
-    line-height: 1.16;
+    line-height: var(--font-title-leading);
   }
   .article-description {
     font-size: 1rem;
@@ -466,7 +466,7 @@
 }
 .article-prose {
   font-size: 1.125rem;
-  line-height: 1.68;
+  line-height: var(--font-prose-leading);
 }
 .article-prose p {
   max-width: 75ch;
@@ -506,7 +506,7 @@
   }
   .article-title {
     font-size: clamp(1.95rem, 8.8vw, 2.45rem);
-    line-height: 1.16;
+    line-height: var(--font-title-leading);
   }
   .archive-records .writing-row {
     padding: 1.3rem 1rem;

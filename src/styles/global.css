@@ -6,13 +6,6 @@
 @import "@fontsource/lato/400.css";
 @import "@fontsource/lato/700.css";
 @font-face {
-  font-family: "Cormorant Garamond";
-  src: url("/fonts/cormorant-garamond-semibold-latin.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
-@font-face {
   font-family: "Canela";
   src: url("/fonts/Canela-Regular.otf") format("opentype");
   font-style: normal;
@@ -35,8 +28,7 @@
 }
 @custom-variant dark (&:where(.dark, .dark *));
 @theme {
-  --font-sans:
-    var(--font-ui);
+  --font-sans: var(--font-ui);
   --font-mono: "JetBrains Mono Variable", "SFMono-Regular", Consolas, monospace;
   --color-gray-400: #818691;
   --color-gray-500: #626976;
@@ -61,16 +53,16 @@
   --line: #25314a20;
   --line-strong: #25314a38;
   --accent: #3e50a0;
+  --brand-magenta: #b0148b;
   --accent-soft: #7083b6;
   --accent-rgb: 62 80 160;
   --signal: #53799b;
   --shadow-card: 0 12px 36px #25314a08;
   --shadow-hover: 0 18px 42px #25314a10;
   --font-display-en: "Canela", Georgia, serif;
-  --font-display-zh:
-    "Noto Serif SC", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  --font-display-zh: "Canela", "Noto Serif SC", "Songti SC", "STSong", serif;
   --font-title-en: "Canela Deck", "Canela", Georgia, serif;
-  --font-title-zh: var(--font-display-zh);
+  --font-title-zh: "Canela Deck", "Noto Serif SC", "Songti SC", "STSong", serif;
   --font-text-en: "Canela Text", Georgia, serif;
   --font-display-cjk:
     "Noto Serif SC", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
@@ -78,17 +70,18 @@
   --font-title: var(--font-title-en);
   --font-body-en: var(--font-text-en);
   --font-body-zh:
-    "PingFang SC", "PingFang TC", "Microsoft YaHei", "Noto Sans SC",
-    system-ui, sans-serif;
+    "PingFang SC", "PingFang TC", "Microsoft YaHei", "Noto Sans SC", system-ui,
+    sans-serif;
   --font-body: var(--font-body-en);
   --font-ui-en: "Lato", "Helvetica Neue", Arial, sans-serif;
   --font-ui-zh:
-    "PingFang SC", "PingFang TC", "Microsoft YaHei", "Noto Sans SC",
+    "Lato", "PingFang SC", "PingFang TC", "Microsoft YaHei", "Noto Sans SC",
     system-ui, sans-serif;
   --font-ui: var(--font-ui-en);
   --font-title-size: clamp(2.05rem, 3.35vw, 3.25rem);
-  --font-title-leading: 1.12;
-  --font-prose-leading: 1.72;
+  --font-title-leading: 1.25;
+  --font-title-tracking: -0.018em;
+  --font-prose-leading: 1.8;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 html:lang(zh-CN),
@@ -97,6 +90,9 @@ html:lang(zh-HK) {
   --font-display: var(--font-display-zh);
   --font-title: var(--font-title-zh);
   --font-ui: var(--font-ui-zh);
+  --font-title-leading: 1.4;
+  --font-title-tracking: 0;
+  --font-prose-leading: 1.9;
 }
 .dark {
   color-scheme: dark;
@@ -116,6 +112,7 @@ html:lang(zh-HK) {
   --line: #2e343a;
   --line-strong: #2e343acc;
   --accent: #ffae91;
+  --brand-magenta: #ed94d4;
   --accent-soft: #b9bcb2;
   --accent-rgb: 255 174 145;
   --signal: #b9bcb2;
@@ -194,14 +191,12 @@ h6 {
   font-family: var(--font-title);
   font-weight: 400;
   text-wrap: balance;
-  line-height: 1.16;
-  letter-spacing: -0.018em;
-}
-:lang(zh-CN) :is(h1, h2, h3, h4) {
-  letter-spacing: -0.035em;
+  line-height: var(--font-title-leading);
+  letter-spacing: var(--font-title-tracking);
 }
 p {
   color: var(--ink);
+  text-wrap: pretty;
 }
 .page-container {
   width: min(100% - 6rem, 76rem);
@@ -293,6 +288,7 @@ p {
   border-bottom: 0;
 }
 .site-nav {
+  font-family: var(--font-ui);
   min-height: 5.4rem;
   display: flex;
   align-items: center;

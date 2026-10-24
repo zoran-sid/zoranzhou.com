@@ -50,7 +50,6 @@ const labels =
         distance: "距离",
         duration: "总耗时",
         elevationGain: "累计爬升",
-        story: "STORY",
         photos: "PHOTOS",
       }
     : {
@@ -61,9 +60,13 @@ const labels =
         distance: "Distance",
         duration: "Elapsed time",
         elevationGain: "Elevation gain",
-        story: "STORY",
         photos: "PHOTOS",
       };
+const facts = [
+  { label: labels.distance, value: distance },
+  { label: labels.duration, value: duration },
+  { label: labels.elevationGain, value: elevationGain },
+].filter((fact) => fact.value);
 
 const articleUrl = new URL(
   localizePath(`/map/${entry.slug}`, locale),
@@ -137,50 +140,40 @@ const jsonld = {
         )
       }
 
-      <dl class="route-facts">
-        <div>
-          <dt>{labels.date}</dt>
-          <dd>
-            <time datetime={data.date.toISOString()}>
-              {
-                data.date.toLocaleDateString(dateLocale, {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
-              }
-            </time>
-          </dd>
-        </div>
-        <div>
-          <dt>{labels.location}</dt>
-          <dd>{data.location}</dd>
-        </div>
+      <div class="route-summary">
+        <dl class="route-context">
+          <div>
+            <dt>{labels.date}</dt>
+            <dd>
+              <time datetime={data.date.toISOString()}>
+                {
+                  data.date.toLocaleDateString(dateLocale, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                }
+              </time>
+            </dd>
+          </div>
+          <div>
+            <dt>{labels.location}</dt>
+            <dd>{data.location}</dd>
+          </div>
+        </dl>
         {
-          distance && (
-            <div>
-              <dt>{labels.distance}</dt>
-              <dd>{distance}</dd>
-            </div>
+          facts.length > 0 && (
+            <dl class="route-facts" style={`--fact-columns: ${facts.length}`}>
+              {facts.map(({ label, value }) => (
+                <div>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
           )
         }
-        {
-          duration && (
-            <div>
-              <dt>{labels.duration}</dt>
-              <dd>{duration}</dd>
-            </div>
-          )
-        }
-        {
-          elevationGain && (
-            <div>
-              <dt>{labels.elevationGain}</dt>
-              <dd>{elevationGain}</dd>
-            </div>
-          )
-        }
-      </dl>
+      </div>
 
       {
         data.tags.length > 0 && (
@@ -207,9 +200,6 @@ const jsonld = {
     {
       hasStory && (
         <section class="route-story">
-          <header class="route-section-header">
-            <span>{labels.story}</span>
-          </header>
           <div class="prose article-prose">
             <Content />
           </div>
@@ -243,9 +233,9 @@ const jsonld = {
 
 <style>
   .route-journal {
-    width: min(100%, 1040px);
+    width: min(calc(100% - 3rem), 1040px);
     margin: 0 auto;
-    padding: clamp(1.5rem, 5vw, 4.5rem) 1rem 5rem;
+    padding: clamp(1.5rem, 5vw, 4.5rem) 0 5rem;
   }
 
   .route-cover {
@@ -267,8 +257,9 @@ const jsonld = {
   .route-cover figcaption,
   .route-photo-grid figcaption {
     padding: 0.7rem 0.9rem;
-    color: var(--text-muted);
-    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
   }
 
   .route-journal__header {
@@ -281,8 +272,9 @@ const jsonld = {
     align-items: center;
     gap: 0.45rem;
     margin-bottom: 2rem;
-    color: var(--text-muted);
-    font-size: 0.78rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-family: var(--font-ui);
   }
 
   .route-breadcrumb a {
@@ -291,66 +283,79 @@ const jsonld = {
   }
 
   .route-breadcrumb a:last-child {
-    color: var(--accent-color, #5271ff);
+    color: var(--accent);
     font-weight: 700;
   }
 
   .route-journal__kicker,
   .route-section-header span {
-    color: var(--text-muted);
-    font-size: 0.68rem;
-    font-weight: 800;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-family: var(--font-ui);
+    font-weight: 700;
     letter-spacing: 0.14em;
   }
 
   .route-journal h1 {
     margin: 0.55rem 0 0;
-    font-size: clamp(2.25rem, 7vw, 4.7rem);
-    line-height: 1.04;
-    letter-spacing: -0.045em;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    line-height: var(--font-title-leading);
+    letter-spacing: var(--font-title-tracking);
   }
 
   .route-journal__description {
     max-width: 720px;
     margin: 1.25rem 0 0;
-    color: var(--text-muted);
+    color: var(--muted);
     font-size: clamp(1rem, 2.2vw, 1.22rem);
     line-height: 1.75;
   }
 
+  .route-summary {
+    margin-top: 2rem;
+    padding-block: 1.25rem;
+    border-block: 1px solid var(--line);
+    font-family: var(--font-ui);
+  }
+
+  .route-context,
   .route-facts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    margin: clamp(2rem, 5vw, 3rem) 0 0;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 1.1rem;
-    background: var(--surface);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.5rem;
+    margin: 0;
   }
 
-  .route-facts > div {
+  .route-facts {
+    grid-template-columns: repeat(var(--fact-columns), minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .route-summary dl > div {
     display: grid;
-    gap: 0.35rem;
-    min-height: 92px;
-    padding: 1rem 1.15rem;
-    border-right: 1px solid var(--line);
+    align-content: start;
+    gap: 0.4rem;
+    min-width: 0;
   }
 
-  .route-facts > div:last-child {
-    border-right: 0;
+  .route-summary dt {
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.5;
   }
 
-  .route-facts dt {
-    color: var(--text-muted);
-    font-size: 0.68rem;
-    font-weight: 700;
+  .route-summary dd {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
   }
 
   .route-facts dd {
-    margin: 0;
-    align-self: end;
-    font-size: 0.9rem;
-    font-weight: 750;
+    font-size: clamp(0.9375rem, 3.7vw, 1.25rem);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
 
   .route-tags {
@@ -361,11 +366,15 @@ const jsonld = {
   }
 
   .route-tags a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     padding: 0.34rem 0.7rem;
     border: 1px solid var(--line);
     border-radius: 999px;
-    color: var(--text-muted);
-    font-size: 0.72rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-family: var(--font-ui);
     text-decoration: none;
   }
 
@@ -386,6 +395,15 @@ const jsonld = {
     margin-bottom: 1.25rem;
     padding-bottom: 0.8rem;
     border-bottom: 1px solid var(--line);
+  }
+
+  .route-story :global(.article-prose > :first-child) {
+    margin-top: 0;
+  }
+
+  .route-story :global(.article-prose > h2:first-child) {
+    padding-bottom: 0;
+    border-bottom: 0;
   }
 
   .route-photo-grid {
@@ -411,20 +429,11 @@ const jsonld = {
 
   @media (max-width: 720px) {
     .route-journal {
-      padding-right: 0.75rem;
-      padding-left: 0.75rem;
+      width: calc(100% - 2.5rem);
     }
 
-    .route-facts {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .route-facts > div:nth-child(2n) {
-      border-right: 0;
-    }
-
-    .route-facts > div:nth-child(n + 3) {
-      border-top: 1px solid var(--line);
+    .route-context dd {
+      font-size: 0.9375rem;
     }
 
     .route-photo-grid {

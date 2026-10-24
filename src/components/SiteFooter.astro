@@ -7,14 +7,18 @@ const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const zh = locale === "zh-CN";
 const c = editorial(locale);
 const footerLinks = [
-  { label: zh ? "文章" : "Writing", href: "/blog" },
+  { label: "Blog", href: "/blog" },
+  { label: "Essays", href: "/blog/formats/essay" },
   { label: zh ? "短笔记" : "Notes", href: "/blog/formats/note" },
-  { label: zh ? "关于" : "About", href: "/about" },
-  { label: "Now", href: "/now" },
   { label: zh ? "项目" : "Projects", href: "/projects" },
+  { label: "Web3 Lab", href: "/lab" },
+  { label: zh ? "生活" : "Life", href: "/life" },
   { label: zh ? "书架" : "Library", href: "/library" },
   { label: zh ? "摄影" : "Photography", href: "/photos" },
+  { label: zh ? "足迹" : "Journeys", href: "/map" },
   { label: zh ? "影视与游戏" : "Films & games", href: "/media" },
+  { label: "Now", href: "/now" },
+  { label: "About", href: "/about" },
 ];
 ---
 
@@ -23,7 +27,9 @@ const footerLinks = [
     <div class="footer-layout">
       <div class="footer-primary">
         <div class="footer-contact">
-          <div><h2>{zh ? "联络" : "Keep in touch"}</h2><p>{c.contactDeck}</p></div>
+          <div>
+            <h2>{zh ? "联络" : "Keep in touch"}</h2><p>{c.contactDeck}</p>
+          </div>
         </div>
         <div class="footer-connect">
           <a class="subscribe-pill" href={localizePath("/subscribe", locale)}>
@@ -66,7 +72,10 @@ const footerLinks = [
                       <circle cx="17.5" cy="6.5" r=".8" fill="currentColor" />
                     </svg>
                   ) : (
-                    <span aria-hidden="true" set:html={SOCIAL_ICONS[link.name]} />
+                    <span
+                      aria-hidden="true"
+                      set:html={SOCIAL_ICONS[link.name]}
+                    />
                   )}
                 </a>
               ))
@@ -77,10 +86,14 @@ const footerLinks = [
           <span>© {new Date().getFullYear()} Zoran Zhou</span><a
             href={COPYRIGHT.licenseUrl}
             target="_blank"
-            rel="noopener noreferrer">{COPYRIGHT.license}</a>
+            rel="noopener noreferrer">{COPYRIGHT.license}</a
+          >
         </div>
       </div>
-      <nav class="footer-directory" aria-label={zh ? "网站目录" : "Site directory"}>
+      <nav
+        class="footer-directory"
+        aria-label={zh ? "网站目录" : "Site directory"}
+      >
         {
           footerLinks.map((link) => (
             <a href={localizePath(link.href, locale)}>{link.label}</a>

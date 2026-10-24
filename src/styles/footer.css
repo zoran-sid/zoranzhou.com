@@ -100,7 +100,9 @@
   padding-top: 0.4rem;
 }
 .footer-directory a {
-  min-height: 1.5rem;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--muted);
   font-family: var(--font-ui);
   font-size: 0.95rem;
@@ -139,7 +141,10 @@
     top: 0;
   }
   .footer-directory {
-    display: none;
+    display: grid;
+    gap: 0.25rem 1.5rem;
+    margin-top: 1.5rem;
+    padding-block: 0.5rem max(1rem, env(safe-area-inset-bottom));
   }
   .subscribe-pill {
     min-height: 38px;

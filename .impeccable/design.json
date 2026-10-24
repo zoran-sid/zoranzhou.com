@@ -414,11 +414,11 @@
     "typographyMeta": {
       "display": {
         "displayName": "作者署名",
-        "purpose": "首页封面；其他页不复用该尺度。"
+        "purpose": "Canela Regular 用于首页署名；中文标题回退 Noto Serif SC。"
       },
       "body": {
         "displayName": "正文",
-        "purpose": "技术与生活内容。"
+        "purpose": "英文 Canela Text，中文系统黑体；行高分别为 1.8 和 1.9。"
       },
       "small": {
         "displayName": "Compact controls",
@@ -430,7 +430,7 @@
       },
       "brand": {
         "displayName": "zoran 字标",
-        "purpose": "自托管 Cormorant Garamond Semibold；只用于鹿角字标。"
+        "purpose": "项目已有 Canela Regular；用于鹿角字标。"
       }
     },
     "shadows": [
@@ -530,12 +530,12 @@
       "refersTo": "feature-story",
       "description": "只用于重点文章，形成阅读层级。",
       "html": "<article class=\"ds-story\"><h3><a href=\"#\">从零开始搭建博客</a></h3><p>一份可以回看的实践记录。</p></article>",
-      "css": ".ds-story{background:var(--field,#ffffff80);padding:2.5rem;color:var(--field-ink,#25314a)}.ds-story h3{font:400 2rem/1.55 Newsreader,Georgia,serif;margin:0 0 1rem}.ds-story a{color:inherit;text-decoration:none}.ds-story p{font:16px/1.85 sans-serif;color:var(--field-muted,#566079)}.ds-story a:hover{text-decoration:underline}.ds-story a:focus-visible{outline:2px solid currentColor;outline-offset:5px}"
+      "css": ".ds-story{background:var(--field,#ffffff80);padding:2.5rem;color:var(--field-ink,#25314a)}.ds-story h3{font:400 2rem/1.55 \"Canela Deck\",Georgia,serif;margin:0 0 1rem}.ds-story a{color:inherit;text-decoration:none}.ds-story p{font:16px/1.85 sans-serif;color:var(--field-muted,#566079)}.ds-story a:hover{text-decoration:underline}.ds-story a:focus-visible{outline:2px solid currentColor;outline-offset:5px}"
     }
   ],
   "narrative": {
     "northStar": "随阅读展开的个人刊物",
-    "overview": "保留浅色滚动渐变、全屏微光点与日落主题。小写 zoran 两端的三叶片贴在字母上方形成鹿角，字标采用自托管 OFL 字体 Cormorant Garamond。首页乒乓球逐字跳跃，路径有小幅随机变化，到 u 后淡出；所有分区标题统一墨色，以不同字形和节奏区分。桌面目录行不再显示重复图标。",
+    "overview": "保留浅色滚动渐变、全屏微光点与日落主题。Canela Regular 的小写 zoran 字样为品红色，两侧三叶草保留绿色并保持静止。手机工具栏保持原位，六项主目录（Blog、Essays、Library、Photography、Now、About）从右侧滑入，语言切换只出现一次；页脚补全双列栏目导航。Canela Deck 与 Noto Serif SC 建立英文、中文标题层级。旅行图文紧密分组，足迹详情分开呈现日期地点与运动数据，正文只保留 Markdown 自带的旅程标题。",
     "keyCharacteristics": [
       "全屏浅色渐变随阅读位置变化，微光点持续缓慢移动",
       "板块各自表达内容，整体共享字体、颜色与动态节奏",

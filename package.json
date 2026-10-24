@@ -37,7 +37,8 @@
     "prebuild": "node scripts/content/privacy.mjs",
     "test:atmosphere": "tsx --test scripts/test-atmosphere.ts",
     "test:theme": "tsx --test scripts/test-theme.ts",
-    "test:name-bounce": "tsx --test scripts/test-name-bounce.ts"
+    "test:name-bounce": "tsx --test scripts/test-name-bounce.ts",
+    "test:mobile-menu": "tsx --test scripts/test-mobile-menu.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

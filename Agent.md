@@ -1674,14 +1674,58 @@ points, typography and day/dusk/night transition.
 This section supersedes earlier references to pointer-driven hero lettering, the
 compact mobile menu and visible film viewing dates.
 
+### Mobile layout and typography update (2026-10-25)
+
+- Typography is defined in `src/styles/global.css` and DESIGN.md frontmatter.
+  The supplied `Canela-Regular.otf`, `CanelaDeck-Regular.otf` and
+  `CanelaText-RegularNo2.otf` serve display, title and English body roles at 400.
+  Do not reference missing Light/Medium files. Noto Serif SC supplies Chinese title
+  glyphs; system Chinese sans supplies body text; Lato/system sans supplies UI and data.
+  `--font-title-leading`, `--font-title-tracking` and `--font-prose-leading` have locale
+  overrides. Keep Chinese titles uncompressed and avoid synthetic bold display type.
+- Below 640px, homepage section headings, descriptions and collection links stack.
+  Keep the book shelf in two columns and the existing motion/background preferences.
+  `LifeFeature.astro` owns the photo + location/date + featured title/summary group,
+  followed by a separate recent-reflections list. The photo/title both open the article;
+  the collection link follows the complete section. This component is shared with Life.
+- The mobile toolbar is sticky. The native dialog temporarily receives the existing
+  toolbar node, preserving its search/theme/language listeners and original geometry.
+  Reserve the header height before moving it. Animate only `.garden-mobile__body`:
+  320ms entry from the right, 240ms exit. Its content scrolls below the toolbar.
+  The same menu button becomes a thin X, with an updated accessible label.
+  Keep six mobile links: Blog, Essays, Library, Photography, Now and About. The desktop
+  directory contains the first four; Now/About remain in its toolbar. Essays links to
+  `/blog/formats/essay`, the existing cross-collection essay index. Other sections remain in their collection
+  navigation and the full two-column footer directory, which is visible on phones.
+  Language switching appears once, in the toolbar; scale the logo on narrow phones
+  instead of hiding or duplicating the language control.
+  Restore the toolbar, original root/body overflow and header height synchronously on
+  close/pagehide; a queued native close event must not dismantle a reopened menu.
+  Resize to desktop closes immediately. Reduced motion skips or finishes the motion.
+- `RoutePostLayout.astro` separates date/location (`route-context`) from available
+  numeric metrics (`route-facts`). The metric grid derives its column count from actual
+  formatted values. No placeholder fifth cell or clipped rounded statistics box.
+  Preserve route identity, dates, GPX processing, map and splits without alteration.
+  The Markdown supplies the story heading; do not add another STORY label. Remove only
+  the first heading's excess top margin and underline, keeping later Markdown styling.
+- Checks for this surface: `npm run test:mobile-menu`, `npm run lint`, `npm run build`,
+  `npm run test:site-build`, `npm run test:route-logic`,
+  `npm run test:language-routing`, `npm run test:atmosphere` and `git diff --check`.
+  Mobile-menu tests run the actual component script with DOM/animation doubles;
+  they cover transitions and restoration, not browser layout or native focus trapping.
+  User-requested acceptance remains code/build only; the user checks actual rendering.
+
+### Shared identity and content behavior
+
 - `GardenMark.astro` renders **zoran** in lowercase with two three-leaf clusters
   attached above its first and last letters like small antlers. The full word stays
-  visible on phones. Leaves sway once on hover/focus and stop with reduced motion.
-  The reference site uses licensed Canela Deck; this site self-hosts the OFL-licensed
-  Cormorant Garamond semibold subset for a similar serif quality. Keep its OFL file.
-- `HeroSection.astro` keeps the accessible H1 `Zoran Zhou` visible by default. A white
+  visible on phones. Leaves retain the existing green and never animate, including
+  hover/focus. Only the word is magenta, using the theme-specific `--brand-magenta`.
+  The current site uses the already supplied Canela Regular font in `public/fonts`.
+  Keep font family roles synchronized with the DESIGN.md typography tokens.
+- `HeroSection.astro` currently keeps the accessible H1 `Zoran` visible by default. A white
   ping-pong ball enters from the upper left, lands on each glyph in reading order,
-  makes a small final hop on **u**, then fades out. Each visit varies only the arc
+  makes a small final hop, then fades out. Each visit varies only the arc
   height and slight sideways drift; the measured landing positions stay exact.
   Measure after fonts are ready: the inline baseline marker plus Canvas text ascenders
   locate each actual glyph top. Do not substitute equal-height letter boxes or run
@@ -1692,22 +1736,25 @@ compact mobile menu and visible film viewing dates.
 - `Navigation.astro`: The Garden itself links to `/blog`; its adjacent native details
   summary opens the desktop directory. Directory rows contain text only. Now links
   to `/now`, About to `/about`.
-  Mobile uses a native modal dialog covering the viewport with safe-area padding and
-  independent scrolling. Preserve native focus containment/Escape, explicit close,
+  Mobile uses a native modal dialog. It temporarily contains the original `.site-nav`
+  toolbar; only `.garden-mobile__body` slides in from the right and scrolls. Keep
+  the toolbar at the same position and restore it synchronously when closing.
+  Preserve native focus containment/Escape, explicit close,
   focus restoration, body scroll restoration, resize closure, search, language-cookie
-  handling and theme initialization. Below 360px the header language link moves to the
-  full-screen directory; language switching remains available there.
+  handling and theme initialization. Narrow phones retain the header language link;
+  do not reintroduce a second English link inside the drawer.
 - `GardenGlyph.astro` is shared by directory entries and running rows: a circle with
   four inward arcs crossfades to four pointed petals on hover/focus. Touch navigation
   never depends on hover. Reduced motion swaps the states without spatial animation.
 - Homepage labels: BLOG, 点点滴滴, 在路中去感受; footer heading 联络.
-  All major titles use the shared ink in both themes. Cormorant Garamond,
-  Newsreader and Chinese Kai forms distinguish sections through letterforms,
+  All major titles use the shared ink in both themes. Canela, Canela Deck
+  and Noto Serif SC distinguish sections through letterforms,
   size and spacing. Keep mobile paragraphs grouped under clear headings.
 - `SiteFooter.astro` uses one outlined elliptical article-subscription link, icon-only
   social links with accessible names, and an envelope that opens on hover/focus.
   It retains the real subscription page, mailto destination and licence. Do not restore
   the removed motivational footer sentence or decorative arrow links in the directory.
+  The full directory appears in two columns after copyright on phones, with 44px targets.
 - `/now` derives a chronological timeline from published localized writing and visible,
   identity-normalized routes. Article timestamps mean publication dates; route dates
   mean activity dates. The caption states this distinction. `src/data/now.ts` owns

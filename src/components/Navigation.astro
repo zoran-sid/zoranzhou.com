@@ -13,32 +13,18 @@ const section = Astro.url.pathname.split("/").filter(Boolean)[1] ?? "";
 const zh = locale === "zh-CN";
 const gardenItems = [
   {
-    label: zh ? "文章" : "Writing",
+    label: zh ? "文章" : "Blog",
     href: "/blog",
     description: zh
-      ? "技术实践、研究与长一点的思考"
-      : "Technical practice, research and longer thoughts",
+      ? "技术实践、长文与短笔记"
+      : "Technical writing, essays and short notes",
   },
   {
-    label: zh ? "短笔记" : "Notes",
-    href: "/blog/formats/note",
+    label: zh ? "随笔" : "Essays",
+    href: "/blog/formats/essay",
     description: zh
-      ? "学习途中，随手记下的理解"
-      : "Small discoveries along the way",
-  },
-  {
-    label: zh ? "项目" : "Projects",
-    href: "/projects",
-    description: zh
-      ? "动手做过的事与过程记录"
-      : "Things I build and how they take shape",
-  },
-  {
-    label: "Web3 Lab",
-    href: "/lab",
-    description: zh
-      ? "从 TypeScript 出发，探索区块链"
-      : "Exploring blockchain, starting with TypeScript",
+      ? "生活随笔、观察与长一点的思考"
+      : "Personal reflections, observations and longer thoughts",
   },
   {
     label: zh ? "书架" : "Library",
@@ -51,28 +37,14 @@ const gardenItems = [
     label: zh ? "摄影" : "Photography",
     href: "/photos",
     description: zh
-      ? "在光线和日常里停留片刻"
-      : "Pausing for light and everyday scenes",
-  },
-  {
-    label: zh ? "足迹" : "Journeys",
-    href: "/map",
-    description: zh
-      ? "跑步、徒步与旅行的路线"
-      : "Running, walking and travelling",
-  },
-  {
-    label: zh ? "影视与游戏" : "Films & games",
-    href: "/media",
-    description: zh ? "屏幕内外，留下来的故事" : "Stories that stay with me",
+      ? "旅途和日常里的光影"
+      : "Light and moments from everyday life and travels",
   },
 ];
 const items = [
-  { label: "The Garden", href: "/blog" },
-  ...gardenItems.filter((item) => item.href !== "/blog"),
-  { label: zh ? "点点滴滴" : "Life", href: "/life" },
-  { label: "Now", href: "/now" },
-  { label: "About", href: "/about" },
+  ...gardenItems,
+  { label: zh ? "近况" : "Now", href: "/now" },
+  { label: zh ? "关于我" : "About", href: "/about" },
 ];
 ---
 
@@ -90,7 +62,7 @@ const items = [
     <div class="site-nav__links">
       <div class="garden-navigation">
         <a class="site-nav__link" href={localizePath("/blog", locale)}
-          >The Garden</a
+          >{zh ? "花园" : "The Garden"}</a
         >
         <details class="garden-disclosure">
           <summary aria-label={zh ? "展开网站目录" : "Explore the garden"}>
@@ -121,12 +93,14 @@ const items = [
       <a
         class="site-nav__link"
         href={localizePath("/now", locale)}
-        aria-current={section === "now" ? "page" : undefined}>Now</a
+        aria-current={section === "now" ? "page" : undefined}
+        >{zh ? "近况" : "Now"}</a
       >
       <a
         class="site-nav__link"
         href={localizePath("/about", locale)}
-        aria-current={section === "about" ? "page" : undefined}>About</a
+        aria-current={section === "about" ? "page" : undefined}
+        >{zh ? "关于我" : "About"}</a
       >
     </div>
     <div class="site-nav__tools">
@@ -170,11 +144,23 @@ const items = [
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-haspopup="dialog"
+        data-open-label={zh ? "打开导航" : "Open navigation"}
+        data-close-label={zh ? "关闭导航" : "Close navigation"}
         ><svg
+          class="menu-icon menu-icon--open"
           viewBox="0 0 24 24"
+          fill="none"
           stroke="currentColor"
           stroke-width="1.5"
           aria-hidden="true"><path d="M4 8h16M4 16h16"></path></svg
+        ><svg
+          class="menu-icon menu-icon--close"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.4"
+          stroke-linecap="round"
+          aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"></path></svg
         ></button
       >
     </div>
@@ -184,43 +170,18 @@ const items = [
     class="garden-mobile"
     aria-label={zh ? "网站导航" : "Site navigation"}
   >
-    <div class="garden-mobile__top">
-      <a
-        class="site-brand"
-        href={localizePath("/", locale)}
-        aria-label="Zoran Zhou"><GardenMark /></a
+    <div class="garden-mobile__body">
+      <nav
+        class="garden-mobile__links"
+        aria-label={zh ? "全部栏目" : "All sections"}
       >
-      <button
-        type="button"
-        class="icon-button"
-        data-menu-close
-        aria-label={zh ? "关闭导航" : "Close navigation"}
-        autofocus
-        ><svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"></path></svg
-        ></button
-      >
+        {
+          items.map((item) => (
+            <a href={localizePath(item.href, locale)}>{item.label}</a>
+          ))
+        }
+      </nav>
     </div>
-    <nav
-      class="garden-mobile__links"
-      aria-label={zh ? "全部栏目" : "All sections"}
-    >
-      {
-        items.map((item) => (
-          <a href={localizePath(item.href, locale)}>{item.label}</a>
-        ))
-      }
-    </nav>
-    <a
-      class="garden-mobile__language"
-      href={alternateHref}
-      data-language-switch
-      data-target-locale={alternateLocale}>{zh ? "English" : "中文"}</a
-    >
   </dialog>
   <noscript
     ><nav
@@ -243,36 +204,116 @@ const items = [
     ?.addEventListener("click", toggleTheme);
   const toggle = document.getElementById("mobile-menu-toggle");
   const menu = document.querySelector<HTMLDialogElement>("#mobile-menu");
+  const header = document.querySelector<HTMLElement>("[data-site-header]");
+  const nav = header?.querySelector<HTMLElement>(".site-nav");
+  const drawer = menu?.querySelector<HTMLElement>(".garden-mobile__body");
   const disclosure =
     document.querySelector<HTMLDetailsElement>(".garden-disclosure");
-  let previousOverflow = "";
-  function closeMenu() {
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const desktop = matchMedia("(min-width: 1024px)");
+  let previousBodyOverflow = "";
+  let previousRootOverflow = "";
+  let previousHeaderHeight = "";
+  let drawerAnimation: Animation | undefined;
+  let closing = false;
+  let active = false;
+
+  function restoreToolbar() {
+    if (!active) return;
+    active = false;
+    drawerAnimation?.cancel();
+    drawerAnimation = undefined;
+    closing = false;
+    if (header && nav && menu) {
+      header.insertBefore(nav, menu);
+      header.style.minHeight = previousHeaderHeight;
+    }
+    document.body.style.overflow = previousBodyOverflow;
+    document.documentElement.style.overflow = previousRootOverflow;
+    toggle?.setAttribute("aria-expanded", "false");
+    toggle?.setAttribute("aria-label", toggle.dataset.openLabel!);
+    if (!desktop.matches) toggle?.focus({ preventScroll: true });
+  }
+
+  function finishClose() {
     menu?.close();
+    // Restore synchronously, including pagehide before the browser freezes the page.
+    restoreToolbar();
+  }
+
+  function closeMenu(immediate = false) {
+    if (!menu?.open) return;
+    if (closing && !immediate) return;
+    closing = true;
+    drawerAnimation?.cancel();
+    drawerAnimation = undefined;
+    if (immediate || reducedMotion.matches || !drawer) {
+      finishClose();
+      return;
+    }
+    const animation = drawer.animate(
+      [{ transform: "translateX(0)" }, { transform: "translateX(100%)" }],
+      { duration: 240, easing: "cubic-bezier(.4, 0, 1, 1)", fill: "forwards" },
+    );
+    drawerAnimation = animation;
+    void animation.finished
+      .then(() => {
+        if (drawerAnimation === animation) finishClose();
+      })
+      .catch(() => {}); // A resize or reduced-motion change can cancel the exit.
   }
   toggle?.addEventListener("click", () => {
-    if (!menu || menu.open) return;
-    previousOverflow = document.body.style.overflow;
+    if (!menu || !header || !nav || !drawer) return;
+    if (menu.open) {
+      closeMenu();
+      return;
+    }
+    closing = false;
+    previousBodyOverflow = document.body.style.overflow;
+    previousRootOverflow = document.documentElement.style.overflow;
+    previousHeaderHeight = header.style.minHeight;
+    active = true;
+    // Move the existing toolbar into the modal: same position, controls and listeners.
+    // Its reserved space keeps the underlying page still; only the directory slides.
+    header.style.minHeight = `${header.getBoundingClientRect().height}px`;
+    menu.prepend(nav);
     menu.showModal();
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", toggle.dataset.closeLabel!);
+    toggle.focus({ preventScroll: true });
+    if (!reducedMotion.matches) {
+      drawerAnimation = drawer.animate(
+        [{ transform: "translateX(100%)" }, { transform: "translateX(0)" }],
+        { duration: 320, easing: "cubic-bezier(.22, 1, .36, 1)" },
+      );
+      void drawerAnimation.finished.catch(() => {});
+    }
   });
   menu?.addEventListener("close", () => {
-    document.body.style.overflow = previousOverflow;
-    toggle?.setAttribute("aria-expanded", "false");
-    toggle?.focus();
+    if (!menu.open) restoreToolbar();
+  });
+  menu?.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeMenu();
   });
   menu
-    ?.querySelector("[data-menu-close]")
-    ?.addEventListener("click", closeMenu);
-  menu
     ?.querySelectorAll("a")
-    .forEach((link) => link.addEventListener("click", closeMenu));
-  window
-    .matchMedia("(min-width: 1024px)")
-    .addEventListener("change", (event) => {
-      if (event.matches) closeMenu();
-      else if (disclosure) disclosure.open = false;
-    });
+    .forEach((link) => link.addEventListener("click", () => closeMenu(true)));
+  desktop.addEventListener("change", (event) => {
+    if (event.matches) {
+      closeMenu(true);
+    }
+    else if (disclosure) disclosure.open = false;
+  });
+  reducedMotion.addEventListener("change", () => {
+    if (!reducedMotion.matches) return;
+    drawerAnimation?.cancel();
+    drawerAnimation = undefined;
+    if (closing) closeMenu(true);
+  });
+  window.addEventListener("pagehide", () => closeMenu(true));
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && disclosure?.open) {
       disclosure.open = false;
