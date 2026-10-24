@@ -105,3 +105,19 @@ Executed Impeccable layout detector before/after (no layout findings) and Taste 
 lint on five changed presentation files (0 failures/0 warnings). Browser inspection
 and screenshot rounds intentionally omitted per the user's code-only validation
 instruction. These are source checks, not a visual acceptance result.
+
+
+2026-10-24 identity refinement: retained the approved palette and layout direction.
+Read the supplied desktop/mobile references and new two-state geometric glyph images.
+Implemented a lowercase zoran leaf-framed wordmark, glyph-top ping-pong intro ending
+with no ball, desktop directory, full-screen mobile dialog, public CV and real-date
+Now timeline. Static Taste lint covers the navigation, footer and identity components;
+only the floating dropdown shadow and meaningful timeline connector are exempted.
+No browser round: the user's code-only verification instruction remains in force.
+
+2026-10-24 refinement: the reference site’s actual CSS uses Canela Deck, a licensed
+commercial face. The zoran mark now uses a self-hosted OFL Cormorant Garamond semibold
+subset with three-leaf forms growing above each end. The dropdown lists text without
+repeated glyphs. Major section titles use one ink; artistic letterforms supply contrast.
+The ping-pong ball varies arc height and horizontal drift while preserving letter-top
+landings and the fade after u. Source lint and build are the agreed verification scope.

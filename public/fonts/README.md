@@ -1,6 +1,16 @@
-# Newsreader
+# Zoran Zhou font files
 
-Newsreader by Production Type, supplied by Google Fonts under the SIL Open Font License 1.1. The full license is included in Newsreader-LICENSE.txt.
+Canela, Canela Deck, and Canela Text are the supplied Canela family files used for the site's English
+display, heading, and long-form text roles. They are self-hosted from the provided OTF files and are
+not redistributed as a package. Keep the supplied license and usage terms with the project when
+deploying these files.
 
-Source: https://github.com/google/fonts/tree/main/ofl/newsreader
-Downloaded from the Google Fonts CSS API on 2026-10-23; the regular upright face includes optical-size variation. It is hosted locally and used for Latin display headings; Chinese display text uses Songti SC / STSong where available. Body and code fonts remain the existing self-hosted Inter Variable and JetBrains Mono Variable packages.
+Lato is provided by the `@fontsource/lato` package and is used for English navigation and functional
+UI. Lato is licensed under the SIL Open Font License 1.1.
+
+Noto Serif SC is provided by Google Fonts and the Noto project under the SIL Open Font License 1.1.
+Its CSS and WOFF2 subsets are bundled through `@fontsource/noto-serif-sc`; the package license is
+retained in `node_modules/@fontsource/noto-serif-sc/LICENSE`.
+
+JetBrains Mono remains the code and terminal face. Inter remains available for compatibility with
+existing lab or legacy surfaces, but the main site UI now uses Lato and English prose uses Canela Text.

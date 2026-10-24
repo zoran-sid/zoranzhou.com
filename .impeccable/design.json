@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-24T06:40:10.554468+00:00",
+  "generatedAt": "2026-10-24T11:29:38.319390+00:00",
   "title": "Design System: Zoran’s Personal Journal",
   "extensions": {
     "colorMeta": {
@@ -427,6 +427,10 @@
       "subheading": {
         "displayName": "Collection fallback title",
         "purpose": "Readable title in a media cover fallback at 20px."
+      },
+      "brand": {
+        "displayName": "zoran 字标",
+        "purpose": "自托管 Cormorant Garamond Semibold；只用于鹿角字标。"
       }
     },
     "shadows": [
@@ -531,7 +535,7 @@
   ],
   "narrative": {
     "northStar": "随阅读展开的个人刊物",
-    "overview": "用接近白色的浅蓝、浅紫、暖白渐变连接全站，微光点覆盖整个视口并缓慢漂移。首页的精选文章、生活与学习区域各有细线、日光和轨道的变化。字体、真实照片与文章结构保持清晰；技术正文沿用稳定的阅读排版。",
+    "overview": "保留浅色滚动渐变、全屏微光点与日落主题。小写 zoran 两端的三叶片贴在字母上方形成鹿角，字标采用自托管 OFL 字体 Cormorant Garamond。首页乒乓球逐字跳跃，路径有小幅随机变化，到 u 后淡出；所有分区标题统一墨色，以不同字形和节奏区分。桌面目录行不再显示重复图标。",
     "keyCharacteristics": [
       "全屏浅色渐变随阅读位置变化，微光点持续缓慢移动",
       "板块各自表达内容，整体共享字体、颜色与动态节奏",

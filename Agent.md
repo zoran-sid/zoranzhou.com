@@ -881,8 +881,8 @@ text fallback. For English titles, use `nameEn` then the last ` / ` title alias;
 pretend a Korean/original title has been translated.
 
 Chinese film links use the existing Douban subject URL. English links use a verified
-`imdb` title ID (`tt…`) when present; otherwise the visible action is **Find on IMDb**
-and opens a title/year search. Never guess an IMDb ID from a title. Book Chinese links
+`imdb` title ID (`tt…`) when present; otherwise the cover/title opens an IMDb
+title/year search. Film cards omit source labels and visible viewing dates. Never guess an IMDb ID from a title. Book Chinese links
 use verified Douban book pages; English links currently use Google Books title/author
 search. Linked cover editions are references, not assertions of the edition read.
 
@@ -1338,7 +1338,7 @@ production function is explicitly requested.
 | `npx tsc --noEmit`               | Independent TypeScript check                  | No                                 | No after install               |
 | `npm run format`                 | Format repository-supported files             | Yes, broad mechanical rewrite      | No                             |
 | `npm run media:update`           | Update Movies table                           | Yes unless dry-run/output changed  | Yes for live mode              |
-| `npm run media:images`           | Cache book/recent film thumbnails locally     | Derived cache only                 | Yes                            |
+| `npm run media:images`           | Cache books/games/recent film thumbnails     | Derived cache only                 | Yes                            |
 | `npm run test:media-list`        | Test display dates, links and filters        | No                                 | No                             |
 | `npm run test:media-update`      | Test Media updater                            | Test artifacts only                | No expected live Douban        |
 | `npm run translate -- --dry-run` | Preview Chinese-to-English changes            | No                                 | No                             |
@@ -1626,9 +1626,9 @@ This section supersedes the old homepage order and adds publication rules. Read
 - Read and apply the installed karpathy-guidelines SKILL.md: explicit success criteria,
   minimum needed implementation, surgical edits, and testable completion. Do not rewrite
   working content/import/translation code just to increase the number of changed files.
-- Homepage pointer effects batch measurements and animate transforms only. Newsreader is
-  the installed 400-weight font; do not synthesize per-pointer font weights or alternate
-  geometry reads/writes for each letter. Reduce Motion cancels pending pointer work.
+- Homepage lettering now uses the bounded ping-pong introduction documented below.
+  Measure glyph tops once after fonts load, animate transforms, and cancel motion on
+  preference/visibility changes. Keep the complete name available without JavaScript.
 - BaseLayout caches the comet element and batches scroll indicator writes in animation
   frames; use shared scrollProgress instead of another clamp implementation.
 - RouteMap / RoutePostLayout use --line and --surface. Removed legacy --border-color and
@@ -1661,10 +1661,69 @@ points, typography and day/dusk/night transition.
   link only. It must not import MapLibre, embed route geometry/GPX URLs, preload GPX,
   or instantiate preview maps. Full maps stay on the existing map/detail pages.
 - Home and Life reuse these components. Library is a separate bilingual route and
-  is included in LifeNavigation and mobile navigation; the Life parent stays active.
+  is included in LifeNavigation and the Garden directory on both desktop and mobile.
 - On narrow screens the photo/journal and running/film columns stack in DOM order;
   book/poster grids reduce to two columns. Keep long original titles, visible metadata,
   keyboard focus and reduced-motion behavior.
 - New code checks are `test:media-list` and collection assertions in `test:site-build`.
   Validation remains code/build only at the user's request. No current screenshot or
   browser-performance approval is implied by the earlier historical browser record.
+
+## Personal wordmark, navigation and profile (2026-10-24)
+
+This section supersedes earlier references to pointer-driven hero lettering, the
+compact mobile menu and visible film viewing dates.
+
+- `GardenMark.astro` renders **zoran** in lowercase with two three-leaf clusters
+  attached above its first and last letters like small antlers. The full word stays
+  visible on phones. Leaves sway once on hover/focus and stop with reduced motion.
+  The reference site uses licensed Canela Deck; this site self-hosts the OFL-licensed
+  Cormorant Garamond semibold subset for a similar serif quality. Keep its OFL file.
+- `HeroSection.astro` keeps the accessible H1 `Zoran Zhou` visible by default. A white
+  ping-pong ball enters from the upper left, lands on each glyph in reading order,
+  makes a small final hop on **u**, then fades out. Each visit varies only the arc
+  height and slight sideways drift; the measured landing positions stay exact.
+  Measure after fonts are ready: the inline baseline marker plus Canvas text ascenders
+  locate each actual glyph top. Do not substitute equal-height letter boxes or run
+  geometry reads in an animation frame loop. `src/lib/name-bounce.ts` generates the
+  bounded parabolic keyframes; `scripts/test-name-bounce.ts` checks landings and fade.
+  Resize, hidden tabs and reduced-motion changes cancel the sequence. With scripts
+  disabled or reduced motion enabled, the complete name remains and the ball is hidden.
+- `Navigation.astro`: The Garden itself links to `/blog`; its adjacent native details
+  summary opens the desktop directory. Directory rows contain text only. Now links
+  to `/now`, About to `/about`.
+  Mobile uses a native modal dialog covering the viewport with safe-area padding and
+  independent scrolling. Preserve native focus containment/Escape, explicit close,
+  focus restoration, body scroll restoration, resize closure, search, language-cookie
+  handling and theme initialization. Below 360px the header language link moves to the
+  full-screen directory; language switching remains available there.
+- `GardenGlyph.astro` is shared by directory entries and running rows: a circle with
+  four inward arcs crossfades to four pointed petals on hover/focus. Touch navigation
+  never depends on hover. Reduced motion swaps the states without spatial animation.
+- Homepage labels: BLOG, 点点滴滴, 在路中去感受; footer heading 联络.
+  All major titles use the shared ink in both themes. Cormorant Garamond,
+  Newsreader and Chinese Kai forms distinguish sections through letterforms,
+  size and spacing. Keep mobile paragraphs grouped under clear headings.
+- `SiteFooter.astro` uses one outlined elliptical article-subscription link, icon-only
+  social links with accessible names, and an envelope that opens on hover/focus.
+  It retains the real subscription page, mailto destination and licence. Do not restore
+  the removed motivational footer sentence or decorative arrow links in the directory.
+- `/now` derives a chronological timeline from published localized writing and visible,
+  identity-normalized routes. Article timestamps mean publication dates; route dates
+  mean activity dates. The caption states this distinction. `src/data/now.ts` owns
+  the manually maintained current learning focus. Do not invent dated life events.
+- `src/data/profile.ts` owns the public bilingual CV summary used by About. The supplied
+  private PDF is not a public asset. Use sector descriptions for employers; omit client
+  names, internal systems, asset counts, vulnerability details and private contact data.
+  Keep degree status/expected completion explicit; do not upgrade learning into expertise.
+- Media cards retain viewing dates in `data-watched-date` for internal ordering, with
+  no visible viewing date or Douban/IMDb action label. Covers/titles are the actual
+  links. Pointer hover gently blurs neighbouring covers; keyboard focus keeps titles
+  readable and all links available. Book source labels remain explicit.
+- TV metadata resolves against a **unique** imported catalogue record by ID, URL, or
+  normalized name/year. Manual values win. First-season aliases may omit Season 1;
+  later season numbers must remain distinct. Ambiguous matches stay unmatched.
+  `test:media-list` checks metadata inheritance, ambiguity, category filtering and all
+  current TV/game cached files. Cache all games in the normal manual `media:images` run.
+- Validation for this change is code/build only by user request. No browser, screenshot
+  or production acceptance is implied. Do not deploy or push as part of this pass.

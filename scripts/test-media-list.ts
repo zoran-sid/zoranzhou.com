@@ -229,3 +229,51 @@ test("category, search, load more and empty states operate together", () => {
     else Reflect.deleteProperty(globalThis, "window");
   }
 });
+
+test("TV inherits viewing metadata from a unique catalogue match, preserving manual values", () => {
+  const entries = parseMediaList(`## movies
+| name | year | rating | status | watchedDate | poster | url | imdb |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 第一季 / Story Season 1 | 2024 | 3 | watched | 2026-09-10 | https://example.com/one.jpg | https://example.com/one | tt1234567 |
+| 第二季 / Story Season 2 | 2024 | 3 | watched | 2026-10-10 | https://example.com/two.jpg | https://example.com/two | tt1234568 |
+## tv
+| name | year | rating | status | watchedDate |
+| --- | --- | --- | --- | --- |
+| 第二季 / Story  Season 2 | 2024 | 5 | watching | |
+| Story | 2024 | 4 | watched | 2026-01-01 |`);
+  const tv = entries.filter((item) => item.category === "tv");
+  assert.equal(tv[0].poster, "https://example.com/two.jpg");
+  assert.equal(tv[0].watchedDate, "2026-10-10");
+  assert.equal(tv[0].rating, 5);
+  assert.equal(tv[0].status, "watching");
+  assert.equal(tv[1].poster, "https://example.com/one.jpg");
+  assert.equal(tv[1].watchedDate, "2026-01-01");
+});
+
+test("ambiguous TV metadata stays unmatched instead of borrowing an arbitrary poster", () => {
+  const entries = parseMediaList(`## movies
+| name | year | rating | status | poster |
+| --- | --- | --- | --- | --- |
+| Shared title | 2020 | | watched | https://example.com/a.jpg |
+| Shared title | 2020 | | watched | https://example.com/b.jpg |
+## tv
+| name | year | rating | status |
+| --- | --- | --- | --- |
+| Shared title | 2020 | | watched |`);
+  assert.equal(entries.at(-1)?.poster, undefined);
+});
+
+test("all existing TV and game covers have local files", () => {
+  const entries = parseMediaList(readFileSync("src/content/media.md", "utf8"));
+  const cache = JSON.parse(readFileSync("src/data/media-covers.json", "utf8"));
+  for (const item of entries.filter((item) =>
+    ["tv", "games"].includes(item.category),
+  )) {
+    assert.ok(
+      item.poster &&
+        cache[item.poster] &&
+        existsSync(`public${cache[item.poster]}`),
+      item.name,
+    );
+  }
+});

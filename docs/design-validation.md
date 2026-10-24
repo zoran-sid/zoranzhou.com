@@ -1,3 +1,58 @@
+# Identity refinement — 2026-10-24
+
+按新截图微调：zoran 字标的小三叶草贴在首尾字母上方，像两只鹿角；菜单行移除几何
+图标；首页各分区主标题统一墨色，以 Cormorant Garamond、Newsreader 和中文楷体
+回退组合表现差异。参考站实际使用 Canela Deck，本站选用有 OFL 授权且已本地缓存的
+Cormorant Garamond Semibold，并保存授权文件。乒乓球的每次跳高和侧向偏移有
+小范围随机变化，落点仍以字母真实顶部为准，最终在 u 处淡出。
+
+本轮验证：`test:name-bounce` 3 项、`test:atmosphere` 4 项通过；Astro 检查、
+构建、站点产物检查结果见本页后续记录。依用户要求仅做代码和构建验证。
+
+---
+
+# Personal identity and navigation validation — 2026-10-24
+
+本轮完成首页姓名动画、zoran 三叶草字标、桌面目录、手机全屏导航、图标页脚、
+跑步条目交互、影视卡片精简，以及双语 Now / About。随后按用户追加说明，将球改为
+沿每个字母顶部跳跃的白色乒乓球，到最后的 u 轻弹后淡出；图标使用所附截图中的
+圆形内弧与四瓣叶形。About 文案依据用户提供的简历，隐藏具体公司与内部业务细节。
+
+实际执行：
+
+- Impeccable：读取并应用 animate / adapt / craft-floor / polish 工作方法，保留已有
+  全屏渐变、微光点与日落主题；没有新增动画依赖。
+- Taste：执行 8 个身份、导航、页脚文件的源码检查，0 FAIL / 0 WARN。两项明确例外：
+  浮动目录的阴影、时间线连接日期的细线。用户指定的背景和姓名风格优先于通用风格限制。
+- anti-defensive-writing：公开简历用教育、职责和实际项目事实组织，区分在读与已完成，
+  学习中与已有技能；不公开公司、客户、内部系统、漏洞数量或私人电话。
+- karpathy-guidelines：维持 Astro 与现有内容入口；动画路径独立为小型纯函数并做测试。
+
+代码与构建结果：
+
+| 检查 | 结果 |
+| --- | --- |
+| Astro check | 94 文件，0 错误 / 0 警告 / 0 提示 |
+| 修改脚本严格 TypeScript 检查 | 通过 |
+| test:name-bounce | 2 项通过，逐字落点、抛物线与最终淡出 |
+| test:media-list | 9 项通过，含剧集日期继承、歧义保护、102 条剧集与 48 条游戏本地封面 |
+| test:media-update | 10 项通过 |
+| test:editorial | 6 项通过 |
+| test:atmosphere / test:theme | 4 / 7 项通过；新增分区色覆盖两种主题各 301 个进度点 |
+| test:language-routing | 7 个场景通过 |
+| Astro build | 143 页通过 |
+| test:site-build | 全部内部链接、元数据、双语搜索/RSS、Lab 边界与新增页面检查通过 |
+
+修正：剧集只从唯一匹配记录补齐观看日期、来源和海报，手工字段优先；Minecraft
+误用的 Dungeons 封面换为 Minecraft 官网页面的分享图片并缓存。普通手动缓存命令
+现在包含全部游戏。未改写个人评分、观看/游玩状态、文章或翻译内容。
+
+构建仍提示部分历史文章远程图片重定向，沿用已有本地缓存并成功完成。此轮依用户
+要求仅做代码/构建检查；没有浏览器截图、交互设备或视觉时序验收，也没有提交、推送
+或部署。新动画的源逻辑测试不等同于已验证真实浏览器合成效果。
+
+---
+
 # Homepage collections validation — 2026-10-24
 
 本轮扩充首页、Life、Media，并新增双语 Library。参考 Maggie Appleton 网站对写作、

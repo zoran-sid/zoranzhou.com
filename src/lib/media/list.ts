@@ -171,14 +171,16 @@ function normalizeCell(value: string | undefined) {
   return (value ?? "").trim().replace(/^["']|["']$/g, "");
 }
 
-function mediaLookupKeys(item: Pick<MediaListItem, "name" | "nameEn" | "year">) {
+function mediaLookupKeys(
+  item: Pick<MediaListItem, "name" | "nameEn" | "year">,
+) {
   const names = [item.name, item.nameEn]
     .filter((value): value is string => Boolean(value))
     .flatMap((value) => value.split(" / "));
   return names.flatMap((name) => {
     const normalized = name.replace(/\s+/g, " ").trim().toLocaleLowerCase();
     const withoutSeason = normalized
-      .replace(/\s+(?:season|第)\s*\d+\s*季?$/i, "")
+      .replace(/\s+(?:season\s+1|第一季|第\s*1\s*季)$/i, "")
       .trim();
     return [...new Set([normalized, withoutSeason])].map(
       (value) => `${value}|${item.year ?? ""}`,
@@ -277,16 +279,25 @@ export function parseMediaList(markdown: string): MediaListItem[] {
     });
   }
 
-  const posters = new Map<string, string>();
-  for (const item of items) {
-    if (!item.poster) continue;
-    for (const key of mediaLookupKeys(item)) posters.set(key, item.poster);
-  }
-  for (const item of items) {
-    if (item.poster || item.category !== "tv") continue;
-    item.poster = mediaLookupKeys(item)
-      .map((key) => posters.get(key))
-      .find((poster): poster is string => Boolean(poster));
+  // Legacy TV rows share imported catalogue records. Resolve only one unique
+  // film record and retain every explicit field from the hand-maintained TV row.
+  const catalogue = items.filter((item) => item.category === "movies");
+  for (const item of items.filter((item) => item.category === "tv")) {
+    const keys = mediaLookupKeys(item);
+    const matches = catalogue.filter((candidate) =>
+      item.id
+        ? candidate.id === item.id
+        : item.url
+          ? candidate.url === item.url
+          : mediaLookupKeys(candidate).some((key) => keys.includes(key)),
+    );
+    if (matches.length !== 1) continue;
+    const match = matches[0];
+    item.poster ??= match.poster;
+    item.url ??= match.url;
+    item.imdb ??= match.imdb;
+    item.watchedDate ??= match.watchedDate;
+    item.id ??= match.id;
   }
 
   // A stable sort preserves the source's order for same-day and undated entries.

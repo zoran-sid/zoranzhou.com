@@ -8,7 +8,7 @@
 }
 .garden-hero h1 {
   font-family: var(--font-display);
-  font-size: clamp(5rem, 13vw, 11.5rem);
+  font-size: clamp(4.5rem, 12vw, 10.5rem);
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.035em;
@@ -22,7 +22,6 @@
 .hero-name-letter {
   display: inline-block;
   transform-origin: center bottom;
-  transition: transform 360ms var(--ease-out);
 }
 .garden-introduction {
   display: grid;
@@ -45,12 +44,10 @@
   padding-bottom: 0.3rem;
 }
 .garden-index {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  display: block;
   margin-top: 3rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--line-strong);
+  border-top: 1px solid var(--line);
 }
 .garden-now {
   display: grid;
@@ -73,29 +70,6 @@
   text-decoration: underline;
   text-underline-offset: 0.3em;
   font-size: 0.875rem;
-}
-.garden-paths {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-.garden-paths a {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  padding-top: 0.2rem;
-}
-.garden-paths a span:first-child {
-  font-size: 1.1rem;
-}
-.garden-paths a span:last-child {
-  color: var(--muted);
-  font-size: 0.875rem;
-}
-.garden-paths a:hover span:first-child {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 0.3em;
 }
 .recent-section {
   padding-block: 1.5rem 2.5rem;
@@ -214,7 +188,7 @@
     padding-block: 2.2rem 1rem;
   }
   .garden-hero h1 {
-    font-size: clamp(3.4rem, 15.8vw, 5.8rem);
+    font-size: clamp(2.8rem, 13.8vw, 5.8rem);
     letter-spacing: -0.035em;
     margin-bottom: 1.5rem;
   }
@@ -225,17 +199,15 @@
     font-size: 1.125rem;
     line-height: 1.8;
   }
+  .hero-actions {
+    padding-bottom: 0;
+  }
   .garden-index {
-    grid-template-columns: 1fr;
     margin-top: 2rem;
     padding-block: 1.5rem;
-    gap: 2rem;
   }
   .garden-now {
     padding: 0;
-  }
-  .garden-paths {
-    gap: 1.4rem;
   }
   .selected-grid {
     grid-template-columns: 1fr;
@@ -251,7 +223,10 @@
     font-size: 1.85rem;
   }
   .selected-story {
-    padding-block: 1.5rem;
+    padding-block: 0.75rem;
+  }
+  .selected-story__bottom {
+    margin-top: 0.75rem;
   }
   .garden-projects .section-head {
     flex-wrap: wrap;
@@ -402,5 +377,151 @@
 @media (max-width: 399px) {
   .recent-cinema__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* One bounded name sequence; the static wordmark is always readable. */
+.hero-name-stage {
+  padding-top: 2.25rem;
+  padding-bottom: 0.6rem;
+}
+.hero-ball {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(16px, 2.5vw, 28px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fffcf4;
+  border: 1.5px solid #aaa798;
+  opacity: 0;
+  pointer-events: none;
+}
+.hero-baseline {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  vertical-align: baseline;
+}
+.hero-letter-0,
+.hero-letter-6 {
+  font-style: italic;
+}
+.hero-letter-1 {
+  font-family: var(--font-sans);
+  font-weight: 300;
+}
+.hero-letter-3 {
+  font-style: italic;
+}
+:root {
+  --garden-green: #22635b;
+  --section-blue: #3d6092;
+  --section-ochre: #75521f;
+}
+.dark {
+  --garden-green: #8cc7bb;
+  --section-blue: #a8bfec;
+  --section-ochre: #dec18f;
+}
+/* Section identities come from letterforms and spacing, not coloured titles. */
+#selected-title,
+#running-heading,
+#cinema-heading {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: clamp(2rem, 3vw, 3rem);
+  color: var(--ink);
+}
+#recent-title,
+.life-feature .section-head h2,
+.library-shelf .section-head h2,
+.garden-projects .section-head h2 {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-style: normal;
+  color: var(--ink);
+}
+.editorial-section > .section-head {
+  margin-bottom: 2.5rem;
+}
+.home-activities .section-head h2 {
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+}
+.running-list li + li {
+  margin-top: 0.6rem;
+}
+.running-list a {
+  position: relative;
+  padding: 1.3rem 1.2rem 1.3rem 3.75rem;
+  border-radius: 12px;
+  transition: background 200ms ease;
+}
+.running-list a:is(:hover, :focus-visible) {
+  background: var(--surface-raised);
+}
+.running-symbol {
+  position: absolute;
+  top: 1.55rem;
+  left: 0.65rem;
+  width: 2rem;
+  height: 2rem;
+  color: var(--garden-green);
+  transition: transform 400ms var(--ease-out);
+}
+
+.running-list h3 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1.35;
+  letter-spacing: -0.012em;
+  word-spacing: 0.08em;
+}
+.running-list + .text-link {
+  font-size: 1rem;
+  min-height: 3rem;
+  gap: 1.1rem;
+}
+@media (max-width: 639px) {
+  .editorial-section {
+    padding-block: 2.75rem;
+  }
+  .editorial-section > .section-head {
+    margin-bottom: 1.6rem;
+  }
+  .section-head {
+    align-items: start;
+    gap: 1rem;
+  }
+  .section-head h2 {
+    line-height: 1.4;
+  }
+  .section-head p {
+    margin-top: 0.75rem;
+    line-height: 1.75;
+  }
+  .garden-deck {
+    font-size: 1rem;
+  }
+  .garden-index {
+    border-top: 1px solid var(--line);
+    padding: 1.5rem;
+    background: var(--surface-soft);
+  }
+  .home-activities {
+    gap: 4.5rem;
+  }
+  .running-list a {
+    padding-left: 3.1rem;
+    padding-right: 0.5rem;
+  }
+  .running-list h3 {
+    font-size: 1.3rem;
+  }
+  .running-symbol {
+    left: 0.1rem;
+  }
+  .selected-story p {
+    line-height: 1.75;
   }
 }

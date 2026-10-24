@@ -75,7 +75,20 @@ test("colour transitions retain endpoints and stay continuous across stops", () 
 
 test("text retains AA contrast through scroll, including the brightest light point", () => {
   for (const dark of [false, true]) {
-    const inks = ["ink", "muted", "accent"].map((name) => token(dark, name));
+    const homeCss = readFileSync(
+      new URL("../src/styles/home.css", import.meta.url),
+      "utf8",
+    );
+    const sectionBlock = homeCss.match(
+      dark ? /\.dark \{([\s\S]*?)\n\}/ : /:root \{([\s\S]*?)\n\}/,
+    )![1];
+    const sectionInks = ["garden-green", "section-blue", "section-ochre"].map(
+      (name) => sectionBlock.match(new RegExp(`--${name}: (#[\\da-f]+)`))![1],
+    );
+    const inks = [
+      ...["ink", "muted", "accent"].map((name) => token(dark, name)),
+      ...sectionInks,
+    ];
     for (let i = 0; i <= 300; i++) {
       const base = atmosphereColor(i / 300, dark);
       const { color: point, opacity } = lightStyle(dark);

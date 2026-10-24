@@ -2,7 +2,8 @@
   max-width: 48rem;
   color: var(--muted);
   font-size: clamp(1rem, 1.25vw, 1.075rem);
-  line-height: 1.9;
+  font-family: var(--font-body);
+  line-height: var(--font-prose-leading);
   overflow-wrap: break-word;
 }
 .prose h1,
@@ -31,7 +32,7 @@
 .prose p {
   margin: 1.35em 0;
   color: var(--muted);
-  line-height: 1.9;
+  line-height: var(--font-prose-leading);
 }
 .prose strong {
   color: var(--ink);

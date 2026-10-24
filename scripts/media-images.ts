@@ -21,7 +21,7 @@ const games = items.filter((item) => item.category === "games");
 const selected = [
   ...items.filter((item) => item.category === "books"),
   ...(args.includes("--all") ? films : films.slice(0, 24)),
-  ...(args.includes("--all") ? games : games.slice(0, 24)),
+  ...games,
 ];
 const covers: Record<string, string> = JSON.parse(
   await fs.readFile(manifestPath, "utf8"),

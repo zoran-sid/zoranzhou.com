@@ -1,9 +1,34 @@
 @import "tailwindcss";
 @import "./prose.css";
 @import "./reading.css";
+@import "@fontsource/noto-serif-sc/chinese-simplified-400.css";
+@import "@fontsource/noto-serif-sc/chinese-simplified-600.css";
+@import "@fontsource/lato/400.css";
+@import "@fontsource/lato/700.css";
 @font-face {
-  font-family: "Newsreader";
-  src: url("/fonts/newsreader-regular.ttf") format("truetype");
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant-garamond-semibold-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Canela";
+  src: url("/fonts/Canela-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Canela Deck";
+  src: url("/fonts/CanelaDeck-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Canela Text";
+  src: url("/fonts/CanelaText-RegularNo2.otf") format("opentype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -11,8 +36,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 @theme {
   --font-sans:
-    "Inter Variable", "PingFang SC", "Microsoft YaHei", "Noto Sans SC",
-    system-ui, sans-serif;
+    var(--font-ui);
   --font-mono: "JetBrains Mono Variable", "SFMono-Regular", Consolas, monospace;
   --color-gray-400: #818691;
   --color-gray-500: #626976;
@@ -42,9 +66,37 @@
   --signal: #53799b;
   --shadow-card: 0 12px 36px #25314a08;
   --shadow-hover: 0 18px 42px #25314a10;
-  --font-display:
-    "Newsreader", Georgia, "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  --font-display-en: "Canela", Georgia, serif;
+  --font-display-zh:
+    "Noto Serif SC", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  --font-title-en: "Canela Deck", "Canela", Georgia, serif;
+  --font-title-zh: var(--font-display-zh);
+  --font-text-en: "Canela Text", Georgia, serif;
+  --font-display-cjk:
+    "Noto Serif SC", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  --font-display: var(--font-display-en);
+  --font-title: var(--font-title-en);
+  --font-body-en: var(--font-text-en);
+  --font-body-zh:
+    "PingFang SC", "PingFang TC", "Microsoft YaHei", "Noto Sans SC",
+    system-ui, sans-serif;
+  --font-body: var(--font-body-en);
+  --font-ui-en: "Lato", "Helvetica Neue", Arial, sans-serif;
+  --font-ui-zh:
+    "PingFang SC", "PingFang TC", "Microsoft YaHei", "Noto Sans SC",
+    system-ui, sans-serif;
+  --font-ui: var(--font-ui-en);
+  --font-title-size: clamp(2.05rem, 3.35vw, 3.25rem);
+  --font-title-leading: 1.12;
+  --font-prose-leading: 1.72;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+html:lang(zh-CN),
+html:lang(zh-HK) {
+  --font-body: var(--font-body-zh);
+  --font-display: var(--font-display-zh);
+  --font-title: var(--font-title-zh);
+  --font-ui: var(--font-ui-zh);
 }
 .dark {
   color-scheme: dark;
@@ -82,9 +134,27 @@ body {
   margin: 0;
   background: var(--page);
   color: var(--ink);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.75;
+}
+.article-title,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.site-footer .footer-contact h2 {
+  font-family: var(--font-title);
+  font-synthesis: none;
+  text-wrap: balance;
+}
+.garden-hero h1,
+.site-footer .footer-contact h2 {
+  font-family: var(--font-display);
+}
+.article-title {
+  font-size: var(--font-title-size);
+  line-height: var(--font-title-leading);
 }
 [hidden] {
   display: none !important;
@@ -121,13 +191,14 @@ h4,
 h5,
 h6 {
   color: var(--ink);
-  font-weight: 500;
+  font-family: var(--font-title);
+  font-weight: 400;
   text-wrap: balance;
-  line-height: 1.35;
-  letter-spacing: -0.035em;
+  line-height: 1.16;
+  letter-spacing: -0.018em;
 }
 :lang(zh-CN) :is(h1, h2, h3, h4) {
-  letter-spacing: -0.025em;
+  letter-spacing: -0.035em;
 }
 p {
   color: var(--ink);
@@ -148,7 +219,7 @@ p {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
   font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.6;
@@ -163,7 +234,8 @@ p {
   align-items: center;
   gap: 1rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-family: var(--font-ui);
+  font-weight: 400;
   min-height: 2.75rem;
   color: var(--ink);
 }
@@ -188,8 +260,9 @@ p {
   border: 1px solid var(--accent);
   border-radius: 4px;
   color: var(--accent-ink);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 700;
   transition:
     background 0.2s,
     color 0.2s;

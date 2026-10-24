@@ -1,0 +1,230 @@
+.personal-page {
+  max-width: 1120px;
+}
+.profile-section,
+.now-present {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  gap: 2.5rem;
+  padding-block: 3rem;
+  border-top: 1px solid var(--line);
+}
+.profile-section h2,
+.now-present h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.8rem;
+  line-height: 1.4;
+  color: var(--accent);
+}
+.profile-section h2 {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+.section-marker {
+  position: relative;
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  margin-top: 0.45rem;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+}
+.section-marker::after {
+  content: "";
+  position: absolute;
+  width: 0.4rem;
+  height: 0.4rem;
+  right: -0.22rem;
+  top: -0.22rem;
+  border-top: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+  transform: rotate(45deg);
+}
+.profile-section p,
+.now-present p {
+  max-width: 65ch;
+  line-height: 1.9;
+}
+.profile-copy {
+  display: grid;
+  gap: 1.1rem;
+}
+.profile-copy p {
+  margin: 0;
+}
+.profile-current {
+  font-size: 1.1rem;
+}
+.profile-current strong {
+  font-weight: 550;
+}
+.profile-entry + .profile-entry {
+  margin-top: 3.25rem;
+}
+.experience-timeline {
+  position: relative;
+  padding-left: 1.75rem;
+}
+.experience-timeline::before {
+  content: "";
+  position: absolute;
+  left: 0.28rem;
+  top: 0.5rem;
+  bottom: 0.6rem;
+  width: 1px;
+  background: var(--line-strong);
+}
+.experience-timeline .profile-entry {
+  position: relative;
+}
+.experience-timeline .profile-entry::before {
+  content: "";
+  position: absolute;
+  left: -1.75rem;
+  top: 0.35rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 2px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--page);
+}
+.profile-entry h3 {
+  font-weight: 550;
+  font-size: 1.25rem;
+  margin-block: 0.35rem 0.35rem;
+}
+.profile-entry .profile-date {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.profile-entry .profile-place {
+  color: var(--muted);
+  margin-bottom: 0.7rem;
+  font-size: 0.95rem;
+}
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin-top: 1.25rem;
+}
+.qualification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.qualification-list li {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.qualification-list span {
+  color: var(--muted);
+}
+.qualification-list strong {
+  font-weight: 500;
+}
+.now-present {
+  background: var(--surface-soft);
+  padding: 2.5rem;
+  border-radius: 12px;
+  margin-bottom: 3rem;
+}
+.now-present p + p {
+  margin-top: 0.8rem;
+}
+.now-present .text-link {
+  margin-top: 1rem;
+}
+.timeline-caption {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.timeline-year {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 2rem;
+  margin-block: 3rem 4rem;
+}
+.timeline-year > h2 {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 400;
+  color: var(--accent);
+}
+.moment-list {
+  margin: 0;
+  padding: 0 0 0 2rem;
+  list-style: none;
+  border-left: 1px solid var(--line-strong); /* taste-skill-ignore: connects dated events in the requested timeline. */
+}
+.moment-list li {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+.moment-list li::before {
+  content: "";
+  position: absolute;
+  left: calc(-2rem - 5px);
+  top: 0.6rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.moment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.moment-list h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  margin-block: 0.65rem;
+}
+.moment-list h3 a:hover {
+  color: var(--accent);
+}
+.moment-list p {
+  max-width: 60ch;
+  line-height: 1.85;
+}
+@media (max-width: 767px) {
+  .profile-section,
+  .now-present {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding-block: 2rem;
+  }
+  .now-present {
+    padding: 1.5rem;
+  }
+  .profile-context__body {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .about-portrait {
+    justify-self: start;
+    width: min(100%, 15rem);
+  }
+  .timeline-year {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .moment-list {
+    margin-left: 0.3rem;
+    padding-left: 1.5rem;
+  }
+  .moment-list li::before {
+    left: calc(-1.5rem - 5px);
+  }
+}

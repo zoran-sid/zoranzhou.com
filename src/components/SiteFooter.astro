@@ -1,56 +1,92 @@
 ---
-import ArrowIcon from "./ArrowIcon.astro";
-import { COPYRIGHT, SOCIAL_LINKS } from "../lib/constants";
+import { COPYRIGHT, SOCIAL_LINKS, SOCIAL_ICONS } from "../lib/constants";
 import { editorial } from "../i18n/editorial";
 import { localizePath, type Locale } from "../i18n/utils";
+import "../styles/footer.css";
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
 const c = editorial(locale);
-const email = SOCIAL_LINKS.find((link) => link.name === "email")!;
+const footerLinks = [
+  { label: zh ? "文章" : "Writing", href: "/blog" },
+  { label: zh ? "短笔记" : "Notes", href: "/blog/formats/note" },
+  { label: zh ? "关于" : "About", href: "/about" },
+  { label: "Now", href: "/now" },
+  { label: zh ? "项目" : "Projects", href: "/projects" },
+  { label: zh ? "书架" : "Library", href: "/library" },
+  { label: zh ? "摄影" : "Photography", href: "/photos" },
+  { label: zh ? "影视与游戏" : "Films & games", href: "/media" },
+];
 ---
 
 <footer class="site-footer" id="contact">
   <div class="page-container">
-    <div class="footer-contact">
-      <div>
-        <h2>{locale === "zh-CN" ? "保持联系" : "Stay in touch"}</h2><p>
-          {c.contactDeck}
-        </p>
-      </div><a class="button-primary" href={email.url}
-        >{c.email}<span aria-hidden="true"
-          ><ArrowIcon direction="up-right" /></span
-        ></a
-      >
-    </div>
-    <div class="footer-links">
-      <a href={localizePath("/subscribe", locale)}
-        >{c.subscribe}<span aria-hidden="true"
-          ><ArrowIcon direction="up-right" /></span
-        ></a
-      ><div>
+    <div class="footer-layout">
+      <div class="footer-primary">
+        <div class="footer-contact">
+          <div><h2>{zh ? "联络" : "Keep in touch"}</h2><p>{c.contactDeck}</p></div>
+        </div>
+        <div class="footer-connect">
+          <a class="subscribe-pill" href={localizePath("/subscribe", locale)}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+              ><circle cx="5" cy="19" r="1.3" fill="currentColor"></circle><path
+                d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"></path></svg
+            >
+            {c.subscribe}
+          </a>
+          <nav
+            class="footer-socials"
+            aria-label={zh ? "社交主页" : "Social profiles"}
+          >
+            {
+              SOCIAL_LINKS.filter(
+                (link) => link.url !== "#" && link.name !== "email",
+              ).map((link) => (
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  title={link.label}
+                >
+                  {link.name === "instagram" ? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="5" />
+                      <circle cx="12" cy="12" r="4" />
+                      <circle cx="17.5" cy="6.5" r=".8" fill="currentColor" />
+                    </svg>
+                  ) : (
+                    <span aria-hidden="true" set:html={SOCIAL_ICONS[link.name]} />
+                  )}
+                </a>
+              ))
+            }
+          </nav>
+        </div>
+        <div class="footer-bottom">
+          <span>© {new Date().getFullYear()} Zoran Zhou</span><a
+            href={COPYRIGHT.licenseUrl}
+            target="_blank"
+            rel="noopener noreferrer">{COPYRIGHT.license}</a>
+        </div>
+      </div>
+      <nav class="footer-directory" aria-label={zh ? "网站目录" : "Site directory"}>
         {
-          SOCIAL_LINKS.filter(
-            (link) => link.url !== "#" && link.name !== "email",
-          ).map((link) => (
-            <a href={link.url} target="_blank" rel="noopener noreferrer">
-              {link.label}
-              <span aria-hidden="true">
-                <ArrowIcon direction="up-right" />
-              </span>
-            </a>
+          footerLinks.map((link) => (
+            <a href={localizePath(link.href, locale)}>{link.label}</a>
           ))
         }
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© {new Date().getFullYear()} ZORAN ZHOU</span><span
-        >{
-          locale === "zh-CN"
-            ? "保持好奇，持续记录。"
-            : "Stay curious. Keep a record."
-        }</span
-      ><a href={COPYRIGHT.licenseUrl} target="_blank" rel="noopener noreferrer"
-        >{COPYRIGHT.license}</a
-      >
+      </nav>
     </div>
   </div>
 </footer>

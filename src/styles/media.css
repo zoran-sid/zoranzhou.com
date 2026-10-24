@@ -170,3 +170,30 @@
     align-items: stretch;
   }
 }
+
+/* Focus a cover without hiding its title or requiring hover to follow its link. */
+.media-cover {
+  transition:
+    filter 220ms ease,
+    opacity 220ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  :is(.media-grid, .recent-cinema__grid):has(.media-card__main[href]:hover)
+    .media-card:not(:hover)
+    .media-cover {
+    filter: blur(1.5px);
+    opacity: 0.65;
+  }
+}
+:is(.media-grid, .recent-cinema__grid):has(.media-card__main:focus-visible)
+  .media-card:not(:focus-within)
+  .media-cover {
+  opacity: 0.65;
+}
+@media (prefers-reduced-motion: reduce) {
+  .media-cover {
+    transition: none;
+  }
+}
+
+.media-card[data-category="games"] .media-cover img { object-fit: contain; }

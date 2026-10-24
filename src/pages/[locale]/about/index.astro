@@ -1,90 +1,123 @@
 ---
-import ArrowIcon from "../../../components/ArrowIcon.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import portrait from "../../../assets/images/zoran-portrait.webp";
-import { editorial } from "../../../i18n/editorial";
-import {
-  locales,
-  getTranslations,
-  localizePath,
-  type Locale,
-} from "../../../i18n/utils";
+import { locales, localizePath, type Locale } from "../../../i18n/utils";
+import { profile, qualifications } from "../../../data/profile";
 import "../../../styles/collections.css";
-export async function getStaticPaths() {
+import "../../../styles/personal.css";
+export function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
 }
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
-const c = editorial(locale);
-const t = getTranslations(locale);
+const zh = locale === "zh-CN";
+const p = profile[locale];
 ---
 
-<BaseLayout title={c.about} description={c.aboutDeck}>
-  <div class="page-container">
+<BaseLayout title="About" description={p.intro}>
+  <div class="page-container personal-page">
     <header class="page-intro about-intro">
-      <div>
-        <h1>
-          {c.aboutTitle.split("\n").map((line) => <span>{line}</span>)}
-        </h1><p>{c.aboutDeck}</p><a class="text-link" href="#contact"
-          >{c.contact} <ArrowIcon direction="up-right" /></a
-        >
-      </div><div class="about-portrait">
-        <Image
-          src={portrait}
-          alt="Zoran Zhou"
-          width={300}
-          height={300}
-          quality={90}
-        />
-      </div>
+      <p class="about-kicker">ABOUT</p>
+      <h1>{zh ? "Zoran Zhou" : "Zoran Zhou"}</h1>
+      <p class="about-lede">{p.intro}</p>
     </header>
-    <section class="about-story editorial-section">
-      <div><h2>{t.aboutHeadline}</h2></div><div>
-        {t.aboutParagraphs.map((paragraph) => <p>{paragraph}</p>)}<p>
-          {
-            locale === "zh-CN"
-              ? "工作之外，我喜欢阅读、摄影与跑步，也会把旅途中的观察和生活里的思考写在这里。"
-              : "Outside work, I read, take photographs and run. This site also holds observations from my travels and thoughts from everyday life."
-          }
-        </p><a class="text-link" href={localizePath("/life", locale)}
-          >{c.exploreLife} <ArrowIcon direction="up-right" /></a
-        >
+    <section class="profile-section profile-context">
+      <h2><span class="section-marker" aria-hidden="true"></span>{zh ? "一些背景" : "A little context"}</h2>
+      <div class="profile-context__body">
+        <div class="profile-copy">
+          <p>
+            {zh
+              ? "我坐在网络、安全、软件与数据的交界处。它们并不是几条彼此独立的技能线，而是我理解问题、动手验证并把复杂事情讲清楚的几种方式。"
+              : "I sit at the intersection of networks, security, software and data. They are not separate skill tracks so much as different ways I understand problems, test ideas and make complicated things clearer."}
+          </p>
+          <p>
+            {zh
+              ? "过去的工作让我熟悉基础设施与安全运营；现在的学习则把视线带向数据科学、AI 和更完整的软件构建过程。"
+              : "My earlier work gave me a grounding in infrastructure and security operations. My current studies are taking me further into data science, AI and the fuller process of building software."}
+          </p>
+        </div>
+        <div class="about-portrait">
+          <Image
+            src={portrait}
+            alt="Zoran Zhou"
+            width={420}
+            height={520}
+            quality={90}
+          />
+        </div>
       </div>
     </section>
-    <section class="editorial-section">
-      <header class="section-head">
-        <div><h2>{c.approach}</h2></div>
-      </header><div class="method-grid">
+    <section class="profile-section">
+      <h2><span class="section-marker" aria-hidden="true"></span>{zh ? "最近几年" : "The last few years"}</h2><div class="experience-timeline">
         {
-          c.methodTitles.map((title, index) => (
-            <article>
+          p.experience.map((item) => (
+            <article class="profile-entry">
               <>
-                <h3>{title}</h3>
-                <p>{c.methodBody[index]}</p>
+                <p class="profile-date">{item.date}</p>
+                <h3>{item.title}</h3>
+                <p class="profile-place">{item.place}</p>
+                <p>{item.body}</p>
               </>
             </article>
           ))
         }
       </div>
     </section>
-    <section class="editorial-section">
-      <header class="section-head">
-        <div><h2>{c.skills}</h2></div>
-      </header><div class="expertise-list">
+    <section class="profile-section">
+      <h2><span class="section-marker" aria-hidden="true"></span>{zh ? "正在做的事" : "What I’m working on"}</h2><div class="profile-copy">
         {
-          t.skillsGroups.map((group) => (
-            <article>
+          p.education.map((item) => (
+            <p class="profile-current">
+              <strong>{item.title}</strong> · {item.body}
+            </p>
+          ))
+        }
+        <p>{p.research}</p>
+        <div class="profile-links">
+          <a class="text-link" href={localizePath("/projects", locale)}
+            >{zh ? "项目记录" : "Projects"}</a
+          ><a class="text-link" href={localizePath("/lab", locale)}>Web3 Lab</a>
+        </div>
+      </div>
+    </section>
+    <section class="profile-section">
+      <h2><span class="section-marker" aria-hidden="true"></span>{zh ? "我经常思考的方向" : "Things I keep exploring"}</h2><div>
+        {
+          p.skills.map((item) => (
+            <article class="profile-entry">
               <>
-                <h3>{group.category}</h3>
-                <ul>
-                  {group.items.map((item) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
               </>
             </article>
           ))
         }
+      </div>
+    </section>
+    <section class="profile-section">
+      <h2><span class="section-marker" aria-hidden="true"></span>{zh ? "专业认证" : "Qualifications"}</h2><ul
+        class="qualification-list"
+      >
+        {
+          qualifications.map((item) => (
+            <li>
+              <>
+                <span>{item.year}</span>
+                <strong>{item.name}</strong>
+              </>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+    <section class="profile-section" id="contact">
+      <h2><span class="section-marker" aria-hidden="true"></span>{zh ? "离开屏幕之后" : "Away from the desk"}</h2><div class="profile-copy">
+        <p>{p.outside}</p><div class="profile-links">
+          <a class="text-link" href={localizePath("/life", locale)}
+            >{zh ? "点点滴滴" : "Little moments"}</a
+          ><a class="text-link" href={localizePath("/now", locale)}
+            >{zh ? "最近的记录" : "Recent entries"}</a>
+        </div>
       </div>
     </section>
   </div>

@@ -842,6 +842,6 @@ Supported status values:
 | Call of Duty: Black Ops III | 2015 | | completed | https://cdn.cloudflare.steamstatic.com/steam/apps/311210/library_600x900_2x.jpg |
 | Call of Duty: Infinite Warfare | 2016 | | completed | https://cdn.cloudflare.steamstatic.com/steam/apps/292730/library_600x900_2x.jpg |
 | Call of Duty: WWII | 2017 | | completed | https://cdn.cloudflare.steamstatic.com/steam/apps/476600/library_600x900_2x.jpg |
-| Minecraft | 2011 | | completed | https://upload.wikimedia.org/wikipedia/en/7/73/Minecraft_Dungeons_cover_art.jpg |
+| Minecraft | 2011 | | completed | https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/key-art/About-Minecraft_Featured-Image-0_570x321.jpg |
 | Metro Exodus | 2019 | | completed | https://cdn.cloudflare.steamstatic.com/steam/apps/412020/library_600x900_2x.jpg |
 | God of War | 2018 | | completed | https://cdn.cloudflare.steamstatic.com/steam/apps/1593500/library_600x900_2x.jpg |

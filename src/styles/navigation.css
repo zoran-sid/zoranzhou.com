@@ -1,0 +1,216 @@
+.garden-mark {
+  width: 9.5rem;
+  height: 3.55rem;
+  flex: none;
+  overflow: visible;
+}
+.garden-mark__word {
+  color: var(--ink);
+  font:
+    400 65px "Canela",
+    Georgia,
+    serif;
+  letter-spacing: -2px;
+}
+.garden-mark__leaves {
+  color: var(--garden-green, #22635b);
+  transform-origin: 18px 29px;
+}
+.garden-mark__leaves--right {
+  transform-origin: 18px 29px;
+}
+.site-brand {
+  gap: 0.35rem;
+}
+.garden-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.garden-disclosure summary {
+  list-style: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.garden-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+.garden-disclosure summary svg {
+  width: 19px;
+  height: 19px;
+  transition: transform 220ms ease;
+}
+.garden-disclosure[open] summary svg {
+  transform: rotate(180deg);
+}
+.garden-disclosure summary:hover {
+  background: var(--surface-soft);
+}
+.garden-dropdown {
+  position: absolute;
+  right: max(1.5rem, calc((100vw - 1280px) / 2));
+  top: calc(100% - 0.5rem);
+  width: min(46rem, calc(100vw - 3rem));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.6rem 2rem;
+  padding: 2.25rem;
+  background: var(--page);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px #00000020; /* taste-skill-ignore: open navigation overlay elevation. */
+}
+.garden-dropdown a {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  align-content: start;
+  padding: 0.25rem;
+}
+.garden-dropdown strong {
+  font-weight: 550;
+  font-size: 1.1rem;
+}
+.garden-dropdown small {
+  display: block;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-top: 0.35rem;
+}
+
+.garden-dropdown a:hover strong {
+  color: var(--accent);
+}
+
+.garden-mobile {
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: max(1.25rem, env(safe-area-inset-top))
+    max(1.5rem, env(safe-area-inset-right))
+    max(2.5rem, env(safe-area-inset-bottom))
+    max(1.5rem, env(safe-area-inset-left));
+  border: 0;
+  background: var(--page);
+  color: var(--ink);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.garden-mobile::backdrop {
+  background: var(--page);
+}
+.garden-mobile__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+}
+.garden-mobile__top .icon-button svg {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+.garden-mobile__links {
+  display: grid;
+  gap: 0.8rem;
+}
+.garden-mobile__links a {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 6.5vw, 2.75rem);
+  line-height: 1.4;
+  padding-block: 0.2rem;
+  min-height: 44px;
+  width: fit-content;
+}
+.garden-mobile__links a:hover {
+  color: var(--accent);
+}
+.garden-mobile__language {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 2rem;
+}
+.fallback-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.dark .garden-mark__leaves,
+.dark @keyframes leaf-sway {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  30% {
+    transform: rotate(-13deg);
+  }
+  65% {
+    transform: rotate(9deg);
+  }
+}
+@keyframes chevron-hop {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  45% {
+    translate: 0 4px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-brand:is(:hover, :focus-visible) .garden-mark__leaves {
+    animation: leaf-sway 700ms ease-in-out;
+  }
+  .site-brand:is(:hover, :focus-visible) .garden-mark__leaves--right {
+    animation-delay: 80ms;
+  }
+  .garden-disclosure summary:hover svg {
+    animation: chevron-hop 450ms ease;
+  }
+  .garden-mobile[open] .garden-mobile__links {
+    animation: menu-arrive 220ms ease-out;
+  }
+  @keyframes menu-arrive {
+    from {
+      opacity: 0.5;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .garden-disclosure summary svg {
+    transition: none;
+  }
+}
+@media (max-width: 639px) {
+  .site-brand .site-nav {
+    gap: 0.25rem;
+  }
+  .site-nav__tools {
+    margin-left: auto;
+  }
+  .garden-mark {
+    width: 8.5rem;
+  }
+}
+
+.site-nav__links .site-nav__link {
+  font-size: 1rem;
+}
+
+@media (max-width: 359px) {
+  .site-nav__tools > .site-nav__language {
+    display: none;
+  }
+}

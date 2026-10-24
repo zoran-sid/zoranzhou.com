@@ -17,22 +17,27 @@ const labFocus = (await getCollection("lab")).find(
 
 <section class="garden-hero page-container">
   <div class="hero-name-stage">
-    <h1 data-motion="cover" data-hero-title aria-label="Zoran Zhou">
+    <h1 data-hero-title aria-label="Zoran">
       {
-        "Zoran Zhou".split("").map((character) => (
-          <span class="hero-name-letter" aria-hidden="true">
+        "Zoran".split("").map((character, index) => (
+          <span
+            class:list={["hero-name-letter", `hero-letter-${index}`]}
+            aria-hidden="true"
+          >
             {character === " " ? "\u00a0" : character}
           </span>
         ))
       }
+      <span class="hero-baseline" aria-hidden="true"></span>
     </h1>
+    <span class="hero-ball" aria-hidden="true"></span>
   </div>
   <div class="garden-introduction" data-motion="cover" data-motion-delay="100">
     <p class="garden-deck">
       {
         zh
-          ? "你好，我是 Zoran。这里记录我在网络安全、软件开发、数据与 AI 方面的学习和实践，也收集摄影、旅途和生活里的想法。"
-          : "I’m Zoran. I write about learning and working with security, software, data and AI, alongside photographs, journeys and everyday life."
+          ? "网络工程师、安全从业者、摄影师和户外运动爱好者。"
+          : "Network engineer, security practitioner, photographer, and outdoor enthusiast."
       }
     </p>
     <div class="hero-actions">
@@ -58,100 +63,79 @@ const labFocus = (await getCollection("lab")).find(
         ></a
       >
     </aside>
-    <nav
-      class="garden-paths"
-      aria-label={zh ? "从兴趣出发" : "Explore by interest"}
-    >
-      <a href={localizePath("/blog/formats/guide", locale)}
-        ><span>{zh ? "技术与实践" : "Technical practice"}</span><span
-          >{
-            zh
-              ? "指南、研究与问题的解法"
-              : "Guides, research and working things out"
-          }</span
-        ></a
-      >
-      <a href={localizePath("/life", locale)}
-        ><span>{zh ? "生活记录" : "Life beyond work"}</span><span
-          >{
-            zh
-              ? "摄影、行走与日常所想"
-              : "Photography, journeys and everyday thoughts"
-          }</span
-        ></a
-      >
-    </nav>
   </div>
 </section>
 <script>
+  import { nameBounceFrames } from "../lib/name-bounce";
   const stage = document.querySelector<HTMLElement>(".hero-name-stage");
+  const ball = stage?.querySelector<HTMLElement>(".hero-ball");
   const letters = [
     ...(stage?.querySelectorAll<HTMLElement>(".hero-name-letter") ?? []),
   ];
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  let frame = 0;
-  let pointer: { x: number; y: number } | null = null;
-  let centers: { x: number; y: number }[] = [];
-
-  function resetLetters() {
-    cancelAnimationFrame(frame);
-    frame = 0;
-    pointer = null;
-    letters.forEach((letter) => letter.style.removeProperty("transform"));
-  }
-  function measureLetters() {
-    if (!stage) return;
+  const animations: Animation[] = [];
+  const settle = () => {
+    animations.forEach((animation) => animation.cancel());
+    animations.length = 0;
+  };
+  async function introduceName() {
+    await document.fonts.ready;
+    if (!stage || !ball || reduced.matches || document.hidden) return;
+    const context = document.createElement("canvas").getContext("2d");
+    const baseline = stage.querySelector<HTMLElement>(".hero-baseline");
+    if (!context || !baseline) return;
     const bounds = stage.getBoundingClientRect();
-    centers = letters.map((letter) => {
-      const rect = letter.getBoundingClientRect();
+    const baselineY = baseline.getBoundingClientRect().top - bounds.top;
+    const diameter = ball.offsetWidth;
+    const visibleLetters = letters.filter((letter) =>
+      letter.textContent?.trim(),
+    );
+    // Actual glyph ascenders put o and u below Z; the empty span marks the baseline.
+    const impacts = visibleLetters.map((letter) => {
+      const box = letter.getBoundingClientRect();
+      const style = getComputedStyle(letter);
+      context.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      const ascent = context.measureText(
+        letter.textContent!.trim(),
+      ).actualBoundingBoxAscent;
       return {
-        x: rect.left + rect.width / 2 - bounds.left,
-        y: rect.top + rect.height / 2 - bounds.top,
+        x: box.left - bounds.left + box.width / 2 - diameter / 2,
+        y: baselineY - ascent - diameter + 2,
       };
     });
-  }
-  function paintLetters() {
-    frame = 0;
-    if (!stage || !pointer || reduced.matches) return;
-    // One layout read per frame; letter transforms never feed back into their origins.
-    const bounds = stage.getBoundingClientRect();
-    const x = pointer.x - bounds.left,
-      y = pointer.y - bounds.top;
-    letters.forEach((letter, index) => {
-      const center = centers[index];
-      if (!center) return;
-      const influence = Math.max(
-        0,
-        1 - Math.hypot(x - center.x, y - center.y) / 180,
+    const sequence = nameBounceFrames(impacts, diameter);
+    animations.push(
+      ball.animate(sequence.frames, {
+        duration: sequence.duration,
+        easing: "linear",
+      }),
+    );
+    visibleLetters.forEach((letter, index) => {
+      animations.push(
+        letter.animate(
+          [
+            { transform: "none", offset: 0 },
+            { transform: "translateY(.025em) scaleY(.96)", offset: 0.2 },
+            {
+              transform: `translateY(-.08em) rotate(${index % 2 ? 3 : -3}deg)`,
+              offset: 0.5,
+            },
+            { transform: "none", offset: 1 },
+          ],
+          {
+            duration: 360,
+            delay: (index + 1) * sequence.hop,
+            easing: "ease-out",
+          },
+        ),
       );
-      letter.style.transform = `translateY(${(-8 * influence).toFixed(2)}px) scaleX(${(1 + influence * 0.2).toFixed(3)}) skewX(${((x - center.x) * 0.025 * influence).toFixed(2)}deg)`;
     });
   }
-  stage?.addEventListener("pointerenter", measureLetters);
-  stage?.addEventListener("pointermove", (event) => {
-    if (reduced.matches || event.pointerType === "touch") return;
-    pointer = { x: event.clientX, y: event.clientY };
-    if (!frame) frame = requestAnimationFrame(paintLetters);
+  void introduceName();
+  reduced.addEventListener("change", settle);
+  window.addEventListener("resize", settle, { passive: true });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) settle();
   });
-  stage?.addEventListener("pointerleave", resetLetters);
-  reduced.addEventListener("change", resetLetters);
-  const resize = () => {
-    resetLetters();
-    measureLetters();
-  };
-  window.addEventListener("resize", resize, { passive: true });
-  const hidden = () => {
-    if (document.hidden) resetLetters();
-  };
-  document.addEventListener("visibilitychange", hidden);
-  document.addEventListener(
-    "astro:before-swap",
-    () => {
-      resetLetters();
-      window.removeEventListener("resize", resize);
-      document.removeEventListener("visibilitychange", hidden);
-      reduced.removeEventListener("change", resetLetters);
-    },
-    { once: true },
-  );
+  document.addEventListener("astro:before-swap", settle, { once: true });
 </script>

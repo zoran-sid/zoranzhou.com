@@ -1,8 +1,6 @@
 ---
-import ArrowIcon from "../ArrowIcon.astro";
 import { getTranslations, type Locale } from "../../i18n/utils";
 import {
-  formatMediaDate,
   mediaLink,
   mediaTitle,
   type MediaListItem,
@@ -47,6 +45,7 @@ const Tag = link ? "a" : "div";
   class:list={["media-card", { "media-card--compact": compact }]}
   data-media-item
   data-category={item.category}
+  data-watched-date={item.watchedDate}
   data-search={`${item.name} ${item.nameEn ?? ""} ${item.author ?? ""}`}
 >
   <Tag
@@ -86,14 +85,6 @@ const Tag = link ? "a" : "div";
         <p class="media-card__author">{zh ? author[0] : author.at(-1)}</p>
       )
     }
-    {
-      link && (
-        <span class="media-card__source">
-          {link.label}
-          <ArrowIcon direction="up-right" />
-        </span>
-      )
-    }
   </Tag>
   <div class="media-card__details">
     {
@@ -110,33 +101,25 @@ const Tag = link ? "a" : "div";
         </p>
       )
     }
-    <p>
-      {statuses[item.status]}{
-        item.rating > 0 && (
-          <>
-            {" "}
-            · {zh ? "我的评分" : "My rating"} {item.rating}/5
-          </>
-        )
-      }
-    </p>
     {
-      (item.category === "movies" || item.category === "tv") && (
-        <p class="media-card__date">
-          {item.watchedDate ? (
-            <>
-              <time datetime={item.watchedDate}>
-                {formatMediaDate(item.watchedDate, locale)}
-              </time>
-              {zh ? " 观看" : " · watched"}
-            </>
-          ) : zh ? (
-            "观看日期未记录"
-          ) : (
-            "Viewing date not recorded"
-          )}
+      item.category === "movies" ? (
+        item.rating > 0 && (
+          <p>
+            {zh ? "我的评分" : "My rating"} {item.rating}/5
+          </p>
+        )
+      ) : item.category !== "books" ? (
+        <p>
+          {statuses[item.status]}{
+            item.rating > 0 && (
+              <>
+                {" "}
+                · {zh ? "我的评分" : "My rating"} {item.rating}/5
+              </>
+            )
+          }
         </p>
-      )
+      ) : null
     }
   </div>
 </article>

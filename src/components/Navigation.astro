@@ -1,30 +1,78 @@
 ---
-import ArrowIcon from "./ArrowIcon.astro";
+import GardenMark from "./GardenMark.astro";
+import "../styles/navigation.css";
 import SearchModal from "./SearchModal.astro";
-import { editorial } from "../i18n/editorial";
 import { localizePath, LANG_COOKIE, type Locale } from "../i18n/utils";
 interface Props {
   alternateHref: string;
 }
 const { alternateHref } = Astro.props;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
-const c = editorial(locale);
 const alternateLocale: Locale = locale === "zh-CN" ? "en" : "zh-CN";
 const section = Astro.url.pathname.split("/").filter(Boolean)[1] ?? "";
-const items = [
+const zh = locale === "zh-CN";
+const gardenItems = [
   {
-    label: c.writing,
+    label: zh ? "文章" : "Writing",
     href: "/blog",
-    active: ["blog", "essays", "research", "tags"].includes(section),
+    description: zh
+      ? "技术实践、研究与长一点的思考"
+      : "Technical practice, research and longer thoughts",
   },
-  { label: c.work, href: "/projects", active: section === "projects" },
   {
-    label: c.life,
-    href: "/life",
-    active: ["life", "photos", "map", "media", "library"].includes(section),
+    label: zh ? "短笔记" : "Notes",
+    href: "/blog/formats/note",
+    description: zh
+      ? "学习途中，随手记下的理解"
+      : "Small discoveries along the way",
   },
-  { label: c.about, href: "/about", active: section === "about" },
-  { label: "WEB3 LAB", href: "/lab", active: false },
+  {
+    label: zh ? "项目" : "Projects",
+    href: "/projects",
+    description: zh
+      ? "动手做过的事与过程记录"
+      : "Things I build and how they take shape",
+  },
+  {
+    label: "Web3 Lab",
+    href: "/lab",
+    description: zh
+      ? "从 TypeScript 出发，探索区块链"
+      : "Exploring blockchain, starting with TypeScript",
+  },
+  {
+    label: zh ? "书架" : "Library",
+    href: "/library",
+    description: zh
+      ? "读过的书与还想翻开的世界"
+      : "Books read and worlds still to explore",
+  },
+  {
+    label: zh ? "摄影" : "Photography",
+    href: "/photos",
+    description: zh
+      ? "在光线和日常里停留片刻"
+      : "Pausing for light and everyday scenes",
+  },
+  {
+    label: zh ? "足迹" : "Journeys",
+    href: "/map",
+    description: zh
+      ? "跑步、徒步与旅行的路线"
+      : "Running, walking and travelling",
+  },
+  {
+    label: zh ? "影视与游戏" : "Films & games",
+    href: "/media",
+    description: zh ? "屏幕内外，留下来的故事" : "Stories that stay with me",
+  },
+];
+const items = [
+  { label: "The Garden", href: "/blog" },
+  ...gardenItems.filter((item) => item.href !== "/blog"),
+  { label: zh ? "点点滴滴" : "Life", href: "/life" },
+  { label: "Now", href: "/now" },
+  { label: "About", href: "/about" },
 ];
 ---
 
@@ -37,28 +85,49 @@ const items = [
       href={localizePath("/", locale)}
       class="site-brand"
       aria-label={locale === "zh-CN" ? "Zoran Zhou 首页" : "Zoran Zhou home"}
-      ><strong>Zoran Zhou</strong></a
+      ><GardenMark /></a
     >
     <div class="site-nav__links">
-      {
-        items.map((item) => (
-          <a
-            href={localizePath(item.href, locale)}
-            class:list={[
-              "site-nav__link",
-              { active: item.active, "site-nav__lab": item.href === "/lab" },
-            ]}
-            aria-current={item.active ? "page" : undefined}
-          >
-            {item.label}
-            {item.href === "/lab" && (
-              <span aria-hidden="true">
-                <ArrowIcon direction="up-right" />
-              </span>
-            )}
-          </a>
-        ))
-      }
+      <div class="garden-navigation">
+        <a class="site-nav__link" href={localizePath("/blog", locale)}
+          >The Garden</a
+        >
+        <details class="garden-disclosure">
+          <summary aria-label={zh ? "展开网站目录" : "Explore the garden"}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"><path d="m5 9 7 7 7-7"></path></svg
+            >
+          </summary>
+          <div class="garden-dropdown">
+            {
+              gardenItems.map((item) => (
+                <a href={localizePath(item.href, locale)}>
+                  <span>
+                    <>
+                      <strong>{item.label}</strong>
+                      <small>{item.description}</small>
+                    </>
+                  </span>
+                </a>
+              ))
+            }
+          </div>
+        </details>
+      </div>
+      <a
+        class="site-nav__link"
+        href={localizePath("/now", locale)}
+        aria-current={section === "now" ? "page" : undefined}>Now</a
+      >
+      <a
+        class="site-nav__link"
+        href={localizePath("/about", locale)}
+        aria-current={section === "about" ? "page" : undefined}>About</a
+      >
     </div>
     <div class="site-nav__tools">
       <SearchModal locale={locale} /><a
@@ -100,6 +169,7 @@ const items = [
         aria-label={locale === "zh-CN" ? "打开或关闭导航" : "Toggle navigation"}
         aria-expanded="false"
         aria-controls="mobile-menu"
+        aria-haspopup="dialog"
         ><svg
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -109,34 +179,61 @@ const items = [
       >
     </div>
   </nav>
-  <div id="mobile-menu" class="site-mobile-menu" hidden>
-    <div class="page-container">
+  <dialog
+    id="mobile-menu"
+    class="garden-mobile"
+    aria-label={zh ? "网站导航" : "Site navigation"}
+  >
+    <div class="garden-mobile__top">
+      <a
+        class="site-brand"
+        href={localizePath("/", locale)}
+        aria-label="Zoran Zhou"><GardenMark /></a
+      >
+      <button
+        type="button"
+        class="icon-button"
+        data-menu-close
+        aria-label={zh ? "关闭导航" : "Close navigation"}
+        autofocus
+        ><svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"></path></svg
+        ></button
+      >
+    </div>
+    <nav
+      class="garden-mobile__links"
+      aria-label={zh ? "全部栏目" : "All sections"}
+    >
       {
         items.map((item) => (
-          <a
-            href={localizePath(item.href, locale)}
-            aria-current={item.active ? "page" : undefined}
-          >
-            {item.label}
-            <span aria-hidden="true">
-              <ArrowIcon direction="up-right" />
-            </span>
-          </a>
+          <a href={localizePath(item.href, locale)}>{item.label}</a>
         ))
-      }<div class="mobile-secondary">
-        <a href={localizePath("/photos", locale)}>{c.photos}</a><a
-          href={localizePath("/map", locale)}>{c.routes}</a
-        ><a href={localizePath("/library", locale)}
-          >{locale === "zh-CN" ? "书架" : "Library"}</a
-        ><a href={localizePath("/media", locale)}>{c.media}</a><a
-          href={alternateHref}
-          data-language-switch
-          data-target-locale={alternateLocale}
-          >{locale === "zh-CN" ? "English" : "中文"}</a
-        >
-      </div>
-    </div>
-  </div>
+      }
+    </nav>
+    <a
+      class="garden-mobile__language"
+      href={alternateHref}
+      data-language-switch
+      data-target-locale={alternateLocale}>{zh ? "English" : "中文"}</a
+    >
+  </dialog>
+  <noscript
+    ><nav
+      class="page-container fallback-nav"
+      aria-label={zh ? "网站目录" : "Site directory"}
+    >
+      {
+        items.map((item) => (
+          <a href={localizePath(item.href, locale)}>{item.label}</a>
+        ))
+      }
+    </nav></noscript
+  >
 </header>
 <script>
   import { initTheme, toggleTheme } from "../lib/theme";
@@ -145,32 +242,58 @@ const items = [
     .getElementById("theme-toggle")
     ?.addEventListener("click", toggleTheme);
   const toggle = document.getElementById("mobile-menu-toggle");
-  const menu = document.getElementById("mobile-menu");
-  function setMenu(open: boolean) {
-    if (menu) menu.hidden = !open;
-    toggle?.setAttribute("aria-expanded", String(open));
+  const menu = document.querySelector<HTMLDialogElement>("#mobile-menu");
+  const disclosure =
+    document.querySelector<HTMLDetailsElement>(".garden-disclosure");
+  let previousOverflow = "";
+  function closeMenu() {
+    menu?.close();
   }
-  toggle?.addEventListener("click", () => setMenu(menu?.hidden ?? true));
+  toggle?.addEventListener("click", () => {
+    if (!menu || menu.open) return;
+    previousOverflow = document.body.style.overflow;
+    menu.showModal();
+    document.body.style.overflow = "hidden";
+    toggle.setAttribute("aria-expanded", "true");
+  });
+  menu?.addEventListener("close", () => {
+    document.body.style.overflow = previousOverflow;
+    toggle?.setAttribute("aria-expanded", "false");
+    toggle?.focus();
+  });
+  menu
+    ?.querySelector("[data-menu-close]")
+    ?.addEventListener("click", closeMenu);
   menu
     ?.querySelectorAll("a")
-    .forEach((link) => link.addEventListener("click", () => setMenu(false)));
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && menu && !menu.hidden) {
-      setMenu(false);
-      toggle?.focus();
-    }
-  });
+    .forEach((link) => link.addEventListener("click", closeMenu));
   window
     .matchMedia("(min-width: 1024px)")
     .addEventListener("change", (event) => {
-      if (event.matches) setMenu(false);
+      if (event.matches) closeMenu();
+      else if (disclosure) disclosure.open = false;
     });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && disclosure?.open) {
+      disclosure.open = false;
+      disclosure.querySelector("summary")?.focus();
+    }
+  });
   document.addEventListener("click", (event) => {
     if (
+      disclosure &&
       event.target instanceof Node &&
-      !document.querySelector(".site-header")?.contains(event.target)
+      !disclosure.contains(event.target)
     )
-      setMenu(false);
+      disclosure.open = false;
+  });
+  document.addEventListener("focusin", (event) => {
+    if (
+      disclosure?.open &&
+      event.target instanceof Node &&
+      !disclosure.contains(event.target)
+    )
+      disclosure.open = false;
   });
   document
     .querySelectorAll<HTMLAnchorElement>("[data-language-switch]")

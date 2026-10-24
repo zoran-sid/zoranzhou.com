@@ -106,8 +106,8 @@ for (const locale of ["zh-CN", "en"]) {
   );
   assert.match(
     media,
-    /<time datetime="\d{4}-\d{2}-\d{2}"/,
-    "Viewing dates reach the rendered page",
+    /data-watched-date="\d{4}-\d{2}-\d{2}"/,
+    "Viewing dates remain internal metadata",
   );
   assert.ok(
     media.includes(
@@ -121,9 +121,26 @@ for (const locale of ["zh-CN", "en"]) {
       assert.ok(pathExists(match[1]), `Local cover exists: ${match[1]}`);
     }
   }
+  assert.ok(
+    !media.includes('class="media-card__date"'),
+    "Viewing dates are not visible",
+  );
+  assert.ok(home.includes('class="garden-mark"'));
+  assert.match(home, /<dialog[^>]*id="mobile-menu"/);
+  assert.ok(home.includes('class="subscribe-pill"'));
+  assert.ok(home.includes('class="hero-ball"'));
+  const about = htmlAt(`${locale}/about`);
+  assert.ok(
+    !/Volkswagen|Huawei Global|Sangfor|State Grid|6959 6879|HF1|HF2/.test(
+      about,
+    ),
+    "Private CV details stay out of the public profile",
+  );
+  assert.ok(htmlAt(`${locale}/now`).includes('class="moment-list"'));
   assert.ok(htmlAt(`${locale}/map`).includes("maplibre-gl.css"));
   for (const section of [
     "about",
+    "now",
     "subscribe",
     "life",
     "projects",

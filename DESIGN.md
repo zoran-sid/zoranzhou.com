@@ -32,9 +32,15 @@ colors:
   dark-atmosphere-2: "#292e33"
   dark-atmosphere-3: "#203238"
 typography:
+  brand:
+    fontFamily: Cormorant Garamond, Georgia, serif
+    fontSize: 65px
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: -2px
   display:
     fontFamily: Newsreader, Georgia, Songti SC, STSong, serif
-    fontSize: clamp(5rem, 13vw, 11.5rem)
+    fontSize: clamp(4.5rem, 12vw, 10.5rem)
     fontWeight: 400
     lineHeight: 1
     letterSpacing: -0.035em
@@ -168,7 +174,7 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 参考 [Maggie Appleton](https://maggieappleton.com) 将写作与个人收藏分别组织的方式，
 以 Zoran 已有的书目、观看日期、路线和旅行文章丰富首页。保留既定渐变、字体与动效。
 书架由真实封面、书名和作者构成；旅途以主图和手记组成左右布局；跑步使用可扫读的
-日期和里程列表；电影使用海报与观看日期。不同内容采用各自合适的密度，不重复套用容器。
+日期和里程列表；电影使用可点击海报与片名，观看日期只参与内部排序。不同内容采用各自合适的密度，不重复套用容器。
 
 Library 为独立双语书架，Media 是可按类型、关键词筛选的海报档案，Life 汇集这些实际
 内容。封面保持原色；小图本地缓存；正文与控件继续使用共享主题变量。交互退化到静态
@@ -188,3 +194,39 @@ Library 为独立双语书架，Media 是可按类型、关键词筛选的海报
 - Don’t 把微动画复制到每个正文段落或制造逐段阅读等待。
 - Don’t 用光点承载信息，或让装饰层接收点击、影响布局。
 - Don’t 为这些动效引入 React、WebGL 或新的动画运行时。
+
+
+## Personal identity and navigation — 2026-10-24
+
+Continue the pale scroll atmosphere, with a more personal masthead and a single focal
+intro. The navigation wordmark reads **zoran**, with three leaves attached above the
+first and last letters like small antlers. Its serif is Cormorant Garamond Semibold,
+a self-hosted open-license counterpart to the reference site’s Canela Deck.
+The hero retains **Zoran Zhou**: an understated white ping-pong ball hops over the
+actual glyph tops, from Z through u, then disappears. Each load adds bounded
+variation to the hops while retaining those landing positions. Serif/italic lettering and one
+sans-serif o give the name character without loading additional fonts. This is an
+original typographic sequence inspired by the requested animated-film opening idea.
+
+The Garden links directly to Writing; a separate animated chevron opens a two-column
+content directory without row icons. Now is a dated writing/journey timeline; About is a public CV with
+sector-level employer descriptions. On phones, navigation occupies the whole viewport,
+with large serif links, a close control, safe-area padding and native modal focus.
+
+The supplied Maggie Appleton screenshots guide the three-leaf framing, four-petal /
+inner-arc circular glyphs, and prominent elliptical subscription control. Glyphs change
+shape on link hover/focus. The footer ends with an envelope, subscription and social
+icons, plus copyright/licence. No motivational sentence is appended.
+
+Headings share the main ink in both themes. Cormorant Garamond and Newsreader,
+with a Chinese Kai fallback, create section differences through type, scale and rhythm.
+Existing accent tokens remain available for controls and the small geometric icons.
+Mobile sections retain distinct spacing and visual leads, avoiding one continuous wall
+of equally weighted text. The route list uses geometric hover glyphs and text metadata;
+it never fetches preview routes. Cinema uses clickable covers and titles; dates remain
+internal sort metadata, and only neighbouring covers blur during pointer selection.
+
+Source lint exceptions are limited to the real dropdown's elevation and the structural
+Now timeline connector. The user's ball/leaf animation, mixed wordmark lettering and
+existing gradients take precedence over generic skill style restrictions. Final checks
+remain code and build only; visual timing and rendering acceptance stay with the user.

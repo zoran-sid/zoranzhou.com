@@ -27,32 +27,49 @@
   color: var(--accent);
 }
 .about-intro {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 5rem;
-  align-items: center;
-  padding-block: 4rem;
+  display: block;
+  padding-block: 4.5rem 6.5rem;
+  max-width: 56rem;
 }
-.about-intro p {
-  max-width: 36rem;
-  font-size: 1.2rem;
-  line-height: 1.9;
+.about-kicker {
+  margin: 0 0 0.8rem;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
 }
-.about-intro .text-link {
-  margin-top: 1rem;
-  text-decoration: underline;
-  text-underline-offset: 0.3em;
+.about-intro h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 9vw, 7.5rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+.about-intro .about-lede {
+  margin: 1.1rem 0 0;
+  max-width: 48rem;
+  color: var(--muted);
+  font-family: var(--font-text);
+  font-size: clamp(1.35rem, 2.2vw, 1.8rem);
+  line-height: 1.45;
+  text-wrap: pretty;
 }
 .about-portrait {
-  padding: 1.25rem;
-  background: var(--cover);
-  width: min(100%, 20rem);
+  width: min(100%, 25rem);
   justify-self: end;
 }
 .about-portrait img {
   width: 100%;
   height: auto;
   border-radius: 0;
+}
+.profile-context__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 25rem);
+  gap: 4rem;
+  align-items: start;
 }
 .about-story {
   display: grid;
@@ -253,8 +270,9 @@
     justify-self: start;
     grid-row: 1;
   }
-  .about-intro p {
-    font-size: 1.125rem;
+  .about-intro .about-lede {
+    font-size: 1.3rem;
+    line-height: 1.65;
   }
   .about-story,
   .expertise-list article,

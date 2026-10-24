@@ -1,4 +1,5 @@
 ---
+import GardenGlyph from "./GardenGlyph.astro";
 import { getCollection } from "astro:content";
 import ArrowIcon from "./ArrowIcon.astro";
 import MediaCard from "./media/MediaCard.astro";
@@ -46,7 +47,9 @@ const date = new Intl.DateTimeFormat(zh ? "zh-CN" : "en-GB", {
         <header class="section-head">
           <div>
             <>
-              <h2 id="running-heading">{zh ? "跑过的路" : "On the run"}</h2>
+              <h2 id="running-heading">
+                {zh ? "在路中去感受" : "Life along the way"}
+              </h2>
               <p>
                 {zh
                   ? "公园里的日常，也有出发线上的清晨。"
@@ -59,12 +62,12 @@ const date = new Intl.DateTimeFormat(zh ? "zh-CN" : "en-GB", {
           {routes.map((entry) => (
             <li>
               <a href={entryPath(entry)}>
+                <GardenGlyph class="running-symbol" />
                 <time datetime={entry.data.date.toISOString()}>
                   {date.format(entry.data.date)}
                 </time>
                 <div class="running-list__title">
                   <h3>{entry.data.title}</h3>
-                  <ArrowIcon direction="up-right" />
                 </div>
                 <p>{entry.data.location}</p>
                 <dl>
@@ -101,8 +104,8 @@ const date = new Intl.DateTimeFormat(zh ? "zh-CN" : "en-GB", {
               </h2>
               <p>
                 {zh
-                  ? "银幕上的故事，按看过的日子留下记录。"
-                  : "Stories from the screen, recorded by the day I watched them."}
+                  ? "银幕落下以后，还记得的那些故事。"
+                  : "Stories that stay with me after the credits roll."}
               </p>
             </>
           </div>
