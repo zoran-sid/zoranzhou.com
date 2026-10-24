@@ -4,51 +4,125 @@ import SectionAtmosphere from "./SectionAtmosphere.astro";
 import { Image } from "astro:assets";
 import mountain from "../assets/images/sichuan-mountains.jpg";
 import { localizePath, type Locale } from "../i18n/utils";
-import { editorial } from "../i18n/editorial";
+import { getWriting, entryPath, displayDate } from "../lib/writing";
+import { writingCategory } from "../lib/content-policy";
 interface Props {
   locale: Locale;
   overview?: boolean;
 }
 const { locale, overview = false } = Astro.props;
-const c = editorial(locale);
+const zh = locale === "zh-CN";
+const writing = (await getWriting(locale)).filter(
+  (entry) => writingCategory(entry) === "life",
+);
+const journey = writing.find(
+  (entry) =>
+    entry.slug === "2025-06-08" ||
+    entry.slug === "2025-06-08en" ||
+    entry.data.translationKey === "blog-0fbcc334cb5e",
+);
+const journal = writing.filter((entry) => entry !== journey).slice(0, 2);
+const href = journey ? entryPath(journey) : localizePath("/photos", locale);
 ---
 
-<section class="editorial-section page-container life-feature scene-section">
+<section
+  class="editorial-section page-container life-feature scene-section"
+  id="on-the-road"
+  aria-labelledby="field-heading"
+>
   <SectionAtmosphere kind="light" />
-  <a
-    class="life-feature__image"
-    data-motion="photo"
-    href={localizePath(
-      locale === "zh-CN" ? "/blog/2025-06-08" : "/photos",
-      locale,
-    )}
-    aria-label={c.fieldLink}
-  >
-    <Image
-      src={mountain}
-      alt={locale === "zh-CN"
-        ? "金色阳光照亮川西的雪山"
-        : "Golden sunlight on the snow-covered mountains of western Sichuan"}
-      widths={[480, 800, 1200]}
-      sizes="(max-width: 760px) 100vw, 55vw"
-      loading="lazy"
-      quality={85}
-    />
-    <span class="life-feature__caption"
-      >{c.fieldCaption}<span aria-hidden="true"
-        ><ArrowIcon direction="up-right" /></span
-      ></span
-    >
-  </a>
-  <div class="life-feature__copy">
-    <h2>
-      {locale === "zh-CN" ? "在路上" : "Out in the world"}
-    </h2><p>{c.fieldDeck}</p><a
+  <header class="section-head">
+    <div>
+      <h2 id="field-heading">{zh ? "在路上" : "Out in the world"}</h2><p>
+        {
+          zh
+            ? "离开屏幕之后，把风景和沿途的想法带回来。"
+            : "Away from the screen, bringing back landscapes and thoughts from the road."
+        }
+      </p>
+    </div>
+    <a
       class="text-link"
       href={localizePath(overview ? "/photos" : "/life", locale)}
-      >{overview ? c.photos : c.exploreLife}<span aria-hidden="true"
-        ><ArrowIcon direction="up-right" /></span
-      ></a
+      >{
+        zh
+          ? overview
+            ? "看看照片"
+            : "更多生活记录"
+          : overview
+            ? "See the photographs"
+            : "More from life"
+      }<ArrowIcon direction="up-right" /></a
     >
+  </header>
+  <div class="field-journal">
+    <figure class="field-journal__photograph">
+      <a
+        href={href}
+        data-motion="photo"
+        aria-label={journey?.data.title ??
+          (zh ? "川西摄影" : "Photographs from western Sichuan")}
+      >
+        <Image
+          src={mountain}
+          alt={zh
+            ? "金色阳光照亮川西的雪山"
+            : "Golden sunlight on the snow-covered mountains of western Sichuan"}
+          widths={[480, 800, 1200]}
+          sizes="(max-width: 760px) 100vw, 60vw"
+          loading="lazy"
+          quality={85}
+        />
+      </a>
+      <figcaption>
+        <span>{zh ? "川西 · 贡嘎" : "Mount Gongga · Western Sichuan"}</span>{
+          journey && (
+            <time datetime={journey.data.date.toISOString()}>
+              {displayDate(journey.data.date, locale)}
+            </time>
+          )
+        }
+      </figcaption>
+    </figure>
+    <div class="field-journal__entries">
+      {
+        journey && (
+          <article class="field-journal__lead">
+            <>
+              <h3>
+                <a href={entryPath(journey)}>{journey.data.title}</a>
+              </h3>
+              <p>{journey.data.description}</p>
+              <a class="text-link" href={entryPath(journey)}>
+                {zh ? "读这篇旅行手记" : "Read this travel journal"}
+                <ArrowIcon direction="up-right" />
+              </a>
+            </>
+          </article>
+        )
+      }
+      {
+        journal.map((entry) => (
+          <article class="field-journal__entry">
+            <>
+              <time datetime={entry.data.date.toISOString()}>
+                {displayDate(entry.data.date, locale)}
+              </time>
+              <h3>
+                <a href={entryPath(entry)}>{entry.data.title}</a>
+              </h3>
+            </>
+          </article>
+        ))
+      }
+      {
+        !journey && journal.length === 0 && (
+          <a class="text-link" href={localizePath("/photos", locale)}>
+            {zh ? "浏览摄影集" : "Browse photographs"}
+            <ArrowIcon direction="up-right" />
+          </a>
+        )
+      }
+    </div>
   </div>
 </section>

@@ -12,6 +12,8 @@
     "astro": "astro",
     "lint": "astro check",
     "format": "prettier --write .",
+    "media:images": "tsx scripts/media-images.ts",
+    "test:media-list": "tsx --test scripts/test-media-list.ts",
     "media:update": "tsx scripts/media-update.ts",
     "translate": "tsx scripts/translate.ts",
     "test:translation": "tsx --test scripts/translation.test.ts",

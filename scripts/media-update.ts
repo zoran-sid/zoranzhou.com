@@ -189,6 +189,14 @@ function normalizeExportedMovie(value: unknown, index: number): DoubanMovie {
   );
   const comment = textValue(raw.comment ?? collect.comment);
   const metadata = textValue(raw.metadata ?? raw.rawInfos ?? raw.intro);
+  const rawImdb = textValue(raw.imdb ?? raw.imdbId);
+  const imdb = rawImdb?.match(
+    /^(?:https:\/\/(?:www\.)?imdb\.com\/title\/)?(tt\d{7,10})\/?$/,
+  )?.[1];
+  if (rawImdb && !imdb)
+    throw new Error(
+      `JSON movie ${subjectId} IMDb must be a title ID or title URL.`,
+    );
 
   return {
     id: `douban:${subjectId}`,
@@ -203,6 +211,7 @@ function normalizeExportedMovie(value: unknown, index: number): DoubanMovie {
     ...(tags ? { tags } : {}),
     ...(comment ? { comment } : {}),
     ...(metadata ? { metadata } : {}),
+    ...(imdb ? { imdb } : {}),
   };
 }
 

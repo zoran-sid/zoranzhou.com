@@ -1,0 +1,165 @@
+---
+import ArrowIcon from "../ArrowIcon.astro";
+import { getTranslations, type Locale } from "../../i18n/utils";
+import {
+  formatMediaDate,
+  mediaLink,
+  mediaTitle,
+  type MediaListItem,
+} from "../../lib/media/list";
+import coverCache from "../../data/media-covers.json";
+interface Props {
+  item: MediaListItem;
+  locale: Locale;
+  compact?: boolean;
+}
+const { item, locale, compact = false } = Astro.props;
+const zh = locale === "zh-CN";
+const t = getTranslations(locale);
+const title = mediaTitle(item, locale);
+const link = mediaLink(item, locale);
+const cached = coverCache as Record<string, string>;
+const poster = item.poster ? cached[item.poster] || item.poster : undefined;
+const author = item.author?.split(" / ");
+const statuses: Record<string, string> = {
+  watched: t.mediaStatusWatched,
+  watching: t.mediaStatusWatching,
+  "want-to-watch": t.mediaStatusWantToWatch,
+  read: t.mediaStatusRead,
+  reading: t.mediaStatusReading,
+  "want-to-read": t.mediaStatusWantToRead,
+  completed: t.mediaStatusCompleted,
+  playing: t.mediaStatusPlaying,
+  "want-to-play": t.mediaStatusWantToPlay,
+  dropped: t.mediaStatusDropped,
+  "on-hold": t.mediaStatusOnHold,
+};
+const categories = {
+  movies: t.mediaCategoryMovies,
+  tv: t.mediaCategoryTV,
+  books: t.mediaCategoryBooks,
+  games: t.mediaCategoryGames,
+};
+const Tag = link ? "a" : "div";
+---
+
+<article
+  class:list={["media-card", { "media-card--compact": compact }]}
+  data-media-item
+  data-category={item.category}
+  data-search={`${item.name} ${item.nameEn ?? ""} ${item.author ?? ""}`}
+>
+  <Tag
+    class="media-card__main"
+    href={link?.href}
+    rel={link ? "noopener noreferrer" : undefined}
+  >
+    <div
+      class:list={[
+        "media-cover",
+        { "media-cover--book": item.category === "books" },
+      ]}
+    >
+      <span
+        class="media-cover__fallback"
+        aria-hidden="true"
+        hidden={Boolean(poster)}>{title}</span
+      >
+      {
+        poster && (
+          <img
+            data-media-cover
+            src={poster}
+            alt=""
+            width="320"
+            height="480"
+            loading="lazy"
+            decoding="async"
+            referrerpolicy="no-referrer"
+          />
+        )
+      }
+    </div>
+    <h3>{title}</h3>
+    {
+      author && (
+        <p class="media-card__author">{zh ? author[0] : author.at(-1)}</p>
+      )
+    }
+    {
+      link && (
+        <span class="media-card__source">
+          {link.label}
+          <ArrowIcon direction="up-right" />
+        </span>
+      )
+    }
+  </Tag>
+  <div class="media-card__details">
+    {
+      !compact && (
+        <p>
+          {categories[item.category]}
+          {item.year && (
+            <>
+              {" "}
+              · {item.year}{" "}
+              {zh ? (item.category === "books" ? "首版" : "发行") : "release"}
+            </>
+          )}
+        </p>
+      )
+    }
+    <p>
+      {statuses[item.status]}{
+        item.rating > 0 && (
+          <>
+            {" "}
+            · {zh ? "我的评分" : "My rating"} {item.rating}/5
+          </>
+        )
+      }
+    </p>
+    {
+      (item.category === "movies" || item.category === "tv") && (
+        <p class="media-card__date">
+          {item.watchedDate ? (
+            <>
+              <time datetime={item.watchedDate}>
+                {formatMediaDate(item.watchedDate, locale)}
+              </time>
+              {zh ? " 观看" : " · watched"}
+            </>
+          ) : zh ? (
+            "观看日期未记录"
+          ) : (
+            "Viewing date not recorded"
+          )}
+        </p>
+      )
+    }
+  </div>
+</article>
+<script>
+  // Remote covers are optional: keep a readable title when a host refuses an image.
+  function failedCover(image: HTMLImageElement) {
+    image.hidden = true;
+    image.previousElementSibling?.removeAttribute("hidden");
+  }
+  document.addEventListener(
+    "error",
+    (event) => {
+      if (
+        event.target instanceof HTMLImageElement &&
+        event.target.hasAttribute("data-media-cover")
+      )
+        failedCover(event.target);
+    },
+    true,
+  );
+  document
+    .querySelectorAll<HTMLImageElement>("[data-media-cover]")
+    .forEach((image) => {
+      if (image.complete && !image.naturalWidth) failedCover(image);
+    });
+</script>

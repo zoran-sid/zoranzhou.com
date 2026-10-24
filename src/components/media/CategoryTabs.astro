@@ -2,16 +2,17 @@
 interface Props {
   categories: { key: string; label: string; count?: number }[];
   activeCategory: string;
+  label: string;
 }
 
-const { categories, activeCategory } = Astro.props;
+const { categories, activeCategory, label } = Astro.props;
 ---
 
 <div id="media-grid-root" data-active={activeCategory}>
   <div
     class="flex flex-wrap items-center gap-2"
     role="group"
-    aria-label="Media categories"
+    aria-label={label}
   >
     {
       categories.map((cat) => (
@@ -19,6 +20,7 @@ const { categories, activeCategory } = Astro.props;
           type="button"
           aria-pressed={cat.key === activeCategory ? "true" : "false"}
           data-cat={cat.key}
+          aria-controls="media-results"
           class="cat-tab"
         >
           <span>{cat.label}</span>
@@ -56,63 +58,3 @@ const { categories, activeCategory } = Astro.props;
     font-variant-numeric: tabular-nums;
   }
 </style>
-
-<script>
-  function setActiveTab(btn: HTMLButtonElement) {
-    document.querySelectorAll<HTMLButtonElement>(".cat-tab").forEach((tab) => {
-      tab.setAttribute("aria-pressed", "false");
-    });
-    btn.setAttribute("aria-pressed", "true");
-  }
-
-  function filterItems(cat: string) {
-    const rows = document.querySelectorAll<HTMLElement>("[data-category]");
-    let visibleCount = 0;
-
-    rows.forEach((el) => {
-      const isVisible = cat === "all" || el.dataset.category === cat;
-      el.classList.toggle("hidden", !isVisible);
-      if (isVisible) visibleCount++;
-    });
-
-    const emptyEl = document.getElementById("media-empty");
-    if (emptyEl) emptyEl.classList.toggle("hidden", visibleCount > 0);
-    const countEl = document.getElementById("media-visible-count");
-    if (countEl) {
-      countEl.textContent = (countEl.dataset.template ?? "{count}").replace(
-        "{count}",
-        String(visibleCount),
-      );
-    }
-  }
-
-  const params = new URLSearchParams(window.location.search);
-  const initialCat = params.get("category") ?? "all";
-  const root = document.getElementById("media-grid-root");
-
-  if (initialCat !== "all") {
-    const targetBtn = Array.from(
-      document.querySelectorAll<HTMLButtonElement>(".cat-tab"),
-    ).find((button) => button.dataset.cat === initialCat);
-    if (targetBtn) {
-      setActiveTab(targetBtn);
-      filterItems(initialCat);
-    }
-  }
-
-  if (root) root.dataset.active = initialCat;
-
-  document.querySelectorAll<HTMLButtonElement>(".cat-tab").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const cat = btn.dataset.cat!;
-      setActiveTab(btn);
-      filterItems(cat);
-      if (root) root.dataset.active = cat;
-
-      const url = new URL(window.location.href);
-      if (cat === "all") url.searchParams.delete("category");
-      else url.searchParams.set("category", cat);
-      window.history.replaceState({}, "", url.toString());
-    });
-  });
-</script>

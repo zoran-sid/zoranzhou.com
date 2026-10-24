@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "scripts/media/douban.ts"
+        ],
+        "createdAt": "2026-10-24T06:36:39.997Z",
+        "reason": "Agent review: line 234 is a regular expression reading img tags from imported Douban HTML, not rendered image markup; parsed URLs are validated before display."
+      }
+    ]
+  }
+}

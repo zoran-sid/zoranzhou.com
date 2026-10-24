@@ -1,0 +1,48 @@
+---
+import ArrowIcon from "./ArrowIcon.astro";
+import MediaCard from "./media/MediaCard.astro";
+import mediaSource from "../content/media.md?raw";
+import { parseMediaList } from "../lib/media/list";
+import { localizePath, type Locale } from "../i18n/utils";
+import "../styles/media.css";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const zh = locale === "zh-CN";
+const books = parseMediaList(mediaSource)
+  .filter((item) => item.category === "books")
+  .slice(0, 6);
+---
+
+{
+  books.length > 0 && (
+    <section
+      class="editorial-section page-container library-shelf"
+      id="library"
+      aria-labelledby="library-heading"
+    >
+      <header class="section-head">
+        <div>
+          <>
+            <h2 id="library-heading">{zh ? "书架" : "Library"}</h2>
+            <p>
+              {zh
+                ? "从科幻到文学，书里还有许多值得停留的世界。"
+                : "Science fiction, literature, and worlds worth spending time in."}
+            </p>
+          </>
+        </div>
+        <a class="text-link" href={localizePath("/library", locale)}>
+          {zh ? "浏览书架" : "Browse the library"}
+          <ArrowIcon direction="up-right" />
+        </a>
+      </header>
+      <div class="media-grid">
+        {books.map((item) => (
+          <MediaCard item={item} locale={locale} compact />
+        ))}
+      </div>
+    </section>
+  )
+}

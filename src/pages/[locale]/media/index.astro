@@ -2,6 +2,7 @@
 import LifeNavigation from "../../../components/LifeNavigation.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import CategoryTabs from "../../../components/media/CategoryTabs.astro";
+import MediaCard from "../../../components/media/MediaCard.astro";
 import {
   getTranslations,
   localizePath,
@@ -9,95 +10,38 @@ import {
   locales,
 } from "../../../i18n/utils";
 import mediaListSource from "../../../content/media.md?raw";
-import {
-  parseMediaList,
-  type MediaCategory,
-  type MediaListItem,
-} from "../../../lib/media/list";
-
+import { parseMediaList, type MediaCategory } from "../../../lib/media/list";
+import "../../../styles/media.css";
 export async function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
 }
-
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
 const t = getTranslations(locale);
-
 const allItems = parseMediaList(mediaListSource);
-
-const statusLabelMap: Record<string, string> = {
-  watched: t.mediaStatusWatched,
-  watching: t.mediaStatusWatching,
-  "want-to-watch": t.mediaStatusWantToWatch,
-  completed: t.mediaStatusCompleted,
-  playing: t.mediaStatusPlaying,
-  "want-to-play": t.mediaStatusWantToPlay,
-  read: t.mediaStatusRead,
-  reading: t.mediaStatusReading,
-  "want-to-read": t.mediaStatusWantToRead,
-  dropped: t.mediaStatusDropped,
-  "on-hold": t.mediaStatusOnHold,
-};
-
-const categoryLabelMap: Record<MediaCategory, string> = {
+const categoryLabels: Record<MediaCategory, string> = {
   movies: t.mediaCategoryMovies,
   tv: t.mediaCategoryTV,
   books: t.mediaCategoryBooks,
   games: t.mediaCategoryGames,
 };
-
-const categoryOrder: MediaCategory[] = ["movies", "tv", "books", "games"];
-const countByCategory = categoryOrder.reduce(
-  (counts, category) => ({
-    ...counts,
-    [category]: allItems.filter((item) => item.category === category).length,
-  }),
-  {} as Record<MediaCategory, number>,
-);
-
 const categories = [
   { key: "all", label: t.mediaAll, count: allItems.length },
-  ...categoryOrder.map((category) => ({
-    key: category,
-    label: categoryLabelMap[category],
-    count: countByCategory[category],
+  ...Object.entries(categoryLabels).map(([key, label]) => ({
+    key,
+    label,
+    count: allItems.filter((item) => item.category === key).length,
   })),
 ];
-
-const categoryAccent: Record<MediaCategory, string> = {
-  movies: "bg-sky-500",
-  tv: "bg-violet-500",
-  books: "bg-emerald-500",
-  games: "bg-amber-500",
-};
-
-function renderRating(rating: number) {
-  const rounded = Math.round(rating);
-  return "★".repeat(rounded) + "☆".repeat(Math.max(0, 5 - rounded));
-}
-
-function formatTotal(count: number) {
-  return t.mediaTotal.replace("{count}", String(count));
-}
-
-const mediaPageUrl = new URL(localizePath("/media", locale), Astro.site).href;
+const countTemplate = zh
+  ? "显示 {shown} / {total} 部作品"
+  : "Showing {shown} of {total} titles";
 const jsonld = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: t.mediaTitle,
   description: t.mediaDescription,
-  url: mediaPageUrl,
-  mainEntity: {
-    "@type": "ItemList",
-    itemListElement: allItems.map((item, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      item: {
-        "@type": "CreativeWork",
-        name: item.name,
-        ...(item.year ? { dateCreated: String(item.year) } : {}),
-      },
-    })),
-  },
+  url: new URL(localizePath("/media", locale), Astro.site).href,
 };
 ---
 
@@ -106,185 +50,77 @@ const jsonld = {
   description={t.mediaDescription}
   jsonld={jsonld}
 >
-  <div class="page-container archive-page">
+  <div class="page-container archive-page" data-media-browser>
     <header class="page-intro">
-      <LifeNavigation />
-      <h1
-        class="mt-3 text-4xl font-bold text-gray-950 dark:text-gray-50 md:text-5xl"
-      >
-        {t.mediaTitle}
-      </h1>
-      <p
-        class="mt-5 max-w-2xl text-base leading-8 text-gray-600 dark:text-gray-300"
-      >
-        {t.mediaIntro}
+      <LifeNavigation /><h1>{t.mediaTitle}</h1>
+      <p>
+        {
+          zh
+            ? "看过的故事，读过的文字，和玩过的世界。"
+            : "Stories watched, pages read, and worlds played through."
+        }
+      </p>
+      <p class="media-order">
+        {
+          zh
+            ? "影视按观看日期排列，最新在前。年份单独标注作品的发行时间。"
+            : "Films and series are ordered by viewing date, newest first. Release years are shown separately."
+        }
       </p>
     </header>
-
-    <section class="mt-10">
-      <div
-        class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
-      >
-        <CategoryTabs categories={categories} activeCategory="all" />
+    <div data-media-controls hidden>
+      <CategoryTabs
+        categories={categories}
+        activeCategory="all"
+        label={zh ? "作品类型" : "Type of work"}
+      />
+      <div class="media-toolbar">
+        <label class="media-search"
+          >{zh ? "查找作品" : "Find a title"}<input
+            id="media-search"
+            type="search"
+            placeholder={zh ? "片名、书名或作者" : "Title or author"}
+            autocomplete="off"
+            aria-controls="media-results"
+          /></label
+        >
         <p
-          id="media-visible-count"
-          data-template={t.mediaTotal}
+          class="media-count"
+          data-media-count
+          data-template={countTemplate}
+          role="status"
           aria-live="polite"
           aria-atomic="true"
-          class="text-sm text-gray-500 dark:text-gray-400"
         >
-          {formatTotal(allItems.length)}
         </p>
       </div>
-
+    </div>
+    <noscript
+      ><p class="media-order">
+        {
+          zh
+            ? "全部作品按观看日期展示；可使用浏览器的页内查找。"
+            : "All titles are listed below. Use your browser’s Find command to look for a title."
+        }
+      </p></noscript
+    >
+    <div class="media-grid" id="media-results">
+      {allItems.map((item) => <MediaCard item={item} locale={locale} />)}
+    </div>
+    <p class="media-empty" data-media-empty hidden>
       {
-        allItems.length === 0 ? (
-          <p
-            id="media-empty"
-            class="rounded-lg border border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-800 dark:text-gray-500"
-          >
-            {t.mediaEmpty}
-          </p>
-        ) : (
-          <>
-            <div class="media-desktop-grid media-header hidden text-[13px] md:grid">
-              <span class="px-4 py-3 text-center">{t.mediaType}</span>
-              <span class="px-4 py-3">{t.mediaName}</span>
-              <span class="px-4 py-3 text-center">{t.mediaYear}</span>
-              <span class="px-4 py-3 text-center">{t.mediaRating}</span>
-              <span class="px-4 py-3 text-center">{t.mediaStatus}</span>
-            </div>
-
-            <div class="media-list">
-              {allItems.map((item: MediaListItem) => (
-                <div
-                  data-category={item.category}
-                  class="media-row group transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-900/50"
-                >
-                  <div class="media-desktop-grid hidden items-center text-sm md:grid">
-                    <span class="media-type inline-flex min-w-0 items-center justify-center gap-2 px-4 py-4 text-[13px] font-medium text-gray-500 dark:text-gray-400">
-                      <span
-                        class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}
-                      />
-                      <span class="whitespace-nowrap">
-                        {categoryLabelMap[item.category]}
-                      </span>
-                    </span>
-                    <div class="px-4 py-4" style="min-width:0">
-                      <p
-                        class="text-base font-medium leading-snug text-gray-950 dark:text-gray-50"
-                        style="overflow-wrap:anywhere;word-break:normal"
-                      >
-                        {item.name}
-                      </p>
-                    </div>
-                    <span class="media-year px-4 py-4 text-center tabular-nums text-gray-500 dark:text-gray-400">
-                      {item.year ?? "-"}
-                    </span>
-                    <span
-                      class="px-4 py-4 text-center tracking-wide text-yellow-600 dark:text-yellow-400"
-                      aria-label={`${t.mediaRating}: ${item.rating}`}
-                    >
-                      {item.rating > 0 ? renderRating(item.rating) : "-"}
-                    </span>
-                    <span class="flex items-center justify-center px-4 py-4">
-                      <span class="media-status-chip inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-[13px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                        {statusLabelMap[item.status] ?? item.status}
-                      </span>
-                    </span>
-                  </div>
-
-                  <div class="flex flex-col gap-1 px-4 py-3 md:hidden">
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="inline-flex items-center gap-1.5 text-[13px] font-medium text-gray-500 dark:text-gray-400">
-                        <span
-                          class={`h-2 w-2 shrink-0 rounded-full ${categoryAccent[item.category]}`}
-                        />
-                        {categoryLabelMap[item.category]}
-                      </span>
-                      <div class="flex items-center gap-2 text-[13px] text-gray-400 dark:text-gray-500">
-                        <span class="media-year tabular-nums">
-                          {item.year ?? "-"}
-                        </span>
-                        <span>·</span>
-                        <span class="media-status-chip">
-                          {statusLabelMap[item.status] ?? item.status}
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <p
-                        class="media-name-mobile text-base font-medium leading-snug text-gray-950 dark:text-gray-50"
-                        style="display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:100%;overflow-wrap:anywhere;word-break:normal"
-                      >
-                        {item.name}
-                      </p>
-                      {item.rating > 0 && (
-                        <span class="mt-1 inline-block text-[13px] tracking-wide text-yellow-600 dark:text-yellow-400">
-                          {renderRating(item.rating)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <p
-              id="media-empty"
-              class="hidden rounded-lg border border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-800 dark:text-gray-500"
-            >
-              {t.mediaEmpty}
-            </p>
-          </>
-        )
+        zh
+          ? "没有找到匹配的作品，请换个关键词或类型。"
+          : "No matching titles. Try another search or category."
       }
-    </section>
+    </p>
+    <button class="media-more" type="button" data-media-more hidden
+      >{zh ? "再看一些" : "Show more"}</button
+    >
   </div>
 </BaseLayout>
-
-<style>
-  .media-row:nth-child(odd),
-  .media-header {
-    background: var(--surface-soft);
-  }
-  .media-row p {
-    color: var(--ink);
-  }
-  .media-status-chip {
-    background: none;
-    color: var(--muted);
-    font-size: 0.8125rem;
-  }
-
-  .media-list {
-    overflow: hidden;
-  }
-  .media-row {
-    container-type: inline-size;
-  }
-  .media-desktop-grid {
-    grid-template-columns:
-      8rem minmax(0, 1fr) 5rem 7.5rem
-      9rem;
-  }
-  .media-year,
-  .media-status-chip {
-    max-width: none;
-    white-space: nowrap;
-    overflow-wrap: normal;
-    word-break: normal;
-  }
-  /* Desktop: ensure grid children don't overflow */
-  @media (min-width: 768px) {
-    .media-row .media-type {
-      min-width: 0;
-    }
-  }
-  /* Mobile: name clamping */
-  @media (max-width: 767px) {
-    .media-name-mobile {
-      font-size: 16px;
-    }
-  }
-</style>
+<script>
+  import { initMediaBrowser } from "../../../lib/media/browser";
+  const root = document.querySelector<HTMLElement>("[data-media-browser]");
+  if (root) initMediaBrowser(root);
+</script>

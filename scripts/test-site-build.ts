@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { parseMediaList } from "../src/lib/media/list";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 const root = join(process.cwd(), "dist");
@@ -12,6 +13,9 @@ const files = (directory: string): string[] =>
 const allFiles = files(root);
 const htmlFiles = allFiles.filter((file) => file.endsWith(".html"));
 const origin = "https://zoranzhou.com";
+const sourceBooks = parseMediaList(
+  readFileSync("src/content/media.md", "utf8"),
+).filter((item) => item.category === "books");
 const htmlAt = (path: string) =>
   readFileSync(join(root, path, "index.html"), "utf8");
 const pathExists = (path: string) =>
@@ -30,7 +34,11 @@ const failures: string[] = [];
 for (const file of htmlFiles) {
   const html = readFileSync(file, "utf8");
   const path = "/" + relative(root, file).replace(/index\.html$/, "");
-  assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${path}: one page title`);
+  assert.equal(
+    (html.match(/<h1\b/g) ?? []).length,
+    1,
+    `${path}: one page title`,
+  );
   assert.ok(
     !/netguard/i.test(html),
     `${path}: excluded project must remain private`,
@@ -81,6 +89,38 @@ for (const locale of ["zh-CN", "en"]) {
   );
   assert.ok(!home.includes('href="#"'));
   assert.ok(!home.includes("maplibre-gl.css"));
+  assert.ok(home.includes('id="library"') && home.includes('id="running"'));
+  assert.ok(
+    !home.includes(".gpx") && !home.includes("data-map-item="),
+    "Homepage routes are text-only links",
+  );
+  const library = htmlAt(`${locale}/library`);
+  assert.equal(
+    (library.match(/data-media-item/g) ?? []).length,
+    sourceBooks.length,
+  );
+  assert.ok(library.includes("data-media-cover"));
+  const media = htmlAt(`${locale}/media`);
+  assert.ok(
+    media.includes("data-media-browser") && media.includes("data-media-more"),
+  );
+  assert.match(
+    media,
+    /<time datetime="\d{4}-\d{2}-\d{2}"/,
+    "Viewing dates reach the rendered page",
+  );
+  assert.ok(
+    media.includes(
+      locale === "en"
+        ? "https://www.imdb.com/title/"
+        : "https://movie.douban.com/subject/",
+    ),
+  );
+  for (const page of [home, library, media]) {
+    for (const match of page.matchAll(/src="(\/media\/covers\/[^\"]+)"/g)) {
+      assert.ok(pathExists(match[1]), `Local cover exists: ${match[1]}`);
+    }
+  }
   assert.ok(htmlAt(`${locale}/map`).includes("maplibre-gl.css"));
   for (const section of [
     "about",

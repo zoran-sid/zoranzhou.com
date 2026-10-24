@@ -76,3 +76,32 @@ main surfaces, dark mobile reading and Lab are captured for independent finish r
 
 ## Sunset/dawn and code maintenance
 The current charcoal night palette is retained with a lighter coral action colour for contrast. A bounded 1.8s day/dusk/night sequence replaces the old SMIL sun and grey wash. The sun is independent of the particle opacity. Karpathy Guidelines informed a focused cleanup of theme state, event lifecycles, letter geometry, scroll indicators and stale route colour variables. Code-only verification remains the final scope.
+
+
+## Homepage collections — 2026-10-24
+
+Reference: https://maggieappleton.com, inspected as a content hierarchy, preserving the
+user's existing pale gradients, type, glints and sunset sequence. No new direction
+was drawn: this is an expansion within the approved visual world.
+
+Subject inventory: Zoran's seven recorded books, viewing dates already in media.md,
+Douban subject IDs and poster sources, the actual Sichuan mountain photograph,
+the localized Sichuan travel article, existing life essays, five `kind: run` routes,
+recorded run distance/duration, current TypeScript learning, and the blog-building
+lead article. No invented reviews, reading dates or new trips.
+
+Reading argument: introduce the person and current focus -> demonstrate technical
+work in selected writing -> reveal reading through a cover shelf -> connect landscape
+with actual travel writing -> show running and viewing as dated personal records.
+On this page, Zoran's book and viewing records become a readable personal shelf,
+while run dates and distances form a simple activity log beside it.
+
+Layout review: generous section intervals preserve the writing lead; compact captions
+sit next to their cover; the main travel image leads two secondary text entries;
+mobile columns collapse in DOM order and book covers become two across. Existing
+motion remains, with only a small cover hover translation and reduced-motion support.
+
+Executed Impeccable layout detector before/after (no layout findings) and Taste source
+lint on five changed presentation files (0 failures/0 warnings). Browser inspection
+and screenshot rounds intentionally omitted per the user's code-only validation
+instruction. These are source checks, not a visual acceptance result.

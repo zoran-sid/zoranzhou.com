@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-23T12:30:44.439Z",
+  "generatedAt": "2026-10-24T06:40:10.554468+00:00",
   "title": "Design System: Zoran’s Personal Journal",
   "extensions": {
     "colorMeta": {
@@ -419,6 +419,14 @@
       "body": {
         "displayName": "正文",
         "purpose": "技术与生活内容。"
+      },
+      "small": {
+        "displayName": "Compact controls",
+        "purpose": "Media category controls, search labels and counts at 14px."
+      },
+      "subheading": {
+        "displayName": "Collection fallback title",
+        "purpose": "Readable title in a media cover fallback at 20px."
       }
     },
     "shadows": [
@@ -539,6 +547,11 @@
         "name": "The Motion Rule",
         "body": "动态服务章节节奏。全屏光点串联阅读；精选文章使用细线随滚动延展，生活部分使用柔和日光漂移，项目与 Lab 使用慢速轨道。正文段落不逐段动画。内容默认可见，JavaScript 失败时仍可阅读。",
         "section": "elevation"
+      },
+      {
+        "name": "Personal collections",
+        "body": "首页在写作之后呈现真实书架、旅行手记、跑步列表与最近观影。Life 与 Library 复用同一内容数据；海报记录实际观看日期，跑步只显示文字指标与详情链接，不加载地图。窄屏书架两列，旅行和活动按 DOM 顺序堆叠。",
+        "section": "layout"
       }
     ],
     "dos": [

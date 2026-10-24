@@ -17,6 +17,7 @@ export interface DoubanMovie {
   tags?: string;
   comment?: string;
   metadata?: string;
+  imdb?: string;
 }
 
 export interface ParsedDoubanPage {

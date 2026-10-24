@@ -52,6 +52,14 @@ typography:
   label:
     fontFamily: Inter Variable, PingFang SC, sans-serif
     fontSize: 0.8125rem
+  small:
+    fontFamily: Inter Variable, PingFang SC, sans-serif
+    fontSize: 0.875rem
+    lineHeight: 1.65
+  subheading:
+    fontFamily: Newsreader, Georgia, Songti SC, STSong, serif
+    fontSize: 1.25rem
+    lineHeight: 1.5
   code:
     fontFamily: JetBrains Mono Variable, SFMono-Regular, Consolas, monospace
     fontSize: 1rem
@@ -121,7 +129,7 @@ Newsreader 400 用于姓名和显示标题，中文回退 Songti SC、STSong；I
 
 ## Layout
 
-主站最大宽 76rem；长文为 42rem 正文和 14rem 目录，间距 5rem。首页以署名与近况开篇，接真实笔记（有内容时）、精选文章、项目（有内容时）和生活图文。Writing 是分类与时间列表，Projects 是实际实践，Life 以摄影开篇，About 是头像与个人背景。Lab 保留当前学习与分阶段计划。
+主站最大宽 76rem；长文为 42rem 正文和 14rem 目录，间距 5rem。首页以署名与近况开篇，接真实笔记（有内容时）、精选文章、项目（有内容时）、封面书架、旅行手记，以及并列的跑步记录和最近观影。Writing 是分类与时间列表，Projects 是实际实践，Life 以摄影开篇，About 是头像与个人背景。Lab 保留当前学习与分阶段计划。
 
 断点为 640、768、900、1024、1280px，具体组件按内容选择。窄屏单列，目录折叠，代码与表格在阅读列内部滚动。装饰层使用绝对或固定定位，不参与排版和命中测试。
 
@@ -152,6 +160,20 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 - Lab focus：深蓝灰阅读底、轻透明学习区，独立 --lab-* 命名空间；首页轨道 28s/36s 反向缓慢运行。
 - Lab mark：connected-W，深蓝底、浅蓝笔画与浅青圆点。SVG 是唯一来源，icons:lab 生成 PNG。
 - Motion：尊重系统减少动态设置。
+
+
+
+### Personal collections
+
+参考 [Maggie Appleton](https://maggieappleton.com) 将写作与个人收藏分别组织的方式，
+以 Zoran 已有的书目、观看日期、路线和旅行文章丰富首页。保留既定渐变、字体与动效。
+书架由真实封面、书名和作者构成；旅途以主图和手记组成左右布局；跑步使用可扫读的
+日期和里程列表；电影使用海报与观看日期。不同内容采用各自合适的密度，不重复套用容器。
+
+Library 为独立双语书架，Media 是可按类型、关键词筛选的海报档案，Life 汇集这些实际
+内容。封面保持原色；小图本地缓存；正文与控件继续使用共享主题变量。交互退化到静态
+链接与完整列表；手机书架为两列，旅行手记和活动区域按 DOM 阅读顺序变为单列。
+
 
 ## Do's and Don'ts
 

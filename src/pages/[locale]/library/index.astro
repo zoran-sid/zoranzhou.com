@@ -1,0 +1,39 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import LifeNavigation from "../../../components/LifeNavigation.astro";
+import MediaCard from "../../../components/media/MediaCard.astro";
+import mediaSource from "../../../content/media.md?raw";
+import { parseMediaList } from "../../../lib/media/list";
+import { locales, type Locale } from "../../../i18n/utils";
+import "../../../styles/media.css";
+export async function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
+const books = parseMediaList(mediaSource).filter(
+  (item) => item.category === "books",
+);
+const title = zh ? "书架" : "Library";
+const description = zh
+  ? "读过的书、正在读的书，以及文字带来的不同世界。"
+  : "Books I've read, books in progress, and the worlds found in their pages.";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="page-container archive-page library-page">
+    <header class="page-intro">
+      <LifeNavigation /><h1>{title}</h1><p>{description}</p>
+    </header>
+    <div class="media-grid">
+      {books.map((item) => <MediaCard item={item} locale={locale} />)}
+    </div>
+    {
+      books.length === 0 && (
+        <p class="media-empty">
+          {zh ? "书架整理中。" : "The library is being put together."}
+        </p>
+      )
+    }
+  </div>
+</BaseLayout>

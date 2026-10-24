@@ -7,7 +7,8 @@
 - **首页**：个人定位 → 精选文章（含博客构建）→ 最近记录 → TypeScript 学习 → 生活照片 → 联系与订阅。
 - **文章 `/blog`**：聚合 Blog、Essays、Research，按技术、研究、生活筛选，支持静态分页。原有详情地址及 `/essays`、`/research` 列表保留。
 - **实践 `/projects`**：项目、实践文章与研究笔记，并提供独立 WEB3 LAB 入口。
-- **生活 `/life`**：摄影、足迹、随笔、书影音与游戏的统一入口。
+- **生活 `/life`**：旅行手记、跑步记录、最近观影与书架的内容入口。
+- **书架 `/library`**：带真实封面的双语书目，中文链接豆瓣读书，英文链接 Google Books。
 - **关于 `/about`**：个人介绍、工作方式与技能方向。
 - **WEB3 LAB `/lab`**：独立深色子站，以当前 TypeScript 学习为起点，依次展开学习路线、钱包平台规划与安全研究笔记；学习状态与验证状态分别呈现。
 
@@ -135,3 +136,24 @@ npm run editor
 
 日常流程与发布确认见 [从手机笔记到个人网站](docs/digital-garden.md)。支持仓库外的私人 Markdown Inbox，使用 `content:new`、`content:prepare`、`content:check`，审核后再运行 `content:approve --confirm`。工具不执行 Git 或生产部署。
 Writing 支持 Notes / Guides / Essays；原文章 URL 保留，成熟度可选。近期关注在 `src/data/now.ts` 维护。
+
+
+### 书架、观影日期与封面
+
+首页、Life、Library 和 Media 共享 `src/content/media.md`，不需要维护第二份书单。
+`year` 表示作品发行／首版年份，`watchedDate` 用 `YYYY-MM-DD` 记录观看日期。
+观影按日期倒序显示；同日保持文件顺序，未记录日期的条目排在后面。页面不会推测日期。
+新增图书时可填写 `author`、`poster`、`url`、`urlEn`、`nameEn`。英文电影介绍优先使用
+`imdb` 列中的已核对 title ID；未填写时，页面显示“Find on IMDb”并进入片名搜索。
+
+更新数据之后，手动缓存封面：
+
+```sh
+npm run media:images          # 所有图书 + 最近 24 部影视
+npm run media:images -- --all # 全量已有影视封面（首次或集中补齐时）
+npm run test:media-list
+```
+
+缓存位于 `public/media/covers/`，索引为 `src/data/media-covers.json`；发布时一起提交。
+已有小图会复用，失败会提示并保留缓存。构建与访问页面都不会运行抓取脚本。
+书影音、摄影和跑步更新仍不触发文章订阅通知。

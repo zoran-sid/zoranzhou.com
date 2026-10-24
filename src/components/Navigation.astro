@@ -21,7 +21,7 @@ const items = [
   {
     label: c.life,
     href: "/life",
-    active: ["life", "photos", "map", "media"].includes(section),
+    active: ["life", "photos", "map", "media", "library"].includes(section),
   },
   { label: c.about, href: "/about", active: section === "about" },
   { label: "WEB3 LAB", href: "/lab", active: false },
@@ -126,6 +126,8 @@ const items = [
       }<div class="mobile-secondary">
         <a href={localizePath("/photos", locale)}>{c.photos}</a><a
           href={localizePath("/map", locale)}>{c.routes}</a
+        ><a href={localizePath("/library", locale)}
+          >{locale === "zh-CN" ? "书架" : "Library"}</a
         ><a href={localizePath("/media", locale)}>{c.media}</a><a
           href={alternateHref}
           data-language-switch

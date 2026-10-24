@@ -227,6 +227,7 @@ test("loads exported JSON and dry-runs without changing the output", async () =>
           title: "测试电影 / Test Movie",
           releaseDate: "2025-07-01",
           score: 8,
+          imdbId: "https://www.imdb.com/title/tt1234567/",
           collectInfo: { date: "2026-07-10", tags: "cinema", comment: "ok" },
         },
       ]),
@@ -235,11 +236,13 @@ test("loads exported JSON and dry-runs without changing the output", async () =>
     await fs.writeFile(output, mediaSource, "utf8");
     const imported = await loadMoviesFromInput(input);
     assert.equal(imported[0].rating, "4");
+    assert.equal(imported[0].imdb, "tt1234567");
     await runMediaUpdate({ dryRun: true, input, output });
     assert.equal(await fs.readFile(output, "utf8"), mediaSource);
     await runMediaUpdate({ dryRun: false, input, output });
     const written = await fs.readFile(output, "utf8");
     assert.match(written, /douban:123/);
+    assert.match(written, /tt1234567/);
     assert.equal(
       written.slice(written.indexOf("## games")),
       mediaSource.slice(mediaSource.indexOf("## games")),

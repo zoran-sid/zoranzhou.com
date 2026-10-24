@@ -851,28 +851,64 @@ Use these functions instead of recreating visibility or fallback rules in pages.
 
 ### Production data path
 
-`src/content/media.md` is the only production Media data source. It is deliberately not
-an Astro content collection.
+`src/content/media.md` remains the canonical source for personal media records. It is
+raw Markdown, deliberately outside Astro's content collections. No movie, book, photo,
+or route update enters article RSS or email notifications.
 
 ```text
-src/content/media.md
-  -> imported as raw Markdown by the locale Media page
-  -> parseMediaList(markdown)
-  -> category counts and filters
-  -> responsive static table
+src/content/media.md -> src/lib/media/list.ts
+  -> LibraryShelf (homepage + Life, first six books)
+  -> /[locale]/library (complete book shelf)
+  -> HomeActivities (latest three watched movies)
+  -> /[locale]/media (poster archive, type/search filters, 24 items per reveal)
+
+src/data/media-covers.json -> public/media/covers/*.webp
+  derived image cache, written only by the manual media:images command
 ```
 
-`src/lib/media/list.ts` recognizes Movies, TV, Books, and Games headings in supported
-English/Chinese aliases. It parses Markdown tables with escaped pipes, maps header and
-status aliases, clamps ratings to the supported range, defaults absent status sensibly,
-and sorts normalized records for presentation.
+Keep `year` (release/original publication year) separate from `watchedDate` (an actual
+recorded calendar date, `YYYY-MM-DD`). `parseMediaList` sorts by descending valid
+`watchedDate`; same-day records retain Markdown order, and undated records retain their
+order after dated records. Never infer a viewing date from `year`, import time, file
+mtime, or today's date. Invalid calendar dates are treated as absent. Existing bulk
+collection dates remain source facts; do not invent historical viewing dates.
 
-There are no Media detail pages and no old Media API. Do not reintroduce API fetches,
-client-side databases, removed Media card implementations, or production Douban calls.
+Supported display columns: `id`, `name`, optional `nameEn`, `author` (Chinese / English),
+`year`, `rating` (personal 0–5), `status`, `watchedDate`, `poster`, `url`, `urlEn`, `imdb`.
+Legacy four-column tables remain valid. `poster` and detail URLs accept HTTP(S) only.
+Missing ratings are not printed as zero-star reviews. Missing covers keep a readable
+text fallback. For English titles, use `nameEn` then the last ` / ` title alias; do not
+pretend a Korean/original title has been translated.
 
-The Media table uses an explicit responsive grid. Type and Status are independent
-columns. Fix truncation or alignment in the table/grid styles, not by modifying parsed
-category/status data. Verify both long bilingual labels and the narrow mobile layout.
+Chinese film links use the existing Douban subject URL. English links use a verified
+`imdb` title ID (`tt…`) when present; otherwise the visible action is **Find on IMDb**
+and opens a title/year search. Never guess an IMDb ID from a title. Book Chinese links
+use verified Douban book pages; English links currently use Google Books title/author
+search. Linked cover editions are references, not assertions of the edition read.
+
+`MediaCard.astro` shares covers and metadata across these surfaces. All content is in
+static HTML. With JavaScript, Media reveals 24 results at a time, provides category
+and title/author filtering, updates the live count, and focuses newly revealed results.
+Without JavaScript all records remain readable. The page never calls Douban/IMDb APIs.
+Remote uncached covers load lazily; cache covers locally for reliable availability.
+
+### Cover maintenance
+
+```sh
+npm run media:images         # all books + 24 most recent film/TV records
+npm run media:images -- --all # all available book/film/TV cover URLs
+npm run test:media-list
+```
+
+This opt-in command uses the existing Sharp dependency to create thumbnails bounded
+by 320×480, hashes the source URL into a stable filename, and atomically writes the
+cache index. Cached files are reused; failed requests preserve previous files and are
+reported. No Markdown, rating, viewing date, or source link is modified. Source
+catalogue Referer and normal User-Agent headers are used for the source image CDN.
+Do not bypass a blocked/captcha source. Do not run this command during Astro build,
+Cloudflare deployment, or a visitor request. Review and commit the generated cache
+index and thumbnails together when publishing. Keep original artwork; never generate
+fake covers or use a placeholder image as if it were the book or film.
 
 ### Douban update pipeline
 
@@ -1302,6 +1338,8 @@ production function is explicitly requested.
 | `npx tsc --noEmit`               | Independent TypeScript check                  | No                                 | No after install               |
 | `npm run format`                 | Format repository-supported files             | Yes, broad mechanical rewrite      | No                             |
 | `npm run media:update`           | Update Movies table                           | Yes unless dry-run/output changed  | Yes for live mode              |
+| `npm run media:images`           | Cache book/recent film thumbnails locally     | Derived cache only                 | Yes                            |
+| `npm run test:media-list`        | Test display dates, links and filters        | No                                 | No                             |
 | `npm run test:media-update`      | Test Media updater                            | Test artifacts only                | No expected live Douban        |
 | `npm run translate -- --dry-run` | Preview Chinese-to-English changes            | No                                 | No                             |
 | `npm run translate -- ...`       | Manually update English articles              | Yes, with backups                  | DeepL for pending entries      |
@@ -1602,3 +1640,31 @@ This section supersedes the old homepage order and adds publication rules. Read
   validate:routes, test:translation (mocked), test:media-update (fixtures), test:editor,
   build, test:site-build, and diff whitespace. Browser and production checks remain with
   the user as requested. Do not claim measured rendering performance from code inspection.
+
+
+## Homepage collections and travel journal (2026-10-24)
+
+The homepage keeps the existing introduction, current TypeScript focus, selected
+writing and conditional projects, followed by LibraryShelf, LifeFeature and
+HomeActivities. The visual reference is Maggie Appleton's separation of writing and
+personal collections; preserve Zoran's own pale scroll gradients, full-screen light
+points, typography and day/dusk/night transition.
+
+- Library uses only books already recorded in `media.md`; never fabricate reading
+  dates, reviews, authorship or new books to fill a layout.
+- LifeFeature is a landscape image with an adjacent travel journal and two other
+  public life entries. The Sichuan article is found within published localized writing;
+  its actual title, description, date and URL supply the feature. If absent, link the
+  image to photography. Do not invent trips or use a non-public translated entry.
+- HomeActivities takes the three newest visible localized `kind: run` routes after
+  route-identity normalization. Show date, location, distance, duration and detail
+  link only. It must not import MapLibre, embed route geometry/GPX URLs, preload GPX,
+  or instantiate preview maps. Full maps stay on the existing map/detail pages.
+- Home and Life reuse these components. Library is a separate bilingual route and
+  is included in LifeNavigation and mobile navigation; the Life parent stays active.
+- On narrow screens the photo/journal and running/film columns stack in DOM order;
+  book/poster grids reduce to two columns. Keep long original titles, visible metadata,
+  keyboard focus and reduced-motion behavior.
+- New code checks are `test:media-list` and collection assertions in `test:site-build`.
+  Validation remains code/build only at the user's request. No current screenshot or
+  browser-performance approval is implied by the earlier historical browser record.

@@ -20,6 +20,7 @@ const DOUBAN_HEADERS = [
   "tags",
   "comment",
   "metadata",
+  "imdb",
 ];
 
 function splitMarkdownRow(line: string): string[] {

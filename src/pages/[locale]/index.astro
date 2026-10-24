@@ -4,6 +4,8 @@ import SectionAtmosphere from "../../components/SectionAtmosphere.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import HeroSection from "../../components/HeroSection.astro";
 import ArticleRow from "../../components/ArticleRow.astro";
+import LibraryShelf from "../../components/LibraryShelf.astro";
+import HomeActivities from "../../components/HomeActivities.astro";
 import LifeFeature from "../../components/LifeFeature.astro";
 import { getCollection } from "astro:content";
 import {
@@ -181,5 +183,7 @@ const jsonld = {
       </section>
     )
   }
+  <LibraryShelf locale={locale} />
   <LifeFeature locale={locale} />
+  <HomeActivities locale={locale} />
 </BaseLayout>
