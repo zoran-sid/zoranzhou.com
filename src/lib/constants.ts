@@ -21,6 +21,11 @@ export const SOCIAL_LINKS = [
     url: "https://space.bilibili.com/596163308",
     label: "Bilibili",
   },
+  {
+    name: "instagram",
+    url: "https://www.instagram.com/zoranzhou?mdxt=MXY5M3B0aHFsYWVxdA%3D%3D&utm_source=qr",
+    label: "Instagram",
+  },
 ] as const;
 
 // ── Pagination ──
