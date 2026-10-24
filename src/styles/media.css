@@ -110,8 +110,15 @@
   min-height: 44px;
   padding: 0.65rem 0.8rem;
   border: 1px solid var(--line);
+  border-radius: 4px;
   background: var(--surface-soft);
   color: var(--ink);
+}
+.media-search input:focus,
+.media-search input:focus-visible {
+  outline: none;
+  border-color: var(--line-strong);
+  box-shadow: none;
 }
 .media-search input::placeholder {
   color: var(--muted);

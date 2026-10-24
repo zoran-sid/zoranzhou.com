@@ -135,11 +135,6 @@ const toc = tocItems.map((h) => {
     <article
       class="article-main"
       data-article-content
-      data-copy-label={locale === "zh-CN" ? "复制代码" : "Copy code"}
-      data-copied-label={locale === "zh-CN" ? "已复制" : "Copied"}
-      data-copy-failed={locale === "zh-CN"
-        ? "复制失败，请手动选择"
-        : "Select code to copy"}
     >
       <header class="article-header mb-10">
         <nav
@@ -373,30 +368,6 @@ const toc = tocItems.map((h) => {
     const article = document.querySelector<HTMLElement>(
       "[data-article-content]",
     );
-    article?.querySelectorAll("pre").forEach((pre) => {
-      if (pre.querySelector(".code-copy-button")) return;
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "code-copy-button";
-      button.textContent = article.dataset.copyLabel ?? "Copy code";
-      button.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(
-            pre.querySelector("code")?.textContent ?? "",
-          );
-          button.textContent = article.dataset.copiedLabel ?? "Copied";
-          button.classList.add("copied");
-        } catch {
-          button.textContent =
-            article.dataset.copyFailed ?? "Select code to copy";
-        }
-        setTimeout(() => {
-          button.textContent = article.dataset.copyLabel ?? "Copy code";
-          button.classList.remove("copied");
-        }, 1800);
-      });
-      pre.appendChild(button);
-    });
     const headings = [
       ...(article?.querySelectorAll<HTMLElement>(
         ".article-prose h2[id],.article-prose h3[id]",

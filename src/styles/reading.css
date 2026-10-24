@@ -186,19 +186,6 @@
   padding-top: 2.8rem;
   font-size: 0.8125rem;
 }
-.code-copy-button {
-  font-size: 0.8125rem;
-  background: var(--surface);
-  color: var(--muted);
-  border-color: var(--line);
-  padding: 0.4rem 0.7rem;
-}
-.code-copy-button:hover,
-.code-copy-button.copied {
-  color: var(--accent);
-  border-color: var(--accent-soft);
-  background: var(--surface);
-}
 [data-rehype-pretty-code-fragment] code span,
 [data-rehype-pretty-code-figure] code span {
   color: var(--shiki-light);
@@ -470,11 +457,6 @@
 }
 .article-prose p {
   max-width: 75ch;
-}
-.code-copy-button {
-  min-height: 36px;
-  min-width: 44px;
-  font-size: 0.8125rem;
 }
 @media (max-width: 900px) {
   .archive-layout {

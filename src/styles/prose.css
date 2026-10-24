@@ -118,30 +118,6 @@
   font-family: var(--font-mono);
   font-size: 0.86em;
 }
-.code-copy-button {
-  position: absolute;
-  z-index: 2;
-  top: 0.75rem;
-  right: 0.75rem;
-  padding: 0.38rem 0.65rem;
-  border: 1px solid rgb(255 255 255 / 0.13);
-  border-radius: 0.45rem;
-  background: rgb(255 255 255 / 0.075);
-  color: #9da8ba;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
-}
-.code-copy-button:hover,
-.code-copy-button.copied {
-  border-color: rgb(135 152 235 / 0.5);
-  background: rgb(135 152 235 / 0.14);
-  color: #dce2ff;
-}
 .prose ul,
 .prose ol {
   margin: 1.25em 0;
