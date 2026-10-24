@@ -50,12 +50,16 @@ const footerLinks = [
           >
             {
               SOCIAL_LINKS.filter(
-                (link) => link.url !== "#" && link.name !== "email",
+                (link) => link.url !== "#",
               ).map((link) => (
                 <a
                   href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  target={link.url.startsWith("mailto:") ? undefined : "_blank"}
+                  rel={
+                    link.url.startsWith("mailto:")
+                      ? undefined
+                      : "noopener noreferrer"
+                  }
                   aria-label={link.label}
                   title={link.label}
                 >
