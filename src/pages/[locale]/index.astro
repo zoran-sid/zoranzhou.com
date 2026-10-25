@@ -3,7 +3,6 @@ import ArrowIcon from "../../components/ArrowIcon.astro";
 import SectionAtmosphere from "../../components/SectionAtmosphere.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import HeroSection from "../../components/HeroSection.astro";
-import ArticleRow from "../../components/ArticleRow.astro";
 import LibraryShelf from "../../components/LibraryShelf.astro";
 import HomeActivities from "../../components/HomeActivities.astro";
 import LifeFeature from "../../components/LifeFeature.astro";
@@ -26,9 +25,7 @@ const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const c = editorial(locale);
 const writing = await getWriting(locale);
 const selected = selectWriting(writing, locale);
-const recent = writing
-  .filter((entry) => writingFormat(entry) === "note")
-  .slice(0, 3);
+const latestNote = writing.find((entry) => writingFormat(entry) === "note");
 const projects = (await getCollection("projects"))
   .filter((entry) => isPublished(entry) && entry.data.lang === locale)
   .slice(0, 2);
@@ -44,46 +41,7 @@ const jsonld = {
 ---
 
 <BaseLayout description={c.intro} jsonld={jsonld}>
-  <HeroSection />
-  {
-    recent.length > 0 && (
-      <section
-        class="editorial-section page-container recent-section"
-        aria-labelledby="recent-title"
-      >
-        <>
-          <header class="section-head">
-            <>
-              <div>
-                <h2 id="recent-title">
-                  {locale === "zh-CN" ? "最近的短笔记" : "Latest notes"}
-                </h2>
-              </div>
-              <p class="section-aside">
-                {locale === "zh-CN"
-                  ? "一个问题，一点理解，都可以记下来。"
-                  : "A question or a small discovery is enough."}
-              </p>
-            </>
-          </header>
-          <div class="writing-list">
-            {recent.length ? (
-              recent.map((entry) => (
-                <ArticleRow entry={entry} locale={locale} updated />
-              ))
-            ) : (
-              <p class="garden-empty">
-                {locale === "zh-CN"
-                  ? "短笔记将在这里慢慢积累。先看看已有的指南与随笔。"
-                  : "Short notes will grow here over time. Start with the guides and essays already in the garden."}{" "}
-                <a href={localizePath("/blog", locale)}>{c.allWriting}</a>
-              </p>
-            )}
-          </div>
-        </>
-      </section>
-    )
-  }
+  <HeroSection latestNote={latestNote} />
   <section
     class="editorial-section page-container scene-section"
     id="selected"

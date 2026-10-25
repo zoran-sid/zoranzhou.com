@@ -68,7 +68,7 @@ assert.deepEqual(
 for (const locale of ["zh-CN", "en"]) {
   const home = htmlAt(locale);
   assert.equal((home.match(/<h1\b/g) ?? []).length, 1);
-  // Notes and standalone project sections appear only when they contain published entries.
+  // The Notes entry point stays available before the first published note.
   assert.ok(home.includes("<dialog"));
   assert.ok(!home.includes("hero-radar"));
   const selected = home.slice(
@@ -84,8 +84,8 @@ for (const locale of ["zh-CN", "en"]) {
     "OpenWrt is not a homepage selection",
   );
   assert.ok(
-    home.includes("/lab/learning/typescript-foundations"),
-    "Current exploration is TypeScript learning",
+    home.includes('id="notes-heading"') && home.includes(`/${locale}/blog/formats/note`),
+    "Homepage introduces Notes with a working archive link",
   );
   assert.ok(!home.includes('href="#"'));
   assert.ok(!home.includes("maplibre-gl.css"));

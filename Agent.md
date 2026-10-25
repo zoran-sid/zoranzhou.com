@@ -1519,13 +1519,23 @@ This section supersedes the old homepage order and adds publication rules. Read
 - npm prebuild runs the draft-resource guard. Draft images/MDX imports can be compiled even
   without routes, so guard them before Astro runs. A hidden route/noindex does not protect
   Git history or public assets. Existing tracked placeholder drafts are not private storage.
-- Homepage order: identity + Now, actual Notes when published notes exist, selected long
-  writing led by blog construction, published projects when present, life photography,
-  contact. Hide empty homepage sections; keep Notes available through Writing and Lab
-  reachable from Now. Never manufacture cards to fill a section.
-  `src/data/now.ts` owns current focus copy. No auto-updating dates or invented projects.
+- Homepage order: identity + Notes (随记), selected long writing led by blog construction,
+  published projects when present, library, life photography and activities.
+  The Notes entry point remains visible with an honest empty state until a first note exists.
+  HeroSection receives the latest published note in the current locale from getWriting;
+  never manufacture a dated note from static focus copy. `src/data/now.ts` remains on /now.
+  NoteCard renders a plain-text/image preview on the homepage and Markdown in the Notes feed.
+  note-preview.ts uses the existing Markdown parser, excludes HTML/comments/code blocks from
+  previews, and accepts root-relative or HTTP(S) preview images only. Keep relative source
+  images in Astro's full content renderer. Order by original date, not updated or build time.
 - Writing formats live at /blog/formats/{note,guide,essay}; old /blog/topics/* stay intact.
   Notes have no TOC/sidebar; Guides/Essays reuse tested long reading controls.
+  Public Chinese labels now say 随记; the stored enum and old URLs remain note.
+  Chinese notes may publish independently; do not manufacture English copies or require
+  translation. RSS continues to include published Notes under the existing Writing policy.
+  Mobile-independent publishing is not connected yet. Pages CMS is a researched option in
+  docs/digital-garden.md, pending the author's workflow choice. Do not expose the local
+  editor or claim that adding front-end Notes UI enables phone publishing.
 - This request requires separate confirmation before Git commit, branch push or PR creation;
   never automatically push main or merge. Cloudflare production configuration is unchanged.
 - Test content imports in temporary external Inbox/repository fixtures. Test privacy against

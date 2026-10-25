@@ -1,18 +1,11 @@
 ---
-import ArrowIcon from "./ArrowIcon.astro";
+import NoteCard from "./NoteCard.astro";
 import { localizePath, type Locale } from "../i18n/utils";
-import { getCollection } from "astro:content";
-import { getLabEntryPath, LAB_CURRENT_FOCUS_KEY } from "../lib/lab";
-import { isPublished } from "../lib/content-policy";
-import { now } from "../data/now";
+import type { WritingEntry } from "../lib/writing";
+interface Props { latestNote?: WritingEntry }
+const { latestNote } = Astro.props;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const zh = locale === "zh-CN";
-const labFocus = (await getCollection("lab")).find(
-  (entry) =>
-    isPublished(entry) &&
-    entry.data.lang === locale &&
-    entry.data.translationKey === LAB_CURRENT_FOCUS_KEY,
-);
 ---
 
 <section class="garden-hero page-container">
@@ -50,18 +43,14 @@ const labFocus = (await getCollection("lab")).find(
     </div>
   </div>
   <div class="garden-index">
-    <aside class="garden-now" aria-labelledby="now-heading">
-      <h2 id="now-heading">{zh ? "近况" : "At the moment"}</h2>
-      <p>{now[locale].body}</p>
-      <a
-        class="text-link"
-        href={labFocus
-          ? getLabEntryPath(labFocus)
-          : localizePath("/lab", locale)}
-        >{now[locale].linkLabel}<span aria-hidden="true"
-          ><ArrowIcon direction="up-right" /></span
-        ></a
-      >
+    <aside class="garden-notes" aria-labelledby="notes-heading">
+      <div class="garden-notes__heading">
+        <h2 id="notes-heading">{zh ? "随记" : "Notes"}</h2>
+        <a class="text-link" href={localizePath("/blog/formats/note", locale)}>{zh ? "所有随记" : "All notes"}</a>
+      </div>
+      <div class="garden-notes__latest">
+        {latestNote ? <NoteCard entry={latestNote} locale={locale} compact /> : <p class="garden-notes__empty">{zh ? "随手记下的想法、照片，还有日常里值得留住的片刻。第一条随记还在酝酿。" : "Thoughts, photographs and small moments from everyday life. The first note is still to come."}</p>}
+      </div>
     </aside>
   </div>
 </section>

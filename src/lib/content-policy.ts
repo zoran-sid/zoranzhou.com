@@ -75,7 +75,7 @@ export function formatLabel(entry: ContentRecord, locale: string): string {
   const format = writingFormat(entry);
   return (
     locale === "zh-CN"
-      ? { note: "短笔记", guide: "指南", essay: "文章与随笔" }
+      ? { note: "随记", guide: "指南", essay: "文章与随笔" }
       : { note: "Notes", guide: "Guides", essay: "Essays" }
   )[format];
 }
