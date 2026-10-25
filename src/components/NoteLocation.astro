@@ -1,0 +1,67 @@
+---
+import type { Locale } from "../i18n/utils";
+interface Props {
+  name?: string;
+  href?: string;
+  locale: Locale;
+}
+const { name, href, locale } = Astro.props;
+const url = href && /^https?:\/\//i.test(href) ? href : undefined;
+const label =
+  name?.trim() ||
+  (url ? (locale === "zh-CN" ? "查看地点" : "View location") : "");
+const Tag = url ? "a" : "span";
+---
+
+{
+  label && (
+    <Tag
+      class="note-location"
+      href={url}
+      target={url ? "_blank" : undefined}
+      rel={url ? "noopener noreferrer" : undefined}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        aria-hidden="true"
+      >
+        <>
+          <path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z" />
+          <circle cx="12" cy="10" r="2.5" />
+        </>
+      </svg>
+      <span>{label}</span>
+    </Tag>
+  )
+}
+
+<style>
+  .note-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    max-width: 100%;
+    margin-top: 0.75rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+  .note-location svg {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+  }
+  a.note-location {
+    min-height: 2.75rem;
+    margin-top: 0.25rem;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  a.note-location:hover {
+    color: var(--accent);
+  }
+</style>

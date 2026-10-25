@@ -270,3 +270,11 @@ stay usable. Only the independently scrollable directory animates (320ms in / 24
 out). Close, Escape, desktop resizing, page exit and reduced-motion changes restore
 scrolling and the toolbar. The logo, language, search and theme controls remain the
 same DOM elements. Reduced motion skips the slide.
+
+
+### 随记预览（2026-10-25）
+
+首页始终只展示最新一条随记；文字最多 5 行，配图最多 3 张。随记列表每页 10 条，每条文字最多 8 行、
+配图最多 6 张；详情保留完整图文。单图保留完整画面，多图采用紧凑网格，超出部分以 +N 表示。
+文字预览使用现有正文字体，时间和可选地点使用辅助文字样式；不增加滚动动画或地图加载。
+缩略图预留比例、延迟加载，正文和相册的完整内容通过明确链接访问。

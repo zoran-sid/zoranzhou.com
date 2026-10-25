@@ -13,6 +13,20 @@ const baseSchema = z.object({
   author: z.string().default("Zoran"),
   lang: z.enum(["zh-CN", "en"]).default("zh-CN"),
   translationKey: z.string().optional(),
+  // Optional place label/map link for casual notes; no automatic geolocation.
+  location: z.string().trim().max(100).optional(),
+  locationUrl: z
+    .union([
+      z.literal(""),
+      z
+        .string()
+        .trim()
+        .url()
+        .refine((url) => /^https?:\/\//i.test(url), {
+          message: "地点链接必须使用 http 或 https。",
+        }),
+    ])
+    .optional(),
   // Local translation provenance; never credentials or provider request payloads.
   translation: z
     .object({

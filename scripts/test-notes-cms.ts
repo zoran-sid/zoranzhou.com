@@ -40,10 +40,12 @@ test("CMS defaults produce an approved note accepted by the existing importer co
   assert.equal(isPublicData(data), true);
   assert.equal(isPublicData({ ...data, draft: true }), false);
   assert.equal(fields.date.options.time, true);
-  assert.ok(
-    fields.date.options.format.includes("XXX"),
-    "publish time records a time-zone offset",
+  assert.equal(
+    fields.date.options.format,
+    "yyyy-MM-dd'T'HH:mm:ss'+08:00'",
+    "CMS server time-zone must not change the author's UTC+8 wall time",
   );
+  assert.equal(new Date(data.date).toISOString(), "2026-10-25T14:30:00.000Z");
 });
 
 test("CMS storage keeps ordinary articles outside the quick-note editor and stable note URLs", () => {
@@ -63,4 +65,14 @@ test("CMS storage keeps ordinary articles outside the quick-note editor and stab
     fields.lang.options.values.map((v: { name: string }) => v.name),
     ["zh-CN", "en"],
   );
+});
+
+test("location is optional and map links accept ordinary web share URLs", () => {
+  assert.ok(!fields.location.required && !fields.locationUrl.required);
+  assert.equal(fields.location.options.maxlength, 100);
+  const pattern = new RegExp(fields.locationUrl.pattern.regex);
+  assert.ok(pattern.test("https://maps.apple.com/?q=Hong%20Kong"));
+  assert.ok(pattern.test("https://surl.amap.com/example"));
+  assert.ok(!pattern.test("javascript:alert(1)"));
+  assert.ok(!pattern.test("地点名称 https://example.com"));
 });

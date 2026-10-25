@@ -1,6 +1,8 @@
 ---
 import ArrowIcon from "../components/ArrowIcon.astro";
 import BaseLayout from "./BaseLayout.astro";
+import NoteLocation from "../components/NoteLocation.astro";
+import { notePreview } from "../lib/note-preview";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getTranslations, localizePath, type Locale } from "../i18n/utils";
 import { editorial } from "../i18n/editorial";
@@ -23,6 +25,9 @@ const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
 const c = editorial(locale);
 const isNote = writingFormat(entry) === "note";
+const noteCover = isNote && entry.data.cover &&
+  !notePreview(entry.body, 0, entry.data.cover).coverIsInline
+  ? entry.data.cover : undefined;
 const tocItems = (isNote ? [] : headings).filter(
   (h) => h.depth === 2 || h.depth === 3,
 );
@@ -193,6 +198,7 @@ const toc = tocItems.map((h) => {
             )
           }
         </div>
+        {isNote && <NoteLocation name={entry.data.location} href={entry.data.locationUrl} locale={locale} />}
         {
           entry.data.tags.length > 0 && (
             <div class="mt-4 flex flex-wrap gap-2">
@@ -266,6 +272,10 @@ const toc = tocItems.map((h) => {
         }
       </header>
       <div class="prose article-prose">
+        {noteCover && <figure>
+          <img src={noteCover.src} alt={noteCover.alt ?? ""} loading="lazy" decoding="async" />
+          {noteCover.caption && <figcaption>{noteCover.caption}</figcaption>}
+        </figure>}
         {
           hasReadableBody(entry) ? (
             <Content />

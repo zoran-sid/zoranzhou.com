@@ -44,13 +44,29 @@ content:
         type: string
         default: 随记
         required: true
+      - name: location
+        label: 地点（可选）
+        type: string
+        description: 可以只填城市或地点名称，例如“香港 · 西贡”。留空则不显示。
+        options:
+          maxlength: 100
+      - name: locationUrl
+        label: 地图链接（可选）
+        type: string
+        description: 粘贴高德、百度、Apple Maps 或 Google Maps 的分享链接，只需网址。
+        pattern:
+          regex: '^https?://\S+$'
+          message: 请粘贴以 https:// 或 http:// 开头的完整网址。
       - name: date
-        label: 记录时间
+        label: 记录时间（香港／北京时间）
         type: date
         required: true
+        description: 统一按 UTC+8 保存。跨时区旅行时，请按香港／北京时间调整。
         options:
           time: true
-          format: "yyyy-MM-dd'T'HH:mm:ssXXX"
+          # CMS serializes datetime-local on its server. XXX would use that
+          # server's zone; a quoted literal preserves the author's wall time.
+          format: "yyyy-MM-dd'T'HH:mm:ss'+08:00'"
       # UUID is also the Astro permalink. Editing text/title never changes the URL.
       - name: slug
         type: uuid
