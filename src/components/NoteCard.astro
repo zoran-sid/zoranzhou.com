@@ -1,6 +1,6 @@
 ---
 import type { Locale } from "../i18n/utils";
-import { displayDate, entryPath, type WritingEntry } from "../lib/writing";
+import { entryPath, type WritingEntry } from "../lib/writing";
 import { notePreview } from "../lib/note-preview";
 interface Props {
   entry: WritingEntry;
@@ -13,39 +13,132 @@ const cover = entry.data.cover ?? (compact ? preview.image : undefined);
 const rendered = compact ? undefined : await entry.render();
 const Content = rendered?.Content;
 const href = entryPath(entry);
+const dateLabel = entry.data.date.toLocaleString(
+  locale === "zh-CN" ? "zh-CN" : "en-GB",
+  {
+    timeZone: "Asia/Hong_Kong",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  },
+);
 ---
 
 <article class:list={["note-card", { "note-card--compact": compact }]}>
   <header class="note-card__meta">
-    <span>Zoran</span>
-    <a href={href} aria-label={`${entry.data.title} · ${displayDate(entry.data.date, locale)}`}>
-      <time datetime={entry.data.date.toISOString()}>{displayDate(entry.data.date, locale)}</time>
+    <span>{entry.data.author}</span>
+    <a href={href} aria-label={`${entry.data.title} · ${dateLabel}`}>
+      <time datetime={entry.data.date.toISOString()}>{dateLabel}</time>
     </a>
   </header>
-  {compact ? <p class="note-card__preview">{preview.text || entry.data.description || entry.data.title}</p> : (
-    <div class="prose note-card__body">{Content && <Content />}</div>
-  )}
-  {cover && <a class="note-card__image" href={href} aria-label={entry.data.title}>
-    <img src={cover.src} alt={cover.alt ?? ""} loading="lazy" decoding="async" />
-  </a>}
-  <a class="note-card__link" href={href}>{locale === "zh-CN" ? "查看这条随记" : "Open this note"}</a>
+  {
+    compact ? (
+      <p class="note-card__preview">
+        {preview.text || entry.data.description || entry.data.title}
+      </p>
+    ) : (
+      <div class="prose note-card__body">{Content && <Content />}</div>
+    )
+  }
+  {
+    cover && (
+      <a class="note-card__image" href={href} aria-label={entry.data.title}>
+        <img
+          src={cover.src}
+          alt={cover.alt ?? ""}
+          loading="lazy"
+          decoding="async"
+        />
+      </a>
+    )
+  }
+  <a class="note-card__link" href={href}
+    >{locale === "zh-CN" ? "查看这条随记" : "Open this note"}</a
+  >
 </article>
 
 <style>
-  .note-card { min-width: 0; padding-block: 1.75rem; }
-  .note-card + .note-card { border-top: 1px solid var(--line); }
-  .note-card__meta { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: baseline; font-size: .875rem; color: var(--muted); margin-bottom: .75rem; }
-  .note-card__meta > span { color: var(--ink); font-weight: 600; }
-  .note-card__meta a:hover { color: var(--accent); }
-  .note-card__preview { white-space: pre-line; overflow-wrap: anywhere; color: var(--ink); line-height: 1.85; }
-  .note-card__body { color: var(--ink); }
-  .note-card__body :global(> :first-child) { margin-top: 0; }
-  .note-card__body :global(p) { color: var(--ink); }
-  .note-card__body :global(:is(h1, h2, h3, h4)) { font-family: var(--font-body); font-size: 1.125rem; border: 0; padding: 0; margin: 1.5rem 0 .5rem; }
-  .note-card__body :global(img) { max-height: 36rem; width: auto; object-fit: contain; border-radius: .5rem; box-shadow: none; }
-  .note-card__image { display: block; width: fit-content; max-width: 100%; margin-block: 1rem; }
-  .note-card__image img { max-width: 100%; width: auto; max-height: 28rem; height: auto; border-radius: .5rem; }
-  .note-card--compact { padding: 0; }
-  .note-card--compact .note-card__image img { max-height: 13rem; }
-  .note-card__link { display: inline-block; margin-top: .75rem; padding-block: .25rem; color: var(--accent); font-size: .875rem; text-decoration: underline; text-underline-offset: .25em; }
+  .note-card {
+    min-width: 0;
+    padding-block: 1.75rem;
+  }
+  .note-card + .note-card {
+    border-top: 1px solid var(--line);
+  }
+  .note-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    align-items: baseline;
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .note-card__meta > span {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .note-card__meta a:hover {
+    color: var(--accent);
+  }
+  .note-card__preview {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    color: var(--ink);
+    line-height: 1.85;
+  }
+  .note-card__body {
+    color: var(--ink);
+  }
+  .note-card__body :global(> :first-child) {
+    margin-top: 0;
+  }
+  .note-card__body :global(p) {
+    color: var(--ink);
+  }
+  .note-card__body :global(:is(h1, h2, h3, h4)) {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    border: 0;
+    padding: 0;
+    margin: 1.5rem 0 0.5rem;
+  }
+  .note-card__body :global(img) {
+    max-height: 36rem;
+    width: auto;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    box-shadow: none;
+  }
+  .note-card__image {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin-block: 1rem;
+  }
+  .note-card__image img {
+    max-width: 100%;
+    width: auto;
+    max-height: 28rem;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+  .note-card--compact {
+    padding: 0;
+  }
+  .note-card--compact .note-card__image img {
+    max-height: 13rem;
+  }
+  .note-card__link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding-block: 0.25rem;
+    color: var(--accent);
+    font-size: 0.875rem;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
 </style>

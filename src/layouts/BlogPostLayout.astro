@@ -177,7 +177,7 @@ const toc = tocItems.map((h) => {
             datetime={entry.data.date.toISOString()}
             >{displayDate(entry.data.date, locale)}</time
           >{
-            hasReadableBody(entry) && (
+            !isNote && hasReadableBody(entry) && (
               <span>
                 · {readingTime(entry.body)} {c.reading}
               </span>

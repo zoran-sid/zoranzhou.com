@@ -1,0 +1,79 @@
+# Pages CMS: saving a note commits PUBLIC content to the selected GitHub branch.
+# Keep private drafts in the existing external Inbox, not in this editor.
+media:
+  - name: note-images
+    label: 随记配图（上传后即公开）
+    input: public/writing-images/notes
+    output: /writing-images/notes
+    extensions: [jpg, jpeg, png, webp, avif, gif]
+    rename: random
+
+content:
+  - name: notes
+    label: 随记
+    type: collection
+    path: src/content/blog/notes
+    format: yaml-frontmatter
+    subfolders: false
+    exclude: [README.md]
+    filename:
+      template: "note-{fields.slug}.md"
+      field: false
+    view:
+      fields: [title, date]
+      primary: title
+      sort: [date, title]
+      search: [title, body]
+      default:
+        sort: date
+        order: desc
+    operations:
+      rename: false
+    fields:
+      - name: body
+        label: 想记下什么？
+        type: rich-text
+        required: true
+        description: 写几句话，也可以插入照片。保存会提交到 GitHub；生产分支构建成功后公开。
+        options:
+          format: markdown
+          media: note-images
+          switcher: false
+      - name: title
+        label: 标题（可以保留默认值）
+        type: string
+        default: 随记
+        required: true
+      - name: date
+        label: 记录时间
+        type: date
+        required: true
+        options:
+          time: true
+          format: "yyyy-MM-dd'T'HH:mm:ssXXX"
+      # UUID is also the Astro permalink. Editing text/title never changes the URL.
+      - name: slug
+        type: uuid
+        hidden: true
+      - name: format
+        type: string
+        default: note
+        hidden: true
+      - name: publication
+        type: string
+        default: approved
+        hidden: true
+      - name: lang
+        label: 语言
+        type: select
+        default: zh-CN
+        options:
+          values:
+            - name: zh-CN
+              label: 中文
+            - name: en
+              label: English
+      - name: draft
+        type: boolean
+        default: false
+        hidden: true

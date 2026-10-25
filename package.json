@@ -27,6 +27,7 @@
     "test:language-routing": "npx tsx scripts/test-language-routing.ts",
     "test:route-logic": "npx tsx scripts/test-route-logic.ts",
     "test:editorial": "tsx --test scripts/test-editorial.ts",
+    "test:notes": "tsx --test scripts/test-note-preview.ts scripts/test-notes-cms.ts",
     "test:site-build": "tsx scripts/test-site-build.ts",
     "icons:lab": "node scripts/generate-lab-icons.mjs",
     "content:new": "node scripts/content/cli.mjs new",

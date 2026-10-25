@@ -14,3 +14,10 @@ dist/
 .taste-skill/before/
 .taste-skill/round-*/
 .impeccable/review/
+
+# Local maintenance instructions and personal-profile deliverable.
+/Agent.md
+/agent.md
+/AGENTS.md
+/.local/docs/
+/docs/github-profile-README.md

@@ -2,7 +2,9 @@
 import NoteCard from "./NoteCard.astro";
 import { localizePath, type Locale } from "../i18n/utils";
 import type { WritingEntry } from "../lib/writing";
-interface Props { latestNote?: WritingEntry }
+interface Props {
+  latestNote?: WritingEntry;
+}
 const { latestNote } = Astro.props;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const zh = locale === "zh-CN";
@@ -46,10 +48,22 @@ const zh = locale === "zh-CN";
     <aside class="garden-notes" aria-labelledby="notes-heading">
       <div class="garden-notes__heading">
         <h2 id="notes-heading">{zh ? "随记" : "Notes"}</h2>
-        <a class="text-link" href={localizePath("/blog/formats/note", locale)}>{zh ? "所有随记" : "All notes"}</a>
+        <a class="text-link" href={localizePath("/blog/formats/note", locale)}
+          >{zh ? "所有随记" : "All notes"}</a
+        >
       </div>
       <div class="garden-notes__latest">
-        {latestNote ? <NoteCard entry={latestNote} locale={locale} compact /> : <p class="garden-notes__empty">{zh ? "随手记下的想法、照片，还有日常里值得留住的片刻。第一条随记还在酝酿。" : "Thoughts, photographs and small moments from everyday life. The first note is still to come."}</p>}
+        {
+          latestNote ? (
+            <NoteCard entry={latestNote} locale={locale} compact />
+          ) : (
+            <p class="garden-notes__empty">
+              {zh
+                ? "随手记下的想法、照片，还有日常里值得留住的片刻。第一条随记还在酝酿。"
+                : "Thoughts, photographs and small moments from everyday life. The first note is still to come."}
+            </p>
+          )
+        }
       </div>
     </aside>
   </div>

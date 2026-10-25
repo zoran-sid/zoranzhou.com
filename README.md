@@ -1,159 +1,24 @@
-# ZORAN ZHOU
+# zoranzhou.com
 
-技术写作与个人生活记录的双语博客，线上地址为 [zoranzhou.com](https://zoranzhou.com)。使用 Astro 5、MDX、TypeScript、Tailwind CSS 4 和 MapLibre GL，静态构建至 `dist/`，由 Cloudflare Pages 托管。
+Zoran Zhou 的个人网站，记录技术学习、实践和日常生活。
 
-## 网站结构
+访问：[zoranzhou.com](https://zoranzhou.com/zh-CN/) · [English](https://zoranzhou.com/en/)
 
-- **首页**：个人定位 → 精选文章（含博客构建）→ 最近记录 → TypeScript 学习 → 生活照片 → 联系与订阅。
-- **文章 `/blog`**：聚合 Blog、Essays、Research，按技术、研究、生活筛选，支持静态分页。原有详情地址及 `/essays`、`/research` 列表保留。
-- **实践 `/projects`**：项目、实践文章与研究笔记，并提供独立 WEB3 LAB 入口。
-- **生活 `/life`**：旅行手记、跑步记录、最近观影与书架的内容入口。
-- **书架 `/library`**：带真实封面的双语书目，中文链接豆瓣读书，英文链接 Google Books。
-- **关于 `/about`**：个人介绍、工作方式与技能方向。
-- **WEB3 LAB `/lab`**：独立深色子站，以当前 TypeScript 学习为起点，依次展开学习路线、钱包平台规划与安全研究笔记；学习状态与验证状态分别呈现。
+网站包含文章、随记、书架、摄影和跑步旅行记录，支持中英文与文章订阅。
+使用 Astro、TypeScript 和 Markdown 构建，由 Cloudflare Pages 托管。
 
-以上路径都带 `/zh-CN` 或 `/en` 语言前缀。根路径仅负责语言选择与跳转。
-
-## 本地开发与检查
+## 本地运行
 
 ```sh
 npm ci
 npm run dev
 ```
 
-本地预览默认位于 `http://127.0.0.1:4321/zh-CN/`。
+## 构建
 
 ```sh
-npm run lint
-npm run test:editorial
-npm run test:language-routing
-npm run build
-npm run test:site-build
-```
-
-受限环境中可设置 `ASTRO_TELEMETRY_DISABLED=1` 后运行 Astro 命令。完整维护约束见 [Agent.md](Agent.md)。
-
-## 内容与视觉维护
-
-- 正文位于 `src/content/`，在原集合内维护，不为聚合页面复制文章。
-- 首页精选引用配置位于 `src/lib/writing.ts`；标题、摘要和日期从正文读取。引用不存在时构建报错，避免留下空入口。
-- 普通文章的双语版本通过相同 `translationKey` 配对；路线继续通过 `routeId` 配对。缺少译文时切换到目标语言的对应列表，不猜测详情地址。
-- 空正文文章保留原详情地址，并显示整理中说明，不进入文章流、标签、搜索和 RSS。
-- `src/i18n/editorial.ts` 维护主站叙事文案；原集合与工具文案仍位于 `zh-CN.ts` 和 `en.ts`。
-- `global.css` 维护主题与公共组件；`home.css`、`collections.css`、`reading.css` 分别负责首页、入口页面与阅读体验。地图样式在 `maps.css` 内，通过 `BaseLayout` 的 `mapStyles` 按需加载。Lab 样式保持独立。
-- 首页山景来自原有川西游记图片：`https://e5d9f02.webp.fi/b83f5dd6937798b1cae03b3c062f8691.jpg`。本地副本 `src/assets/images/sichuan-mountains.jpg` 由 Astro 生成响应式图片。
-
-设计依据见 [重构方案](docs/refactor-proposal-2026-09-05.md)，本轮变更与验收记录见 [重构记录](docs/refactor-implementation-2026-09-05.md)。旧 Route v2 修改说明已原文移至 [历史记录](docs/history/route-system-v2-2026-07-11.md)；其中新旧集合并存的描述仅代表历史过程，当前运行时只读取 `routes`。
-
-## 文章更新订阅
-
-`/subscribe` 提供邮件订阅说明和 RSS 阅读器入口。通知源为各语言的 `/rss.xml`，仅收录已发布、非空正文的 Blog / Essays / Research。摄影、跑步路线、项目和 LAB 更新均排除。读者通过 Blogtrottr 的公开页面自行填写邮箱、确认和退订，本站不收集邮箱；免费方案带广告。部署后第三方才能读取新版内容源。
-
-- 中文地址：`https://zoranzhou.com/zh-CN/rss.xml`；英文地址：`https://zoranzhou.com/en/rss.xml`。两者分别订阅，网页语言切换不会修改邮箱订阅。请直接使用完整 RSS 地址，避免通过首页自动发现时选错语言。
-- RSS 按 `date`、`updated`、英文 `translation.translatedAt` 中最新的时间排序。译文正式放入内容目录并部署后，才会进入英文订阅源；导出报告不触发通知。
-- 手工发布文章的重要修订时设置 `updated`（建议带时区的完整时间，例如 `2026-09-25T10:00:00+08:00`）。有修订时间的条目使用标题、摘要、正文生成稳定的版本标识，让阅读器识别更新；不使用构建时间，重复部署或相同译文不会生成新标识。未修订旧文章保留原有标识。
-- 首次启用此规则时，已带更新/翻译时间的文章可能收到一次更新提醒。免费 Blogtrottr 通常每小时检查，汇总按所选时间发送；旧文章补发和最终邮件送达由服务决定。
-
-## 手动翻译与对照导出
-
-中文写好后手动触发，默认只导出中英对照 HTML 报告、英文文件和 ZIP 包，不修改网站中的中英文原文件：
-
-```sh
-npm run translate -- --all --dry-run
-npm run translate -- --all --max-characters 50000
-```
-
-支持 Blog、Essays、Research、Lab；报告集中提示遗漏、术语、否定和规划状态等问题。结果位于 `.local/translation/exports/`，可直接打开 HTML 阅读，无需逐篇检查 Markdown。相同内容复用缓存，减少重复 API 请求。需要写入网站时必须明确加 `--write`；替换已有英文需指定 `--file "中文路径" --retranslate --write`。
-
-密钥只在本机 `.env.translation` 中配置，该文件和 `.local/translation/` 均被 Git 忽略。工具不自动提交、推送或部署，构建也不触发翻译。完整用法、保护边界及恢复方式见 [翻译维护说明](docs/translation.md)。
-
-## 发布
-
-构建命令为 `npm run build`，发布目录为 `dist`。`public/_routes.json` 将 Cloudflare Pages Function 限定在根路径 `/`。内容编辑器、备份、导入器和设置文件均为本地维护工具，不属于生产站点。提交、推送和部署由站点维护者明确执行。
-
-## 本地更新 Media
-
-Media 数据是构建时读取的静态文件 `src/content/media.md`。网站构建、Cloudflare 部署和页面请求都不会访问豆瓣，也不会运行更新脚本。游戏及其他非电影分区继续手工维护。
-
-在 Windows 本机仓库根目录手动运行：
-
-```powershell
-npm run media:update
-```
-
-如果 PowerShell 的执行策略阻止 `npm.ps1`，使用等价命令 `npm.cmd run media:update`。
-
-脚本使用普通浏览器 User-Agent 和请求间隔，基于上面的“看过”列表地址请求其 grid 视图（以取得海报和评分），并依次读取所有分页。它会合并稳定的豆瓣 ID/slug，避免重复条目，保留已有非空字段、未知列、未匹配的手工电影条目，并原样保留游戏等其他分区。完整抓取和校验成功后，脚本先写临时文件，再原子替换 `media.md`；失败或数据不完整时不会修改正式文件，也不会自动提交或推送 Git。
-
-只验证抓取和合并、不写文件：
-
-```powershell
-npm run media:update -- --dry-run
-```
-
-豆瓣可能返回 403、418、429、验证码或异常请求页。豆瓣的分页总数有时也会包含已删除或私密的收藏记录，但页面不会提供对应条目；脚本会明确警告并继续完整分页，这类不可见记录无法导入。遇到反爬限制时，在浏览器中把每个分页分别保存为 HTML 文件并放进同一个目录，然后运行：
-
-```powershell
-npm run media:update -- --input C:\path\to\douban-pages
-```
-
-也可以传入单个导出 JSON 文件。JSON 顶层应为数组，或包含 `movies`/`items` 数组；每条至少需要豆瓣 subject ID（`subjectId`、`doubanId` 或 `id`）或 `movie.douban.com/subject/...` URL，以及 `name`/`title`。支持 `year`/`releaseDate`、`rating`/`score`、`poster`/`cover`、`watchedDate`/`date`、`tags`、`comment` 和 `metadata`/`rawInfos`。若保存的 HTML 数量少于页面声明的收藏总数，脚本会拒绝部分更新。
-
-更新后请检查差异并运行：
-
-```powershell
-npm run test:media-update
 npm run lint
 npm run build
 ```
 
-## 本地内容编辑器
-
-Blog、Essays 及相同 Markdown/MDX 内容集合可以通过仅限本机的浏览器编辑器维护：
-
-```powershell
-npm run editor
-```
-
-编辑器只监听 `127.0.0.1:4322`，直接读写本仓库中明确允许的内容目录，并在覆盖、重命名或删除前把备份写入被 Git 忽略的 `tools/content-editor/backups/`。它不会自动提交或推送，也不会被 Astro 构建或 Cloudflare 部署包含。完整说明见 `tools/content-editor/README.md`。
-
-界面默认使用类似 Typora 的可视化正文编辑，另保留源码 / MDX 与阅读预览模式；文章信息、格式、素材和常用操作都可直接用鼠标完成。复杂 MDX/JSX 会自动回退到源码模式，避免转换时改坏内容：
-
-- 图片：第一次使用时点击右上角“设置”，只填写本机 `PicGo.exe` 的完整路径；之后可点击“图片”、把图片拖入正文或直接粘贴，编辑器会调用本机 PicGo 上传并插入返回的 Markdown 链接。PicGo 本身仍需提前配置好目标图床。
-- GPX：点击“GPX”选择文件，编辑器会校验后原子写入 `public/routes/` 并插入链接；“素材库”可以查看、复用、删除（删除前备份）或在 Windows 资源管理器中打开 GPX 目录，也可一键复用现有 Route importer 生成/更新符合项目 schema 的路线内容。
-- 设置和临时上传文件仅保存在被 Git 忽略的 `tools/content-editor/` 本地文件中，不会进入生产站点。
-
-“快速检查”运行 Astro 内容/schema 与类型检查；“部署前构建”运行完整 `npm run build`，生成 Cloudflare 发布使用的 `dist/`。生产构建不是 GPX 导入命令，日常编辑不必每次运行；远程图片处理可能耗时，编辑器会持续显示运行状态、耗时和增量日志。GPX 转 Route Markdown 请使用编辑器“素材库”，或单独运行 `npm run import:routes`。
-
-## 设计与交付资料
-
-- [重构实现与验收记录](docs/refactor-implementation-2026-09-05.md)
-- [GitHub 个人主页 README](docs/github-profile-README.md)：独立交付文件，由作者手动同步到 `zoran-sid/zoran-sid`。
-- WEB3 LAB 图标以 `public/web3-lab-favicon.svg` 为唯一来源，修改后运行 `npm run icons:lab` 生成 64 px 与 180 px PNG，并更新 `src/lib/lab.ts` 中的 `LAB_ICON_REVISION`。页头与浏览器图标使用同一设计。
-- 长期内容与发布约定见 [Agent.md](Agent.md)。
-
-## Digital Garden：低摩擦记录
-
-日常流程与发布确认见 [从手机笔记到个人网站](docs/digital-garden.md)。支持仓库外的私人 Markdown Inbox，使用 `content:new`、`content:prepare`、`content:check`，审核后再运行 `content:approve --confirm`。工具不执行 Git 或生产部署。
-Writing 支持 Notes / Guides / Essays；原文章 URL 保留，成熟度可选。近期关注在 `src/data/now.ts` 维护。
-
-
-### 书架、观影日期与封面
-
-首页、Life、Library 和 Media 共享 `src/content/media.md`，不需要维护第二份书单。
-`year` 表示作品发行／首版年份，`watchedDate` 用 `YYYY-MM-DD` 记录观看日期。
-观影按日期倒序显示；同日保持文件顺序，未记录日期的条目排在后面。页面不会推测日期。
-新增图书时可填写 `author`、`poster`、`url`、`urlEn`、`nameEn`。英文电影介绍优先使用
-`imdb` 列中的已核对 title ID；未填写时，页面显示“Find on IMDb”并进入片名搜索。
-
-更新数据之后，手动缓存封面：
-
-```sh
-npm run media:images          # 所有图书 + 最近 24 部影视
-npm run media:images -- --all # 全量已有影视封面（首次或集中补齐时）
-npm run test:media-list
-```
-
-缓存位于 `public/media/covers/`，索引为 `src/data/media-covers.json`；发布时一起提交。
-已有小图会复用，失败会提示并保留缓存。构建与访问页面都不会运行抓取脚本。
-书影音、摄影和跑步更新仍不触发文章订阅通知。
+静态文件输出到 `dist/`。

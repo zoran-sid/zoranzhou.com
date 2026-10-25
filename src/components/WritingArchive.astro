@@ -128,17 +128,27 @@ const filters = [
         <p class="archive-count">{page.total} {c.results}</p>
         {
           entries.length > 0 ? (
-            <div class:list={[format === "note" ? "notes-feed" : "writing-list"]}>
-              {entries.map((entry) => format === "note" ? (
-                <NoteCard entry={entry} locale={locale} />
-              ) : (
-                <ArticleRow entry={entry} locale={locale} />
-              ))}
+            <div
+              class:list={[format === "note" ? "notes-feed" : "writing-list"]}
+            >
+              {entries.map((entry) =>
+                format === "note" ? (
+                  <NoteCard entry={entry} locale={locale} />
+                ) : (
+                  <ArticleRow entry={entry} locale={locale} />
+                ),
+              )}
             </div>
           ) : (
             <div class="empty-note">
               <>
-                <p>{format === "note" ? (locale === "zh-CN" ? "还没有公开的随记。写下第一条后，就会按时间出现在这里。" : "No notes published yet. New notes will appear here, newest first.") : c.empty}</p>
+                <p>
+                  {format === "note"
+                    ? locale === "zh-CN"
+                      ? "还没有公开的随记。写下第一条后，就会按时间出现在这里。"
+                      : "No notes published yet. New notes will appear here, newest first."
+                    : c.empty}
+                </p>
                 <a class="text-link" href={localizePath("/blog", locale)}>
                   {c.browse} <ArrowIcon direction="up-right" />
                 </a>
