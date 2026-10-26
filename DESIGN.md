@@ -231,8 +231,11 @@ The supplied Maggie Appleton screenshots guide the three-leaf framing, four-peta
 inner-arc circular glyphs, and prominent elliptical subscription control. Glyphs change
 shape on link hover/focus. The footer ends with an envelope, subscription and social
 icons, plus copyright/licence. No motivational sentence is appended.
-The mobile footer displays the full directory in two columns after copyright,
-with 44px link targets; secondary collections remain reachable without crowding the drawer.
+The footer gives subscription its own non-wrapping pill row, followed by a single row
+of five social icons with 44px targets and 12px gaps. Below 900px, the full two-column
+directory sits beneath copyright with a separating rule. Wider layouts place the
+directory alongside the contact block; secondary collections remain reachable without
+crowding the drawer or compressing the subscription control.
 
 Headings share the main ink in both themes. Canela, Canela Deck and Noto Serif SC
 create section differences through type, scale and rhythm.

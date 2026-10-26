@@ -20,23 +20,27 @@
 }
 .footer-connect {
   display: flex;
-  align-items: center;
-  gap: 2rem;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
   margin-bottom: 2.5rem;
 }
 .subscribe-pill {
   display: inline-flex;
+  flex: none;
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
-  min-height: 40px;
-  padding: 0.4rem 1rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
   border: 1px solid var(--muted);
   border-radius: 999px;
   color: var(--muted);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
   font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
   transition:
     color 180ms,
     background 180ms;
@@ -51,18 +55,16 @@
   flex: none;
 }
 .footer-socials {
-  position: relative;
-  top: 1.05rem;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
 }
 .footer-socials a {
   display: grid;
+  flex: none;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   color: var(--muted);
   transition: color 180ms;
 }
@@ -77,8 +79,10 @@
   display: flex;
 }
 .site-footer .footer-bottom {
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem 1.5rem;
   padding-top: 0;
   font-family: var(--font-ui);
   font-size: 0.95rem;
@@ -111,9 +115,19 @@
 .footer-directory a:hover {
   color: var(--accent);
 }
+@media (max-width: 899px) {
+  .footer-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  .footer-directory {
+    gap: 0.25rem 1.5rem;
+    border-top: 1px solid var(--line);
+    padding-block: 1rem max(1rem, env(safe-area-inset-bottom));
+  }
+}
 @media (max-width: 639px) {
   .footer-layout {
-    display: block;
     padding-block: 2.5rem 1rem;
   }
   .site-footer .footer-contact {
@@ -132,23 +146,6 @@
     font-size: clamp(2rem, 8vw, 2.5rem);
   }
   .footer-connect {
-    align-items: start;
-    flex-direction: column;
-    gap: 1.35rem;
     margin-bottom: 1.6rem;
-  }
-  .footer-socials {
-    top: 0;
-  }
-  .footer-directory {
-    display: grid;
-    gap: 0.25rem 1.5rem;
-    margin-top: 1.5rem;
-    padding-block: 0.5rem max(1rem, env(safe-area-inset-bottom));
-  }
-  .subscribe-pill {
-    min-height: 38px;
-    font-size: 0.875rem;
-    padding-inline: 0.95rem;
   }
 }
