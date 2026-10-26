@@ -2,6 +2,12 @@ import assert from "node:assert/strict";
 import test, { type TestContext } from "node:test";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
+import { atmosphereColor } from "../src/lib/scroll-atmosphere";
+
+const bootstrap = readFileSync(
+  new URL("../src/components/ThemeScript.astro", import.meta.url),
+  "utf8",
+);
 
 class Events {
   listeners = new Map<string, Set<() => void>>();
@@ -21,8 +27,22 @@ let revision = 0;
 async function setup(t: TestContext) {
   const classes = new Set<string>();
   const attributes = new Map<string, string>();
+  const properties = new Map<string, string>();
+  const color = {
+    content: "",
+    dataset: {
+      light: bootstrap.match(/data-light="([^"]+)"/)![1],
+      dark: bootstrap.match(/data-dark="([^"]+)"/)![1],
+    },
+  };
+  const scheme = { content: "light dark" };
   const root = {
     dataset: {} as Record<string, string>,
+    style: {
+      colorScheme: "",
+      getPropertyValue: (name: string) => properties.get(name) ?? "",
+      setProperty: (name: string, value: string) => properties.set(name, value),
+    },
     classList: {
       contains: (name: string) => classes.has(name),
       toggle: (name: string, on: boolean) =>
@@ -87,7 +107,11 @@ async function setup(t: TestContext) {
   const document = Object.assign(new Events(), {
     hidden: false,
     documentElement: root,
-    querySelector: (): typeof element | null => element,
+    querySelector: (selector: string) => {
+      if (selector === 'meta[name="theme-color"]') return color;
+      if (selector === 'meta[name="color-scheme"]') return scheme;
+      return element;
+    },
     getElementById: () => ({
       setAttribute: (name: string, value: string) =>
         attributes.set(name, value),
@@ -120,6 +144,8 @@ async function setup(t: TestContext) {
     document,
     window,
     root,
+    color,
+    scheme,
     reduced,
     system,
     storage,
@@ -155,6 +181,8 @@ test("sunset commits the reading theme after daylight and clears the sequence", 
   assert.equal(e.root.classList.contains("dark"), false);
   e.advance(200);
   assert.equal(e.root.classList.contains("dark"), true);
+  assert.equal(e.color.content, e.color.dataset.dark);
+  assert.equal(e.scheme.content, "dark");
   await e.finish();
   assert.equal(e.root.dataset.themeTransition, undefined);
   assert.equal(e.attributes.get("aria-pressed"), "true");
@@ -173,6 +201,8 @@ test("dawn reverses the sky and sun and settles in the light theme", async (t) =
   );
   e.advance(700);
   assert.equal(e.root.classList.contains("dark"), false);
+  assert.equal(e.color.content, e.color.dataset.light);
+  assert.equal(e.root.style.colorScheme, "light");
   await e.finish();
   assert.equal(e.root.dataset.themeTransition, undefined);
 });
@@ -240,12 +270,68 @@ test("invalid or blocked storage falls back to the system and retains this page'
   assert.equal(e.root.classList.contains("dark"), false);
 });
 
-test("the pre-paint theme bootstrap works when storage access throws", () => {
-  const source = readFileSync(
-    new URL("../src/components/ThemeScript.astro", import.meta.url),
-    "utf8",
-  ).match(/<script is:inline>([\s\S]*?)<\/script>/)![1];
-  const classes = new Set();
+test("browser colour follows scroll and switches to the current position's other palette", async (t) => {
+  const e = await setup(t);
+  for (const progress of [0, 0.5, 1]) {
+    const day = atmosphereColor(progress * 0.72 + 0.14, false);
+    const night = atmosphereColor(progress * 0.72 + 0.14, true);
+    e.root.style.setProperty("--browser-day", day);
+    e.root.style.setProperty("--browser-night", night);
+    e.theme.applyTheme("dark");
+    assert.equal(e.color.content, night);
+    assert.equal(e.scheme.content, "dark");
+    e.theme.applyTheme("light");
+    assert.equal(e.color.content, day);
+    assert.equal(e.scheme.content, "light");
+  }
+  e.root.style.setProperty("--browser-day", "#faf1ed");
+  e.theme.syncBrowserTheme();
+  assert.equal(e.color.content, "#faf1ed");
+});
+
+test("system preference updates browser chrome until an explicit theme is chosen", async (t) => {
+  const e = await setup(t);
+  e.theme.initTheme();
+  for (const handler of e.system.listeners.get("change") ?? []) {
+    (handler as (event: { matches: boolean }) => void)({ matches: true });
+  }
+  assert.equal(e.color.content, e.color.dataset.dark);
+  assert.equal(e.root.style.colorScheme, "dark");
+  e.reduced.matches = true;
+  e.theme.toggleTheme();
+  e.system.emit("change");
+  assert.equal(e.color.content, e.color.dataset.light);
+});
+
+test("browser synchronization leaves the independent Lab metadata alone", async (t) => {
+  const e = await setup(t);
+  e.color.content = "#111c32";
+  e.color.dataset.light = "";
+  e.theme.syncBrowserTheme();
+  assert.equal(e.color.content, "#111c32");
+  assert.equal(e.root.style.colorScheme, "");
+});
+
+test("pre-paint bootstrap honors saved choices and blocked storage in browser chrome", async (t) => {
+  const e = await setup(t);
+  const source = bootstrap.match(/<script is:inline>([\s\S]*?)<\/script>/)![1];
+  for (const [stored, systemDark, expected] of [
+    [null, false, "light"],
+    [null, true, "dark"],
+    ["light", true, "light"],
+    ["dark", false, "dark"],
+    ["invalid", true, "dark"],
+  ] as const) {
+    vm.runInNewContext(source, {
+      localStorage: { getItem: () => stored },
+      window: { matchMedia: () => ({ matches: systemDark }) },
+      document: e.document,
+    });
+    assert.equal(e.root.classList.contains("dark"), expected === "dark");
+    assert.equal(e.root.style.colorScheme, expected);
+    assert.equal(e.scheme.content, expected);
+    assert.equal(e.color.content, e.color.dataset[expected]);
+  }
   vm.runInNewContext(source, {
     localStorage: {
       getItem() {
@@ -253,11 +339,8 @@ test("the pre-paint theme bootstrap works when storage access throws", () => {
       },
     },
     window: { matchMedia: () => ({ matches: true }) },
-    document: {
-      documentElement: {
-        classList: { add: (value: string) => classes.add(value) },
-      },
-    },
+    document: e.document,
   });
-  assert.ok(classes.has("dark"));
+  assert.equal(e.color.content, e.color.dataset.dark);
+  assert.equal(e.root.style.colorScheme, "dark");
 });

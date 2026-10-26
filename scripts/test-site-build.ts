@@ -34,6 +34,16 @@ const failures: string[] = [];
 for (const file of htmlFiles) {
   const html = readFileSync(file, "utf8");
   const path = "/" + relative(root, file).replace(/index\.html$/, "");
+  if (html.includes('<body class="site-body"')) {
+    for (const name of ["theme-color", "color-scheme"]) {
+      assert.equal(
+        [...html.matchAll(new RegExp(`<meta\\s[^>]*name="${name}"[^>]*>`, "g"))]
+          .length,
+        1,
+        `${path}: one ${name} declaration for browser chrome`,
+      );
+    }
+  }
   assert.equal(
     (html.match(/<h1\b/g) ?? []).length,
     1,

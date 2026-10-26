@@ -42,6 +42,30 @@ const luminance = (hex: string) => {
   return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
 };
 
+test("browser backdrop fallbacks match the initial scroll colours before scripts load", () => {
+  const bootstrap = readFileSync(
+    new URL("../src/components/ThemeScript.astro", import.meta.url),
+    "utf8",
+  );
+  for (const dark of [false, true]) {
+    const prefix = dark ? "night" : "day";
+    const theme = dark ? "dark" : "light";
+    const expected = atmosphereColor(0.14, dark);
+    assert.equal(
+      atmosphereCss.match(new RegExp(`--browser-${prefix}: (#[\\da-f]+)`))![1],
+      expected,
+    );
+    assert.equal(
+      atmosphereCss.match(new RegExp(`--${prefix}-b: (#[\\da-f]+)`))![1],
+      expected,
+    );
+    assert.equal(
+      bootstrap.match(new RegExp(`data-${theme}="([^"]+)"`))![1],
+      expected,
+    );
+  }
+});
+
 test("reading progress handles short pages and overscroll", () => {
   assert.equal(scrollProgress(200, 800, 800), 0);
   assert.equal(scrollProgress(-40, 2000, 800), 0);

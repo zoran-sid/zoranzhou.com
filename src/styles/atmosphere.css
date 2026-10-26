@@ -1,4 +1,28 @@
 /* Continuous colour belongs to the page; reading ink remains stable. */
+:root:not(.lab-document) {
+  --browser-day: #f0f2f9;
+  --browser-night: #191d21;
+  --browser-surface: var(--browser-day);
+  background-color: var(--browser-surface);
+}
+:root.dark {
+  --browser-surface: var(--browser-night);
+}
+.site-body,
+.site-body .scroll-atmosphere {
+  background-color: var(--browser-surface);
+}
+/* Safari extends solid fixed-layer colours into its bars. Blend both edges into
+   the same scroll-aware colour used by html/body, including during overscroll. */
+.site-body .atmosphere-sky {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+}
 .site-body,
 .lab-body {
   isolation: isolate;
@@ -8,14 +32,15 @@
   --day-b: #f0f2f9;
   --day-c: #f3f0f8;
   --night-a: #14181c;
-  --night-b: #1b2024;
-  --night-c: #23292e;
+  --night-b: #191d21;
+  --night-c: #1f2429;
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
 }
+.atmosphere-sky,
 .atmosphere-day,
 .atmosphere-dusk,
 .atmosphere-night,

@@ -31,8 +31,30 @@ export function getSystemTheme(): Theme {
     : "light";
 }
 
+/** Keep browser chrome in step with the committed theme and scroll backdrop. */
+export function syncBrowserTheme(): void {
+  const root = document.documentElement;
+  const color = document.querySelector<HTMLMetaElement>(
+    'meta[name="theme-color"]',
+  );
+  // The Lab owns its independent, fixed browser colour.
+  if (!color?.dataset.light) return;
+  const dark = root.classList.contains("dark");
+  const theme = dark ? "dark" : "light";
+  const backdrop =
+    root.style.getPropertyValue(`--browser-${dark ? "night" : "day"}`).trim() ||
+    color.dataset[theme];
+  if (backdrop && color.content !== backdrop) color.content = backdrop;
+  if (root.style.colorScheme !== theme) root.style.colorScheme = theme;
+  const scheme = document.querySelector<HTMLMetaElement>(
+    'meta[name="color-scheme"]',
+  );
+  if (scheme && scheme.content !== theme) scheme.content = theme;
+}
+
 export function applyTheme(theme: Theme): void {
   document.documentElement.classList.toggle("dark", theme === "dark");
+  syncBrowserTheme();
   document
     .getElementById("theme-toggle")
     ?.setAttribute("aria-pressed", String(theme === "dark"));

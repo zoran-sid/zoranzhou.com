@@ -13,9 +13,11 @@ const { dark = false } = Astro.props;
   data-dark={String(dark)}
   aria-hidden="true"
 >
-  <div class="atmosphere-day"></div>
-  <div class="atmosphere-dusk" data-sky-dusk></div>
-  <div class="atmosphere-night" data-sky-night></div>
+  <div class="atmosphere-sky">
+    <div class="atmosphere-day"></div>
+    <div class="atmosphere-dusk" data-sky-dusk></div>
+    <div class="atmosphere-night" data-sky-night></div>
+  </div>
   <div class="theme-sun-scene">
     <span class="theme-solar-disc" data-theme-sun></span>
   </div>
@@ -28,6 +30,7 @@ const { dark = false } = Astro.props;
     scrollProgress,
     sectionProgress,
   } from "../lib/scroll-atmosphere";
+  import { syncBrowserTheme } from "../lib/theme";
 
   const layer = document.querySelector<HTMLElement>("[data-scroll-atmosphere]");
   if (layer) {
@@ -55,15 +58,18 @@ const { dark = false } = Astro.props;
 
     function paint() {
       const p = reduced.matches ? 0 : current * 0.72;
+      const mainSite = layer!.dataset.dark !== "true";
       for (const dark of [false, true]) {
         const prefix = dark ? "night" : "day";
         for (const [index, stop] of ["a", "b", "c"].entries()) {
-          layer!.style.setProperty(
-            `--${prefix}-${stop}`,
-            atmosphereColor(p + index * 0.14, dark),
-          );
+          const color = atmosphereColor(p + index * 0.14, dark);
+          layer!.style.setProperty(`--${prefix}-${stop}`, color);
+          if (mainSite && index === 1) {
+            root.style.setProperty(`--browser-${prefix}`, color);
+          }
         }
       }
+      if (mainSite) syncBrowserTheme();
       layer!.style.setProperty("--tone-angle", `${130 + p * 75}deg`);
       layer!.style.setProperty("--spark-shift", `${(p * 20).toFixed(2)}px`);
     }
