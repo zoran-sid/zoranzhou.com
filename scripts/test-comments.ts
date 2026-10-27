@@ -35,6 +35,7 @@ test("Waline uses the supplied server, site theme and local page language withou
   assert.equal(zh.pageview, false);
   assert.equal(zh.imageUploader, false);
   assert.equal(zh.search, false);
+  assert.deepEqual(zh.meta, ["nick"]);
   assert.ok(en.locale.placeholder.includes("reading"));
   assert.deepEqual(zh.requiredMeta, ["nick"]);
   const headers = readFileSync(

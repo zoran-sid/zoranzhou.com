@@ -15,7 +15,7 @@ export function commentOptions(path: string, locale: Locale) {
     path: commentPath(path),
     lang: locale,
     dark: "html.dark",
-    meta: ["nick", "mail"] as ("nick" | "mail")[],
+    meta: ["nick"] as "nick"[],
     requiredMeta: ["nick"] as "nick"[],
     login: "enable" as const,
     pageSize: 10,
