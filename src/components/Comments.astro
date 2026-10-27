@@ -1,0 +1,48 @@
+---
+import { type Locale } from "../i18n/utils";
+import { commentPath } from "../lib/comment-config";
+import "@waline/client/style";
+import "../styles/comments.css";
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
+---
+
+<section
+  class="comments"
+  id="comments"
+  aria-labelledby="comments-heading"
+  data-comments
+  data-path={commentPath(Astro.url.pathname)}
+  data-locale={locale}
+>
+  <header class="comments__heading">
+    <h2 id="comments-heading">{zh ? "聊一聊" : "A conversation"}</h2>
+    <p>
+      {
+        zh
+          ? "想法、疑问，或相似的经历，都可以留在这里。"
+          : "Leave a thought, a question, or a story of your own."
+      }
+    </p>
+  </header>
+  <div class="comments__load" data-comments-load>
+    <button type="button" data-comments-button
+      >{zh ? "加载评论" : "Load comments"}</button
+    >
+    <p role="status" data-comments-status></p>
+  </div>
+  <div class="comments__widget" data-comments-widget></div>
+  <noscript
+    ><p>
+      {
+        zh
+          ? "开启 JavaScript 后可以阅读和发表留言。"
+          : "Enable JavaScript to read and leave comments."
+      }
+    </p></noscript
+  >
+</section>
+<script>
+  import { initComments } from "../lib/comments";
+  initComments();
+</script>

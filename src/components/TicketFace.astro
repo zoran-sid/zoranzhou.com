@@ -1,0 +1,122 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { Locale } from "../i18n/utils";
+import { displayTicketDate, ticketTypeLabels } from "../lib/ticket-model";
+import { ticketFields, ticketJourney } from "../lib/ticket-fields";
+import TicketIcon from "./TicketIcon.astro";
+import "../styles/tickets.css";
+interface Props {
+  ticket: CollectionEntry<"tickets">;
+  locale: Locale;
+  heading?: "h1" | "h2" | "h3";
+  detailed?: boolean;
+}
+const {
+  ticket,
+  locale,
+  heading: Heading = "h2",
+  detailed = false,
+} = Astro.props;
+const { title, date, type, location, details, lang } = ticket.data;
+const fields = ticketFields(type, details, locale, !detailed);
+const journey = ticketJourney(type, details);
+const hasOrigin = Boolean(journey?.from || journey?.fromCode);
+const hasDestination = Boolean(journey?.to || journey?.toCode);
+const zh = locale === "zh-CN";
+---
+
+<div
+  class:list={["ticket-face", { "ticket-face--full": detailed }]}
+  data-type={type}
+>
+  <div class="ticket-face__body">
+    <div class="ticket-face__category">
+      <span>{ticketTypeLabels[locale][type]}</span><TicketIcon type={type} />
+    </div>
+    <Heading lang={lang}>{title}</Heading>
+    {
+      location && (
+        <p class="ticket-face__location" lang={lang}>
+          {location}
+        </p>
+      )
+    }
+    {
+      journey && (
+        <div
+          class:list={[
+            "ticket-journey",
+            { "ticket-journey--single": !hasOrigin || !hasDestination },
+          ]}
+        >
+          {hasOrigin && (
+            <div>
+              <span>{zh ? "出发" : "From"}</span>
+              {journey.fromCode && <strong>{journey.fromCode}</strong>}
+              {journey.from && <p>{journey.from}</p>}
+            </div>
+          )}
+          {hasOrigin && hasDestination && (
+            <svg
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"
+            >
+              <path d="M3 12h17m-6-6 6 6-6 6" />
+            </svg>
+          )}
+          {hasDestination && (
+            <div>
+              <span>{zh ? "抵达" : "To"}</span>
+              {journey.toCode && <strong>{journey.toCode}</strong>}
+              {journey.to && <p>{journey.to}</p>}
+            </div>
+          )}
+        </div>
+      )
+    }
+    {
+      fields.length > 0 && (
+        <dl class="ticket-fields">
+          {fields.map((field) => (
+            <div
+              class:list={{
+                "ticket-fields__wide": [
+                  "cinema",
+                  "performance",
+                  "artist",
+                  "teams",
+                  "venue",
+                  "branch",
+                  "items",
+                  "transport",
+                  "item",
+                  "buyer",
+                ].includes(field.key),
+                "ticket-fields__total": field.key === "total",
+              }}
+            >
+              <dt>{field.label}</dt>
+              <dd lang={lang}>{field.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+  </div>
+  <div class="ticket-face__stub">
+    <time datetime={date.toISOString().slice(0, 10)}
+      >{displayTicketDate(date, locale)}</time
+    >
+    {lang !== locale && <span>{lang === "zh-CN" ? "中文" : "English"}</span>}
+    {
+      !detailed && (
+        <span class="ticket-face__open">{zh ? "查看票根" : "View ticket"}</span>
+      )
+    }
+  </div>
+</div>

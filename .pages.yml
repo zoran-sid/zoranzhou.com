@@ -468,7 +468,7 @@ content:
       - name: photos
         label: 照片（可选）
         type: image
-        description: 上传后即公开。请先遮住二维码、条码、订单号、证件信息及不想公开的姓名；建议使用已处理定位信息的导出图片。
+        description: 上传后即公开。请先遮住二维码、条码、订单号、证件信息及不想公开的姓名，并使用已处理定位信息的导出图片。为避免 Pages CMS 托管上传的 413 错误，请先压缩到 3 MB 以内（建议 WebP/JPEG）。
         options:
           media: ticket-images
           multiple: true

@@ -35,6 +35,16 @@ colors:
   dark-atmosphere-1: "#20252a"
   dark-atmosphere-2: "#292e33"
   dark-atmosphere-3: "#203238"
+  ticket-movie: "#79b8d4"
+  ticket-concert: "#b19ac9"
+  ticket-theatre: "#cf9dab"
+  ticket-comedy: "#d5ab7c"
+  ticket-sport: "#8ab794"
+  ticket-train: "#d5a091"
+  ticket-flight: "#9fbbc5"
+  ticket-receipt: "#c5b48b"
+  ticket-travel: "#84b8af"
+  ticket-other: "#8fa99c"
 typography:
   brand:
     fontFamily: Canela, Georgia, serif
@@ -84,6 +94,8 @@ typography:
     lineHeight: 1.9
 rounded:
   control: 4px
+  comment-panel: 8px
+  ticket: 12px
   flat: "0"
 spacing:
   xs: 8px
@@ -139,6 +151,8 @@ components:
 
 Taste 的调色库与真实案例研究用于比较方向；用户已否决其中的酒红方案。最终渐变是按用户要求确定的配色，不宣称出自某个获奖网站。研究过程保存在设计系统 MASTER 和方向笔记。
 
+票根按用户提供的实体票参考区分类别：电影雾蓝、音乐会淡紫、戏剧柔粉、喜剧浅杏、赛事浅绿、火车暖桃、机票灰蓝、小票暖米、旅行浅青。票纸在浅色主题混合 70% surface 与 30% 分类色，深色主题混合 84% surface 与 16% 分类色；文字沿用 ink / muted，类型名称与图标同步表达类别。
+
 ## Typography
 
 使用项目已有的三款 Canela 字体：Canela Regular 用于 zoran 字标和首页署名，Canela Deck Regular 用于英文栏目与文章标题，Canela Text Regular 用于英文正文。中文标题由 Noto Serif SC 承接，正文用系统中文黑体；Lato 与系统黑体用于导航、按钮、日期和路线数据。JetBrains Mono Variable 用于代码。所有字体均本地提供并使用 swap；只引用实际存在的 Regular 文件，不假设截图中的 Light、Medium 已在项目中。
@@ -169,6 +183,8 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 
 内容色面为直角；控件为 4px 小圆角。摄影为矩形原图。全屏光点由点与径向透明过渡构成；章节细线和轨道为真实矢量几何，不作为内容或数据图表。
 
+票根沿用纸票的轮廓：12px 圆角、两侧缺口和虚线存根；消费与餐饮小票采用 4px 上角及锯齿底边。裁切只作用于背景，文字与键盘焦点保持完整。评论编辑框为 8px 圆角，使用主题细线与透明底色。
+
 ## Components
 
 - Primary button：浅色为蓝墨底浅字，深色为浅珊瑚底深字；focus 使用 2px 轮廓。
@@ -181,6 +197,8 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 - Lab mark：connected-W，深蓝底、浅蓝笔画与浅青圆点。SVG 是唯一来源，icons:lab 生成 PNG。
 - Motion：尊重系统减少动态设置。
 - Subscription：说明区直接使用页面渐变底色，不叠白色面板或分隔框。步骤与说明正文使用 UI 字体，小标题以 700 字重区分；二级标题保留 Canela Deck / 中文宋体。正文至少 16px，段落宽度不超过 65ch；手机端取消侧栏内缩，订阅地址输入框使用 16px 字体。
+- Ticket face：列表以至少 19rem 的自适应网格排列，窄屏单列；票面标题 24px，字段正文 16px、标签 13px。列表最多四项已填信息，每项预览两行，详情完整显示；交通票突出起终点。无图片时保留文字票面，照片在详情保持完整比例。悬停为标题下划线，键盘使用独立焦点轮廓。
+- Comments：标题沿用 Canela Deck / 中文宋体，表单与留言使用 UI 字体、至少 16px 正文；操作按钮至少 44px 高。透明编辑区域融入渐变，输入区使用浅主题色面，暗黑模式共享全站变量。手机端昵称与邮箱逐行排列；评论在进入视口附近时加载。
 
 
 

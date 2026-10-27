@@ -2,6 +2,7 @@
 import ArrowIcon from "../components/ArrowIcon.astro";
 import BaseLayout from "./BaseLayout.astro";
 import NoteLocation from "../components/NoteLocation.astro";
+import Comments from "../components/Comments.astro";
 import TicketCard from "../components/TicketCard.astro";
 import { getTickets } from "../lib/tickets";
 import { linkedNote } from "../lib/ticket-model";
@@ -29,12 +30,19 @@ const t = getTranslations(locale);
 const c = editorial(locale);
 const isNote = writingFormat(entry) === "note";
 const notesForTickets = isNote ? await getCollection("blog") : [];
-const noteTickets = isNote && entry.collection === "blog"
-  ? (await getTickets()).filter((ticket) => linkedNote(ticket.data.note, notesForTickets)?.id === entry.id)
-  : [];
-const noteCover = isNote && entry.data.cover &&
+const noteTickets =
+  isNote && entry.collection === "blog"
+    ? (await getTickets()).filter(
+        (ticket) =>
+          linkedNote(ticket.data.note, notesForTickets)?.id === entry.id,
+      )
+    : [];
+const noteCover =
+  isNote &&
+  entry.data.cover &&
   !notePreview(entry.body, 0, entry.data.cover).coverIsInline
-  ? entry.data.cover : undefined;
+    ? entry.data.cover
+    : undefined;
 const tocItems = (isNote ? [] : headings).filter(
   (h) => h.depth === 2 || h.depth === 3,
 );
@@ -144,10 +152,7 @@ const toc = tocItems.map((h) => {
     data-reading-format={writingFormat(entry)}
     data-reading-category={writingCategory(entry)}
   >
-    <article
-      class="article-main"
-      data-article-content
-    >
+    <article class="article-main" data-article-content>
       <header class="article-header mb-10">
         <nav
           class="article-breadcrumb"
@@ -205,7 +210,15 @@ const toc = tocItems.map((h) => {
             )
           }
         </div>
-        {isNote && <NoteLocation name={entry.data.location} href={entry.data.locationUrl} locale={locale} />}
+        {
+          isNote && (
+            <NoteLocation
+              name={entry.data.location}
+              href={entry.data.locationUrl}
+              locale={locale}
+            />
+          )
+        }
         {
           entry.data.tags.length > 0 && (
             <div class="mt-4 flex flex-wrap gap-2">
@@ -279,10 +292,21 @@ const toc = tocItems.map((h) => {
         }
       </header>
       <div class="prose article-prose">
-        {noteCover && <figure>
-          <img src={noteCover.src} alt={noteCover.alt ?? ""} loading="lazy" decoding="async" />
-          {noteCover.caption && <figcaption>{noteCover.caption}</figcaption>}
-        </figure>}
+        {
+          noteCover && (
+            <figure>
+              <img
+                src={noteCover.src}
+                alt={noteCover.alt ?? ""}
+                loading="lazy"
+                decoding="async"
+              />
+              {noteCover.caption && (
+                <figcaption>{noteCover.caption}</figcaption>
+              )}
+            </figure>
+          )
+        }
         {
           hasReadableBody(entry) ? (
             <Content />
@@ -300,12 +324,24 @@ const toc = tocItems.map((h) => {
           )
         }
       </div>
-      {noteTickets.length > 0 && <section class="note-tickets" aria-labelledby="note-tickets-title">
-        <h2 id="note-tickets-title">{locale === "zh-CN" ? "这段回忆的票根" : "Tickets from this memory"}</h2>
-        <ul class="ticket-grid" role="list">
-          {noteTickets.map((ticket) => <li><TicketCard ticket={ticket} locale={locale} heading="h3" /></li>)}
-        </ul>
-      </section>}
+      {
+        noteTickets.length > 0 && (
+          <section class="note-tickets" aria-labelledby="note-tickets-title">
+            <h2 id="note-tickets-title">
+              {locale === "zh-CN"
+                ? "这段回忆的票根"
+                : "Tickets from this memory"}
+            </h2>
+            <ul class="ticket-grid" role="list">
+              {noteTickets.map((ticket) => (
+                <li>
+                  <TicketCard ticket={ticket} locale={locale} heading="h3" />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
       <footer class="article-footer mt-16 border-t pt-8">
         {
           !isNote && related.length > 0 && (
@@ -362,6 +398,11 @@ const toc = tocItems.map((h) => {
           {entry.collection === "projects" ? c.work : c.backWriting}</a
         >
       </footer>
+      {
+        ["blog", "essays", "research"].includes(entry.collection) &&
+          isPublished(entry) &&
+          hasReadableBody(entry) && <Comments />
+      }
     </article>
     {
       toc.length > 0 && (

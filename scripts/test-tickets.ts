@@ -19,6 +19,51 @@ import {
   ticketTypes,
 } from "../src/lib/ticket-model";
 import type { ContentRecord } from "../src/lib/content-policy";
+import { ticketFields, ticketJourney } from "../src/lib/ticket-fields";
+
+test("ticket templates render populated fields only, with safe text and complete detail data", () => {
+  const movie = {
+    variant: "movie",
+    cinema: "香港影院",
+    startTime: "20:10",
+    auditorium: "3",
+    seat: "F8",
+    endTime: null,
+    collectionCode: "<test-code>",
+    unknown: "must not render",
+  };
+  const full = ticketFields("movie", movie, "zh-CN");
+  assert.deepEqual(
+    full.map((field) => field.value),
+    ["香港影院", "20:10", "3", "F8", "<test-code>"],
+  );
+  assert.equal(ticketFields("movie", movie, "en", true).length, 4);
+  assert.equal(ticketFields("movie", undefined, "zh-CN").length, 0);
+  assert.equal(
+    ticketFields(
+      "dining",
+      { guests: 0, items: "茶\n咖啡", total: "HK$ 50" },
+      "en",
+    )[0].value,
+    "0",
+  );
+  assert.equal(
+    ticketFields("other", { venue: { nested: "bad" }, time: "  " }, "en")
+      .length,
+    0,
+  );
+  assert.deepEqual(
+    ticketJourney("flight", {
+      from: "香港",
+      fromIata: "HKG",
+      to: "东京",
+      toIata: "NRT",
+    }),
+    { from: "香港", fromCode: "HKG", to: "东京", toCode: "NRT" },
+  );
+  assert.equal(ticketJourney("flight", {}), undefined);
+  assert.equal(ticketJourney("movie", { from: "香港" }), undefined);
+});
 
 test("ticket dates preserve calendar days and reject impossible or timestamp inputs", () => {
   assert.equal(ticketDay("2024-02-29"), "2024-02-29");
@@ -120,6 +165,7 @@ test("CMS exposes three required fields, separate uploads and a stable optional 
   assert.equal(fields.note.options.value, "{fields.slug}");
   assert.equal(fields.note.options.multiple, false);
   assert.equal(fields.publication.default, "approved");
+  assert.match(fields.photos.description, /3 MB/);
   assert.equal(fields.details.type, "block");
   assert.equal(fields.details.list, false);
   assert.equal(fields.details.blockKey, "variant");

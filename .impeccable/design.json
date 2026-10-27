@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-24T11:29:38.319390+00:00",
+  "generatedAt": "2026-10-27T12:34:39.794198+00:00",
   "title": "Design System: Zoran’s Personal Journal",
   "extensions": {
     "colorMeta": {
@@ -409,6 +409,46 @@
           "oklch(83.6% 0.0258 220.7)",
           "oklch(95.0% 0.0258 220.7)"
         ]
+      },
+      "ticket-movie": {
+        "role": "secondary",
+        "displayName": "电影雾蓝"
+      },
+      "ticket-concert": {
+        "role": "secondary",
+        "displayName": "音乐会淡紫"
+      },
+      "ticket-theatre": {
+        "role": "secondary",
+        "displayName": "戏剧柔粉"
+      },
+      "ticket-comedy": {
+        "role": "secondary",
+        "displayName": "喜剧浅杏"
+      },
+      "ticket-sport": {
+        "role": "secondary",
+        "displayName": "赛事浅绿"
+      },
+      "ticket-train": {
+        "role": "secondary",
+        "displayName": "火车暖桃"
+      },
+      "ticket-flight": {
+        "role": "secondary",
+        "displayName": "机票灰蓝"
+      },
+      "ticket-receipt": {
+        "role": "secondary",
+        "displayName": "小票暖米"
+      },
+      "ticket-travel": {
+        "role": "secondary",
+        "displayName": "旅行浅青"
+      },
+      "ticket-other": {
+        "role": "secondary",
+        "displayName": "纪念灰绿"
       }
     },
     "typographyMeta": {
@@ -531,6 +571,20 @@
       "description": "只用于重点文章，形成阅读层级。",
       "html": "<article class=\"ds-story\"><h3><a href=\"#\">从零开始搭建博客</a></h3><p>一份可以回看的实践记录。</p></article>",
       "css": ".ds-story{background:var(--field,#ffffff80);padding:2.5rem;color:var(--field-ink,#25314a)}.ds-story h3{font:400 2rem/1.55 \"Canela Deck\",Georgia,serif;margin:0 0 1rem}.ds-story a{color:inherit;text-decoration:none}.ds-story p{font:16px/1.85 sans-serif;color:var(--field-muted,#566079)}.ds-story a:hover{text-decoration:underline}.ds-story a:focus-visible{outline:2px solid currentColor;outline-offset:5px}"
+    },
+    {
+      "name": "Ticket face",
+      "kind": "card",
+      "description": "分类票纸与虚线存根；列表显示主要字段，详情完整展示。",
+      "html": "<a class=\"ds-ticket\" href=\"#\"><div class=\"ds-ticket-body\"><span>电影</span><h3>那天看的电影</h3><p>影院 · 场次与座位</p></div><div class=\"ds-ticket-stub\">票面日期 <span>查看票根</span></div></a>",
+      "css": ".ds-ticket{display:block;position:relative;isolation:isolate;color:var(--ink,#25314a);padding-inline:24px;text-decoration:none}.ds-ticket::before{content:\"\";position:absolute;inset:0;z-index:-1;border-radius:12px;background:color-mix(in srgb,var(--surface,#fff) 70%,#79b8d4);mask:radial-gradient(circle at 0 calc(100% - 4rem),transparent 8px,#000 8.5px),radial-gradient(circle at 100% calc(100% - 4rem),transparent 8px,#000 8.5px);mask-composite:intersect}.ds-ticket-body{padding-block:24px}.ds-ticket-body span,.ds-ticket-body p{font:14px/1.65 var(--font-ui,sans-serif);color:var(--muted,#566079)}.ds-ticket h3{font:400 24px/1.4 var(--font-title,serif);margin:24px 0 0}.ds-ticket-stub{display:flex;align-items:center;justify-content:space-between;min-height:4rem;border-top:1px dashed var(--line-strong,#25314a38);font:14px/1.65 var(--font-ui,sans-serif);color:var(--muted,#566079)}.ds-ticket:hover h3{text-decoration:underline;text-underline-offset:.2em}.ds-ticket:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:4px}"
+    },
+    {
+      "name": "Comment editor",
+      "kind": "input",
+      "description": "透明留言区域共享主站字体和主题色；输入文字至少16px。",
+      "html": "<label class=\"ds-comment-label\">聊一聊<textarea class=\"ds-comment\" placeholder=\"读到这里，有什么想说的？\"></textarea></label>",
+      "css": ".ds-comment-label{display:grid;gap:16px;color:var(--ink,#25314a);font:400 24px/1.4 var(--font-title,serif)}.ds-comment{min-height:9rem;padding:16px;border:1px solid var(--line-strong,#25314a38);border-radius:8px;background:transparent;color:var(--ink,#25314a);font:16px/1.8 var(--font-ui,sans-serif)}.ds-comment::placeholder{color:var(--muted,#566079);opacity:1}.ds-comment:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:3px}"
     }
   ],
   "narrative": {

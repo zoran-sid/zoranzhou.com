@@ -2,13 +2,11 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import LifeNavigation from "../../../components/LifeNavigation.astro";
+import TicketFace from "../../../components/TicketFace.astro";
+import Comments from "../../../components/Comments.astro";
 import { localizePath } from "../../../i18n/utils";
 import { getTickets } from "../../../lib/tickets";
-import {
-  linkedNote,
-  displayTicketDate,
-  ticketTypeLabels,
-} from "../../../lib/ticket-model";
+import { linkedNote, displayTicketDate } from "../../../lib/ticket-model";
 import { hasReadableBody } from "../../../lib/content-policy";
 import { entryPath } from "../../../lib/writing";
 import "../../../styles/tickets.css";
@@ -22,7 +20,7 @@ interface Props {
   ticket: CollectionEntry<"tickets">;
 }
 const { ticket } = Astro.props;
-const { title, date, type, photos, location, lang: locale } = ticket.data;
+const { title, date, photos, location, lang: locale } = ticket.data;
 const zh = locale === "zh-CN";
 const { Content } = await ticket.render();
 const note = linkedNote(ticket.data.note, await getCollection("blog"));
@@ -39,14 +37,7 @@ const description = [title, displayTicketDate(date, locale), location]
         <a class="ticket-text-link" href={localizePath("/tickets", locale)}
           >{zh ? "所有票根" : "All tickets"}</a
         >
-        <h1>{title}</h1>
-        <div class="ticket-detail__meta">
-          <span>{ticketTypeLabels[locale][type]}</span>
-          <time datetime={date.toISOString().slice(0, 10)}
-            >{displayTicketDate(date, locale)}</time
-          >
-          {location && <span>{location}</span>}
-        </div>
+        <TicketFace ticket={ticket} locale={locale} heading="h1" detailed />
       </header>
       {
         photos.length > 0 && (
@@ -108,6 +99,7 @@ const description = [title, displayTicketDate(date, locale), location]
           </aside>
         )
       }
+      <Comments />
     </article>
   </div>
 </BaseLayout>
