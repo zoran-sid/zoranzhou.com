@@ -1,4 +1,5 @@
 import { defineCollection, z } from "astro:content";
+import { ticketDay, ticketTypes } from "../lib/ticket-model";
 
 const baseSchema = z.object({
   format: z.enum(["note", "guide", "essay"]).optional(),
@@ -214,6 +215,47 @@ const labCollection = defineCollection({
   }),
 });
 
+const ticketsCollection = defineCollection({
+  type: "content",
+  schema: baseSchema.extend({
+    title: z.string().trim().min(1).max(160),
+    date: z
+      .preprocess(
+        ticketDay,
+        z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/, "票根日期须为有效的 YYYY-MM-DD 日期。"),
+      )
+      .transform((day) => new Date(`${day}T00:00:00Z`)),
+    type: z.enum(ticketTypes),
+    publication: z.enum(["draft", "approved"]).default("draft"),
+    // Pages CMS clears optional fields with null or an empty string.
+    location: z
+      .string()
+      .trim()
+      .max(100)
+      .nullish()
+      .transform((value) => value || undefined),
+    note: z
+      .string()
+      .trim()
+      .nullish()
+      .transform((value) => value || undefined),
+    photos: z
+      .array(
+        z
+          .string()
+          .refine(
+            (src) =>
+              /^\/(?!\/)[^\s]+$/.test(src) || /^https?:\/\/[^\s]+$/i.test(src),
+            "图片须为站内路径或 HTTP(S) 链接。",
+          ),
+      )
+      .nullish()
+      .transform((value) => [...new Set(value ?? [])]),
+  }),
+});
+
 export const collections = {
   blog: blogCollection,
   essays: essaysCollection,
@@ -222,4 +264,5 @@ export const collections = {
   photos: photosCollection,
   routes: routesCollection,
   lab: labCollection,
+  tickets: ticketsCollection,
 };

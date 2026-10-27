@@ -1,0 +1,49 @@
+---
+import type { Locale } from "../i18n/utils";
+import { localizePath } from "../i18n/utils";
+import { getTickets } from "../lib/tickets";
+import TicketCard from "./TicketCard.astro";
+import "../styles/tickets.css";
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const zh = locale === "zh-CN";
+const tickets = (await getTickets(locale)).slice(0, 3);
+---
+
+<section
+  class="ticket-shelf page-container"
+  aria-labelledby="ticket-shelf-title"
+>
+  <header class="ticket-shelf__heading">
+    <div>
+      <h2 id="ticket-shelf-title">{zh ? "票根" : "Ticket Box"}</h2>
+      <p>
+        {
+          zh
+            ? "看过的演出，去过的地方，把那一天收好。"
+            : "Shows I’ve seen, places I’ve been. A little of the day, kept here."
+        }
+      </p>
+    </div>
+    <a class="ticket-text-link" href={localizePath("/tickets", locale)}
+      >{zh ? "翻开票根盒" : "Open the ticket box"}</a
+    >
+  </header>
+  {
+    tickets.length > 0 ? (
+      <ul class="ticket-grid" role="list">
+        {tickets.map((ticket) => (
+          <li>
+            <TicketCard ticket={ticket} locale={locale} heading="h3" />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="ticket-empty-inline">
+        {zh ? "第一张票根，还在整理中。" : "The first keepsake is on its way."}
+      </p>
+    )
+  }
+</section>

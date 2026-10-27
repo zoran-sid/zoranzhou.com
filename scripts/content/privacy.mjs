@@ -1,5 +1,5 @@
 import { readdir, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { unpack, references } from "./core.mjs";
 // Draft text is filtered at every public consumer. Local images/MDX imports in a
 // draft can still be emitted by Astro compilation, so reject them before any build.
@@ -14,10 +14,11 @@ export async function privacyCheck(root = "src/content") {
       }
       if (!/\.mdx?$/.test(item.name)) continue;
       const { data, body } = unpack(await readFile(file, "utf8"));
+      const isTicket = relative(root, file).split(/[\\/]/)[0] === "tickets";
       if (
         !data.draft &&
         (data.publication === "approved" ||
-          (!data.publication && !data.format)) &&
+          (!isTicket && !data.publication && !data.format)) &&
         data.published !== false
       )
         continue;
@@ -27,6 +28,7 @@ export async function privacyCheck(root = "src/content") {
         ) ||
         data.cover ||
         data.gallery?.length ||
+        data.photos?.length ||
         data.gpx ||
         /^import\s/m.test(body) ||
         /<img\b/.test(body)

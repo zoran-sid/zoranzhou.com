@@ -3,6 +3,8 @@ import { getCollection } from "astro:content";
 import { localizePath, type Locale, locales } from "../../i18n/utils";
 import { getLabEntryPath } from "../../lib/lab";
 import { hasReadableBody } from "../../lib/content-policy";
+import { getTickets } from "../../lib/tickets";
+import { ticketTypeLabels } from "../../lib/ticket-model";
 
 export async function getStaticPaths() {
   return locales.map((locale) => ({
@@ -66,7 +68,16 @@ export async function GET(context: { currentLocale?: string }) {
       date: entry.data.date.toISOString().slice(0, 10),
     }));
 
-  const entries = [...standardEntries, ...labEntries].sort((a, b) =>
+  const ticketEntries = (await getTickets(locale)).map((ticket) => ({
+    title: ticket.data.title,
+    description: [ticketTypeLabels[locale][ticket.data.type], ticket.data.location].filter(Boolean).join(" · "),
+    tags: ticket.data.tags,
+    collection: "tickets",
+    slug: ticket.slug,
+    url: localizePath(`/tickets/${ticket.slug}`, locale),
+    date: ticket.data.date.toISOString().slice(0, 10),
+  }));
+  const entries = [...standardEntries, ...labEntries, ...ticketEntries].sort((a, b) =>
     b.date.localeCompare(a.date),
   );
 

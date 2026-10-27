@@ -4,6 +4,7 @@ import LifeNavigation from "../../../components/LifeNavigation.astro";
 import LifeFeature from "../../../components/LifeFeature.astro";
 import HomeActivities from "../../../components/HomeActivities.astro";
 import LibraryShelf from "../../../components/LibraryShelf.astro";
+import TicketShelf from "../../../components/TicketShelf.astro";
 import { editorial } from "../../../i18n/editorial";
 import { locales, type Locale } from "../../../i18n/utils";
 import "../../../styles/home.css";
@@ -23,6 +24,7 @@ const c = editorial(locale);
     </header>
   </div>
   <LifeFeature locale={locale} overview />
+  <TicketShelf locale={locale} />
   <HomeActivities locale={locale} />
   <LibraryShelf locale={locale} />
 </BaseLayout>

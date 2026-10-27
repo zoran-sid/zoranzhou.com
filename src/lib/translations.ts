@@ -3,7 +3,7 @@ import { localizePath, locales, type Locale } from "../i18n/utils";
 import { findTranslation, isPublished } from "./content-policy";
 import { entryPath } from "./writing";
 type StandardCollection =
-  "blog" | "essays" | "research" | "projects" | "photos" | "routes";
+  "blog" | "essays" | "research" | "projects" | "photos" | "routes" | "tickets";
 export async function resolveAlternatePaths(
   path: string,
   locale: Locale,
@@ -27,7 +27,7 @@ export async function resolveAlternatePaths(
   const result: Partial<Record<Locale, string>> = { [locale]: path };
   const section = segments[0] === "map" ? "routes" : segments[0];
   if (
-    !["blog", "essays", "research", "projects", "photos", "routes"].includes(
+    !["blog", "essays", "research", "projects", "photos", "routes", "tickets"].includes(
       section,
     )
   )

@@ -1,4 +1,4 @@
-# Pages CMS: saving a note commits PUBLIC content to the selected GitHub branch.
+# Pages CMS: saving commits PUBLIC content to the selected GitHub branch.
 # Keep private drafts in the existing external Inbox, not in this editor.
 media:
   - name: note-images
@@ -6,6 +6,12 @@ media:
     input: public/writing-images/notes
     output: /writing-images/notes
     extensions: [jpg, jpeg, png, webp, avif, gif]
+    rename: random
+  - name: ticket-images
+    label: 票根照片（上传后即公开）
+    input: public/ticket-images
+    output: /ticket-images
+    extensions: [jpg, jpeg, png, webp, avif]
     rename: random
 
 content:
@@ -89,6 +95,105 @@ content:
               label: 中文
             - name: en
               label: English
+      - name: draft
+        type: boolean
+        default: false
+        hidden: true
+
+  - name: tickets
+    label: 票根
+    type: collection
+    path: src/content/tickets
+    format: yaml-frontmatter
+    subfolders: false
+    filename:
+      template: "ticket-{fields.slug}.md"
+      field: false
+    operations:
+      rename: false
+    view:
+      fields: [title, date, type]
+      primary: title
+      sort: [date, title]
+      search: [title, location, body]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: 名称
+        type: string
+        required: true
+        description: 电影、演出或这段旅程的名字。
+        options:
+          maxlength: 160
+      - name: date
+        label: 票面日期
+        type: date
+        required: true
+        description: 按活动或出行当天的日期排序，和上传时间无关。
+        options:
+          time: false
+          format: yyyy-MM-dd
+      - name: type
+        label: 类型
+        type: select
+        required: true
+        options:
+          values:
+            - { name: movie, label: 电影 }
+            - { name: performance, label: 演出（音乐会／戏剧／喜剧等） }
+            - { name: exhibition, label: 展览 }
+            - { name: sport, label: 赛事 }
+            - { name: train, label: 火车 }
+            - { name: flight, label: 机票 }
+            - { name: other, label: 其他 }
+      - name: photos
+        label: 照片（可选）
+        type: image
+        description: 上传后即公开。请先遮住二维码、条码、订单号、证件信息及不想公开的姓名；建议使用已处理定位信息的导出图片。
+        options:
+          media: ticket-images
+          multiple: true
+          unique: true
+      - name: location
+        label: 地点（可选）
+        type: string
+        options:
+          maxlength: 100
+      - name: body
+        label: 想记住的事（可选）
+        type: rich-text
+        description: 写一句感受或一段故事。保存会提交公开内容到 GitHub；构建成功后出现在生活 → 票根。
+        options:
+          format: markdown
+          media: ticket-images
+          switcher: false
+      - name: note
+        label: 关联随记（可选）
+        type: reference
+        description: 搜索标题，选择已有随记。票根和随记会互相显示链接；一条随记可以关联多张票根。
+        options:
+          collection: notes
+          multiple: false
+          search: "title,body"
+          value: "{fields.slug}"
+          label: "{fields.title} · {fields.lang}"
+      - name: lang
+        label: 语言
+        type: select
+        default: zh-CN
+        options:
+          values:
+            - { name: zh-CN, label: 中文 }
+            - { name: en, label: English }
+      - name: slug
+        type: uuid
+        hidden: true
+      - name: publication
+        type: string
+        default: approved
+        hidden: true
       - name: draft
         type: boolean
         default: false

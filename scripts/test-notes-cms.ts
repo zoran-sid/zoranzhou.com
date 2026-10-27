@@ -49,7 +49,7 @@ test("CMS defaults produce an approved note accepted by the existing importer co
 });
 
 test("CMS storage keeps ordinary articles outside the quick-note editor and stable note URLs", () => {
-  assert.equal(config.content.length, 1);
+  assert.deepEqual(config.content.map((entry: { name: string }) => entry.name), ["notes", "tickets"]);
   assert.equal(collection.path, "src/content/blog/notes");
   assert.equal(fields.slug.type, "uuid");
   assert.equal(fields.slug.hidden, true);

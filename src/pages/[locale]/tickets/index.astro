@@ -1,0 +1,109 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import LifeNavigation from "../../../components/LifeNavigation.astro";
+import TicketCard from "../../../components/TicketCard.astro";
+import { locales, localizePath, type Locale } from "../../../i18n/utils";
+import { getTickets } from "../../../lib/tickets";
+import { ticketTypes, ticketTypeLabels } from "../../../lib/ticket-model";
+import "../../../styles/tickets.css";
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
+const tickets = await getTickets(locale);
+const types = ticketTypes.filter((type) =>
+  tickets.some((ticket) => ticket.data.type === type),
+);
+const title = zh ? "票根" : "Ticket Box";
+const description = zh
+  ? "看过的电影、听过的现场，和去过的地方。留一张票根，记住那一天。"
+  : "Films, live shows and journeys. A ticket kept, a day remembered.";
+---
+
+<BaseLayout title={title} description={description}>
+  <div
+    class="page-container ticket-collection"
+    data-ticket-browser
+    data-locale={locale}
+  >
+    <header class="page-intro">
+      <LifeNavigation />
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </header>
+    {
+      tickets.length > 0 ? (
+        <>
+          <div class="ticket-tools">
+            <div
+              class="ticket-filters"
+              role="group"
+              aria-label={zh ? "按票根类型筛选" : "Filter by ticket type"}
+              hidden
+            >
+              <button
+                type="button"
+                data-ticket-filter="all"
+                aria-pressed="true"
+              >
+                {zh ? "全部" : "All"}
+              </button>
+              {types.map((type) => (
+                <button
+                  type="button"
+                  data-ticket-filter={type}
+                  aria-pressed="false"
+                >
+                  {ticketTypeLabels[locale][type]}
+                </button>
+              ))}
+            </div>
+            <p
+              class="ticket-count"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              data-ticket-count
+            >
+              {zh
+                ? `${tickets.length} 张票根 · 按日期由近到远`
+                : `${tickets.length} tickets · newest first`}
+            </p>
+          </div>
+          <ul class="ticket-grid" role="list">
+            {tickets.map((ticket) => (
+              <li data-ticket-item={ticket.data.type}>
+                <TicketCard ticket={ticket} locale={locale} />
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <div class="ticket-empty">
+          <h2>
+            {zh
+              ? "第一张票根，还在整理中。"
+              : "The first keepsake is on its way."}
+          </h2>
+          <p>
+            {zh
+              ? "回忆先留在随记里，票根慢慢收。"
+              : "In the meantime, there are moments to read in my notes."}
+          </p>
+          <a
+            class="ticket-text-link"
+            href={localizePath("/blog/formats/note", locale)}
+          >
+            {zh ? "看看最近的随记" : "Read my recent notes"}
+          </a>
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<script>
+  import { initTicketFilters } from "../../../lib/ticket-filter";
+  initTicketFilters();
+</script>

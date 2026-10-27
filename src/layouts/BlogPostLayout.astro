@@ -2,6 +2,9 @@
 import ArrowIcon from "../components/ArrowIcon.astro";
 import BaseLayout from "./BaseLayout.astro";
 import NoteLocation from "../components/NoteLocation.astro";
+import TicketCard from "../components/TicketCard.astro";
+import { getTickets } from "../lib/tickets";
+import { linkedNote } from "../lib/ticket-model";
 import { notePreview } from "../lib/note-preview";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getTranslations, localizePath, type Locale } from "../i18n/utils";
@@ -25,6 +28,10 @@ const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
 const c = editorial(locale);
 const isNote = writingFormat(entry) === "note";
+const notesForTickets = isNote ? await getCollection("blog") : [];
+const noteTickets = isNote && entry.collection === "blog"
+  ? (await getTickets()).filter((ticket) => linkedNote(ticket.data.note, notesForTickets)?.id === entry.id)
+  : [];
 const noteCover = isNote && entry.data.cover &&
   !notePreview(entry.body, 0, entry.data.cover).coverIsInline
   ? entry.data.cover : undefined;
@@ -293,6 +300,12 @@ const toc = tocItems.map((h) => {
           )
         }
       </div>
+      {noteTickets.length > 0 && <section class="note-tickets" aria-labelledby="note-tickets-title">
+        <h2 id="note-tickets-title">{locale === "zh-CN" ? "这段回忆的票根" : "Tickets from this memory"}</h2>
+        <ul class="ticket-grid" role="list">
+          {noteTickets.map((ticket) => <li><TicketCard ticket={ticket} locale={locale} heading="h3" /></li>)}
+        </ul>
+      </section>}
       <footer class="article-footer mt-16 border-t pt-8">
         {
           !isNote && related.length > 0 && (

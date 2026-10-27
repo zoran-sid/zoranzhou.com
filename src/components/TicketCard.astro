@@ -1,0 +1,34 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { Locale } from "../i18n/utils";
+import { entryPath } from "../lib/writing";
+import { displayTicketDate, ticketTypeLabels } from "../lib/ticket-model";
+import "../styles/tickets.css";
+interface Props {
+  ticket: CollectionEntry<"tickets">;
+  locale: Locale;
+  heading?: "h2" | "h3";
+}
+const { ticket, locale, heading: Heading = "h2" } = Astro.props;
+const { title, date, type, location, lang } = ticket.data;
+---
+
+<a class="ticket-card" href={entryPath(ticket)} data-type={type}>
+  <div class="ticket-card__body">
+    <span class="ticket-card__type">{ticketTypeLabels[locale][type]}</span>
+    <Heading lang={lang}>{title}</Heading>
+    {
+      location && (
+        <p class="ticket-card__location" lang={lang}>
+          {location}
+        </p>
+      )
+    }
+  </div>
+  <div class="ticket-card__stub">
+    <time datetime={date.toISOString().slice(0, 10)}
+      >{displayTicketDate(date, locale)}</time
+    >
+    {lang !== locale && <span>{lang === "zh-CN" ? "中文" : "English"}</span>}
+  </div>
+</a>
