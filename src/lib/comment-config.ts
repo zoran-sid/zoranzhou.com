@@ -1,6 +1,13 @@
 import type { Locale } from "../i18n/utils";
 
 export const commentServer = "https://zorancomment.xyz";
+export const commentAvatarCount = 100;
+
+export function commentAvatarPath(index: number): string {
+  const normalized =
+    ((index % commentAvatarCount) + commentAvatarCount) % commentAvatarCount;
+  return `/comment-avatars/avatar-${String(normalized + 1).padStart(3, "0")}.png`;
+}
 
 /** A query, fragment or trailing slash must not split a page's discussion. */
 export function commentPath(path: string): string {

@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import {
+  commentAvatarCount,
+  commentAvatarPath,
   commentOptions,
   commentPath,
   commentServer,
@@ -47,4 +49,11 @@ test("Waline uses the supplied server, site theme and local page language withou
     /Cross-Origin-Opener-Policy: same-origin-allow-popups/,
     "Waline desktop login needs the popup opener to return login state",
   );
+});
+
+test("anonymous avatar pool uses stable, local paths", () => {
+  assert.equal(commentAvatarCount, 100);
+  assert.equal(commentAvatarPath(0), "/comment-avatars/avatar-001.png");
+  assert.equal(commentAvatarPath(100), "/comment-avatars/avatar-001.png");
+  assert.equal(commentAvatarPath(-1), "/comment-avatars/avatar-100.png");
 });

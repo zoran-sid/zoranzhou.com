@@ -118,10 +118,15 @@
   max-width: 100%;
   height: auto;
 }
-.comments .wl-avatar,
-.comments .wl-user-avatar,
 .comments .wl-meta {
   display: none;
+}
+.comments .wl-user-avatar {
+  display: block;
+  width: var(--waline-avatar-size);
+  height: var(--waline-avatar-size);
+  object-fit: cover;
+  border-radius: 50%;
 }
 .comments .wl-user {
   min-width: 0;
