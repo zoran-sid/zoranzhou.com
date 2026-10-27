@@ -142,12 +142,329 @@ content:
         options:
           values:
             - { name: movie, label: 电影 }
+            - { name: concert, label: 音乐会 }
+            - { name: theatre, label: 戏剧 }
+            - { name: comedy, label: 喜剧 }
             - { name: performance, label: 演出（音乐会／戏剧／喜剧等） }
             - { name: exhibition, label: 展览 }
             - { name: sport, label: 赛事 }
             - { name: train, label: 火车 }
             - { name: flight, label: 机票 }
+            - { name: receipt, label: 消费小票 }
+            - { name: dining, label: 餐饮小票 }
+            - { name: invoice, label: 发票 }
+            - { name: travel, label: 旅行 }
             - { name: other, label: 其他 }
+      - name: details
+        label: 分类票面信息（可选）
+        type: block
+        list: false
+        blockKey: variant
+        description: 选择与类型对应的票面模板，只填写该分类需要的信息。顶层“类型”仍用于网站筛选，请保持两者一致。
+        blocks:
+          - name: movie
+            label: 电影
+            fields:
+              - name: cinema
+                label: 影院
+                type: string
+              - name: startTime
+                label: 开始时间
+                type: string
+              - name: endTime
+                label: 结束时间
+                type: string
+              - name: auditorium
+                label: 影厅
+                type: string
+              - name: seat
+                label: 座位
+                type: string
+              - name: collectionCode
+                label: 取票码
+                type: string
+          - name: performance
+            label: 演出
+            fields:
+              - name: performance
+                label: 演出／巡演名称
+                type: string
+              - name: artist
+                label: 艺术家／表演者
+                type: string
+              - name: venue
+                label: 场地
+                type: string
+              - name: startTime
+                label: 开始时间
+                type: string
+              - name: endTime
+                label: 结束时间
+                type: string
+              - name: section
+                label: 区域
+                type: string
+              - name: seat
+                label: 座位
+                type: string
+          - name: concert
+            label: 音乐会
+            fields:
+              - name: performance
+                label: 演出／巡演名称
+                type: string
+              - name: artist
+                label: 艺术家／表演者
+                type: string
+              - name: venue
+                label: 场地
+                type: string
+              - name: startTime
+                label: 开始时间
+                type: string
+              - name: endTime
+                label: 结束时间
+                type: string
+              - name: section
+                label: 区域
+                type: string
+              - name: seat
+                label: 座位
+                type: string
+          - name: theatre
+            label: 戏剧
+            fields:
+              - name: performance
+                label: 演出／剧目名称
+                type: string
+              - name: artist
+                label: 艺术家／表演者
+                type: string
+              - name: venue
+                label: 场地
+                type: string
+              - name: startTime
+                label: 开始时间
+                type: string
+              - name: endTime
+                label: 结束时间
+                type: string
+              - name: section
+                label: 区域
+                type: string
+              - name: seat
+                label: 座位
+                type: string
+          - name: comedy
+            label: 喜剧
+            fields:
+              - name: performance
+                label: 演出／巡演名称
+                type: string
+              - name: artist
+                label: 喜剧演员／表演者
+                type: string
+              - name: venue
+                label: 场地
+                type: string
+              - name: startTime
+                label: 开始时间
+                type: string
+              - name: endTime
+                label: 结束时间
+                type: string
+              - name: section
+                label: 区域
+                type: string
+              - name: seat
+                label: 座位
+                type: string
+          - name: exhibition
+            label: 展览
+            fields:
+              - name: venue
+                label: 展馆／地点
+                type: string
+              - name: admission
+                label: 入场方式
+                type: string
+              - name: time
+                label: 时间
+                type: string
+              - name: endTime
+                label: 结束时间
+                type: string
+              - name: verificationCode
+                label: 验证码
+                type: string
+              - name: ticketNumber
+                label: 票号
+                type: string
+          - name: sport
+            label: 赛事
+            fields:
+              - name: teams
+                label: 对阵／队伍
+                type: string
+              - name: venue
+                label: 场地
+                type: string
+              - name: startTime
+                label: 开始时间
+                type: string
+              - name: section
+                label: 区域
+                type: string
+              - name: seat
+                label: 座位
+                type: string
+          - name: train
+            label: 火车
+            fields:
+              - name: fromStation
+                label: 出发站
+                type: string
+              - name: toStation
+                label: 到达站
+                type: string
+              - name: departure
+                label: 出发时间
+                type: string
+              - name: arrival
+                label: 到达时间
+                type: string
+              - name: carriage
+                label: 车厢
+                type: string
+              - name: seat
+                label: 座位
+                type: string
+              - name: ticketGate
+                label: 检票口
+                type: string
+              - name: class
+                label: 座席等级
+                type: string
+              - name: receiptNumber
+                label: 票据编号
+                type: string
+          - name: flight
+            label: 机票／登机牌
+            fields:
+              - name: from
+                label: 出发地
+                type: string
+              - name: fromIata
+                label: 出发机场 IATA
+                type: string
+              - name: to
+                label: 目的地
+                type: string
+              - name: toIata
+                label: 到达机场 IATA
+                type: string
+              - name: departure
+                label: 起飞时间
+                type: string
+              - name: arrival
+                label: 到达时间
+                type: string
+              - name: seat
+                label: 座位
+                type: string
+              - name: boardingGate
+                label: 登机口
+                type: string
+              - name: terminal
+                label: 航站楼
+                type: string
+              - name: boardingGroup
+                label: 登机组
+                type: string
+          - name: receipt
+            label: 消费小票
+            fields:
+              - name: branch
+                label: 分店／地址
+                type: string
+              - name: time
+                label: 时间
+                type: string
+              - name: receiptNumber
+                label: 小票编号
+                type: string
+              - name: items
+                label: 商品／消费明细
+                type: text
+              - name: total
+                label: 实付金额
+                type: string
+          - name: dining
+            label: 餐饮小票
+            fields:
+              - name: branch
+                label: 分店／地址
+                type: string
+              - name: time
+                label: 时间
+                type: string
+              - name: table
+                label: 桌号
+                type: string
+              - name: guests
+                label: 人数
+                type: string
+              - name: receiptNumber
+                label: 小票编号
+                type: string
+              - name: items
+                label: 菜品／消费明细
+                type: text
+              - name: total
+                label: 实付金额
+                type: string
+          - name: invoice
+            label: 发票
+            fields:
+              - name: taxId
+                label: 税号
+                type: string
+              - name: invoiceCode
+                label: 发票代码
+                type: string
+              - name: invoiceNumber
+                label: 发票号码
+                type: string
+              - name: buyer
+                label: 购买方
+                type: string
+              - name: item
+                label: 项目
+                type: string
+          - name: travel
+            label: 旅行
+            fields:
+              - name: from
+                label: 出发地
+                type: string
+              - name: to
+                label: 目的地
+                type: string
+              - name: departure
+                label: 出发时间
+                type: string
+              - name: transport
+                label: 交通／行程
+                type: text
+          - name: other
+            label: 其他
+            fields:
+              - name: venue
+                label: 地点
+                type: string
+              - name: time
+                label: 时间
+                type: string
       - name: photos
         label: 照片（可选）
         type: image

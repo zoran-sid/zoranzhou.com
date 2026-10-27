@@ -6,9 +6,12 @@
 
 1. 打开 [Pages CMS](https://app.pagescms.org/)，选择网站仓库和用于发布的分支。
 2. 进入「票根」，新建一条，填写**名称、票面日期、类型**。
-3. 按需要选照片、写地点或故事。只填三个必填项，也能发布文字票根。
-4. 如需关联随记，在「关联随记」中搜索标题并选择；留空即可独立发布。
-5. 保存。Pages CMS 会提交到 GitHub，网站构建完成后显示。新增这个栏目不需要另设密钥或后台服务。
+3. 在「分类票面信息」中选择与类型对应的模板。电影、演出、赛事、火车、机票、
+   展览、消费小票、餐饮小票、发票、旅行和其他类型各自有不同的字段，不需要
+   填写其他分类的选项。顶层「类型」仍用于网站筛选，请和模板保持一致。
+4. 按需要选照片、写地点或故事。只填三个必填项，也能发布文字票根。
+5. 如需关联随记，在「关联随记」中搜索标题并选择；留空即可独立发布。
+6. 保存。Pages CMS 会提交到 GitHub，网站构建完成后显示。新增这个栏目不需要另设密钥或后台服务。
 
 照片上传后就会进入公开仓库，保存前请遮住二维码、条码、订单号、证件资料和不想公开的姓名。CMS 直传不保证移除照片的定位信息，上传前使用处理好的图片。私人原件保留在自己的设备。
 
@@ -25,7 +28,11 @@
 
 - CMS 配置：`.pages.yml`；原文：`src/content/tickets/ticket-<UUID>.md`；照片：`public/ticket-images/`。
 - `date` 是票面日期，使用 `YYYY-MM-DD`；不带时间或时区，和上传日期无关。
-- `type`：`movie` / `performance` / `exhibition` / `sport` / `train` / `flight` / `other`。
+- `type`：`movie` / `concert` / `theatre` / `comedy` / `performance` /
+  `exhibition` / `sport` / `train` / `flight` / `receipt` / `dining` /
+  `invoice` / `travel` / `other`。`performance` 保留给旧票根。
+- `details`：Pages CMS 的分类票面模板对象，使用 `variant` 保存模板名称，
+  其余字段按模板变化；它是可选的，不影响旧票根。
 - `photos` 为图片路径列表；`location` 为可选地点；Markdown 正文为故事；`note` 保存关联随记的 `slug`。
 - `lang` 为 `zh-CN` 或 `en`。手工准备译文时，可用相同 `translationKey` 配对不同语言的票根；没有译文时，语言切换返回另一语言的票根列表。
 - `publication: approved` 才会公开，`draft: true` 始终隐藏。公开仓库不能作为私人草稿库。

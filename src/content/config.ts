@@ -229,6 +229,29 @@ const ticketsCollection = defineCollection({
       .transform((day) => new Date(`${day}T00:00:00Z`)),
     type: z.enum(ticketTypes),
     publication: z.enum(["draft", "approved"]).default("draft"),
+    // Pages CMS stores the category-specific ticket template as one block object.
+    details: z
+      .object({
+        variant: z.enum([
+          "movie",
+          "concert",
+          "theatre",
+          "comedy",
+          "performance",
+          "exhibition",
+          "sport",
+          "train",
+          "flight",
+          "receipt",
+          "dining",
+          "invoice",
+          "travel",
+          "other",
+        ]),
+      })
+      .passthrough()
+      .nullish()
+      .transform((value) => value || undefined),
     // Pages CMS clears optional fields with null or an empty string.
     location: z
       .string()

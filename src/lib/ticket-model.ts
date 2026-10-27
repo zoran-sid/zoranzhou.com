@@ -7,11 +7,19 @@ import type { Locale } from "../i18n/utils";
 
 export const ticketTypes = [
   "movie",
+  "concert",
+  "theatre",
+  "comedy",
+  // Kept for older ticket entries that used one broad performance category.
   "performance",
   "exhibition",
   "sport",
   "train",
   "flight",
+  "receipt",
+  "dining",
+  "invoice",
+  "travel",
   "other",
 ] as const;
 export type TicketType = (typeof ticketTypes)[number];
@@ -19,20 +27,34 @@ export type TicketType = (typeof ticketTypes)[number];
 export const ticketTypeLabels: Record<Locale, Record<TicketType, string>> = {
   "zh-CN": {
     movie: "电影",
+    concert: "音乐会",
+    theatre: "戏剧",
+    comedy: "喜剧",
     performance: "演出",
     exhibition: "展览",
     sport: "赛事",
     train: "火车",
     flight: "机票",
+    receipt: "消费小票",
+    dining: "餐饮小票",
+    invoice: "发票",
+    travel: "旅行",
     other: "其他",
   },
   en: {
     movie: "Film",
+    concert: "Concerts",
+    theatre: "Theatre",
+    comedy: "Comedy",
     performance: "Live shows",
     exhibition: "Exhibitions",
     sport: "Sports",
     train: "Rail",
     flight: "Flights",
+    receipt: "Receipts",
+    dining: "Dining receipts",
+    invoice: "Invoices",
+    travel: "Travel",
     other: "Other",
   },
 };
