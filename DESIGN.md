@@ -73,6 +73,11 @@ typography:
     fontFamily: Canela Deck, Noto Serif SC, Songti SC, STSong, serif
     fontSize: 1.25rem
     lineHeight: 1.5
+  section-heading-small:
+    fontFamily: Canela Deck, Noto Serif SC, Songti SC, serif
+    fontSize: 1.5rem
+    fontWeight: 400
+    lineHeight: 1.4
   code:
     fontFamily: JetBrains Mono Variable, SFMono-Regular, Consolas, monospace
     fontSize: 1rem
@@ -175,6 +180,7 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 - Lab focus：深蓝灰阅读底、轻透明学习区，独立 --lab-* 命名空间；首页轨道 28s/36s 反向缓慢运行。
 - Lab mark：connected-W，深蓝底、浅蓝笔画与浅青圆点。SVG 是唯一来源，icons:lab 生成 PNG。
 - Motion：尊重系统减少动态设置。
+- Subscription：说明区直接使用页面渐变底色，不叠白色面板或分隔框。步骤与说明正文使用 UI 字体，小标题以 700 字重区分；二级标题保留 Canela Deck / 中文宋体。正文至少 16px，段落宽度不超过 65ch；手机端取消侧栏内缩，订阅地址输入框使用 16px 字体。
 
 
 

@@ -4,14 +4,23 @@
   gap: 5rem;
   align-items: start;
   padding-block: 1rem 3rem;
+  font-family: var(--font-ui);
+}
+.subscription-grid > * {
+  min-width: 0;
 }
 .subscription-grid h2 {
-  font-size: 1.7rem;
-  margin: 1rem 0;
+  font-family: var(--font-title);
+  font-synthesis: none;
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
 }
 .subscription-grid p {
+  max-width: 65ch;
   font-size: 1rem;
-  line-height: 1.9;
+  line-height: var(--font-prose-leading);
+  margin: 0 0 1rem;
+  overflow-wrap: anywhere;
 }
 .subscription-steps {
   counter-reset: step;
@@ -35,7 +44,7 @@
 }
 .subscription-steps strong {
   font-size: 1rem;
-  font-weight: 550;
+  font-weight: 700;
 }
 .subscription-steps p {
   font-size: 1rem;
@@ -54,7 +63,7 @@
   background: var(--surface);
   border-radius: 4px;
   padding: 0.8rem;
-  font: 0.8rem var(--font-mono);
+  font: 1rem var(--font-mono);
   color: var(--ink);
 }
 .feed-copy button {
@@ -63,7 +72,7 @@
   border-radius: 4px;
   padding: 0.55rem 1rem;
   color: var(--ink);
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 .feed-copy button:hover {
   border-color: var(--accent);
@@ -75,22 +84,22 @@
   color: var(--accent);
 }
 .rss-subscription {
-  background: var(--surface-soft);
-  padding: 2rem;
-  border-left: 0;
-  padding-left: 2.5rem;
+  background: transparent;
+  padding: 0;
 }
 .subscription-scope {
   margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--line);
 }
 .subscription-scope h3 {
+  font-family: var(--font-ui);
   font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0;
+  margin: 0 0 0.75rem;
 }
 .subscription-scope p {
-  font-size: 1rem;
-  margin-top: 1rem;
+  margin: 0 0 0.75rem;
 }
 .subscription-grid .subscription-provider {
   font-size: 0.875rem;
@@ -106,17 +115,6 @@
   .subscription-grid {
     grid-template-columns: 1fr;
     gap: 2.5rem;
-  }
-  .rss-subscription {
-    background: var(--surface-soft);
-    padding: 2rem;
-    border-left: 0;
-    padding-left: 0;
-    border-top: 1px solid var(--line);
-    padding-top: 2rem;
-  }
-  .subscription-grid h2 {
-    font-size: 1.5rem;
   }
   .subscription-steps > li {
     padding-left: 2rem;
