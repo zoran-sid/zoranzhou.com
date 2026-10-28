@@ -7,6 +7,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import headingLevels from "./src/lib/markdown/heading-levels.mjs";
+import walineLikePlugin from "./scripts/waline-like-plugin.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -127,7 +128,9 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), walineLikePlugin()],
+    // Keep the same guarded like patch active in development and production.
+    optimizeDeps: { exclude: ["@waline/client"] },
   },
 
   markdown: {

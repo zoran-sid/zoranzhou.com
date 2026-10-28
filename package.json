@@ -30,7 +30,7 @@
     "test:notes": "tsx --test scripts/test-note-preview.ts scripts/test-notes-cms.ts",
     "test:tickets": "tsx --test scripts/test-tickets.ts",
     "test:tickets-build": "tsx scripts/test-ticket-build.ts",
-    "test:comments": "tsx --test scripts/test-comments.ts",
+    "test:comments": "tsx --test scripts/test-comments.ts scripts/test-comment-like.ts",
     "test:site-build": "tsx scripts/test-site-build.ts",
     "icons:lab": "node scripts/generate-lab-icons.mjs",
     "content:new": "node scripts/content/cli.mjs new",

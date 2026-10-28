@@ -4,6 +4,7 @@ import {
   commentOptions,
 } from "./comment-config";
 import type { Locale } from "../i18n/utils";
+import type { LikeState } from "./comment-like";
 
 function hashComment(value: string): number {
   let hash = 2166136261;
@@ -52,6 +53,57 @@ export function initComments() {
     let instance: import("@waline/client").WalineInstance | null = null;
     let observer: IntersectionObserver | undefined;
     let avatarObserver: MutationObserver | undefined;
+    const feedback = document.createElement("p");
+    feedback.className = "comments__feedback";
+    feedback.setAttribute("role", "status");
+    target.after(feedback);
+    const onLikeFeedback = (event: Event) => {
+      const { id, state, liked } = (
+        event as CustomEvent<{
+          id: string | number;
+          state: LikeState;
+          liked: boolean;
+        }>
+      ).detail;
+      const card = document.getElementById(String(id));
+      if (!card || !target.contains(card)) return;
+      const like = card.querySelector<HTMLButtonElement>(".wl-like");
+      if (!like) return;
+      like.disabled = state === "pending";
+      like.setAttribute("aria-pressed", String(liked));
+      like.setAttribute("aria-busy", String(state === "pending"));
+      if (state === "pending") {
+        feedback.textContent = "";
+        feedback.dataset.error = "false";
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          like
+            .querySelector("svg")
+            ?.animate?.(
+              [
+                { transform: "scale(1)" },
+                { transform: "scale(1.25)", offset: 0.4 },
+                { transform: "scale(1)" },
+              ],
+              { duration: 280, easing: "ease-out" },
+            );
+        }
+      } else {
+        feedback.textContent =
+          locale === "zh-CN"
+            ? ({
+                liked: "已点赞",
+                unliked: "已取消点赞",
+                error: "点赞未能保存，请稍后重试。",
+              }[state] ?? "")
+            : ({
+                liked: "Liked",
+                unliked: "Like removed",
+                error: "Your like could not be saved. Please try again.",
+              }[state] ?? "");
+        feedback.dataset.error = String(state === "error");
+      }
+    };
+    document.addEventListener("waline:like-feedback", onLikeFeedback);
     const load = async () => {
       if (loading || instance) return;
       loading = true;
@@ -108,6 +160,8 @@ export function initComments() {
       () => {
         observer?.disconnect();
         avatarObserver?.disconnect();
+        document.removeEventListener("waline:like-feedback", onLikeFeedback);
+        feedback.remove();
         instance?.destroy();
       },
       { once: true },

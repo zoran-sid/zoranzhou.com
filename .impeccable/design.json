@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-27T12:34:39.794198+00:00",
+  "generatedAt": "2026-10-28T01:21:02.147663+00:00",
   "title": "Design System: Zoran’s Personal Journal",
   "extensions": {
     "colorMeta": {
@@ -505,6 +505,11 @@
         "name": "sunset-dawn",
         "value": "1800ms",
         "purpose": "日光、黄昏、夜色三层与独立太阳协同；阅读主题在日落62%/日出38%切换。重复操作、隐藏和减少动态设置均能收束。"
+      },
+      {
+        "name": "comment-like",
+        "value": "280ms ease-out",
+        "purpose": "爱心即时跳动一次，配合数量与选中状态更新；减少动态模式关闭跳动。"
       }
     ],
     "breakpoints": [
@@ -582,9 +587,9 @@
     {
       "name": "Comment editor",
       "kind": "input",
-      "description": "透明留言区域共享主站字体和主题色；输入文字至少16px。",
+      "description": "透明留言框；登录身份横排在上方，焦点使用轻边框，手机提交按钮与工具栏分行。",
       "html": "<label class=\"ds-comment-label\">聊一聊<textarea class=\"ds-comment\" placeholder=\"读到这里，有什么想说的？\"></textarea></label>",
-      "css": ".ds-comment-label{display:grid;gap:16px;color:var(--ink,#25314a);font:400 24px/1.4 var(--font-title,serif)}.ds-comment{min-height:9rem;padding:16px;border:1px solid var(--line-strong,#25314a38);border-radius:8px;background:transparent;color:var(--ink,#25314a);font:16px/1.8 var(--font-ui,sans-serif)}.ds-comment::placeholder{color:var(--muted,#566079);opacity:1}.ds-comment:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:3px}"
+      "css": ".ds-comment-label{display:grid;gap:16px;color:var(--ink,#25314a);font:400 24px/1.4 var(--font-title,serif)}.ds-comment{min-height:9rem;padding:16px;border:1px solid var(--line-strong,#25314a38);border-radius:8px;background:transparent;color:var(--ink,#25314a);font:16px/1.8 var(--font-ui,sans-serif)}.ds-comment::placeholder{color:var(--muted,#566079);opacity:1}.ds-comment:focus-visible{outline:none;border-color:var(--muted,#566079);background:var(--surface-soft,#ffffff59)}"
     }
   ],
   "narrative": {

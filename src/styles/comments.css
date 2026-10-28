@@ -62,9 +62,52 @@
   font-size: 0.875rem;
 }
 .comments .wl-panel {
+  width: 100%;
+  min-width: 0;
   border-radius: 8px;
   margin: 0 0 1.5rem;
   overflow: visible;
+}
+.comments .wl-comment {
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.comments .wl-login-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 100%;
+  margin: 0;
+  min-height: 44px;
+  padding-inline-end: 3rem;
+  text-align: start;
+}
+.comments .wl-login-info .wl-avatar {
+  position: static;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+}
+.comments .wl-login-info > .wl-login-nick {
+  min-width: 0;
+  color: var(--ink);
+  font: 600 0.875rem/1.5 var(--font-ui);
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+.comments .wl-login-info .wl-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  inset-inline-end: 0;
+  width: 44px;
+  height: 44px;
+  padding: 12px;
+  border-radius: 4px;
+  background: transparent;
 }
 .comments .wl-header {
   border-bottom: 1px solid var(--line);
@@ -81,6 +124,51 @@
 }
 .comments .wl-editor {
   min-height: 9rem;
+  caret-color: var(--ink);
+}
+.comments .wl-editor:focus,
+.comments .wl-editor:focus-visible,
+.comments .wl-input:focus,
+.comments .wl-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+  background: var(--surface-soft);
+}
+/* Keep keyboard focus visible with a quiet single frame, not a second blue box. */
+.comments .wl-panel:has(.wl-editor:focus-visible),
+.comments .wl-header:has(.wl-input:focus-visible) {
+  border-color: var(--muted);
+}
+.comments .wl-footer {
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0.5rem 0.75rem 0.75rem;
+}
+.comments .wl-actions {
+  flex: 0 1 auto;
+  gap: 0.25rem;
+}
+.comments .wl-info {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-width: 0;
+  margin-inline-start: auto;
+}
+.comments .wl-info .wl-text-number {
+  margin-inline-end: 0.25rem;
+  font-size: 0.8125rem;
+}
+.comments .wl-info .wl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 4.5rem;
+  height: 44px;
+  margin: 0;
+  padding: 0.5rem 1rem;
 }
 .comments .wl-input::placeholder {
   color: var(--muted);
@@ -102,9 +190,34 @@
   min-width: 44px;
   min-height: 44px;
 }
-.comments :is(button, a, input, textarea):focus-visible {
+.comments :is(button, a):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+.comments__feedback {
+  color: var(--muted);
+  font: 0.875rem/1.65 var(--font-ui);
+}
+.comments__feedback:not([data-error="true"]) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.comments .wl-card .wl-like,
+.comments .wl-card .wl-reply {
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+  gap: 0.25rem;
+}
+.comments .wl-like[aria-busy="true"] {
+  cursor: progress;
+  color: var(--accent);
 }
 .comments .wl-content {
   font: 1rem/1.8 var(--font-ui);
@@ -155,5 +268,16 @@
   .comments .wl-operation {
     flex-wrap: wrap;
     gap: 0.5rem;
+  }
+  .comments .wl-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  .comments .wl-info {
+    width: 100%;
+  }
+  .comments .wl-info .wl-text-number {
+    margin-inline-end: auto;
   }
 }

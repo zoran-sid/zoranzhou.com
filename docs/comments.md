@@ -33,11 +33,20 @@ DISABLE_USERAGENT=true
 
 客户端固定使用 `@waline/client` 3.16.1，由网站本地打包，不使用浮动版本 CDN。暗黑模式跟随 `html.dark`，切换主题时不需要重新加载。网站不保存 Waline 管理员密码、数据库信息或服务端密钥。
 
+登录后的头像和名字横排在输入框上方，手机与电脑保持同一阅读顺序。输入时使用轻边框和主题底色；提交按钮固定为 44px 高，手机端放在工具栏下方右侧。
+
+点赞后，爱心与数量立即更新，并显示一次短暂跳动；启用「减少动态效果」时不跳动。请求期间锁定该条点赞按钮，保存失败会恢复原状态并提示重试。不同评论的操作相互独立。
+
+`scripts/waline-like-plugin.mjs` 在开发和构建时替换客户端 3.16.1 的点赞处理函数，
+调用 `src/lib/comment-like.ts`；其余渲染和接口继续由 Waline 管理，不修改
+`node_modules`。补丁严格校验版本和原函数，升级 Waline 时需重新核对并运行测试，
+不能直接删除校验。`src/lib/comments.ts` 负责按钮忙碌状态、动画和操作提示。
+
 `public/_headers` 的 `Cross-Origin-Opener-Policy` 使用 `same-origin-allow-popups`，允许 Waline 电脑版登录弹窗把登录状态传回本站。手机端采用 Waline 自带的登录跳转；这两种行为由客户端维护。
 
 ## 检查
 
-`npm run test:comments` 检查评论路径与配置；`npm run test:tickets-build` 用临时内容核对票根、随记的评论入口及列表页排除规则。运行后重新执行 `npm run build` 生成正式网站，再执行 `npm run test:site-build`。
+`npm run test:comments` 检查评论路径、配置、点赞即时更新、重复点击、失败回退与补丁版本；`npm run test:tickets-build` 用临时内容核对票根、随记的评论入口及列表页排除规则。运行后重新执行 `npm run build` 生成正式网站，再执行 `npm run test:site-build`。
 
 接入时已验证服务的评论读取接口可访问，并允许网站域名的跨域请求。没有向线上发送测试留言；实际提交、登录和通知仍依赖服务端配置。
 
