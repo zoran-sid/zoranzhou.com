@@ -1,6 +1,13 @@
 import { createHash } from "node:crypto";
 import type { RSSFeedItem } from "@astrojs/rss";
-import { entryPath, type WritingEntry } from "./writing";
+import { unified } from "unified";
+import remarkGfm from "remark-gfm";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import rehypeSlug from "rehype-slug";
+import rehypeStringify from "rehype-stringify";
+import headingLevels from "./markdown/heading-levels.mjs";
+import { entryPath, type WritingEntry } from "./writing-entry";
 
 const xmlEscapes: Record<string, string> = {
   "<": "&lt;",
@@ -14,11 +21,62 @@ export function escapeXml(value: string): string {
   return value.replace(/[<>&"']/g, (character) => xmlEscapes[character]);
 }
 
+function absoluteResourceUrl(value: string, pageUrl: URL): string {
+  if (
+    value.startsWith("#") ||
+    value.startsWith("mailto:") ||
+    value.startsWith("tel:") ||
+    /^[a-z][a-z\d+.-]*:/i.test(value)
+  )
+    return value;
+  return new URL(value, pageUrl).href;
+}
+
+function absoluteUrls(pageUrl: URL) {
+  return () => (tree: { type: string; children?: unknown[] }) => {
+    const visit = (node: unknown) => {
+      if (!node || typeof node !== "object") return;
+      const current = node as {
+        type?: string;
+        properties?: Record<string, unknown>;
+        children?: unknown[];
+      };
+      if (current.type === "element" && current.properties) {
+        for (const attribute of ["href", "src"]) {
+          const value = current.properties[attribute];
+          if (typeof value === "string")
+            current.properties[attribute] = absoluteResourceUrl(
+              value,
+              pageUrl,
+            );
+        }
+      }
+      current.children?.forEach(visit);
+    };
+    visit(tree);
+  };
+}
+
+async function renderFeedContent(entry: WritingEntry, site: URL): Promise<string> {
+  // Resolve relative resources against the canonical directory form of the page.
+  const pageUrl = new URL(`${entryPath(entry).replace(/\/$/, "")}/`, site);
+  const file = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(headingLevels)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeSlug)
+    .use(absoluteUrls(pageUrl))
+    .use(rehypeStringify, { allowDangerousHtml: true });
+  const result = await file.process(entry.body);
+  return String(result);
+}
+
 /** A published translation has its own release time, separate from the source date. */
-export function writingFeedItem(
+export async function writingFeedItem(
   entry: WritingEntry,
   site: URL,
-): RSSFeedItem & { pubDate: Date } {
+): Promise<RSSFeedItem & { pubDate: Date }> {
   const { data } = entry;
   const pubDate = new Date(
     Math.max(
@@ -46,6 +104,7 @@ export function writingFeedItem(
   return {
     title: data.title,
     description: data.description ?? "",
+    content: await renderFeedContent(entry, site),
     pubDate,
     link,
     categories: data.tags,

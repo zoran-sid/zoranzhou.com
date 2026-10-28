@@ -1,11 +1,12 @@
-import { getCollection, type CollectionEntry } from "astro:content";
-import { localizePath, type Locale } from "../i18n/utils";
+import { getCollection } from "astro:content";
+import type { Locale } from "../i18n/utils";
 import {
   hasReadableBody,
   isPublished,
   writingCategory,
 } from "./content-policy";
-export type WritingEntry = CollectionEntry<"blog" | "essays" | "research">;
+import type { WritingEntry } from "./writing-entry";
+export { entryPath, type WritingEntry } from "./writing-entry";
 export async function getWriting(locale?: Locale): Promise<WritingEntry[]> {
   const collections = await Promise.all([
     getCollection("blog"),
@@ -21,16 +22,6 @@ export async function getWriting(locale?: Locale): Promise<WritingEntry[]> {
         (!locale || entry.data.lang === locale),
     )
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-}
-export function entryPath(entry: {
-  collection: string;
-  slug: string;
-  data: { lang: Locale };
-}): string {
-  return localizePath(
-    `/${entry.collection === "routes" ? "map" : entry.collection}/${entry.slug}`,
-    entry.data.lang,
-  );
 }
 export function categoryLabel(entry: WritingEntry, locale: Locale): string {
   const category = writingCategory(entry);

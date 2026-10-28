@@ -18,8 +18,9 @@ export async function GET(context: APIContext) {
   const t = getTranslations(locale);
   const all = await getWriting(locale);
   const site = context.site!;
-  const items = all
-    .map((entry) => writingFeedItem(entry, site))
+  const items = (await Promise.all(
+    all.map((entry) => writingFeedItem(entry, site)),
+  ))
     .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
   const feed = new URL(localizePath("/rss.xml", locale), site).href;
 
