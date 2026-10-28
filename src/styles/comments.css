@@ -281,3 +281,55 @@
     margin-inline-end: auto;
   }
 }
+
+.comments__help {
+  margin: 0 0 1.5rem;
+  font: 0.9375rem/1.75 var(--font-ui);
+  color: var(--muted);
+}
+.comments__help summary {
+  width: fit-content;
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  color: var(--ink);
+}
+.comments__help summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.comments__help p {
+  max-width: 65ch;
+  margin: 0.5rem 0;
+}
+.comments__help ul {
+  padding-left: 1.25rem;
+}
+.comments__help code {
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.comments__help .comments__credits {
+  font-size: 0.8125rem;
+}
+.comments .wl-emoji-popup {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  max-width: 100%;
+}
+.comments .wl-tab-wrapper button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.comments .wl-search input {
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--surface-soft);
+}
+.comments .wl-like[aria-pressed="true"] {
+  color: var(--accent);
+  opacity: 1;
+}
+.comments .wl-like:disabled:not([aria-busy="true"]) {
+  cursor: default;
+}

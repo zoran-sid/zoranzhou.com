@@ -1,3 +1,4 @@
+import { commentEmoji, searchCommentEmoji } from "./comment-emoji";
 import type { Locale } from "../i18n/utils";
 
 export const commentServer = "https://zorancomment.xyz";
@@ -29,12 +30,17 @@ export function commentOptions(path: string, locale: Locale) {
     wordLimit: 2000,
     commentSorting: "latest" as const,
     imageUploader: false,
-    search: false,
-    emoji: false,
+    search: { search: searchCommentEmoji, default: () => searchCommentEmoji() },
+    emoji: commentEmoji(locale),
     reaction: false,
     pageview: false,
     comment: false,
     locale: {
+      like: locale === "zh-CN" ? "点赞" : "Like",
+      cancelLike: locale === "zh-CN" ? "已点赞" : "Liked",
+      admin: locale === "zh-CN" ? "博主" : "Author",
+      sofa:
+        locale === "zh-CN" ? "来聊聊你的想法吧。" : "Start the conversation.",
       placeholder:
         locale === "zh-CN"
           ? "读到这里，有什么想说的？"

@@ -25,6 +25,50 @@ const zh = locale === "zh-CN";
       }
     </p>
   </header>
+  <details class="comments__help">
+    <summary>{zh ? "表情与写法" : "Emoji & formatting"}</summary>
+    <p>
+      {
+        zh
+          ? "可以用表情按钮选择，或搜索“开心”“赞”“smile”。也支持直接输入手机自带的表情。"
+          : "Choose an emoji or search for “smile”, “thanks” or “heart”. Your phone’s emoji keyboard works too."
+      }
+    </p>
+    <ul>
+      <li>
+        <code>**{zh ? "加粗" : "bold"}**</code> · <code
+          >*{zh ? "斜体" : "italic"}*</code
+        > · <code>~~{zh ? "删除线" : "strikethrough"}~~</code>
+      </li>
+      <li>
+        <code>[{zh ? "链接文字" : "link text"}](https://example.com)</code>
+      </li>
+      <li>
+        {
+          zh
+            ? "代码用反引号包裹；多行代码用三个反引号，可在后面加语言名。"
+            : "Wrap code in backticks; use three backticks and a language name for a code block."
+        }
+      </li>
+    </ul>
+    <p>
+      {
+        zh
+          ? "发表前可以预览。公式、上下标和部分表情语法以发表后的效果为准。登录后，每条评论可点赞一次。"
+          : "Preview before posting. Math, subscripts and some emoji syntax render fully after posting. Sign in to like each comment once."
+      }
+    </p>
+    <p class="comments__credits">
+      <a
+        href="https://github.com/jdecked/twemoji"
+        target="_blank"
+        rel="noopener noreferrer">Twemoji</a
+      > · <a
+        href="https://creativecommons.org/licenses/by/4.0/"
+        target="_blank"
+        rel="noopener noreferrer">CC BY 4.0</a>
+    </p>
+  </details>
   <div class="comments__load" data-comments-load>
     <button type="button" data-comments-button
       >{zh ? "加载评论" : "Load comments"}</button

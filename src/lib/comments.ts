@@ -69,7 +69,15 @@ export function initComments() {
       if (!card || !target.contains(card)) return;
       const like = card.querySelector<HTMLButtonElement>(".wl-like");
       if (!like) return;
-      like.disabled = state === "pending";
+      like.disabled =
+        state === "pending" || state === "liked" || state === "unknown";
+      like.title = liked
+        ? locale === "zh-CN"
+          ? "已点赞"
+          : "Liked"
+        : locale === "zh-CN"
+          ? "点赞"
+          : "Like";
       like.setAttribute("aria-pressed", String(liked));
       like.setAttribute("aria-busy", String(state === "pending"));
       if (state === "pending") {
@@ -92,15 +100,29 @@ export function initComments() {
           locale === "zh-CN"
             ? ({
                 liked: "已点赞",
-                unliked: "已取消点赞",
+                ready: "",
+                login: "登录后即可点赞，每条评论只需点一次。",
+                unknown: "暂时无法确认点赞状态，请刷新核对。",
                 error: "点赞未能保存，请稍后重试。",
               }[state] ?? "")
             : ({
                 liked: "Liked",
-                unliked: "Like removed",
+                ready: "",
+                login: "Sign in to like. Each account can like a comment once.",
+                unknown:
+                  "Like status could not be confirmed. Refresh to check.",
                 error: "Your like could not be saved. Please try again.",
               }[state] ?? "");
-        feedback.dataset.error = String(state === "error");
+        feedback.dataset.error = String(
+          ["error", "unknown", "login"].includes(state),
+        );
+        if (state === "login") {
+          target
+            .querySelector<HTMLElement>(
+              ".wl-login-nick, .wl-login-info a, .wl-info .wl-btn",
+            )
+            ?.focus();
+        }
       }
     };
     document.addEventListener("waline:like-feedback", onLikeFeedback);

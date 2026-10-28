@@ -1,0 +1,382 @@
+/* The collection front only. TicketFace remains the complete, flexible detail view. */
+.ticket-card {
+  max-width: 24rem;
+}
+.ticket-cover {
+  --stock: #e4eced;
+  --print: #203b47;
+  --rule: color-mix(in srgb, var(--print) 25%, transparent);
+  --ticket-display: var(--font-title);
+  container-type: inline-size;
+  position: relative;
+  aspect-ratio: 2 / 3;
+  color: var(--print);
+  font-family: var(--font-ui);
+  transition: transform 200ms ease-out;
+}
+.ticket-cover__paper {
+  height: 100%;
+  padding: 6%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto 24cqi;
+  gap: 4cqi;
+  background: var(--stock);
+  border-radius: 4px;
+  /* Physical tear notches line up with the retained date stub. */
+  -webkit-mask:
+    radial-gradient(circle at 0 80%, transparent 7px, #000 7.5px),
+    radial-gradient(circle at 100% 80%, transparent 7px, #000 7.5px);
+  -webkit-mask-composite: source-in;
+  mask:
+    radial-gradient(circle at 0 80%, transparent 7px, #000 7.5px),
+    radial-gradient(circle at 100% 80%, transparent 7px, #000 7.5px);
+  mask-composite: intersect;
+}
+.ticket-cover__category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.ticket-cover__category .ticket-icon {
+  width: 22px;
+  height: 22px;
+}
+.ticket-cover :is(h2, h3) {
+  font: 400 clamp(1.25rem, 7cqi, 1.875rem)/1.25 var(--ticket-display);
+  margin: 3cqi 0 0;
+  min-height: 2.5em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+.ticket-cover__picture {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--print) 6%, var(--stock));
+}
+.ticket-cover__picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ticket-cover__typography {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1cqi;
+}
+.ticket-cover__typography > span:first-of-type {
+  font: 400 clamp(2rem, 19cqi, 4.5rem)/1 var(--ticket-display);
+}
+.ticket-cover__typography > span:last-child {
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+}
+.ticket-cover__typography .ticket-icon {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 1cqi;
+}
+.ticket-cover__information {
+  min-height: 3.4rem;
+}
+.ticket-cover__fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.65fr);
+  gap: 0.75rem;
+  margin: 0;
+}
+.ticket-cover__fields > div {
+  min-width: 0;
+}
+.ticket-cover__fields dt {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.ticket-cover__fields dd {
+  margin: 0.125rem 0 0;
+  font-size: clamp(0.9375rem, 4.8cqi, 1.125rem);
+  font-weight: 600;
+  line-height: 1.4;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ticket-cover__location {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ticket-cover__stub {
+  min-height: 14cqi;
+  padding-top: 3cqi;
+  border-top: 1px dashed var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.ticket-cover__stub time {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.ticket-cover__stub time strong {
+  font: 400 clamp(1.3rem, 8cqi, 2rem)/1 var(--ticket-display);
+  white-space: nowrap;
+}
+.ticket-cover__stub time span,
+.ticket-cover__stub-end {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.ticket-cover__stub-end {
+  display: grid;
+  text-align: end;
+  min-width: 0;
+}
+.ticket-cover__number {
+  max-width: 9ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ticket-cover__route {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  font-weight: 600;
+  font-size: clamp(1rem, 6cqi, 1.5rem);
+}
+.ticket-cover__route span {
+  max-width: 42%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+.ticket-cover__route svg {
+  flex-shrink: 0;
+}
+/* Cinema: actual image in a perforated film frame, with an unprinted date stub. */
+.ticket-cover[data-type="movie"] {
+  --stock: #dcebf0;
+  --print: #173d4c;
+}
+.ticket-cover[data-type="movie"] .ticket-cover__picture {
+  padding-inline: 6%;
+  background: var(--print);
+}
+.ticket-cover[data-type="movie"] .ticket-cover__typography {
+  color: var(--stock);
+}
+.ticket-cover__film::before,
+.ticket-cover__film::after {
+  content: "";
+  position: absolute;
+  top: 4%;
+  bottom: 4%;
+  width: 3%;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--stock) 0 8px,
+    transparent 8px 17px
+  );
+}
+.ticket-cover__film::before {
+  left: 1.5%;
+}
+.ticket-cover__film::after {
+  right: 1.5%;
+}
+/* Concert: indigo letterpress with a strong, warm date imprint. */
+.ticket-cover[data-type="concert"] {
+  --stock: #e8dfc9;
+  --print: #373453;
+  --ticket-display: var(--font-ui);
+}
+.ticket-cover[data-type="concert"] :is(h2, h3) {
+  font-weight: 700;
+}
+.ticket-cover[data-type="concert"] .ticket-cover__stub {
+  border-top: 2px solid var(--print);
+}
+.ticket-cover[data-type="concert"] time strong {
+  font-weight: 800;
+}
+.ticket-cover[data-type="concert"] .ticket-cover__picture img {
+  filter: saturate(0.75);
+}
+/* Theatre: programme typography and a warm, restrained box-office frame. */
+.ticket-cover:is(
+  [data-type="theatre"],
+  [data-type="performance"],
+  [data-type="comedy"]
+) {
+  --stock: #eee1cb;
+  --print: #62452c;
+}
+.ticket-cover:is(
+    [data-type="theatre"],
+    [data-type="performance"],
+    [data-type="comedy"]
+  )
+  .ticket-cover__heading {
+  padding-top: 2cqi;
+  border-top: 3px double var(--print);
+}
+.ticket-cover:is(
+    [data-type="theatre"],
+    [data-type="performance"],
+    [data-type="comedy"]
+  )
+  .ticket-cover__picture {
+  padding: 2cqi;
+  border: 1px solid var(--rule);
+}
+/* Exhibition: gallery breathing room and a carefully contained work detail. */
+.ticket-cover[data-type="exhibition"] {
+  --stock: #eeede5;
+  --print: #354b44;
+}
+.ticket-cover[data-type="exhibition"] .ticket-cover__picture {
+  margin-inline: 6%;
+}
+.ticket-cover[data-type="exhibition"] .ticket-cover__category {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 2cqi;
+}
+/* Sport: compact fixture information and the seat retained on the front. */
+.ticket-cover[data-type="sport"] {
+  --stock: #e1ead7;
+  --print: #284b3c;
+  --ticket-display: var(--font-ui);
+}
+.ticket-cover[data-type="sport"] :is(h2, h3),
+.ticket-cover[data-type="sport"]
+  .ticket-cover__typography
+  > span:first-of-type {
+  font-weight: 800;
+}
+.ticket-cover[data-type="sport"] .ticket-cover__stub {
+  border-top: 3px solid var(--print);
+}
+/* Transport: route labels and ruled stock, without invented journey details. */
+.ticket-cover[data-type="train"] {
+  --stock: #eedbd0;
+  --print: #704331;
+}
+.ticket-cover[data-type="flight"] {
+  --stock: #e3e8df;
+  --print: #354a53;
+}
+.ticket-cover:is([data-type="train"], [data-type="flight"])
+  .ticket-cover__category {
+  border-bottom: 2px solid var(--print);
+  padding-bottom: 2cqi;
+}
+.ticket-cover:is([data-type="train"], [data-type="flight"])
+  .ticket-cover__route {
+  padding-block: 2cqi;
+  border-block: 1px solid var(--rule);
+}
+/* Travel / miscellaneous: a photograph kept as a postage keepsake. */
+.ticket-cover[data-type="travel"] {
+  --stock: #dce9e1;
+  --print: #31594e;
+}
+.ticket-cover[data-type="other"] {
+  --stock: #e7e4d8;
+  --print: #4b5145;
+}
+.ticket-cover__picture--stamp {
+  padding: 3cqi;
+  border: 2px dotted var(--rule);
+  margin-inline: 3%;
+}
+.ticket-cover__postmark {
+  position: absolute;
+  right: 1cqi;
+  bottom: 1cqi;
+  display: grid;
+  place-content: center;
+  width: 18cqi;
+  height: 18cqi;
+  text-align: center;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  color: var(--print);
+  background: var(--stock);
+  font: 600 0.75rem/1.3 var(--font-ui);
+  transform: rotate(-13deg);
+}
+.ticket-cover:is(
+  [data-type="receipt"],
+  [data-type="dining"],
+  [data-type="invoice"]
+) {
+  --stock: #f0e8d9;
+  --print: #514b3c;
+}
+.dark .ticket-cover {
+  --stock: #243b45;
+  --print: #d9e9ed;
+}
+.dark .ticket-cover[data-type="concert"] {
+  --stock: #343149;
+  --print: #ece0bf;
+}
+.dark
+  .ticket-cover:is(
+    [data-type="theatre"],
+    [data-type="performance"],
+    [data-type="comedy"],
+    [data-type="train"]
+  ) {
+  --stock: #40342d;
+  --print: #edddc6;
+}
+.dark
+  .ticket-cover:is(
+    [data-type="sport"],
+    [data-type="travel"],
+    [data-type="flight"],
+    [data-type="exhibition"],
+    [data-type="other"]
+  ) {
+  --stock: #2b3c34;
+  --print: #dfebdd;
+}
+.dark
+  .ticket-cover:is(
+    [data-type="receipt"],
+    [data-type="dining"],
+    [data-type="invoice"]
+  ) {
+  --stock: #3b372e;
+  --print: #e9e2d3;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .ticket-card:hover .ticket-cover {
+    transform: translateY(-3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticket-cover {
+    transition: none;
+  }
+}

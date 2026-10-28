@@ -101,6 +101,7 @@ try {
     date: "2024-02-29",
     note: noteSlug,
     photos: null,
+    cover: null,
     location: null,
   });
   ticket("missing-note", { note: "removed-note" });
@@ -163,8 +164,21 @@ try {
     assert.ok(listing.includes(`data-ticket-filter="${type}"`));
   assert.ok(listing.includes('aria-pressed="true"'));
   assert.ok(
-    !listing.includes("<img"),
-    "Ticket wall must not load photo previews",
+    listing.includes('class="ticket-cover"'),
+    "Ticket wall uses collectible covers",
+  );
+  assert.ok(
+    listing.includes(`src="${photos[0]}"`),
+    "First photo supplies the cover",
+  );
+  assert.ok(
+    !listing.includes(`src="${photos[1]}"`),
+    "Remaining photos stay in the detail gallery",
+  );
+  assert.ok(
+    latest.includes("ticket-face--full") &&
+      !latest.includes('class="ticket-cover"'),
+    "Detail ticket remains unchanged",
   );
   for (const src of photos) assert.ok(latest.includes(`src="${src}"`));
   assert.ok(latest.includes("这是保留完整段落的临时故事。"));

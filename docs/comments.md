@@ -4,9 +4,9 @@
 
 ## 使用与管理
 
-读者滚动到评论区附近时，网站加载评论；也可以点「加载评论」。评论表单只要求昵称，不展示邮箱字段；评论列表保留头像，但匿名或服务端默认头像会从网站本地头像池中按评论 ID 稳定选择一个随机头像，已登录用户的自定义头像不替换。位置、浏览器和系统信息不显示。登录入口保留。文字留言最长 2000 字，图片上传、GIF 搜索、表情选择与浏览量统计关闭。
+读者滚动到评论区附近时，网站加载评论；也可以点「加载评论」。评论表单只要求昵称，不展示邮箱字段；评论列表保留头像，但匿名或服务端默认头像会从网站本地头像池中按评论 ID 稳定选择一个随机头像，已登录用户的自定义头像不替换。位置、浏览器和系统信息不显示。登录入口保留。文字留言最长 2000 字。表情按钮提供 24 个本地 Twemoji，可用中文或英文关键词搜索；也支持手机自带表情。折叠的「表情与写法」说明 Markdown 用法和预览范围。图片上传、外部 GIF 搜索、文章表态与浏览量统计关闭。
 
-评论保存在你现有的 Waline 服务中，不写入网站 Markdown，也不随网站重新构建而删除。审核、删除留言、注册登录及邮件通知由 Waline 服务端管理，网站仓库只负责显示。服务端仓库为 `zoran-sid/waline`，本次接入没有修改它的配置。
+评论保存在你现有的 Waline 服务中，不写入网站 Markdown，也不随网站重新构建而删除。审核、删除留言、注册登录及邮件通知由 Waline 服务端管理，网站仓库只负责显示。服务端仓库为 `zoran-sid/waline`，使用 Neon PostgreSQL。2026-10-28 已经作者授权发布账号点赞插件；邮件通知仍使用服务端已有配置。
 
 如果要同时停止 Waline 服务端对这些信息的解析和保存，需要在 `zorancomment.xyz`
 对应的 Waline 服务环境变量中设置：
@@ -27,6 +27,7 @@ DISABLE_USERAGENT=true
 - `src/components/Comments.astro`：共同的评论区入口。
 - `src/lib/comment-config.ts`：服务地址、语言、页面标识和功能配置。
 - `src/lib/comments.ts`：进入视口后加载、手动重试和离开页面后的清理。
+- `src/lib/comment-emoji.ts` 和 `public/comment-emojis/`：24 个本地表情及双语搜索；图形来源、固定版本和 CC BY 4.0 授权保存在该目录。
 - `src/styles/comments.css`：本地样式，使用网站的字体、文字色、线条和背景变量。
 - `public/comment-avatars/`：从提供的 Userpics 头像包提取的 100 个圆形 PNG，仅用于匿名/默认评论头像；头像包授权信息见 [Craftwork Design License](https://craftwork.design/license/)。
 - `src/layouts/BlogPostLayout.astro` 与票根详情页：决定显示范围。
@@ -35,7 +36,13 @@ DISABLE_USERAGENT=true
 
 登录后的头像和名字横排在输入框上方，手机与电脑保持同一阅读顺序。输入时使用轻边框和主题底色；提交按钮固定为 44px 高，手机端放在工具栏下方右侧。
 
-点赞后，爱心与数量立即更新，并显示一次短暂跳动；启用「减少动态效果」时不跳动。请求期间锁定该条点赞按钮，保存失败会恢复原状态并提示重试。不同评论的操作相互独立。
+登录后才能点赞。每个账号对每条评论只能点赞一次，刷新或换设备后从服务端恢复状态，已点赞按钮保持选中。点赞时爱心和数量立即更新，并跳动一次；「减少动态效果」模式关闭跳动。
+
+服务器以评论 ID 和账号 ID 的联合主键保证唯一，通过同一条 SQL 同时记录账号和增加总数。首次认证请求会创建 `<现有表前缀>comment_likes` 表；Neon 连接账号需要建表权限，连接配置沿用 Waline 现有环境变量。旧评论与原有点赞总数保留；旧匿名点赞没有账号信息，不回溯分配。
+
+原故障发生在 Waline 保存点赞后格式化响应：评论文本被内存更新对象覆盖为空值，导致响应报错。插件对点赞请求直接返回账号状态和总数，避免进入这段格式化流程。若网络丢失保存响应，网站再查询该账号的状态：确认成功则保留，确认未保存才恢复；无法核对时提示刷新确认，不重复增加。前端只接受 `account-likes-v1` 协议，不会退回匿名增减接口。
+
+服务端文件为 `account-likes.cjs`，维护说明和本地 PostgreSQL 测试在服务端仓库的 `ACCOUNT-LIKES.md` 与 `test/account-likes.test.cjs`。服务端更新和网站更新分别提交；数据库密码与认证令牌不进入任何仓库。
 
 `scripts/waline-like-plugin.mjs` 在开发和构建时替换客户端 3.16.1 的点赞处理函数，
 调用 `src/lib/comment-like.ts`；其余渲染和接口继续由 Waline 管理，不修改
@@ -46,8 +53,8 @@ DISABLE_USERAGENT=true
 
 ## 检查
 
-`npm run test:comments` 检查评论路径、配置、点赞即时更新、重复点击、失败回退与补丁版本；`npm run test:tickets-build` 用临时内容核对票根、随记的评论入口及列表页排除规则。运行后重新执行 `npm run build` 生成正式网站，再执行 `npm run test:site-build`。
+`npm run test:comments` 检查评论路径、配置、本地表情、登录限制、单次点赞、账号切换、丢失响应核对与补丁版本；`npm run test:tickets-build` 用临时内容核对票根、随记的评论入口及列表页排除规则。运行后重新执行 `npm run build` 生成正式网站，再执行 `npm run test:site-build`。
 
-接入时已验证服务的评论读取接口可访问，并允许网站域名的跨域请求。没有向线上发送测试留言；实际提交、登录和通知仍依赖服务端配置。
+已通过本地 PostgreSQL SQL 测试、前端状态测试与网站构建。发布后只读请求确认匿名访问账号点赞接口返回 401；没有向线上发送测试留言或点赞。真实账号的跨设备操作由作者实际使用时核对。
 
 官方参考：[快速开始](https://waline.js.org/guide/get-started/)、[客户端选项](https://waline.js.org/reference/client/props.html)、[自定义样式](https://waline.js.org/guide/features/style.html)。
