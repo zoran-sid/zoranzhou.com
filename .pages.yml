@@ -465,19 +465,6 @@ content:
               - name: time
                 label: 时间
                 type: string
-      - name: cover
-        label: 列表封面（可选）
-        type: object
-        description: 只用于票根墙。可上传剧照、演出或旅途照片；不填时使用第一张照片，详情内容保持原样。
-        fields:
-          - name: src
-            label: 封面图
-            type: image
-            options:
-              media: ticket-images
-          - name: alt
-            label: 图片描述
-            type: string
       - name: photos
         label: 照片（可选）
         type: image

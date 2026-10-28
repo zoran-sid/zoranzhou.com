@@ -45,6 +45,38 @@ colors:
   ticket-receipt: "#c5b48b"
   ticket-travel: "#84b8af"
   ticket-other: "#8fa99c"
+  ticket-cover-default-stock: "#e4eced"
+  ticket-cover-default-print: "#203b47"
+  ticket-cover-movie-stock: "#dcebf0"
+  ticket-cover-movie-print: "#173d4c"
+  ticket-cover-concert-stock: "#e8dfc9"
+  ticket-cover-concert-print: "#373453"
+  ticket-cover-stage-stock: "#eee1cb"
+  ticket-cover-stage-print: "#62452c"
+  ticket-cover-exhibition-stock: "#eeede5"
+  ticket-cover-exhibition-print: "#354b44"
+  ticket-cover-sport-stock: "#e1ead7"
+  ticket-cover-sport-print: "#284b3c"
+  ticket-cover-train-stock: "#eedbd0"
+  ticket-cover-train-print: "#704331"
+  ticket-cover-flight-stock: "#e3e8df"
+  ticket-cover-flight-print: "#354a53"
+  ticket-cover-travel-stock: "#dce9e1"
+  ticket-cover-travel-print: "#31594e"
+  ticket-cover-other-stock: "#e7e4d8"
+  ticket-cover-other-print: "#4b5145"
+  ticket-cover-receipt-stock: "#f0e8d9"
+  ticket-cover-receipt-print: "#514b3c"
+  ticket-cover-dark-default-stock: "#243b45"
+  ticket-cover-dark-default-print: "#d9e9ed"
+  ticket-cover-dark-concert-stock: "#343149"
+  ticket-cover-dark-concert-print: "#ece0bf"
+  ticket-cover-dark-stage-stock: "#40342d"
+  ticket-cover-dark-stage-print: "#edddc6"
+  ticket-cover-dark-green-stock: "#2b3c34"
+  ticket-cover-dark-green-print: "#dfebdd"
+  ticket-cover-dark-receipt-stock: "#3b372e"
+  ticket-cover-dark-receipt-print: "#e9e2d3"
 typography:
   brand:
     fontFamily: Canela, Georgia, serif
@@ -92,6 +124,16 @@ typography:
     fontFamily: JetBrains Mono Variable, SFMono-Regular, Consolas, monospace
     fontSize: 1rem
     lineHeight: 1.9
+  ticket-cover-title:
+    fontFamily: Canela Deck, Canela, Georgia, serif
+    fontSize: clamp(1.25rem, 7cqi, 1.875rem)
+    fontWeight: 400
+    lineHeight: 1.25
+  ticket-cover-date:
+    fontFamily: Canela Deck, Canela, Georgia, serif
+    fontSize: clamp(1.3rem, 8cqi, 2rem)
+    fontWeight: 400
+    lineHeight: 1
 rounded:
   control: 4px
   comment-panel: 8px
@@ -105,6 +147,19 @@ spacing:
   xl: 48px
   section: 64px
 components:
+  ticket-cover:
+    backgroundColor: "{colors.ticket-cover-default-stock}"
+    textColor: "{colors.ticket-cover-default-print}"
+    rounded: "{rounded.control}"
+    padding: 6%
+  ticket-cover-movie:
+    backgroundColor: "{colors.ticket-cover-movie-stock}"
+    textColor: "{colors.ticket-cover-movie-print}"
+  comment-emoji-popup:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+  comment-like-selected:
+    textColor: "{colors.accent}"
   button-primary:
     backgroundColor: "{colors.accent}"
     textColor: "{colors.accent-ink}"
@@ -151,7 +206,27 @@ components:
 
 Taste 的调色库与真实案例研究用于比较方向；用户已否决其中的酒红方案。最终渐变是按用户要求确定的配色，不宣称出自某个获奖网站。研究过程保存在设计系统 MASTER 和方向笔记。
 
-票根按用户提供的实体票参考区分类别：电影雾蓝、音乐会淡紫、戏剧柔粉、喜剧浅杏、赛事浅绿、火车暖桃、机票灰蓝、小票暖米、旅行浅青。票纸在浅色主题混合 70% surface 与 30% 分类色，深色主题混合 84% surface 与 16% 分类色；文字沿用 ink / muted，类型名称与图标同步表达类别。
+详情票面（TicketFace）按用户提供的实体票参考区分类别：电影雾蓝、音乐会淡紫、戏剧柔粉、喜剧浅杏、赛事浅绿、火车暖桃、机票灰蓝、小票暖米、旅行浅青。票纸在浅色主题混合 70% surface 与 30% 分类色，深色主题混合 84% surface 与 16% 分类色；文字沿用 ink / muted，类型名称与图标同步表达类别。
+
+### Ticket cover scope
+
+列表封面使用独立的纸色与印墨配对，规范中的 `ticket-cover-*-stock` / `ticket-cover-*-print` 对应 `src/styles/ticket-covers.css` 内 `.ticket-cover` 的局部 `--stock` / `--print`；它们不替换全站颜色或详情票面的 `ticket-*` 分类色。细线由当前印墨与透明色混合 25% 形成，图案底由印墨 6% 与纸色混合形成。
+
+| 类别 | 浅色配对前缀 | 深色配对前缀 | 印刷语言 |
+| --- | --- | --- | --- |
+| 默认 | `ticket-cover-default` | `ticket-cover-dark-default` | 冷灰纸与深墨 |
+| 电影 | `ticket-cover-movie` | `ticket-cover-dark-default` | 雾蓝纸、深蓝墨、反色胶片画框 |
+| 音乐会 | `ticket-cover-concert` | `ticket-cover-dark-concert` | 暖纸与靛墨、唱片沟槽、粗日期 |
+| 戏剧、演出、喜剧 | `ticket-cover-stage` | `ticket-cover-dark-stage` | 节目单暖纸与棕墨、舞台拱门 |
+| 展览 | `ticket-cover-exhibition` | `ticket-cover-dark-green` | 灰白纸与绿墨、几何版画留白 |
+| 赛事 | `ticket-cover-sport` | `ticket-cover-dark-green` | 浅绿纸与深绿墨、跑道 |
+| 火车 | `ticket-cover-train` | `ticket-cover-dark-stage` | 暖桃纸与棕墨、路线 |
+| 航班 | `ticket-cover-flight` | `ticket-cover-dark-green` | 灰绿纸与蓝灰墨、航线 |
+| 旅行 | `ticket-cover-travel` | `ticket-cover-dark-green` | 浅青纸与绿墨、路线与邮戳 |
+| 其他 | `ticket-cover-other` | `ticket-cover-dark-green` | 灰米纸与灰绿墨、纪念邮戳 |
+| 小票、餐饮、发票 | `ticket-cover-receipt` | `ticket-cover-dark-receipt` | 米色纸与暖灰墨 |
+
+**The Cover Scope Rule.** 2:3 竖向封面只用于票根列表，以原创 SVG 印刷图形表达类别；照片、海报和上传图片保留在详情页。封面与详情分别维护，不把封面的裁切与信息限额带入详情。
 
 ## Typography
 
@@ -183,7 +258,7 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 
 内容色面为直角；控件为 4px 小圆角。摄影为矩形原图。全屏光点由点与径向透明过渡构成；章节细线和轨道为真实矢量几何，不作为内容或数据图表。
 
-票根沿用纸票的轮廓：12px 圆角、两侧缺口和虚线存根；消费与餐饮小票采用 4px 上角及锯齿底边。裁切只作用于背景，文字与键盘焦点保持完整。评论编辑框为 8px 圆角，使用主题细线与透明底色。
+详情票面沿用纸票的轮廓：12px 圆角、两侧缺口和虚线存根；消费与餐饮小票采用 4px 上角及锯齿底边。裁切只作用于背景，文字与键盘焦点保持完整。评论编辑框为 8px 圆角，使用主题细线与透明底色。列表封面使用 4px 圆角与 2:3 竖向纸面，两侧缺口位于高度 80% 处；日期存根使用虚线，音乐会和赛事分别使用 2px、3px 实线。
 
 ## Components
 
@@ -197,10 +272,28 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 - Lab mark：connected-W，深蓝底、浅蓝笔画与浅青圆点。SVG 是唯一来源，icons:lab 生成 PNG。
 - Motion：尊重系统减少动态设置。
 - Subscription：说明区直接使用页面渐变底色，不叠白色面板或分隔框。步骤与说明正文使用 UI 字体，小标题以 700 字重区分；二级标题保留 Canela Deck / 中文宋体。正文至少 16px，段落宽度不超过 65ch；手机端取消侧栏内缩，订阅地址输入框使用 16px 字体。
-- Ticket face：列表以至少 19rem 的自适应网格排列，窄屏单列；票面标题 24px，字段正文 16px、标签 13px。列表最多四项已填信息，每项预览两行，详情完整显示；交通票突出起终点。无图片时保留文字票面，照片在详情保持完整比例。悬停为标题下划线，键盘使用独立焦点轮廓。
-- Comments：标题沿用 Canela Deck / 中文宋体，表单与留言使用 UI 字体、至少 16px 正文；只展示昵称字段，登录后头像和名字在编辑框上方横排。透明编辑区域融入渐变，输入焦点用 muted 细边框与浅主题色面，按钮保留清晰键盘轮廓。提交按钮高 44px，手机端工具栏和提交区域分行，字数居左、提交居右；暗黑模式共享全站变量。点赞即时填充爱心与数量，280ms 跳动提供触感反馈，减少动态模式关闭跳动；请求失败恢复原状态。评论在进入视口附近时加载。
+- Ticket face：完整详情沿用 `src/components/TicketFace.astro` 与 `src/styles/tickets.css`，保留全部票面字段及完整比例图片。列表由独立 TicketCover 呈现。
+- Comments：标题沿用 Canela Deck / 中文宋体，编辑区与留言使用 UI 字体及至少 16px 正文；透明底和 8px 圆角融入现有渐变。登录身份横排，手机工具栏与提交行分开，控制项至少 44px。表情与点赞状态见下方组件规则。
 
 
+
+### Ticket covers
+
+`src/components/TicketCard.astro` 提供链接与独立键盘焦点，`src/components/TicketCover.astro` 负责封面内容，`src/styles/ticket-covers.css` 负责纸色、几何与分类差异。列表网格由 `src/styles/tickets.css` 提供：最小列宽 17rem（不足时占满可用宽度），间距 1.5rem；每张封面最大宽 24rem，固定比例 2:3。封面内部为类别与标题、原创图形、主要信息、日期存根四段，内边距 6%，段间距 4cqi，存根行高 24cqi。
+
+标题采用现有标题字体，字号与行高见 `ticket-cover-title`，最多两行；英文继承 `--font-title-en`，中文继承 `--font-title-zh`。音乐会改用 UI 字体、标题 700 字重和日期 800 字重；赛事标题采用 UI 字体 800 字重。类别为 14px，字段标签与年份为 13px，字段值为 clamp(1rem, 4.8cqi, 1.125rem)，日期使用 `ticket-cover-date`。标题和日期的 cqi 相对每张封面计算。
+
+电影使用双卷盘与两侧齿孔；音乐会使用唱片椭圆沟槽；戏剧、演出和喜剧使用舞台拱门；展览使用几何版画；赛事使用跑道；交通使用路线及对应交通图形；旅行与其他纪念使用日期邮戳。所有图形均为组件中的内联 SVG 或 CSS 几何，设为装饰，不替代真实类别文字。
+
+封面最多显示两项真实字段，优先保留座位；交通票有起终点时显示路线。地点、字段值与可选票号各自截断，完整内容由详情提供。日期使用真实票面日期；不补造座位、航班号、旅程或活动信息。标题在悬停与键盘焦点时加下划线；焦点位于外层链接，保留 2px accent 轮廓与 4px 偏移。支持悬停且允许动态时封面上移 3px，过渡为 200ms ease-out；减少动态设置关闭该位移和过渡。
+
+### Comments: emoji and account likes
+
+样式范围为 `src/styles/comments.css` 的 `.comments`；行为来源为 `src/lib/comment-config.ts`、`src/lib/comment-emoji.ts`、`src/lib/comments.ts` 与 `src/lib/comment-like.ts`。评论标题、正文、主题细线、浅色面与强调色继续共享全站变量。编辑区最小高 9rem，输入焦点改变浅色底与所在框线；按钮、链接保留 2px accent 键盘轮廓。
+
+表情选择与搜索使用本站提供的 24 个 SVG 表情和本地关键词索引，搜索支持中文与英文。弹层跟随评论区宽度，最大 33rem，使用 surface 底与 line-strong 边框；选择项为 44×44px、内边距 8px，搜索结果区最大高 14rem 并可纵向滚动。发表后的表情以 1.5em 方形嵌入文字，基线偏移 -0.25em。保留 Twemoji 授权链接与“表情与写法”说明；预览与发表结果可能有差异的语法在说明中明确标出。
+
+点赞为登录账号对每条评论的一次永久操作。点击后爱心与计数立即显示选中状态，按钮在请求期间设置 `aria-busy` 并禁止重复提交；成功后保持选中与禁用，不提供取消点赞。280ms ease-out 跳动只在允许动态时执行。数量与账号状态由服务器核对：确定失败时恢复原状态；写入响应丢失时再次查询，仍无法确认则保持选中并提示刷新核对，避免重复计数。未登录、失败和未确认状态显示反馈；状态同时通过 `role="status"`、`aria-pressed` 与 `aria-busy` 表达。评论加载、账号切换和分页同步服务器状态。
 
 ### Personal collections
 

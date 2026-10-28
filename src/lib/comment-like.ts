@@ -61,6 +61,8 @@ export function createCommentLikeHandler({
       return;
     }
     pending.add(pendingKey);
+    // A hydration request started before this gesture must not restore stale state.
+    revision++;
     const before = Number(comment.like) || 0;
     comment.like = before + 1;
     setLiked(comment.objectId, true);
@@ -102,6 +104,8 @@ export function createCommentLikeHandler({
       }
     } finally {
       pending.delete(pendingKey);
+      // Also invalidate reads started while the write was still in flight.
+      revision++;
     }
   };
   like.sync = async (comments: LikeComment[]) => {

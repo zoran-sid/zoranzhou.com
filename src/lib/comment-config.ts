@@ -39,6 +39,11 @@ export function commentOptions(path: string, locale: Locale) {
       like: locale === "zh-CN" ? "点赞" : "Like",
       cancelLike: locale === "zh-CN" ? "已点赞" : "Liked",
       admin: locale === "zh-CN" ? "博主" : "Author",
+      gif: locale === "zh-CN" ? "搜索表情" : "Search emoji",
+      gifSearchPlaceholder:
+        locale === "zh-CN"
+          ? "搜索：开心、赞、smile…"
+          : "Search: smile, thanks, heart…",
       sofa:
         locale === "zh-CN" ? "来聊聊你的想法吧。" : "Start the conversation.",
       placeholder:

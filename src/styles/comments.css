@@ -312,19 +312,47 @@
 .comments__help .comments__credits {
   font-size: 0.8125rem;
 }
-.comments .wl-emoji-popup {
+.comments :is(.wl-emoji-popup, .wl-gif-popup) {
+  box-sizing: border-box;
+  inset-inline: 0;
+  width: 100%;
+  max-width: min(100%, 33rem);
   background: var(--surface);
   border-color: var(--line-strong);
-  max-width: 100%;
 }
 .comments .wl-tab-wrapper button {
   min-width: 44px;
   min-height: 44px;
 }
-.comments .wl-search input {
+.comments .wl-gif-popup input {
   font-size: 1rem;
   color: var(--ink);
   background: var(--surface-soft);
+  min-height: 44px;
+}
+.comments .wl-gif-popup .wl-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+.comments .wl-gif-popup .wl-gallery-column {
+  display: contents;
+}
+.comments .wl-gif-popup img {
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  border-color: transparent;
+}
+.comments
+  :is(.wl-content, .wl-preview)
+  img[src^="https://zoranzhou.com/comment-emojis/"] {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: -0.25em;
 }
 .comments .wl-like[aria-pressed="true"] {
   color: var(--accent);

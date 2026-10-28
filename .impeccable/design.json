@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-28T01:21:02.147663+00:00",
+  "generatedAt": "2026-10-28T11:55:21.295479+00:00",
   "title": "Design System: Zoran’s Personal Journal",
   "extensions": {
     "colorMeta": {
@@ -449,6 +449,454 @@
       "ticket-other": {
         "role": "secondary",
         "displayName": "纪念灰绿"
+      },
+      "ticket-cover-default-stock": {
+        "role": "secondary",
+        "displayName": "默认纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0087 205.9)",
+          "oklch(26.4% 0.0087 205.9)",
+          "oklch(37.9% 0.0087 205.9)",
+          "oklch(49.3% 0.0087 205.9)",
+          "oklch(60.7% 0.0087 205.9)",
+          "oklch(72.1% 0.0087 205.9)",
+          "oklch(83.6% 0.0087 205.9)",
+          "oklch(95.0% 0.0087 205.9)"
+        ]
+      },
+      "ticket-cover-default-print": {
+        "role": "secondary",
+        "displayName": "默认印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0391 228.4)",
+          "oklch(26.4% 0.0391 228.4)",
+          "oklch(37.9% 0.0391 228.4)",
+          "oklch(49.3% 0.0391 228.4)",
+          "oklch(60.7% 0.0391 228.4)",
+          "oklch(72.1% 0.0391 228.4)",
+          "oklch(83.6% 0.0391 228.4)",
+          "oklch(95.0% 0.0391 228.4)"
+        ]
+      },
+      "ticket-cover-movie-stock": {
+        "role": "secondary",
+        "displayName": "电影纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0174 219.7)",
+          "oklch(26.4% 0.0174 219.7)",
+          "oklch(37.9% 0.0174 219.7)",
+          "oklch(49.3% 0.0174 219.7)",
+          "oklch(60.7% 0.0174 219.7)",
+          "oklch(72.1% 0.0174 219.7)",
+          "oklch(83.6% 0.0174 219.7)",
+          "oklch(95.0% 0.0174 219.7)"
+        ]
+      },
+      "ticket-cover-movie-print": {
+        "role": "secondary",
+        "displayName": "电影印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0501 227.1)",
+          "oklch(26.4% 0.0501 227.1)",
+          "oklch(37.9% 0.0501 227.1)",
+          "oklch(49.3% 0.0501 227.1)",
+          "oklch(60.7% 0.0501 227.1)",
+          "oklch(72.1% 0.0501 227.1)",
+          "oklch(83.6% 0.0501 227.1)",
+          "oklch(95.0% 0.0501 227.1)"
+        ]
+      },
+      "ticket-cover-concert-stock": {
+        "role": "secondary",
+        "displayName": "音乐会纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0309 88.4)",
+          "oklch(26.4% 0.0309 88.4)",
+          "oklch(37.9% 0.0309 88.4)",
+          "oklch(49.3% 0.0309 88.4)",
+          "oklch(60.7% 0.0309 88.4)",
+          "oklch(72.1% 0.0309 88.4)",
+          "oklch(83.6% 0.0309 88.4)",
+          "oklch(95.0% 0.0309 88.4)"
+        ]
+      },
+      "ticket-cover-concert-print": {
+        "role": "secondary",
+        "displayName": "音乐会印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0537 287.6)",
+          "oklch(26.4% 0.0537 287.6)",
+          "oklch(37.9% 0.0537 287.6)",
+          "oklch(49.3% 0.0537 287.6)",
+          "oklch(60.7% 0.0537 287.6)",
+          "oklch(72.1% 0.0537 287.6)",
+          "oklch(83.6% 0.0537 287.6)",
+          "oklch(95.0% 0.0537 287.6)"
+        ]
+      },
+      "ticket-cover-stage-stock": {
+        "role": "secondary",
+        "displayName": "戏剧与演出纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0325 81.0)",
+          "oklch(26.4% 0.0325 81.0)",
+          "oklch(37.9% 0.0325 81.0)",
+          "oklch(49.3% 0.0325 81.0)",
+          "oklch(60.7% 0.0325 81.0)",
+          "oklch(72.1% 0.0325 81.0)",
+          "oklch(83.6% 0.0325 81.0)",
+          "oklch(95.0% 0.0325 81.0)"
+        ]
+      },
+      "ticket-cover-stage-print": {
+        "role": "secondary",
+        "displayName": "戏剧与演出印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0551 61.2)",
+          "oklch(26.4% 0.0551 61.2)",
+          "oklch(37.9% 0.0551 61.2)",
+          "oklch(49.3% 0.0551 61.2)",
+          "oklch(60.7% 0.0551 61.2)",
+          "oklch(72.1% 0.0551 61.2)",
+          "oklch(83.6% 0.0551 61.2)",
+          "oklch(95.0% 0.0551 61.2)"
+        ]
+      },
+      "ticket-cover-exhibition-stock": {
+        "role": "secondary",
+        "displayName": "展览纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0107 100.8)",
+          "oklch(26.4% 0.0107 100.8)",
+          "oklch(37.9% 0.0107 100.8)",
+          "oklch(49.3% 0.0107 100.8)",
+          "oklch(60.7% 0.0107 100.8)",
+          "oklch(72.1% 0.0107 100.8)",
+          "oklch(83.6% 0.0107 100.8)",
+          "oklch(95.0% 0.0107 100.8)"
+        ]
+      },
+      "ticket-cover-exhibition-print": {
+        "role": "secondary",
+        "displayName": "展览印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0298 173.1)",
+          "oklch(26.4% 0.0298 173.1)",
+          "oklch(37.9% 0.0298 173.1)",
+          "oklch(49.3% 0.0298 173.1)",
+          "oklch(60.7% 0.0298 173.1)",
+          "oklch(72.1% 0.0298 173.1)",
+          "oklch(83.6% 0.0298 173.1)",
+          "oklch(95.0% 0.0298 173.1)"
+        ]
+      },
+      "ticket-cover-sport-stock": {
+        "role": "secondary",
+        "displayName": "赛事纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0271 127.8)",
+          "oklch(26.4% 0.0271 127.8)",
+          "oklch(37.9% 0.0271 127.8)",
+          "oklch(49.3% 0.0271 127.8)",
+          "oklch(60.7% 0.0271 127.8)",
+          "oklch(72.1% 0.0271 127.8)",
+          "oklch(83.6% 0.0271 127.8)",
+          "oklch(95.0% 0.0271 127.8)"
+        ]
+      },
+      "ticket-cover-sport-print": {
+        "role": "secondary",
+        "displayName": "赛事印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0487 164.6)",
+          "oklch(26.4% 0.0487 164.6)",
+          "oklch(37.9% 0.0487 164.6)",
+          "oklch(49.3% 0.0487 164.6)",
+          "oklch(60.7% 0.0487 164.6)",
+          "oklch(72.1% 0.0487 164.6)",
+          "oklch(83.6% 0.0487 164.6)",
+          "oklch(95.0% 0.0487 164.6)"
+        ]
+      },
+      "ticket-cover-train-stock": {
+        "role": "secondary",
+        "displayName": "火车纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0258 52.2)",
+          "oklch(26.4% 0.0258 52.2)",
+          "oklch(37.9% 0.0258 52.2)",
+          "oklch(49.3% 0.0258 52.2)",
+          "oklch(60.7% 0.0258 52.2)",
+          "oklch(72.1% 0.0258 52.2)",
+          "oklch(83.6% 0.0258 52.2)",
+          "oklch(95.0% 0.0258 52.2)"
+        ]
+      },
+      "ticket-cover-train-print": {
+        "role": "secondary",
+        "displayName": "火车印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0689 42.4)",
+          "oklch(26.4% 0.0689 42.4)",
+          "oklch(37.9% 0.0689 42.4)",
+          "oklch(49.3% 0.0689 42.4)",
+          "oklch(60.7% 0.0689 42.4)",
+          "oklch(72.1% 0.0689 42.4)",
+          "oklch(83.6% 0.0689 42.4)",
+          "oklch(95.0% 0.0689 42.4)"
+        ]
+      },
+      "ticket-cover-flight-stock": {
+        "role": "secondary",
+        "displayName": "航班纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0131 130.8)",
+          "oklch(26.4% 0.0131 130.8)",
+          "oklch(37.9% 0.0131 130.8)",
+          "oklch(49.3% 0.0131 130.8)",
+          "oklch(60.7% 0.0131 130.8)",
+          "oklch(72.1% 0.0131 130.8)",
+          "oklch(83.6% 0.0131 130.8)",
+          "oklch(95.0% 0.0131 130.8)"
+        ]
+      },
+      "ticket-cover-flight-print": {
+        "role": "secondary",
+        "displayName": "航班印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0302 226.2)",
+          "oklch(26.4% 0.0302 226.2)",
+          "oklch(37.9% 0.0302 226.2)",
+          "oklch(49.3% 0.0302 226.2)",
+          "oklch(60.7% 0.0302 226.2)",
+          "oklch(72.1% 0.0302 226.2)",
+          "oklch(83.6% 0.0302 226.2)",
+          "oklch(95.0% 0.0302 226.2)"
+        ]
+      },
+      "ticket-cover-travel-stock": {
+        "role": "secondary",
+        "displayName": "旅行纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0175 159.1)",
+          "oklch(26.4% 0.0175 159.1)",
+          "oklch(37.9% 0.0175 159.1)",
+          "oklch(49.3% 0.0175 159.1)",
+          "oklch(60.7% 0.0175 159.1)",
+          "oklch(72.1% 0.0175 159.1)",
+          "oklch(83.6% 0.0175 159.1)",
+          "oklch(95.0% 0.0175 159.1)"
+        ]
+      },
+      "ticket-cover-travel-print": {
+        "role": "secondary",
+        "displayName": "旅行印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0493 174.2)",
+          "oklch(26.4% 0.0493 174.2)",
+          "oklch(37.9% 0.0493 174.2)",
+          "oklch(49.3% 0.0493 174.2)",
+          "oklch(60.7% 0.0493 174.2)",
+          "oklch(72.1% 0.0493 174.2)",
+          "oklch(83.6% 0.0493 174.2)",
+          "oklch(95.0% 0.0493 174.2)"
+        ]
+      },
+      "ticket-cover-other-stock": {
+        "role": "secondary",
+        "displayName": "其他纪念纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0164 95.2)",
+          "oklch(26.4% 0.0164 95.2)",
+          "oklch(37.9% 0.0164 95.2)",
+          "oklch(49.3% 0.0164 95.2)",
+          "oklch(60.7% 0.0164 95.2)",
+          "oklch(72.1% 0.0164 95.2)",
+          "oklch(83.6% 0.0164 95.2)",
+          "oklch(95.0% 0.0164 95.2)"
+        ]
+      },
+      "ticket-cover-other-print": {
+        "role": "secondary",
+        "displayName": "其他纪念印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0208 129.0)",
+          "oklch(26.4% 0.0208 129.0)",
+          "oklch(37.9% 0.0208 129.0)",
+          "oklch(49.3% 0.0208 129.0)",
+          "oklch(60.7% 0.0208 129.0)",
+          "oklch(72.1% 0.0208 129.0)",
+          "oklch(83.6% 0.0208 129.0)",
+          "oklch(95.0% 0.0208 129.0)"
+        ]
+      },
+      "ticket-cover-receipt-stock": {
+        "role": "secondary",
+        "displayName": "小票纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0218 83.3)",
+          "oklch(26.4% 0.0218 83.3)",
+          "oklch(37.9% 0.0218 83.3)",
+          "oklch(49.3% 0.0218 83.3)",
+          "oklch(60.7% 0.0218 83.3)",
+          "oklch(72.1% 0.0218 83.3)",
+          "oklch(83.6% 0.0218 83.3)",
+          "oklch(95.0% 0.0218 83.3)"
+        ]
+      },
+      "ticket-cover-receipt-print": {
+        "role": "secondary",
+        "displayName": "小票印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0252 88.8)",
+          "oklch(26.4% 0.0252 88.8)",
+          "oklch(37.9% 0.0252 88.8)",
+          "oklch(49.3% 0.0252 88.8)",
+          "oklch(60.7% 0.0252 88.8)",
+          "oklch(72.1% 0.0252 88.8)",
+          "oklch(83.6% 0.0252 88.8)",
+          "oklch(95.0% 0.0252 88.8)"
+        ]
+      },
+      "ticket-cover-dark-default-stock": {
+        "role": "secondary",
+        "displayName": "深色默认纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0337 227.2)",
+          "oklch(26.4% 0.0337 227.2)",
+          "oklch(37.9% 0.0337 227.2)",
+          "oklch(49.3% 0.0337 227.2)",
+          "oklch(60.7% 0.0337 227.2)",
+          "oklch(72.1% 0.0337 227.2)",
+          "oklch(83.6% 0.0337 227.2)",
+          "oklch(95.0% 0.0337 227.2)"
+        ]
+      },
+      "ticket-cover-dark-default-print": {
+        "role": "secondary",
+        "displayName": "深色默认印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0179 214.4)",
+          "oklch(26.4% 0.0179 214.4)",
+          "oklch(37.9% 0.0179 214.4)",
+          "oklch(49.3% 0.0179 214.4)",
+          "oklch(60.7% 0.0179 214.4)",
+          "oklch(72.1% 0.0179 214.4)",
+          "oklch(83.6% 0.0179 214.4)",
+          "oklch(95.0% 0.0179 214.4)"
+        ]
+      },
+      "ticket-cover-dark-concert-stock": {
+        "role": "secondary",
+        "displayName": "深色音乐会纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0422 289.6)",
+          "oklch(26.4% 0.0422 289.6)",
+          "oklch(37.9% 0.0422 289.6)",
+          "oklch(49.3% 0.0422 289.6)",
+          "oklch(60.7% 0.0422 289.6)",
+          "oklch(72.1% 0.0422 289.6)",
+          "oklch(83.6% 0.0422 289.6)",
+          "oklch(95.0% 0.0422 289.6)"
+        ]
+      },
+      "ticket-cover-dark-concert-print": {
+        "role": "secondary",
+        "displayName": "深色音乐会印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0455 90.4)",
+          "oklch(26.4% 0.0455 90.4)",
+          "oklch(37.9% 0.0455 90.4)",
+          "oklch(49.3% 0.0455 90.4)",
+          "oklch(60.7% 0.0455 90.4)",
+          "oklch(72.1% 0.0455 90.4)",
+          "oklch(83.6% 0.0455 90.4)",
+          "oklch(95.0% 0.0455 90.4)"
+        ]
+      },
+      "ticket-cover-dark-stage-stock": {
+        "role": "secondary",
+        "displayName": "深色戏剧与火车纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0211 52.0)",
+          "oklch(26.4% 0.0211 52.0)",
+          "oklch(37.9% 0.0211 52.0)",
+          "oklch(49.3% 0.0211 52.0)",
+          "oklch(60.7% 0.0211 52.0)",
+          "oklch(72.1% 0.0211 52.0)",
+          "oklch(83.6% 0.0211 52.0)",
+          "oklch(95.0% 0.0211 52.0)"
+        ]
+      },
+      "ticket-cover-dark-stage-print": {
+        "role": "secondary",
+        "displayName": "深色戏剧与火车印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0354 77.1)",
+          "oklch(26.4% 0.0354 77.1)",
+          "oklch(37.9% 0.0354 77.1)",
+          "oklch(49.3% 0.0354 77.1)",
+          "oklch(60.7% 0.0354 77.1)",
+          "oklch(72.1% 0.0354 77.1)",
+          "oklch(83.6% 0.0354 77.1)",
+          "oklch(95.0% 0.0354 77.1)"
+        ]
+      },
+      "ticket-cover-dark-green-stock": {
+        "role": "secondary",
+        "displayName": "深色绿色类别纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0262 164.4)",
+          "oklch(26.4% 0.0262 164.4)",
+          "oklch(37.9% 0.0262 164.4)",
+          "oklch(49.3% 0.0262 164.4)",
+          "oklch(60.7% 0.0262 164.4)",
+          "oklch(72.1% 0.0262 164.4)",
+          "oklch(83.6% 0.0262 164.4)",
+          "oklch(95.0% 0.0262 164.4)"
+        ]
+      },
+      "ticket-cover-dark-green-print": {
+        "role": "secondary",
+        "displayName": "深色绿色类别印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0226 141.2)",
+          "oklch(26.4% 0.0226 141.2)",
+          "oklch(37.9% 0.0226 141.2)",
+          "oklch(49.3% 0.0226 141.2)",
+          "oklch(60.7% 0.0226 141.2)",
+          "oklch(72.1% 0.0226 141.2)",
+          "oklch(83.6% 0.0226 141.2)",
+          "oklch(95.0% 0.0226 141.2)"
+        ]
+      },
+      "ticket-cover-dark-receipt-stock": {
+        "role": "secondary",
+        "displayName": "深色小票纸色",
+        "tonalRamp": [
+          "oklch(15.0% 0.0162 86.9)",
+          "oklch(26.4% 0.0162 86.9)",
+          "oklch(37.9% 0.0162 86.9)",
+          "oklch(49.3% 0.0162 86.9)",
+          "oklch(60.7% 0.0162 86.9)",
+          "oklch(72.1% 0.0162 86.9)",
+          "oklch(83.6% 0.0162 86.9)",
+          "oklch(95.0% 0.0162 86.9)"
+        ]
+      },
+      "ticket-cover-dark-receipt-print": {
+        "role": "secondary",
+        "displayName": "深色小票印墨",
+        "tonalRamp": [
+          "oklch(15.0% 0.0215 85.9)",
+          "oklch(26.4% 0.0215 85.9)",
+          "oklch(37.9% 0.0215 85.9)",
+          "oklch(49.3% 0.0215 85.9)",
+          "oklch(60.7% 0.0215 85.9)",
+          "oklch(72.1% 0.0215 85.9)",
+          "oklch(83.6% 0.0215 85.9)",
+          "oklch(95.0% 0.0215 85.9)"
+        ]
       }
     },
     "typographyMeta": {
@@ -471,6 +919,14 @@
       "brand": {
         "displayName": "zoran 字标",
         "purpose": "项目已有 Canela Regular；用于鹿角字标。"
+      },
+      "ticket-cover-title": {
+        "displayName": "票根封面标题",
+        "purpose": "票根列表的两行标题；继承页面语言的 --font-title。音乐会与赛事使用 --font-ui，字重分别为 700、800。"
+      },
+      "ticket-cover-date": {
+        "displayName": "票根日期存根",
+        "purpose": "2:3 列表封面的日期；cqi 相对每张票纸。音乐会使用 UI 字体 800 字重，赛事继承 UI 字体。"
       }
     },
     "shadows": [
@@ -510,6 +966,11 @@
         "name": "comment-like",
         "value": "280ms ease-out",
         "purpose": "爱心即时跳动一次，配合数量与选中状态更新；减少动态模式关闭跳动。"
+      },
+      {
+        "name": "ticket-cover-hover",
+        "value": "transform 200ms ease-out; translateY(-3px)",
+        "purpose": "仅票根列表、支持悬停且允许动态时启用；减少动态设置移除位移和过渡。"
       }
     ],
     "breakpoints": [
@@ -580,21 +1041,37 @@
     {
       "name": "Ticket face",
       "kind": "card",
-      "description": "分类票纸与虚线存根；列表显示主要字段，详情完整展示。",
+      "description": "完整详情票面（src/components/TicketFace.astro、src/styles/tickets.css）；分类票纸与存根保留，完整字段与图片在详情展示。列表另用 TicketCover。",
       "html": "<a class=\"ds-ticket\" href=\"#\"><div class=\"ds-ticket-body\"><span>电影</span><h3>那天看的电影</h3><p>影院 · 场次与座位</p></div><div class=\"ds-ticket-stub\">票面日期 <span>查看票根</span></div></a>",
       "css": ".ds-ticket{display:block;position:relative;isolation:isolate;color:var(--ink,#25314a);padding-inline:24px;text-decoration:none}.ds-ticket::before{content:\"\";position:absolute;inset:0;z-index:-1;border-radius:12px;background:color-mix(in srgb,var(--surface,#fff) 70%,#79b8d4);mask:radial-gradient(circle at 0 calc(100% - 4rem),transparent 8px,#000 8.5px),radial-gradient(circle at 100% calc(100% - 4rem),transparent 8px,#000 8.5px);mask-composite:intersect}.ds-ticket-body{padding-block:24px}.ds-ticket-body span,.ds-ticket-body p{font:14px/1.65 var(--font-ui,sans-serif);color:var(--muted,#566079)}.ds-ticket h3{font:400 24px/1.4 var(--font-title,serif);margin:24px 0 0}.ds-ticket-stub{display:flex;align-items:center;justify-content:space-between;min-height:4rem;border-top:1px dashed var(--line-strong,#25314a38);font:14px/1.65 var(--font-ui,sans-serif);color:var(--muted,#566079)}.ds-ticket:hover h3{text-decoration:underline;text-underline-offset:.2em}.ds-ticket:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:4px}"
     },
     {
       "name": "Comment editor",
       "kind": "input",
-      "description": "透明留言框；登录身份横排在上方，焦点使用轻边框，手机提交按钮与工具栏分行。",
+      "description": "src/styles/comments.css 的主题化编辑区；登录身份横排，焦点使用轻边框，手机提交行与工具栏分开。表情使用本站资源；账号点赞状态由服务器核对。",
       "html": "<label class=\"ds-comment-label\">聊一聊<textarea class=\"ds-comment\" placeholder=\"读到这里，有什么想说的？\"></textarea></label>",
       "css": ".ds-comment-label{display:grid;gap:16px;color:var(--ink,#25314a);font:400 24px/1.4 var(--font-title,serif)}.ds-comment{min-height:9rem;padding:16px;border:1px solid var(--line-strong,#25314a38);border-radius:8px;background:transparent;color:var(--ink,#25314a);font:16px/1.8 var(--font-ui,sans-serif)}.ds-comment::placeholder{color:var(--muted,#566079);opacity:1}.ds-comment:focus-visible{outline:none;border-color:var(--muted,#566079);background:var(--surface-soft,#ffffff59)}"
+    },
+    {
+      "name": "Ticket cover",
+      "kind": "card",
+      "refersTo": "ticket-cover-movie",
+      "description": "仅列表使用的 2:3 竖向封面；源码 TicketCover.astro 与 ticket-covers.css。原创 SVG、分类纸墨和日期存根；无照片、海报或上传图片。示例为电影，其他类别继承相同结构并使用各自几何。",
+      "html": "<a class=\"ds-ticket-card\" href=\"#\"><div class=\"ds-ticket-cover\" data-type=\"movie\"><div class=\"ds-ticket-cover__paper\"><header class=\"ds-ticket-cover__heading\"><div class=\"ds-ticket-cover__category\"><span>电影</span></div><h3>电影票根</h3></header><div class=\"ds-ticket-cover__picture\"><svg class=\"ds-ticket-cover__art\" viewBox=\"0 0 260 160\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\" aria-hidden=\"true\"><path d=\"M18 30h224v100H18zM32 42h196v76H32z\"/><circle cx=\"101\" cy=\"80\" r=\"34\"/><circle cx=\"163\" cy=\"80\" r=\"34\"/><circle cx=\"101\" cy=\"80\" r=\"5\"/><circle cx=\"163\" cy=\"80\" r=\"5\"/><circle cx=\"101\" cy=\"58\" r=\"7\" transform=\"rotate(0 101 80)\"/><circle cx=\"101\" cy=\"58\" r=\"7\" transform=\"rotate(72 101 80)\"/><circle cx=\"101\" cy=\"58\" r=\"7\" transform=\"rotate(144 101 80)\"/><circle cx=\"101\" cy=\"58\" r=\"7\" transform=\"rotate(216 101 80)\"/><circle cx=\"101\" cy=\"58\" r=\"7\" transform=\"rotate(288 101 80)\"/><circle cx=\"163\" cy=\"58\" r=\"7\" transform=\"rotate(0 163 80)\"/><circle cx=\"163\" cy=\"58\" r=\"7\" transform=\"rotate(72 163 80)\"/><circle cx=\"163\" cy=\"58\" r=\"7\" transform=\"rotate(144 163 80)\"/><circle cx=\"163\" cy=\"58\" r=\"7\" transform=\"rotate(216 163 80)\"/><circle cx=\"163\" cy=\"58\" r=\"7\" transform=\"rotate(288 163 80)\"/><path d=\"M67 80v35c0 25 58 29 85 16s62-7 77 13\"/></svg><span class=\"ds-ticket-cover__film\" aria-hidden=\"true\"></span></div><div class=\"ds-ticket-cover__information\"><dl class=\"ds-ticket-cover__fields\"><div><dt>影院</dt><dd>示例影院</dd></div><div><dt>座位</dt><dd>示例座位</dd></div></dl></div><footer class=\"ds-ticket-cover__stub\"><time datetime=\"2026-10-28\"><strong>10.28</strong><span>2026</span></time><span class=\"ds-ticket-cover__stub-end\">查看票根</span></footer></div></div></a>",
+      "css": ".ds-ticket-card{display:block;height:100%;color:var(--ink,#25314a);text-decoration:none}.ds-ticket-cover{--font-title:var(--font-title-zh,\"Canela Deck\",\"Noto Serif SC\",\"Songti SC\",serif);--font-ui:var(--font-ui-zh,\"Lato\",\"PingFang SC\",sans-serif)}.ds-ticket-card:is(:hover,:focus-visible) :is(h2,h3){text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.2em}.ds-ticket-card:focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:4px}\n.ds-ticket-card {\n  max-width: 24rem;\n}\n.ds-ticket-cover {\n  --stock: #e4eced;\n  --print: #203b47;\n  --rule: color-mix(in srgb, var(--print) 25%, transparent);\n  --ticket-display: var(--font-title);\n  container-type: inline-size;\n  position: relative;\n  aspect-ratio: 2 / 3;\n  color: var(--print);\n  font-family: var(--font-ui);\n  transition: transform 200ms ease-out;\n}\n.ds-ticket-cover__paper {\n  height: 100%;\n  padding: 6%;\n  display: grid;\n  grid-template-rows: auto minmax(0, 1fr) auto 24cqi;\n  gap: 4cqi;\n  background: var(--stock);\n  border-radius: 4px;\n  \n  -webkit-mask:\n    radial-gradient(circle at 0 80%, transparent 7px, var(--print) 7.5px),\n    radial-gradient(circle at 100% 80%, transparent 7px, var(--print) 7.5px);\n  -webkit-mask-composite: source-in;\n  mask:\n    radial-gradient(circle at 0 80%, transparent 7px, var(--print) 7.5px),\n    radial-gradient(circle at 100% 80%, transparent 7px, var(--print) 7.5px);\n  mask-composite: intersect;\n}\n.ds-ticket-cover__category {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 1rem;\n  font-size: 0.875rem;\n  line-height: 1.4;\n}\n.ds-ticket-cover__category .ds-ticket-icon {\n  width: 22px;\n  height: 22px;\n}\n.ds-ticket-cover :is(h2, h3) {\n  font: 400 clamp(1.25rem, 7cqi, 1.875rem)/1.25 var(--ticket-display);\n  margin: 3cqi 0 0;\n  min-height: 2.5em;\n  overflow: hidden;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow-wrap: anywhere;\n}\n.ds-ticket-cover__picture {\n  position: relative;\n  min-height: 0;\n  overflow: hidden;\n  background: color-mix(in srgb, var(--print) 6%, var(--stock));\n}\n.ds-ticket-cover__art {\n  display: block;\n  width: 100%;\n  height: 100%;\n}\n.ds-ticket-cover__information {\n  min-height: 3.4rem;\n}\n.ds-ticket-cover__fields {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) minmax(0, 0.65fr);\n  gap: 0.75rem;\n  margin: 0;\n}\n.ds-ticket-cover__fields > div {\n  min-width: 0;\n}\n.ds-ticket-cover__fields dt {\n  font-size: 0.8125rem;\n  line-height: 1.5;\n}\n.ds-ticket-cover__fields dd {\n  margin: 0.125rem 0 0;\n  font-size: clamp(1rem, 4.8cqi, 1.125rem);\n  font-weight: 600;\n  line-height: 1.4;\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.ds-ticket-cover__location {\n  margin: 0.25rem 0 0;\n  font-size: 0.875rem;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.ds-ticket-cover__stub {\n  min-height: 14cqi;\n  padding-top: 3cqi;\n  border-top: 1px dashed var(--rule);\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 0.75rem;\n  font-variant-numeric: tabular-nums;\n}\n.ds-ticket-cover__stub time {\n  display: flex;\n  align-items: baseline;\n  gap: 0.5rem;\n}\n.ds-ticket-cover__stub time strong {\n  font: 400 clamp(1.3rem, 8cqi, 2rem)/1 var(--ticket-display);\n  white-space: nowrap;\n}\n.ds-ticket-cover__stub time span,\n.ds-ticket-cover__stub-end {\n  font-size: 0.8125rem;\n  line-height: 1.5;\n}\n.ds-ticket-cover__stub-end {\n  display: grid;\n  text-align: end;\n  min-width: 0;\n}\n.ds-ticket-cover__number {\n  max-width: 9ch;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.ds-ticket-cover__route {\n  display: flex;\n  justify-content: space-between;\n  gap: 0.5rem;\n  align-items: center;\n  font-weight: 600;\n  font-size: clamp(1rem, 6cqi, 1.5rem);\n}\n.ds-ticket-cover__route span {\n  max-width: 42%;\n  overflow: hidden;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow-wrap: anywhere;\n}\n.ds-ticket-cover__route svg {\n  flex-shrink: 0;\n}\n\n.ds-ticket-cover[data-type=\"movie\"] {\n  --stock: #dcebf0;\n  --print: #173d4c;\n}\n.ds-ticket-cover[data-type=\"movie\"] .ds-ticket-cover__picture {\n  padding-inline: 6%;\n  background: var(--print);\n}\n.ds-ticket-cover[data-type=\"movie\"] .ds-ticket-cover__art {\n  color: var(--stock);\n}\n.ds-ticket-cover__film::before,\n.ds-ticket-cover__film::after {\n  content: \"\";\n  position: absolute;\n  top: 4%;\n  bottom: 4%;\n  width: 3%;\n  background: repeating-linear-gradient(\n    to bottom,\n    var(--stock) 0 8px,\n    transparent 8px 17px\n  );\n}\n.ds-ticket-cover__film::before {\n  left: 1.5%;\n}\n.ds-ticket-cover__film::after {\n  right: 1.5%;\n}\n\n.ds-ticket-cover[data-type=\"concert\"] {\n  --stock: #e8dfc9;\n  --print: #373453;\n  --ticket-display: var(--font-ui);\n}\n.ds-ticket-cover[data-type=\"concert\"] :is(h2, h3) {\n  font-weight: 700;\n}\n.ds-ticket-cover[data-type=\"concert\"] .ds-ticket-cover__stub {\n  border-top: 2px solid var(--print);\n}\n.ds-ticket-cover[data-type=\"concert\"] time strong {\n  font-weight: 800;\n}\n.ds-ticket-cover[data-type=\"concert\"] .ds-ticket-cover__picture {\n  border-block: 1px solid var(--rule);\n}\n\n.ds-ticket-cover:is(\n  [data-type=\"theatre\"],\n  [data-type=\"performance\"],\n  [data-type=\"comedy\"]\n) {\n  --stock: #eee1cb;\n  --print: #62452c;\n}\n.ds-ticket-cover:is(\n    [data-type=\"theatre\"],\n    [data-type=\"performance\"],\n    [data-type=\"comedy\"]\n  )\n  .ds-ticket-cover__heading {\n  padding-top: 2cqi;\n  border-top: 3px double var(--print);\n}\n.ds-ticket-cover:is(\n    [data-type=\"theatre\"],\n    [data-type=\"performance\"],\n    [data-type=\"comedy\"]\n  )\n  .ds-ticket-cover__picture {\n  padding: 2cqi;\n  border: 1px solid var(--rule);\n}\n\n.ds-ticket-cover[data-type=\"exhibition\"] {\n  --stock: #eeede5;\n  --print: #354b44;\n}\n.ds-ticket-cover[data-type=\"exhibition\"] .ds-ticket-cover__picture {\n  margin-inline: 6%;\n}\n.ds-ticket-cover[data-type=\"exhibition\"] .ds-ticket-cover__category {\n  border-bottom: 1px solid var(--rule);\n  padding-bottom: 2cqi;\n}\n\n.ds-ticket-cover[data-type=\"sport\"] {\n  --stock: #e1ead7;\n  --print: #284b3c;\n  --ticket-display: var(--font-ui);\n}\n.ds-ticket-cover[data-type=\"sport\"] :is(h2, h3) {\n  font-weight: 800;\n}\n.ds-ticket-cover[data-type=\"sport\"] .ds-ticket-cover__stub {\n  border-top: 3px solid var(--print);\n}\n\n.ds-ticket-cover[data-type=\"train\"] {\n  --stock: #eedbd0;\n  --print: #704331;\n}\n.ds-ticket-cover[data-type=\"flight\"] {\n  --stock: #e3e8df;\n  --print: #354a53;\n}\n.ds-ticket-cover:is([data-type=\"train\"], [data-type=\"flight\"])\n  .ds-ticket-cover__category {\n  border-bottom: 2px solid var(--print);\n  padding-bottom: 2cqi;\n}\n.ds-ticket-cover:is([data-type=\"train\"], [data-type=\"flight\"])\n  .ds-ticket-cover__route {\n  padding-block: 2cqi;\n  border-block: 1px solid var(--rule);\n}\n\n.ds-ticket-cover[data-type=\"travel\"] {\n  --stock: #dce9e1;\n  --print: #31594e;\n}\n.ds-ticket-cover[data-type=\"other\"] {\n  --stock: #e7e4d8;\n  --print: #4b5145;\n}\n.ds-ticket-cover__picture--stamp {\n  padding: 3cqi;\n  border: 2px dotted var(--rule);\n  margin-inline: 3%;\n}\n.ds-ticket-cover__postmark {\n  position: absolute;\n  right: 1cqi;\n  bottom: 1cqi;\n  display: grid;\n  place-content: center;\n  width: 18cqi;\n  height: 18cqi;\n  text-align: center;\n  border: 2px solid currentColor;\n  border-radius: 50%;\n  color: var(--print);\n  background: var(--stock);\n  font: 600 0.75rem/1.3 var(--font-ui);\n  transform: rotate(-13deg);\n}\n.ds-ticket-cover:is(\n  [data-type=\"receipt\"],\n  [data-type=\"dining\"],\n  [data-type=\"invoice\"]\n) {\n  --stock: #f0e8d9;\n  --print: #514b3c;\n}\n:host-context(.dark) .ds-ticket-cover {\n  --stock: #243b45;\n  --print: #d9e9ed;\n}\n:host-context(.dark) .ds-ticket-cover[data-type=\"concert\"] {\n  --stock: #343149;\n  --print: #ece0bf;\n}\n:host-context(.dark)\n  .ds-ticket-cover:is(\n    [data-type=\"theatre\"],\n    [data-type=\"performance\"],\n    [data-type=\"comedy\"],\n    [data-type=\"train\"]\n  ) {\n  --stock: #40342d;\n  --print: #edddc6;\n}\n:host-context(.dark)\n  .ds-ticket-cover:is(\n    [data-type=\"sport\"],\n    [data-type=\"travel\"],\n    [data-type=\"flight\"],\n    [data-type=\"exhibition\"],\n    [data-type=\"other\"]\n  ) {\n  --stock: #2b3c34;\n  --print: #dfebdd;\n}\n:host-context(.dark)\n  .ds-ticket-cover:is(\n    [data-type=\"receipt\"],\n    [data-type=\"dining\"],\n    [data-type=\"invoice\"]\n  ) {\n  --stock: #3b372e;\n  --print: #e9e2d3;\n}\n@media (hover: hover) and (prefers-reduced-motion: no-preference) {\n  .ds-ticket-card:hover .ds-ticket-cover {\n    transform: translateY(-3px);\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .ds-ticket-cover {\n    transition: none;\n  }\n}"
+    },
+    {
+      "name": "Comment emoji and like states",
+      "kind": "custom",
+      "refersTo": "comment-emoji-popup",
+      "description": "本站 24 个表情的选择与中英文本地搜索；弹层最大 33rem，项目 44px。下方示例为已点赞状态：登录后每账号一次，成功后保持选中，响应丢失时先向服务器核对。源码 comments.css、comment-emoji.ts、comment-like.ts。",
+      "html": "<section class=\"ds-comment-tools\"><div class=\"ds-comment-popup\"><label class=\"ds-comment-search\">搜索表情<input type=\"search\" placeholder=\"搜索：开心、赞、smile…\"></label><div class=\"ds-comment-gallery\"><button type=\"button\" aria-label=\"开心 微笑 smile happy\"><svg aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 36 36\"><path fill=\"#FFCC4D\" d=\"M36 18c0 9.941-8.059 18-18 18-9.94 0-18-8.059-18-18C0 8.06 8.06 0 18 0c9.941 0 18 8.06 18 18\"/><path fill=\"#664500\" d=\"M28.457 17.797c-.06-.135-1.499-3.297-4.457-3.297-2.957 0-4.397 3.162-4.457 3.297-.092.207-.032.449.145.591.175.142.426.147.61.014.012-.009 1.262-.902 3.702-.902 2.426 0 3.674.881 3.702.901.088.066.194.099.298.099.11 0 .221-.037.312-.109.177-.142.238-.386.145-.594zm-12 0c-.06-.135-1.499-3.297-4.457-3.297-2.957 0-4.397 3.162-4.457 3.297-.092.207-.032.449.144.591.176.142.427.147.61.014.013-.009 1.262-.902 3.703-.902 2.426 0 3.674.881 3.702.901.088.066.194.099.298.099.11 0 .221-.037.312-.109.178-.142.237-.386.145-.594zM18 22c-3.623 0-6.027-.422-9-1-.679-.131-2 0-2 2 0 4 4.595 9 11 9 6.404 0 11-5 11-9 0-2-1.321-2.132-2-2-2.973.578-5.377 1-9 1z\"/><path fill=\"#FFF\" d=\"M9 23s3 1 9 1 9-1 9-1-2 4-9 4-9-4-9-4z\"/></svg></button></div></div><button class=\"ds-comment-liked\" type=\"button\" aria-pressed=\"true\" disabled>已点赞</button><p class=\"ds-comment-state\" role=\"status\">每个登录账号可为每条评论点赞一次。</p></section>",
+      "css": ".ds-comment-tools{font:1rem/1.8 var(--font-ui,\"Lato\",\"PingFang SC\",sans-serif);color:var(--ink,#25314a)}.ds-comment-popup{width:100%;max-width:min(100%,33rem);background:var(--surface,#fff);border:1px solid var(--line-strong,#25314a38)}.ds-comment-search{display:grid}.ds-comment-search input{font:1rem/1.8 var(--font-ui,\"Lato\",sans-serif);min-height:44px;color:var(--ink,#25314a);background:var(--surface-soft,#ffffff59);border:1px solid var(--line-strong,#25314a38)}.ds-comment-gallery{display:flex;flex-wrap:wrap;max-height:14rem;overflow-y:auto}.ds-comment-gallery button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;background:transparent;border:1px solid transparent;cursor:pointer}.ds-comment-gallery svg{width:28px;height:28px}.ds-comment-gallery button:hover{background:var(--surface-soft,#ffffff59)}.ds-comment-tools :is(button,input):focus-visible{outline:2px solid var(--accent,#3e50a0);outline-offset:3px}.ds-comment-liked{min-width:44px;min-height:44px;border:0;background:transparent;font:inherit;color:var(--accent,#3e50a0);opacity:1;cursor:default}.ds-comment-state{font:.875rem/1.65 var(--font-ui,\"Lato\",sans-serif);color:var(--muted,#566079)}"
     }
   ],
   "narrative": {
     "northStar": "随阅读展开的个人刊物",
-    "overview": "保留浅色滚动渐变、全屏微光点与日落主题。Canela Regular 的小写 zoran 字样为品红色，两侧三叶草保留绿色并保持静止。手机工具栏保持原位，六项主目录（Blog、Essays、Library、Photography、Now、About）从右侧滑入，语言切换只出现一次；页脚补全双列栏目导航。Canela Deck 与 Noto Serif SC 建立英文、中文标题层级。旅行图文紧密分组，足迹详情分开呈现日期地点与运动数据，正文只保留 Markdown 自带的旅程标题。",
+    "overview": "**Creative North Star: \"随阅读展开的个人刊物\"**\n\n用接近白色的浅蓝、浅紫、暖白渐变连接全站，微光点覆盖整个视口并缓慢漂移。首页的精选文章、生活与学习区域各有细线、日光和轨道的变化。字体、真实照片与文章结构保持清晰；技术正文沿用稳定的阅读排版。\n\n最新方向由用户明确提出：放弃酒红、降低饱和度、让渐变随滚动过渡，并把微光点扩展到全屏。本规范记录当前代码，替换之前的绿色和酒红方案。最终验证依用户要求限于代码和构建。",
     "keyCharacteristics": [
       "全屏浅色渐变随阅读位置变化，微光点持续缓慢移动",
       "板块各自表达内容，整体共享字体、颜色与动态节奏",
@@ -615,6 +1092,11 @@
         "name": "Personal collections",
         "body": "首页在写作之后呈现真实书架、旅行手记、跑步列表与最近观影。Life 与 Library 复用同一内容数据；海报记录实际观看日期，跑步只显示文字指标与详情链接，不加载地图。窄屏书架两列，旅行和活动按 DOM 顺序堆叠。",
         "section": "layout"
+      },
+      {
+        "name": "The Cover Scope Rule",
+        "body": "2:3 竖向封面只用于票根列表，以原创 SVG 印刷图形表达类别；照片、海报和上传图片保留在详情页。封面与详情分别维护，不把封面的裁切与信息限额带入详情。",
+        "section": "colors"
       }
     ],
     "dos": [

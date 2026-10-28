@@ -101,7 +101,7 @@ try {
     date: "2024-02-29",
     note: noteSlug,
     photos: null,
-    cover: null,
+
     location: null,
   });
   ticket("missing-note", { note: "removed-note" });
@@ -168,12 +168,8 @@ try {
     "Ticket wall uses collectible covers",
   );
   assert.ok(
-    listing.includes(`src="${photos[0]}"`),
-    "First photo supplies the cover",
-  );
-  assert.ok(
-    !listing.includes(`src="${photos[1]}"`),
-    "Remaining photos stay in the detail gallery",
+    !listing.includes("<img"),
+    "Listing covers use print designs, not uploaded or work images",
   );
   assert.ok(
     latest.includes("ticket-face--full") &&

@@ -24,12 +24,12 @@
   border-radius: 4px;
   /* Physical tear notches line up with the retained date stub. */
   -webkit-mask:
-    radial-gradient(circle at 0 80%, transparent 7px, #000 7.5px),
-    radial-gradient(circle at 100% 80%, transparent 7px, #000 7.5px);
+    radial-gradient(circle at 0 80%, transparent 7px, var(--print) 7.5px),
+    radial-gradient(circle at 100% 80%, transparent 7px, var(--print) 7.5px);
   -webkit-mask-composite: source-in;
   mask:
-    radial-gradient(circle at 0 80%, transparent 7px, #000 7.5px),
-    radial-gradient(circle at 100% 80%, transparent 7px, #000 7.5px);
+    radial-gradient(circle at 0 80%, transparent 7px, var(--print) 7.5px),
+    radial-gradient(circle at 100% 80%, transparent 7px, var(--print) 7.5px);
   mask-composite: intersect;
 }
 .ticket-cover__category {
@@ -60,31 +60,10 @@
   overflow: hidden;
   background: color-mix(in srgb, var(--print) 6%, var(--stock));
 }
-.ticket-cover__picture img {
+.ticket-cover__art {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-}
-.ticket-cover__typography {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 1cqi;
-}
-.ticket-cover__typography > span:first-of-type {
-  font: 400 clamp(2rem, 19cqi, 4.5rem)/1 var(--ticket-display);
-}
-.ticket-cover__typography > span:last-child {
-  font-size: 0.875rem;
-  letter-spacing: 0.12em;
-}
-.ticket-cover__typography .ticket-icon {
-  width: 26px;
-  height: 26px;
-  margin-bottom: 1cqi;
 }
 .ticket-cover__information {
   min-height: 3.4rem;
@@ -104,7 +83,7 @@
 }
 .ticket-cover__fields dd {
   margin: 0.125rem 0 0;
-  font-size: clamp(0.9375rem, 4.8cqi, 1.125rem);
+  font-size: clamp(1rem, 4.8cqi, 1.125rem);
   font-weight: 600;
   line-height: 1.4;
   overflow: hidden;
@@ -172,7 +151,7 @@
 .ticket-cover__route svg {
   flex-shrink: 0;
 }
-/* Cinema: actual image in a perforated film frame, with an unprinted date stub. */
+/* Cinema: engraved reels and a perforated frame, with a retained date stub. */
 .ticket-cover[data-type="movie"] {
   --stock: #dcebf0;
   --print: #173d4c;
@@ -181,7 +160,7 @@
   padding-inline: 6%;
   background: var(--print);
 }
-.ticket-cover[data-type="movie"] .ticket-cover__typography {
+.ticket-cover[data-type="movie"] .ticket-cover__art {
   color: var(--stock);
 }
 .ticket-cover__film::before,
@@ -218,8 +197,8 @@
 .ticket-cover[data-type="concert"] time strong {
   font-weight: 800;
 }
-.ticket-cover[data-type="concert"] .ticket-cover__picture img {
-  filter: saturate(0.75);
+.ticket-cover[data-type="concert"] .ticket-cover__picture {
+  border-block: 1px solid var(--rule);
 }
 /* Theatre: programme typography and a warm, restrained box-office frame. */
 .ticket-cover:is(
@@ -248,7 +227,7 @@
   padding: 2cqi;
   border: 1px solid var(--rule);
 }
-/* Exhibition: gallery breathing room and a carefully contained work detail. */
+/* Exhibition: gallery whitespace and a geometric print. */
 .ticket-cover[data-type="exhibition"] {
   --stock: #eeede5;
   --print: #354b44;
@@ -266,10 +245,7 @@
   --print: #284b3c;
   --ticket-display: var(--font-ui);
 }
-.ticket-cover[data-type="sport"] :is(h2, h3),
-.ticket-cover[data-type="sport"]
-  .ticket-cover__typography
-  > span:first-of-type {
+.ticket-cover[data-type="sport"] :is(h2, h3) {
   font-weight: 800;
 }
 .ticket-cover[data-type="sport"] .ticket-cover__stub {
@@ -294,7 +270,7 @@
   padding-block: 2cqi;
   border-block: 1px solid var(--rule);
 }
-/* Travel / miscellaneous: a photograph kept as a postage keepsake. */
+/* Travel / miscellaneous: a postage keepsake with a calendar postmark. */
 .ticket-cover[data-type="travel"] {
   --stock: #dce9e1;
   --print: #31594e;

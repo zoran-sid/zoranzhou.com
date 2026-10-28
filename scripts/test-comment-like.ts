@@ -134,6 +134,26 @@ test("an in-flight like cannot block or overwrite the next account's state", asy
   assert.equal(s.states.at(-1), "ready");
 });
 
+test("late hydration cannot clear a confirmed heart or restore a stale count", async () => {
+  let finishHydration!: (value: ReturnType<typeof result>[]) => void;
+  let reads = 0;
+  const s = setup({
+    read: async () =>
+      ++reads === 1
+        ? new Promise((resolve) => {
+            finishHydration = resolve;
+          })
+        : [result()],
+  });
+  const hydration = s.handler.sync([s.comment]);
+  await s.handler(s.comment);
+  finishHydration([result(false, 2)]);
+  await hydration;
+  assert.equal(s.comment.like, 3);
+  assert.deepEqual(s.likes.value, [1]);
+  assert.equal(s.states.at(-1), "liked");
+});
+
 test("transport rejects old backend, non-JSON and invalid results; never falls back to legacy increment", async () => {
   for (const response of [
     new Response("not JSON"),

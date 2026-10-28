@@ -11,7 +11,7 @@ interface Props {
   heading?: "h2" | "h3";
 }
 const { ticket, locale, heading: Heading = "h2" } = Astro.props;
-const { title, date, type, details, photos, location, lang } = ticket.data;
+const { title, date, type, details, location, lang } = ticket.data;
 const zh = locale === "zh-CN";
 const day = date.toISOString().slice(0, 10);
 const journey = ticketJourney(type, details);
@@ -36,10 +36,9 @@ const coverFields = [
 const number = ticketValue(details, "ticketNumber");
 const transport = ["train", "flight", "travel"].includes(type);
 const stamp = ["travel", "other"].includes(type);
-const image = ticket.data.cover?.src ?? photos[0];
 ---
 
-<div class="ticket-cover" data-type={type} data-image={Boolean(image)}>
+<div class="ticket-cover" data-type={type}>
   <div class="ticket-cover__paper">
     <header class="ticket-cover__heading">
       <div class="ticket-cover__category">
@@ -53,28 +52,105 @@ const image = ticket.data.cover?.src ?? photos[0];
         { "ticket-cover__picture--stamp": stamp },
       ]}
     >
-      {
-        image ? (
-          <img
-            src={image}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            width="600"
-            height="450"
-          />
-        ) : (
-          <div class="ticket-cover__typography" aria-hidden="true">
+      <svg
+        class="ticket-cover__art"
+        viewBox="0 0 260 160"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.4"
+        aria-hidden="true"
+      >
+        {
+          type === "movie" ? (
             <>
-              <TicketIcon type={type} />
-              <span>
-                {type === "sport" ? number || day.slice(8) : day.slice(0, 4)}
-              </span>
+              <path d="M18 30h224v100H18zM32 42h196v76H32z" />
+              <>
+                <circle cx="101" cy="80" r="34" />
+                <circle cx="163" cy="80" r="34" />
+              </>
+              <>
+                <circle cx="101" cy="80" r="5" />
+                <circle cx="163" cy="80" r="5" />
+              </>
+              {[101, 163].map((x) => (
+                <>
+                  {[0, 72, 144, 216, 288].map((angle) => (
+                    <circle
+                      cx={x}
+                      cy="58"
+                      r="7"
+                      transform={`rotate(${angle} ${x} 80)`}
+                    />
+                  ))}
+                </>
+              ))}
+              <path d="M67 80v35c0 25 58 29 85 16s62-7 77 13" />
             </>
-            <span>{day.slice(5).replace("-", " / ")}</span>
-          </div>
-        )
-      }
+          ) : type === "concert" ? (
+            <>
+              {[62, 48, 34, 20].map((r) => (
+                <ellipse cx="130" cy="80" rx={r * 1.5} ry={r} />
+              ))}
+              <circle cx="130" cy="80" r="5" fill="currentColor" />
+              <path d="M18 80h48m128 0h48M130 6v12m0 124v12" />
+            </>
+          ) : ["theatre", "performance", "comedy"].includes(type) ? (
+            <>
+              <path d="M36 144V60a94 50 0 0 1 188 0v84M50 144V62a80 38 0 0 1 160 0v82M36 62h188M62 64c0 49-4 63-26 80m162-80c0 49 4 63 26 80M62 64c10 37 21 48 68 48s58-11 68-48M36 144h188" />
+              <path d="M82 64c5 18 17 30 48 30s43-12 48-30M92 144v-30m76 30v-30" />
+            </>
+          ) : type === "exhibition" ? (
+            <>
+              <path d="M36 24h188v112H36zM52 40h156v80H52z" />
+              <>
+                <circle cx="111" cy="80" r="36" />
+                <path d="m118 116 36-72 36 72zM75 116h115" />
+              </>
+            </>
+          ) : type === "sport" ? (
+            <>
+              {[0, 12, 24, 36].map((inset) => (
+                <rect
+                  x={26 + inset}
+                  y={16 + inset / 2}
+                  width={208 - inset * 2}
+                  height={128 - inset}
+                  rx={64 - inset / 2}
+                />
+              ))}
+              <path d="M130 16v36m0 56v36" stroke-dasharray="3 4" />
+            </>
+          ) : transport ? (
+            <>
+              <path
+                d="M30 112C92 112 80 48 134 48s62 45 96-16"
+                stroke-dasharray="4 5"
+              />
+              <>
+                <circle cx="30" cy="112" r="9" />
+                <circle cx="230" cy="32" r="9" />
+              </>
+              {type === "flight" ? (
+                <path
+                  d="m120 72 14-26-24-17 4-5 29 10 13-16 5 2-8 20 26 19-3 5-30-12-18 23z"
+                  fill="currentColor"
+                  stroke="none"
+                />
+              ) : (
+                <path d="M104 68h52v35h-52zM112 76h14v12h-14zm22 0h14v12h-14zM110 113l9-10m31 10-9-10" />
+              )}
+            </>
+          ) : (
+            <>
+              <>
+                <circle cx="130" cy="80" r="58" />
+                <circle cx="130" cy="80" r="50" />
+              </>
+              <path d="m82 104 34-53 23 34 16-22 27 41zM23 65h44m126 0h44M23 80h38m138 0h38M23 95h44m126 0h44" />
+            </>
+          )
+        }
+      </svg>
       {
         type === "movie" && (
           <span class="ticket-cover__film" aria-hidden="true" />

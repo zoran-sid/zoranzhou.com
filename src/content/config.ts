@@ -229,25 +229,6 @@ const ticketsCollection = defineCollection({
       .transform((day) => new Date(`${day}T00:00:00Z`)),
     type: z.enum(ticketTypes),
     publication: z.enum(["draft", "approved"]).default("draft"),
-    // A cleared CMS cover is absent; the collection front falls back to its first photo.
-    cover: z
-      .object({
-        src: z.string().trim().nullish(),
-        alt: z.string().nullish(),
-      })
-      .nullish()
-      .transform((value) =>
-        value?.src
-          ? { src: value.src, alt: value.alt || undefined }
-          : undefined,
-      )
-      .refine(
-        (value) =>
-          !value ||
-          /^\/(?!\/)[^\s]+$/.test(value.src) ||
-          /^https?:\/\/[^\s]+$/i.test(value.src),
-        "封面须为站内路径或 HTTP(S) 链接。",
-      ),
     // Pages CMS stores the category-specific ticket template as one block object.
     details: z
       .object({
