@@ -4,6 +4,8 @@ import { unified } from "unified";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
 import headingLevels from "./markdown/heading-levels.mjs";
@@ -45,10 +47,7 @@ function absoluteUrls(pageUrl: URL) {
         for (const attribute of ["href", "src"]) {
           const value = current.properties[attribute];
           if (typeof value === "string")
-            current.properties[attribute] = absoluteResourceUrl(
-              value,
-              pageUrl,
-            );
+            current.properties[attribute] = absoluteResourceUrl(value, pageUrl);
         }
       }
       current.children?.forEach(visit);
@@ -57,7 +56,10 @@ function absoluteUrls(pageUrl: URL) {
   };
 }
 
-async function renderFeedContent(entry: WritingEntry, site: URL): Promise<string> {
+async function renderFeedContent(
+  entry: WritingEntry,
+  site: URL,
+): Promise<string> {
   // Resolve relative resources against the canonical directory form of the page.
   const pageUrl = new URL(`${entryPath(entry).replace(/\/$/, "")}/`, site);
   const file = unified()
@@ -65,9 +67,19 @@ async function renderFeedContent(entry: WritingEntry, site: URL): Promise<string
     .use(remarkGfm)
     .use(headingLevels)
     .use(remarkRehype, { allowDangerousHtml: true })
+    // Parse authored HTML too, so its images and links receive the same treatment
+    // as Markdown. Feed readers need static HTML without page scripts or styles.
+    .use(rehypeRaw)
     .use(rehypeSlug)
+    .use(rehypeSanitize, {
+      ...defaultSchema,
+      // Preserve heading/footnote targets in this standalone feed fragment.
+      clobberPrefix: "",
+      tagNames: [...(defaultSchema.tagNames ?? []), "figure", "figcaption"],
+      strip: [...(defaultSchema.strip ?? []), "style", "iframe"],
+    })
     .use(absoluteUrls(pageUrl))
-    .use(rehypeStringify, { allowDangerousHtml: true });
+    .use(rehypeStringify);
   const result = await file.process(entry.body);
   return String(result);
 }

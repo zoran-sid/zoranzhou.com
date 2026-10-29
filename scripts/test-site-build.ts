@@ -192,11 +192,22 @@ for (const locale of ["zh-CN", "en"]) {
     ...feed.matchAll(/<item>[\s\S]*?<link>(.*?)<\/link>[\s\S]*?<\/item>/g),
   ].map((match) => new URL(match[1]));
   assert.ok(links.length > 0);
-  assert.match(
-    feed,
-    /<content:encoded>/,
-    `${locale}: RSS items include full content`,
-  );
+  for (const [index, item] of [
+    ...feed.matchAll(/<item>([\s\S]*?)<\/item>/g),
+  ].entries()) {
+    const content = item[1].match(
+      /<content:encoded>([\s\S]*?)<\/content:encoded>/,
+    )?.[1];
+    assert.ok(
+      content?.trim(),
+      `${locale}: RSS item ${index + 1} includes full content`,
+    );
+    assert.doesNotMatch(
+      content,
+      /&lt;(?:script|style|iframe)(?:\s|&gt;)/,
+      `${locale}: RSS excludes executable page markup`,
+    );
+  }
   assert.ok(
     feed.includes("href=&quot;https://zoranzhou.com/"),
     `${locale}: RSS internal links use absolute URLs`,
