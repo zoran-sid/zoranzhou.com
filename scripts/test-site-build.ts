@@ -12,6 +12,18 @@ const files = (directory: string): string[] =>
   );
 const allFiles = files(root);
 const htmlFiles = allFiles.filter((file) => file.endsWith(".html"));
+const commentIndex = JSON.parse(readFileSync(join(root, "comment-pages.json"), "utf8"));
+assert.equal(commentIndex.version, 1);
+assert.ok(commentIndex.pages.length > 0);
+assert.equal(new Set(commentIndex.pages.map((page: {path: string}) => page.path)).size, commentIndex.pages.length);
+for (const page of commentIndex.pages) {
+  assert.match(page.path, /^\/(zh-CN|en)\/(blog|essays|research|tickets)\//);
+  assert.ok(page.title.trim());
+  const html = readFileSync(join(root, page.path.slice(1), "index.html"), "utf8");
+  assert.ok(html.includes('data-comments'), `${page.path}: only public discussion pages enter the index`);
+  assert.ok(html.includes(`path=${encodeURIComponent(page.path)}`), `${page.path}: article-specific comment subscription`);
+}
+assert.doesNotMatch(JSON.stringify(commentIndex), /netguard/i);
 const origin = "https://zoranzhou.com";
 const sourceBooks = parseMediaList(
   readFileSync("src/content/media.md", "utf8"),

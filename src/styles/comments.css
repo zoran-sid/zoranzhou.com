@@ -41,6 +41,27 @@
   line-height: 1.8;
   color: var(--muted);
 }
+.comments__subscriptions {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.comments__subscriptions p {
+  margin: 0;
+  color: var(--muted);
+}
+.comments__subscription-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.5rem;
+}
+.comments__subscription-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
 .comments__load[hidden] {
   display: none;
 }

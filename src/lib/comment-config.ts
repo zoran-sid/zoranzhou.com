@@ -4,6 +4,12 @@ import type { Locale } from "../i18n/utils";
 export const commentServer = "https://zorancomment.xyz";
 export const commentAvatarCount = 100;
 
+export function commentFeedUrl(path?: string): string {
+  const url = new URL("/api/comment/rss", commentServer);
+  if (path) url.searchParams.set("path", commentPath(path));
+  return url.href;
+}
+
 export function commentAvatarPath(index: number): string {
   const normalized =
     ((index % commentAvatarCount) + commentAvatarCount) % commentAvatarCount;
@@ -35,6 +41,7 @@ export function commentOptions(path: string, locale: Locale) {
     reaction: false,
     pageview: false,
     comment: false,
+    noRss: true,
     locale: {
       like: locale === "zh-CN" ? "点赞" : "Like",
       cancelLike: locale === "zh-CN" ? "已点赞" : "Liked",

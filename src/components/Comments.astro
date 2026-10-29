@@ -1,6 +1,6 @@
 ---
 import { type Locale } from "../i18n/utils";
-import { commentPath } from "../lib/comment-config";
+import { commentPath, commentFeedUrl } from "../lib/comment-config";
 import "@waline/client/style";
 import "../styles/comments.css";
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
@@ -76,6 +76,19 @@ const zh = locale === "zh-CN";
     <p role="status" data-comments-status></p>
   </div>
   <div class="comments__widget" data-comments-widget></div>
+  <div class="comments__subscriptions">
+    <p>
+      {zh
+        ? "用 RSS 关注讨论，按文章查看评论和回复。"
+        : "Follow discussions in RSS, with comments and replies grouped by article."}
+    </p>
+    <div class="comments__subscription-links">
+      <a href={commentFeedUrl(Astro.url.pathname)}
+        >{zh ? "订阅本文评论" : "Subscribe to this discussion"}</a>
+      <a href={commentFeedUrl()}
+        >{zh ? "按文章订阅全部评论" : "Subscribe to all discussions"}</a>
+    </div>
+  </div>
   <noscript
     ><p>
       {

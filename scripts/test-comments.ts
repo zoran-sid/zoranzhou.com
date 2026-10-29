@@ -7,6 +7,7 @@ import {
   commentOptions,
   commentPath,
   commentServer,
+  commentFeedUrl,
 } from "../src/lib/comment-config";
 
 test("one comment thread per page regardless of trailing slash, query or fragment", () => {
@@ -35,6 +36,7 @@ test("Waline uses the supplied server, site theme and local page language withou
   assert.equal(zh.lang, "zh-CN");
   assert.equal(en.lang, "en");
   assert.equal(zh.pageview, false);
+  assert.equal(zh.noRss, true);
   assert.equal(zh.imageUploader, false);
   assert.equal(typeof zh.search.search, "function");
   assert.equal(zh.emoji[0].items.length, 24);
@@ -50,6 +52,21 @@ test("Waline uses the supplied server, site theme and local page language withou
     /Cross-Origin-Opener-Policy: same-origin-allow-popups/,
     "Waline desktop login needs the popup opener to return login state",
   );
+});
+
+test("comment subscriptions expose the current article and grouped site feed", () => {
+  assert.equal(commentFeedUrl(), `${commentServer}/api/comment/rss`);
+  const feed = new URL(
+    commentFeedUrl("/zh-CN/blog/example/?ref=home#comments"),
+  );
+  assert.equal(feed.origin, commentServer);
+  assert.equal(feed.searchParams.get("path"), "/zh-CN/blog/example");
+  const component = readFileSync(
+    new URL("../src/components/Comments.astro", import.meta.url),
+    "utf8",
+  );
+  assert.match(component, /订阅本文评论/);
+  assert.match(component, /按文章订阅全部评论/);
 });
 
 test("anonymous avatar pool uses stable, local paths", () => {
