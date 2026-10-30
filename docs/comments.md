@@ -24,7 +24,7 @@ DISABLE_USERAGENT=true
 
 全部评论继续使用 `https://zorancomment.xyz/api/comment/rss`，单篇使用该地址的 `path` 参数。新评论更新同一文章条目，GUID 保持稳定；阅读器如何将更新标为未读由软件决定。旧版按单条评论显示的缓存可能仍留在阅读器中，需要在那里清理或重新添加订阅。
 
-网站静态生成 `comment-pages.json`，只包含已发布、开放评论页面的路径、标题和语言。Waline 的 `article-feed.cjs` 从这个固定地址读取标题与公开页面范围，并沿用 Waline 的评论审核条件和 Markdown 清理。不会读取邮箱、IP 或认证令牌。数据库没有新增表和写操作；`email` / `user_id` 定向回复订阅保持 Waline 原有规则。
+网站静态生成 `comment-pages.json`，只包含已发布、开放评论页面的路径、标题和语言。Waline 的 `article-feed.cjs` 从这个固定地址读取标题与公开页面范围；主域名不可读时使用同一网站的 `zoranzhou-com.pages.dev` 域名。两处均读取失败则暂停输出，避免展示未经公开页面范围筛选的评论。沿用 Waline 的评论审核条件和 Markdown 清理，不会读取邮箱、IP 或认证令牌。数据库没有新增表和写操作；`email` / `user_id` 定向回复订阅保持 Waline 原有规则。
 
 每个页面以去掉末尾斜杠的路径作为评论标识；网址中的查询参数与锚点不会生成新的讨论串。中文与英文使用各自的路径，评论分开。改标题不会改变评论；修改文章或票根的 slug 会改变路径，需保留原标识或另做迁移。
 
