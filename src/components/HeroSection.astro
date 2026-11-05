@@ -1,5 +1,5 @@
 ---
-import NoteCard from "./NoteCard.astro";
+import NoteTimeline from "./NoteTimeline.astro";
 import { localizePath, type Locale } from "../i18n/utils";
 import type { WritingEntry } from "../lib/writing";
 interface Props {
@@ -55,7 +55,7 @@ const zh = locale === "zh-CN";
       <div class="garden-notes__latest">
         {
           latestNote ? (
-            <NoteCard entry={latestNote} locale={locale} compact />
+            <NoteTimeline entries={[latestNote]} locale={locale} compact />
           ) : (
             <p class="garden-notes__empty">
               {zh

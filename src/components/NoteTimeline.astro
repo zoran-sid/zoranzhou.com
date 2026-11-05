@@ -1,0 +1,92 @@
+---
+import { getCollection } from "astro:content";
+import type { Locale } from "../i18n/utils";
+import type { WritingEntry } from "../lib/writing";
+import { groupNotes } from "../lib/note-timeline";
+import { getTickets } from "../lib/tickets";
+import { linkedNote } from "../lib/ticket-model";
+import NoteEntry from "./NoteEntry.astro";
+import "../styles/notes.css";
+interface Props {
+  entries: WritingEntry[];
+  locale: Locale;
+  compact?: boolean;
+}
+const { entries, locale, compact = false } = Astro.props;
+const groups = groupNotes(entries, locale);
+const [tickets, notes] = await Promise.all([
+  getTickets(),
+  getCollection("blog"),
+]);
+const associated = tickets.map((ticket) => ({
+  ticket,
+  note: linkedNote(ticket.data.note, notes),
+}));
+const zh = locale === "zh-CN";
+---
+
+<div
+  class:list={["note-timeline", { "note-timeline--compact": compact }]}
+  data-note-timeline
+>
+  {
+    groups.map((group, index) => (
+      <section
+        class="note-timeline__month"
+        aria-label={`${group.year} ${group.label}`}
+      >
+        {!compact && (
+          <>
+            {groups[index - 1]?.year !== group.year && (
+              <h2 class="note-timeline__year">{group.year}</h2>
+            )}
+            <h3 class="note-timeline__month-label">{group.label}</h3>
+          </>
+        )}
+        <ol class="note-timeline__entries" role="list">
+          {group.entries.map((entry) => (
+            <li>
+              <NoteEntry
+                entry={entry}
+                locale={locale}
+                compact={compact}
+                tickets={associated
+                  .filter(
+                    (item) =>
+                      entry.collection === "blog" && item.note?.id === entry.id,
+                  )
+                  .map((item) => item.ticket)}
+              />
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))
+  }
+  <dialog
+    class="note-viewer"
+    data-note-viewer
+    aria-label={zh ? "随记照片" : "Note photos"}
+  >
+    <div class="note-viewer__toolbar">
+      <span data-note-photo-count aria-live="polite"></span>
+      <button type="button" data-note-photo-close autofocus
+        >{zh ? "关闭" : "Close"}</button
+      >
+    </div>
+    <div class="note-viewer__stage" data-note-photo-stage></div>
+    <div class="note-viewer__navigation">
+      <button type="button" data-note-photo-prev
+        >{zh ? "上一张" : "Previous"}</button
+      >
+      <p data-note-photo-caption></p>
+      <button type="button" data-note-photo-next
+        >{zh ? "下一张" : "Next"}</button
+      >
+    </div>
+  </dialog>
+</div>
+<script>
+  import { initNoteTimelines } from "../lib/notes-client";
+  initNoteTimelines();
+</script>

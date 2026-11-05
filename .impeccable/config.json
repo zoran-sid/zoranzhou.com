@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-10-24T06:36:39.997Z",
         "reason": "Agent review: line 234 is a regular expression reading img tags from imported Douban HTML, not rendered image markup; parsed URLs are validated before display."
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "scripts/test-note-timeline.ts"
+        ],
+        "createdAt": "2026-11-05T05:56:53.912Z",
+        "reason": "Agent: the matched text is a negative test assertion verifying extracted image markup is absent; this file is not shipped UI."
       }
     ]
   }

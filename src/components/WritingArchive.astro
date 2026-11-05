@@ -2,7 +2,6 @@
 import ArrowIcon from "./ArrowIcon.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleRow from "./ArticleRow.astro";
-import NoteCard from "./NoteCard.astro";
 import { editorial } from "../i18n/editorial";
 import { localizePath, type Locale } from "../i18n/utils";
 import type { WritingEntry } from "../lib/writing";
@@ -128,16 +127,10 @@ const filters = [
         <p class="archive-count">{page.total} {c.results}</p>
         {
           entries.length > 0 ? (
-            <div
-              class:list={[format === "note" ? "notes-feed" : "writing-list"]}
-            >
-              {entries.map((entry) =>
-                format === "note" ? (
-                  <NoteCard entry={entry} locale={locale} />
-                ) : (
-                  <ArticleRow entry={entry} locale={locale} />
-                ),
-              )}
+            <div class="writing-list">
+              {entries.map((entry) => (
+                <ArticleRow entry={entry} locale={locale} />
+              ))}
             </div>
           ) : (
             <div class="empty-note">

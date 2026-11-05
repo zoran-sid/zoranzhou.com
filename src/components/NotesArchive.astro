@@ -1,0 +1,84 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import NoteTimeline from "./NoteTimeline.astro";
+import ArrowIcon from "./ArrowIcon.astro";
+import { localizePath, type Locale } from "../i18n/utils";
+import type { WritingEntry } from "../lib/writing";
+import type { PageLinks } from "../lib/pagination";
+interface Props {
+  entries: WritingEntry[];
+  page: PageLinks;
+}
+const { entries, page } = Astro.props;
+const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
+const title = zh ? "随记" : "Notes";
+const description = zh
+  ? "几句话，一张照片，把日常慢慢串成故事。"
+  : "A few words, a photograph. Everyday moments, one after another.";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="page-container notes-page">
+    <header class="notes-page__intro">
+      <h1>{title}</h1>
+      <p>{description}</p>
+      <div class="notes-page__meta">
+        <span
+          >{
+            zh
+              ? `${page.total} 条随记 · 由近到远`
+              : `${page.total} ${page.total === 1 ? "note" : "notes"} · Newest first`
+          }</span
+        >
+        <span>{zh ? "香港时间 UTC+8" : "Hong Kong time · UTC+8"}</span>
+        <a href={localizePath("/subscribe", locale)}
+          >{zh ? "订阅更新" : "Subscribe"}</a
+        >
+      </div>
+    </header>
+    {
+      entries.length ? (
+        <NoteTimeline entries={entries} locale={locale} />
+      ) : (
+        <div class="notes-page__empty">
+          <p>
+            {zh
+              ? "第一条随记还在酝酿。往后的片刻，会沿着时间留在这里。"
+              : "The first note is still to come. New moments will find their place here."}
+          </p>
+          <a href={localizePath("/blog", locale)}>
+            {zh ? "先读读文章" : "Explore the writing"}
+          </a>
+        </div>
+      )
+    }
+    {
+      page.last > 1 && (
+        <nav
+          class="pagination"
+          aria-label={zh ? "随记时间线分页" : "Note timeline pages"}
+        >
+          {page.prev ? (
+            <a href={localizePath(page.prev, locale)}>
+              <ArrowIcon direction="left" /> {zh ? "较新的随记" : "Newer notes"}
+            </a>
+          ) : (
+            <span />
+          )}
+          <span>
+            {page.current} / {page.last}
+          </span>
+          {page.next ? (
+            <a href={localizePath(page.next, locale)}>
+              {zh ? "更早的随记" : "Earlier notes"}{" "}
+              <ArrowIcon direction="right" />
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )
+    }
+  </div>
+</BaseLayout>

@@ -1,0 +1,210 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { ImageMetadata } from "astro";
+import type { Locale } from "../i18n/utils";
+import { entryPath, type WritingEntry } from "../lib/writing";
+import {
+  noteAnchor,
+  noteTimeZone,
+  renderTimelineNote,
+} from "../lib/note-timeline";
+import NoteLocation from "./NoteLocation.astro";
+import sharp from "sharp";
+import { resolve, posix } from "node:path";
+interface Props {
+  entry: WritingEntry;
+  locale: Locale;
+  compact?: boolean;
+  tickets?: CollectionEntry<"tickets">[];
+}
+const { entry, locale, compact = false, tickets = [] } = Astro.props;
+const zh = locale === "zh-CN";
+const id = noteAnchor(entry);
+const permalink = entryPath(entry);
+const sourceAssets = import.meta.glob<{ default: ImageMetadata }>(
+  "../{assets,content}/**/*.{png,jpg,jpeg,webp,avif,gif,svg}",
+);
+const note = await renderTimelineNote(entry.body, {
+  id,
+  permalink,
+  cover: entry.data.cover,
+  limit: compact ? (zh ? 180 : 320) : zh ? 420 : 700,
+  resolveImage: async (src) => {
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(src);
+    } catch {
+      return undefined;
+    }
+    const key = posix.join(
+      "../content",
+      entry.collection,
+      posix.dirname(entry.id),
+      decoded,
+    );
+    const asset = await sourceAssets[key]?.();
+    return asset?.default;
+  },
+});
+const date = entry.data.date;
+const day = date.toLocaleDateString(zh ? "zh-CN" : "en-GB", {
+  timeZone: noteTimeZone,
+  month: "short",
+  day: "numeric",
+});
+const time = date.toLocaleTimeString("en-GB", {
+  timeZone: noteTimeZone,
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+const gallery = note.images;
+const publicRoot = resolve("public");
+const photos = await Promise.all(
+  gallery.map(async (image) => {
+    if (image.src.startsWith("/")) {
+      try {
+        const path = resolve(publicRoot, `.${decodeURIComponent(image.src)}`);
+        if (path.startsWith(`${publicRoot}/`)) {
+          const { width, height } = await sharp(path).metadata();
+          return { ...image, width, height };
+        }
+      } catch {
+        /* Missing/local unsupported images retain their original URL. */
+      }
+    }
+    return image;
+  }),
+);
+const photoGroups = [photos.slice(0, 6), photos.slice(6)].filter(
+  (group) => group.length,
+);
+---
+
+<article
+  class="note-entry"
+  id={id}
+  data-note-entry
+  aria-label={`${entry.data.title} · ${day} ${time}`}
+>
+  <header class="note-entry__date">
+    <a
+      href={`#${encodeURIComponent(id)}`}
+      aria-label={date.toLocaleString(zh ? "zh-CN" : "en-GB", {
+        timeZone: noteTimeZone,
+      })}
+    >
+      <time datetime={date.toISOString()}
+        ><span>{day}</span><span>{time}</span></time
+      >
+    </a>
+  </header>
+  <div class="note-entry__main">
+    <div data-note-copy>
+      {
+        note.truncated && (
+          <p class="note-entry__excerpt" data-note-excerpt hidden>
+            {note.excerpt}
+          </p>
+        )
+      }
+      <div class="note-entry__body" id={`${id}-body`} data-note-body>
+        <Fragment set:html={note.html} />
+      </div>
+      {
+        note.truncated && (
+          <button
+            class="note-entry__expand"
+            type="button"
+            hidden
+            data-note-expand
+            aria-expanded="true"
+            aria-controls={`${id}-body`}
+            data-open-label={zh ? "展开全文" : "Read more"}
+            data-close-label={zh ? "收起全文" : "Show less"}
+          >
+            {zh ? "收起全文" : "Show less"}
+          </button>
+        )
+      }
+    </div>
+    {
+      photoGroups.map((images, groupIndex) => {
+        const Gallery = (
+          <div
+            class:list={[
+              "note-entry__gallery",
+              { "note-entry__gallery--single": gallery.length === 1 },
+            ]}
+            style={`--note-columns: ${gallery.length === 1 ? 1 : gallery.length === 2 || gallery.length === 4 ? 2 : 3}`}
+          >
+            {images.map((image, index) => (
+              <a
+                class="note-entry__photo"
+                href={image.src}
+                data-note-photo
+                aria-label={
+                  zh
+                    ? `放大照片 ${groupIndex * 6 + index + 1} / ${gallery.length}`
+                    : `Enlarge photo ${groupIndex * 6 + index + 1} of ${gallery.length}`
+                }
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt ?? ""}
+                  width={image.width}
+                  height={image.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
+            ))}
+          </div>
+        );
+        return groupIndex === 0 ? (
+          Gallery
+        ) : (
+          <details class="note-entry__photos-more">
+            <summary>
+              {zh
+                ? `还有 ${images.length} 张照片`
+                : `${images.length} more photos`}
+            </summary>
+            {Gallery}
+          </details>
+        );
+      })
+    }
+    <NoteLocation
+      name={entry.data.location}
+      href={entry.data.locationUrl}
+      locale={locale}
+    />
+    {
+      tickets.length > 0 && (
+        <ul class="note-entry__tickets" role="list">
+          {tickets.map((ticket) => (
+            <li>
+              <a href={entryPath(ticket)}>
+                {zh ? "票根" : "Ticket"} · {ticket.data.title}
+                {ticket.data.lang !== locale
+                  ? ` (${ticket.data.lang === "en" ? "English" : "中文"})`
+                  : ""}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <footer class="note-entry__footer">
+      {
+        note.unresolvedImages && (
+          <a href={permalink}>
+            {zh ? "查看原记录的配图" : "View original attachments"}
+          </a>
+        )
+      }
+      <a href={`${permalink}#comments`}>{zh ? "评论" : "Comment"}</a>
+    </footer>
+  </div>
+</article>
