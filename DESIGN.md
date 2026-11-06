@@ -45,38 +45,36 @@ colors:
   ticket-receipt: "#c5b48b"
   ticket-travel: "#84b8af"
   ticket-other: "#8fa99c"
-  ticket-cover-default-stock: "#e4eced"
-  ticket-cover-default-print: "#203b47"
-  ticket-cover-movie-stock: "#dcebf0"
-  ticket-cover-movie-print: "#173d4c"
-  ticket-cover-concert-stock: "#e8dfc9"
-  ticket-cover-concert-print: "#373453"
-  ticket-cover-stage-stock: "#eee1cb"
-  ticket-cover-stage-print: "#62452c"
-  ticket-cover-exhibition-stock: "#eeede5"
-  ticket-cover-exhibition-print: "#354b44"
-  ticket-cover-sport-stock: "#e1ead7"
-  ticket-cover-sport-print: "#284b3c"
-  ticket-cover-train-stock: "#eedbd0"
-  ticket-cover-train-print: "#704331"
-  ticket-cover-flight-stock: "#e3e8df"
-  ticket-cover-flight-print: "#354a53"
-  ticket-cover-travel-stock: "#dce9e1"
-  ticket-cover-travel-print: "#31594e"
-  ticket-cover-other-stock: "#e7e4d8"
-  ticket-cover-other-print: "#4b5145"
-  ticket-cover-receipt-stock: "#f0e8d9"
-  ticket-cover-receipt-print: "#514b3c"
-  ticket-cover-dark-default-stock: "#243b45"
-  ticket-cover-dark-default-print: "#d9e9ed"
-  ticket-cover-dark-concert-stock: "#343149"
-  ticket-cover-dark-concert-print: "#ece0bf"
-  ticket-cover-dark-stage-stock: "#40342d"
-  ticket-cover-dark-stage-print: "#edddc6"
-  ticket-cover-dark-green-stock: "#2b3c34"
-  ticket-cover-dark-green-print: "#dfebdd"
-  ticket-cover-dark-receipt-stock: "#3b372e"
-  ticket-cover-dark-receipt-print: "#e9e2d3"
+  ticket-cover-movie-highlight: "#d2bd98"
+  ticket-cover-movie-shade: "#a88d66"
+  ticket-cover-movie-ink: "#2e2419"
+  ticket-cover-concert-stock: "#221a3d"
+  ticket-cover-concert-ink: "#f6eaff"
+  ticket-cover-concert-accent: "#ffd166"
+  ticket-cover-stage-stock: "#f3e6cf"
+  ticket-cover-stage-ink: "#3a1d24"
+  ticket-cover-stage-accent: "#8c2b4a"
+  ticket-cover-exhibition-stock: "#f5f2ea"
+  ticket-cover-exhibition-ink: "#1d2529"
+  ticket-cover-exhibition-accent: "#2f5fb3"
+  ticket-cover-sport-stock: "#edf3e3"
+  ticket-cover-sport-ink: "#183a25"
+  ticket-cover-sport-accent: "#23794b"
+  ticket-cover-train-stock: "#e3edf7"
+  ticket-cover-train-ink: "#183451"
+  ticket-cover-train-accent: "#b23b31"
+  ticket-cover-flight-stock: "#f6f3ee"
+  ticket-cover-flight-ink: "#1b2b3c"
+  ticket-cover-flight-accent: "#2468a8"
+  ticket-cover-travel-stock: "#fbf1e2"
+  ticket-cover-travel-ink: "#2b3b36"
+  ticket-cover-travel-accent: "#23716a"
+  ticket-cover-receipt-stock: "#fbfaf6"
+  ticket-cover-receipt-ink: "#2a2a2a"
+  ticket-cover-receipt-accent: "#2f7a5c"
+  ticket-cover-other-stock: "#efe4d1"
+  ticket-cover-other-ink: "#3a2f25"
+  ticket-cover-other-accent: "#2c7a7b"
 typography:
   brand:
     fontFamily: Canela, Georgia, serif
@@ -126,12 +124,12 @@ typography:
     lineHeight: 1.9
   ticket-cover-title:
     fontFamily: Canela Deck, Canela, Georgia, serif
-    fontSize: clamp(1.25rem, 7cqi, 1.875rem)
+    fontSize: clamp(1.2rem, 7.5cqi, 1.75rem)
     fontWeight: 400
     lineHeight: 1.25
   ticket-cover-date:
     fontFamily: Canela Deck, Canela, Georgia, serif
-    fontSize: clamp(1.3rem, 8cqi, 2rem)
+    fontSize: clamp(1.5rem, 10cqi, 2.25rem)
     fontWeight: 400
     lineHeight: 1
 rounded:
@@ -148,13 +146,13 @@ spacing:
   section: 64px
 components:
   ticket-cover:
-    backgroundColor: "{colors.ticket-cover-default-stock}"
-    textColor: "{colors.ticket-cover-default-print}"
+    backgroundColor: "{colors.ticket-cover-movie-highlight}"
+    textColor: "{colors.ticket-cover-movie-ink}"
     rounded: "{rounded.control}"
     padding: 6%
-  ticket-cover-movie:
-    backgroundColor: "{colors.ticket-cover-movie-stock}"
-    textColor: "{colors.ticket-cover-movie-print}"
+  ticket-cover-concert:
+    backgroundColor: "{colors.ticket-cover-concert-stock}"
+    textColor: "{colors.ticket-cover-concert-ink}"
   comment-emoji-popup:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
@@ -210,23 +208,28 @@ Taste 的调色库与真实案例研究用于比较方向；用户已否决其�
 
 ### Ticket cover scope
 
-列表封面使用独立的纸色与印墨配对，规范中的 `ticket-cover-*-stock` / `ticket-cover-*-print` 对应 `src/styles/ticket-covers.css` 内 `.ticket-cover` 的局部 `--stock` / `--print`；它们不替换全站颜色或详情票面的 `ticket-*` 分类色。细线由当前印墨与透明色混合 25% 形成，图案底由印墨 6% 与纸色混合形成。
+列表封面分两种：电影使用低调的手机钱包式电子票（`.ticket-pass`），其余类别使用彩色印版票（`.ticket-cover`）。两者都不替换全站颜色或详情票面的 `ticket-*` 分类色。
 
-| 类别 | 浅色配对前缀 | 深色配对前缀 | 印刷语言 |
-| --- | --- | --- | --- |
-| 默认 | `ticket-cover-default` | `ticket-cover-dark-default` | 冷灰纸与深墨 |
-| 电影 | `ticket-cover-movie` | `ticket-cover-dark-default` | 雾蓝纸、深蓝墨、反色胶片画框 |
-| 音乐会 | `ticket-cover-concert` | `ticket-cover-dark-concert` | 暖纸与靛墨、唱片沟槽、粗日期 |
-| 戏剧、演出、喜剧 | `ticket-cover-stage` | `ticket-cover-dark-stage` | 节目单暖纸与棕墨、舞台拱门 |
-| 展览 | `ticket-cover-exhibition` | `ticket-cover-dark-green` | 灰白纸与绿墨、几何版画留白 |
-| 赛事 | `ticket-cover-sport` | `ticket-cover-dark-green` | 浅绿纸与深绿墨、跑道 |
-| 火车 | `ticket-cover-train` | `ticket-cover-dark-stage` | 暖桃纸与棕墨、路线 |
-| 航班 | `ticket-cover-flight` | `ticket-cover-dark-green` | 灰绿纸与蓝灰墨、航线 |
-| 旅行 | `ticket-cover-travel` | `ticket-cover-dark-green` | 浅青纸与绿墨、路线与邮戳 |
-| 其他 | `ticket-cover-other` | `ticket-cover-dark-green` | 灰米纸与灰绿墨、纪念邮戳 |
-| 小票、餐饮、发票 | `ticket-cover-receipt` | `ticket-cover-dark-receipt` | 米色纸与暖灰墨 |
+电影票：香槟铜双色渐变（`ticket-cover-movie-highlight` → `-shade`，170°），叠加左上角柔光与一道斜向高光、内侧 1px 高光描边，12px 圆角，顶部中央为票夹式椭圆缺口。依次为影院行（圆形徽标、影院名，右侧“电影 · 年份”）、“影片”标签与标题、影厅 · 座位 · 观影时间三栏、地点，底部细线后为“查看票根 →”。日期只出现在观影时间栏内，与其他事实同字号，不作为大字号视觉焦点。
 
-**The Cover Scope Rule.** 2:3 竖向封面只用于票根列表，以原创 SVG 印刷图形表达类别；照片、海报和上传图片保留在详情页。封面与详情分别维护，不把封面的裁切与信息限额带入详情。
+其他类别共用同一骨架：类型行（右侧强调色图标）、彩色印版、标题、最多两项信息、撕口存根。存根以强调色 12% 着色并延伸到卡片边缘。印版由 `src/components/TicketArt.astro` 绘制，是自带配色的几何插画。`ticket-cover-*-stock` / `-ink` / `-accent` 对应 `--stock` / `--ink` / `--accent`。
+
+两种封面在明暗主题中都保持原色，暗色主题略微压暗。不显示海报、取票码、验证码或票号，不绘制二维码。
+
+| 类别 | 令牌前缀 | 卡面或纸、墨与印版 |
+| --- | --- | --- |
+| 电影 | `ticket-cover-movie` | 香槟铜金属卡面（Wallet 电子票），不使用印版 |
+| 音乐会 | `ticket-cover-concert` | 夜紫纸、金黄；暮色渐变、声波柱与黑胶唱片 |
+| 戏剧、演出、喜剧 | `ticket-cover-stage` | 节目单奶油纸、酒红；墨绿舞台、酒红幕布、金色帷幔与追光 |
+| 展览 | `ticket-cover-exhibition` | 画廊白纸、钴蓝；钴蓝圆、芥黄矩形、赭红三角的构成 |
+| 赛事 | `ticket-cover-sport` | 浅绿纸、球场绿；修剪条纹草坪、白色场线与赭色跑道 |
+| 火车 | `ticket-cover-train` | 车票浅蓝纸、红；晨光山丘、透视铁轨与红色列车 |
+| 航班 | `ticket-cover-flight` | 米白纸、航空蓝；蓝到杏色天空、云与虚线航迹 |
+| 旅行 | `ticket-cover-travel` | 沙色纸、青绿；明信片式落日、山与海浪 |
+| 小票、餐饮、发票 | `ticket-cover-receipt` | 热敏白纸、墨绿；薄荷底上的锯齿小票与条码 |
+| 其他 | `ticket-cover-other` | 牛皮纸、青色；齿孔邮票与邮戳 |
+
+**The Cover Scope Rule.** 2:3 竖向封面只用于票根列表：电影为金属电子票，其他类别以原创彩色 SVG 印版表达类别，同一种封面内骨架、字体与信息位置不变；照片、海报和上传图片保留在详情页。封面与详情分别维护，不把封面的裁切与信息限额带入详情。
 
 ## Typography
 
@@ -236,7 +239,7 @@ Taste 的调色库与真实案例研究用于比较方向；用户已否决其�
 
 ## Layout
 
-主站最大宽 76rem；长文为 42rem 正文和 14rem 目录，间距 5rem。首页以署名与“随记 / Notes”开篇：最新一条记录以正文预览和配图呈现，没有记录时保留简短空状态与列表入口。随后是精选文章、项目（有内容时）、封面书架、旅行手记，以及并列的跑步记录和最近观影。Writing 是分类与时间列表，Projects 是实际实践，Life 以摄影开篇，About 是头像与个人背景。Lab 保留当前学习与分阶段计划。
+主站最大宽 76rem；长文为 42rem 正文和 14rem 目录，间距 5rem。首页以署名与“随记 / Notes”开篇：署名、一句身份与内容说明和两个入口（精选文章、关于我）在左，最新一条随记在右（1024px 以下改为上下排列）；没有记录时保留简短空状态与列表入口。随后是精选文章、项目（有内容时）、旅行手记、封面书架，以及并列的跑步记录和最近观影。主导航为五个直接入口：文章、随记、生活、近况、关于我，旁边保留展开按钮，打开精选页面（随笔、摄影、书架、足迹，各附一行说明）；手机抽屉列出五个入口及说明，下方一行精选。完整目录留在页脚。Writing 只列长文，按年份分组，以“技术指南 / 研究分析 / 随笔”一组类型筛选；随记保留在自己的时间线，Projects 是实际实践，Life 以摄影开篇，About 是头像与个人背景。Lab 保留当前学习与分阶段计划。
 
 断点为 640、768、900、1024、1280px，具体组件按内容选择。窄屏单列，目录折叠，代码与表格在阅读列内部滚动。装饰层使用绝对或固定定位，不参与排版和命中测试。
 
@@ -256,9 +259,9 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 
 ## Shapes
 
-内容色面为直角；控件为 4px 小圆角。摄影为矩形原图。全屏光点由点与径向透明过渡构成；章节细线和轨道为真实矢量几何，不作为内容或数据图表。
+内容色面为直角；控件为 4px 小圆角。摄影为矩形原图，按原始比例完整显示：摄影页以等高行排列，每张占据与自身比例相同的格子，不裁切。全屏光点由点与径向透明过渡构成；章节细线和轨道为真实矢量几何，不作为内容或数据图表。
 
-详情票面沿用纸票的轮廓：12px 圆角、两侧缺口和虚线存根；消费与餐饮小票采用 4px 上角及锯齿底边。裁切只作用于背景，文字与键盘焦点保持完整。评论编辑框为 8px 圆角，使用主题细线与透明底色。列表封面使用 4px 圆角与 2:3 竖向纸面，两侧缺口位于高度 80% 处；日期存根使用虚线，音乐会和赛事分别使用 2px、3px 实线。
+详情票面沿用纸票的轮廓：12px 圆角、两侧缺口和虚线存根；消费与餐饮小票采用 4px 上角及锯齿底边。裁切只作用于背景，文字与键盘焦点保持完整。评论编辑框为 8px 圆角，使用主题细线与透明底色。电影列表封面使用 12px 圆角与顶部中央椭圆缺口；其他列表封面使用 4px 圆角，两侧缺口位于高度 80% 处，与日期存根的虚线对齐。
 
 ## Components
 
@@ -279,13 +282,11 @@ Karpathy Guidelines 用于代码收尾：减少重复状态和无效观察器，
 
 ### Ticket covers
 
-`src/components/TicketCard.astro` 提供链接与独立键盘焦点，`src/components/TicketCover.astro` 负责封面内容，`src/styles/ticket-covers.css` 负责纸色、几何与分类差异。列表网格由 `src/styles/tickets.css` 提供：最小列宽 17rem（不足时占满可用宽度），间距 1.5rem；每张封面最大宽 24rem，固定比例 2:3。封面内部为类别与标题、原创图形、主要信息、日期存根四段，内边距 6%，段间距 4cqi，存根行高 24cqi。
+`src/components/TicketCard.astro` 提供链接与独立键盘焦点，`src/components/TicketCover.astro` 负责两种封面的内容与字段选择，`src/components/TicketArt.astro` 负责非电影类别的彩色印版，`src/styles/ticket-covers.css` 负责卡面、间距与动效。列表网格由 `src/styles/tickets.css` 提供：最小列宽 17rem（不足时占满可用宽度），间距 1.5rem；每张封面最大宽 24rem，固定比例 2:3。
 
-标题采用现有标题字体，字号与行高见 `ticket-cover-title`，最多两行；英文继承 `--font-title-en`，中文继承 `--font-title-zh`。音乐会改用 UI 字体、标题 700 字重和日期 800 字重；赛事标题采用 UI 字体 800 字重。类别为 14px，字段标签与年份为 13px，字段值为 clamp(1rem, 4.8cqi, 1.125rem)，日期使用 `ticket-cover-date`。标题和日期的 cqi 相对每张封面计算。
+标题统一使用标题字体，最多两行。标签、类别、地点、年份与操作文字为 13px。电影票事实值为 clamp(0.95rem, 5.2cqi, 1.0625rem)，观影时间栏日期在上、开场时间在下；彩色票字段值为 clamp(0.95rem, 4.8cqi, 1.0625rem)，存根日期为强调色标题字体。交通票有起终点时显示路线。
 
-电影使用双卷盘与两侧齿孔；音乐会使用唱片椭圆沟槽；戏剧、演出和喜剧使用舞台拱门；展览使用几何版画；赛事使用跑道；交通使用路线及对应交通图形；旅行与其他纪念使用日期邮戳。所有图形均为组件中的内联 SVG 或 CSS 几何，设为装饰，不替代真实类别文字。
-
-封面最多显示两项真实字段，优先保留座位；交通票有起终点时显示路线。地点、字段值与可选票号各自截断，完整内容由详情提供。日期使用真实票面日期；不补造座位、航班号、旅程或活动信息。标题在悬停与键盘焦点时加下划线；焦点位于外层链接，保留 2px accent 轮廓与 4px 偏移。支持悬停且允许动态时封面上移 3px，过渡为 200ms ease-out；减少动态设置关闭该位移和过渡。
+日期使用真实票面日期；不补造座位、航班号、旅程或活动信息。标题在悬停与键盘焦点时加下划线；焦点位于外层链接，保留 2px accent 轮廓与 4px 偏移。支持悬停且允许动态时：电影票上移 4px、投影加深，一道柔光在 900ms 内掠过卡面；彩色票上移 4px、轻微倾斜 0.4° 并出现强调色柔影；箭头右移。减少动态设置关闭这些过渡。
 
 ### Comments: emoji and account likes
 

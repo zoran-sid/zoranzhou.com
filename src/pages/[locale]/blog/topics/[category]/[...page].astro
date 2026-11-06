@@ -1,19 +1,29 @@
 ---
 import WritingArchive from "../../../../../components/WritingArchive.astro";
 import { getWriting } from "../../../../../lib/writing";
-import { writingCategory } from "../../../../../lib/content-policy";
-import { paginateEntries } from "../../../../../lib/pagination";
+import {
+  writingCategory,
+  writingFormat,
+} from "../../../../../lib/content-policy";
+import {
+  ARTICLE_PAGE_SIZE,
+  paginateEntries,
+} from "../../../../../lib/pagination";
 import { locales } from "../../../../../i18n/utils";
+// Earlier subject URLs stay available; the writing index now leads with formats.
 export async function getStaticPaths() {
-  const entries = await getWriting();
+  const entries = (await getWriting()).filter(
+    (entry) => writingFormat(entry) !== "note",
+  );
   return locales.flatMap((locale) =>
-    ["technology", "research", "life"].flatMap((category) =>
+    (["technology", "research", "life"] as const).flatMap((category) =>
       paginateEntries(
         entries.filter(
           (entry) =>
             entry.data.lang === locale && writingCategory(entry) === category,
         ),
         `/blog/topics/${category}`,
+        ARTICLE_PAGE_SIZE,
       ).map(({ param, ...props }) => ({
         params: { locale, category, page: param },
         props: { ...props, category },

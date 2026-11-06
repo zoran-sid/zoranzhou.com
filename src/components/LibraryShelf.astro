@@ -24,18 +24,11 @@ const books = parseMediaList(mediaSource)
     >
       <header class="section-head">
         <div>
-          <>
-            <h2 id="library-heading">{zh ? "书架" : "Library"}</h2>
-            <p>
-              {zh
-                ? "从科幻到文学，书里还有许多值得停留的世界。"
-                : "Science fiction, literature, and worlds worth spending time in."}
-            </p>
-          </>
+          <h2 id="library-heading">{zh ? "书架" : "Library"}</h2>
         </div>
         <a class="text-link" href={localizePath("/library", locale)}>
           {zh ? "浏览书架" : "Browse the library"}
-          <ArrowIcon direction="up-right" />
+          <ArrowIcon direction="right" />
         </a>
       </header>
       <div class="media-grid">

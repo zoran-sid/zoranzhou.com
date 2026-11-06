@@ -5,6 +5,11 @@ export interface PageLinks {
   prev?: string;
   next?: string;
 }
+/**
+ * Long-form archives are grouped by year and stay on one page until the list
+ * outgrows a quick scan. Notes keep the default size for their timeline.
+ */
+export const ARTICLE_PAGE_SIZE = 50;
 export function paginateEntries<T>(entries: T[], base: string, size = 10) {
   const last = Math.max(1, Math.ceil(entries.length / size));
   return Array.from({ length: last }, (_, index) => ({

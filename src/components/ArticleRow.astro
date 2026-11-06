@@ -1,5 +1,4 @@
 ---
-import ArrowIcon from "./ArrowIcon.astro";
 import { displayDate, entryPath, type WritingEntry } from "../lib/writing";
 import { formatLabel, writingCategory } from "../lib/content-policy";
 import { readingTime } from "../lib/utils";
@@ -9,11 +8,28 @@ interface Props {
   entry: WritingEntry;
   locale: Locale;
   updated?: boolean;
+  /** Inside a year group the year is already the heading. */
+  withinYear?: boolean;
+  showFormat?: boolean;
+  showReadingTime?: boolean;
 }
-const { entry, locale, updated = false } = Astro.props;
+const {
+  entry,
+  locale,
+  updated = false,
+  withinYear = false,
+  showFormat = true,
+  showReadingTime = true,
+} = Astro.props;
 const c = editorial(locale);
 const date =
   updated && entry.data.updated ? entry.data.updated : entry.data.date;
+const shownDate = withinYear
+  ? date.toLocaleDateString(locale === "zh-CN" ? "zh-CN" : "en-GB", {
+      month: "short",
+      day: "numeric",
+    })
+  : displayDate(date, locale);
 ---
 
 <article
@@ -23,20 +39,18 @@ const date =
 >
   <div class="writing-row__meta">
     <time datetime={date.toISOString()}
-      >{updated && entry.data.updated ? `${c.updated} ` : ""}{
-        displayDate(date, locale)
-      }</time
-    ><span>{formatLabel(entry, locale)}</span>
+      >{updated && entry.data.updated ? `${c.updated} ` : ""}{shownDate}</time
+    >{showFormat && <span>{formatLabel(entry, locale)}</span>}
   </div>
   <div class="writing-row__body">
     <h3>
-      <a href={entryPath(entry)}
-        >{entry.data.title}<span class="row-arrow" aria-hidden="true"
-          ><ArrowIcon direction="up-right" /></span
-        ></a
-      >
-    </h3>{entry.data.description && <p>{entry.data.description}</p>}<span
-      class="reading-time">{readingTime(entry.body)} {c.reading}</span
-    >
+      <a href={entryPath(entry)}>{entry.data.title}</a>
+    </h3>{entry.data.description && <p>{entry.data.description}</p>}{
+      showReadingTime && (
+        <span class="reading-time">
+          {readingTime(entry.body)} {c.reading}
+        </span>
+      )
+    }
   </div>
 </article>

@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 import type { Locale } from "../i18n/utils";
 import { displayTicketDate, ticketTypeLabels } from "../lib/ticket-model";
 import { ticketFields, ticketJourney, ticketValue } from "../lib/ticket-fields";
+import TicketArt from "./TicketArt.astro";
 import TicketIcon from "./TicketIcon.astro";
 import "../styles/ticket-covers.css";
 interface Props {
@@ -15,6 +16,8 @@ const { title, date, type, details, location, lang } = ticket.data;
 const zh = locale === "zh-CN";
 const day = date.toISOString().slice(0, 10);
 const journey = ticketJourney(type, details);
+const transport = ["train", "flight", "travel"].includes(type);
+// Codes and numbers stay on the detail page only.
 const fields = ticketFields(type, details, locale).filter(
   (field) =>
     ![
@@ -27,202 +30,192 @@ const fields = ticketFields(type, details, locale).filter(
       "ticketNumber",
     ].includes(field.key),
 );
-const seat = fields.find((field) => field.key === "seat");
+const typeLabel = ticketTypeLabels[locale][type];
+const label = (key: string) => fields.find((field) => field.key === key);
+
+// Film: a quiet wallet pass. Cinema in the header, then screen, seat and showtime;
+// the date sits inside the showtime column rather than as a headline.
+const cinema = label("cinema");
+const showtime = label("startTime");
+const passFacts = [label("auditorium"), label("seat")].filter(
+  (field) => field !== undefined,
+);
+const [, month, dayOfMonth] = day.split("-").map(Number);
+const shortDate = zh
+  ? `${month}月${dayOfMonth}日`
+  : date.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    });
+
+// Every other category: a colour plate and a perforated date stub.
+const seat = label("seat");
 const primary = fields.find((field) => field.key !== "seat");
 const coverFields = [
   primary,
   seat ?? fields.find((field) => field.key !== primary?.key),
 ].filter(Boolean);
 const number = ticketValue(details, "ticketNumber");
-const transport = ["train", "flight", "travel"].includes(type);
-const stamp = ["travel", "other"].includes(type);
+const uid = ticket.id.replace(/[^a-z0-9]/gi, "");
 ---
 
-<div class="ticket-cover" data-type={type}>
-  <div class="ticket-cover__paper">
-    <header class="ticket-cover__heading">
-      <div class="ticket-cover__category">
-        <span>{ticketTypeLabels[locale][type]}</span><TicketIcon type={type} />
-      </div>
-      <Heading lang={lang}>{title}</Heading>
-    </header>
-    <div
-      class:list={[
-        "ticket-cover__picture",
-        { "ticket-cover__picture--stamp": stamp },
-      ]}
-    >
-      <svg
-        class="ticket-cover__art"
-        viewBox="0 0 260 160"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.4"
-        aria-hidden="true"
-      >
-        {
-          type === "movie" ? (
-            <>
-              <path d="M18 30h224v100H18zM32 42h196v76H32z" />
-              <>
-                <circle cx="101" cy="80" r="34" />
-                <circle cx="163" cy="80" r="34" />
-              </>
-              <>
-                <circle cx="101" cy="80" r="5" />
-                <circle cx="163" cy="80" r="5" />
-              </>
-              {[101, 163].map((x) => (
-                <>
-                  {[0, 72, 144, 216, 288].map((angle) => (
-                    <circle
-                      cx={x}
-                      cy="58"
-                      r="7"
-                      transform={`rotate(${angle} ${x} 80)`}
-                    />
-                  ))}
-                </>
-              ))}
-              <path d="M67 80v35c0 25 58 29 85 16s62-7 77 13" />
-            </>
-          ) : type === "concert" ? (
-            <>
-              {[62, 48, 34, 20].map((r) => (
-                <ellipse cx="130" cy="80" rx={r * 1.5} ry={r} />
-              ))}
-              <circle cx="130" cy="80" r="5" fill="currentColor" />
-              <path d="M18 80h48m128 0h48M130 6v12m0 124v12" />
-            </>
-          ) : ["theatre", "performance", "comedy"].includes(type) ? (
-            <>
-              <path d="M36 144V60a94 50 0 0 1 188 0v84M50 144V62a80 38 0 0 1 160 0v82M36 62h188M62 64c0 49-4 63-26 80m162-80c0 49 4 63 26 80M62 64c10 37 21 48 68 48s58-11 68-48M36 144h188" />
-              <path d="M82 64c5 18 17 30 48 30s43-12 48-30M92 144v-30m76 30v-30" />
-            </>
-          ) : type === "exhibition" ? (
-            <>
-              <path d="M36 24h188v112H36zM52 40h156v80H52z" />
-              <>
-                <circle cx="111" cy="80" r="36" />
-                <path d="m118 116 36-72 36 72zM75 116h115" />
-              </>
-            </>
-          ) : type === "sport" ? (
-            <>
-              {[0, 12, 24, 36].map((inset) => (
-                <rect
-                  x={26 + inset}
-                  y={16 + inset / 2}
-                  width={208 - inset * 2}
-                  height={128 - inset}
-                  rx={64 - inset / 2}
-                />
-              ))}
-              <path d="M130 16v36m0 56v36" stroke-dasharray="3 4" />
-            </>
-          ) : transport ? (
-            <>
-              <path
-                d="M30 112C92 112 80 48 134 48s62 45 96-16"
-                stroke-dasharray="4 5"
-              />
-              <>
-                <circle cx="30" cy="112" r="9" />
-                <circle cx="230" cy="32" r="9" />
-              </>
-              {type === "flight" ? (
-                <path
-                  d="m120 72 14-26-24-17 4-5 29 10 13-16 5 2-8 20 26 19-3 5-30-12-18 23z"
-                  fill="currentColor"
-                  stroke="none"
-                />
-              ) : (
-                <path d="M104 68h52v35h-52zM112 76h14v12h-14zm22 0h14v12h-14zM110 113l9-10m31 10-9-10" />
-              )}
-            </>
-          ) : (
-            <>
-              <>
-                <circle cx="130" cy="80" r="58" />
-                <circle cx="130" cy="80" r="50" />
-              </>
-              <path d="m82 104 34-53 23 34 16-22 27 41zM23 65h44m126 0h44M23 80h38m138 0h38M23 95h44m126 0h44" />
-            </>
-          )
-        }
-      </svg>
-      {
-        type === "movie" && (
-          <span class="ticket-cover__film" aria-hidden="true" />
-        )
-      }
-      {
-        stamp && (
-          <span class="ticket-cover__postmark" aria-hidden="true">
-            {day.slice(0, 4)}
-            <br />
-            {day.slice(5).replace("-", ".")}
+{
+  type === "movie" ? (
+    <div class="ticket-cover ticket-pass" data-type={type}>
+      <div class="ticket-pass__card">
+        <header class="ticket-pass__issuer">
+          <span class="ticket-pass__badge">
+            <TicketIcon type={type} />
           </span>
-        )
-      }
-    </div>
-    <div class="ticket-cover__information">
-      {
-        transport && journey ? (
-          <div class="ticket-cover__route" lang={lang}>
-            <span>
-              {journey.fromCode || journey.from || (zh ? "出发" : "From")}
+          <span
+            class="ticket-pass__issuer-name"
+            lang={cinema ? lang : undefined}
+          >
+            {cinema?.value ?? typeLabel}
+          </span>
+          <span class="ticket-pass__type">
+            {cinema ? `${typeLabel} · ` : ""}
+            {day.slice(0, 4)}
+          </span>
+        </header>
+        <div>
+          <p class="ticket-pass__label">{zh ? "影片" : "Film"}</p>
+          <Heading lang={lang}>{title}</Heading>
+        </div>
+        <dl class="ticket-pass__facts">
+          {passFacts.map((field) => (
+            <div>
+              <dt>{field!.label}</dt>
+              <dd lang={lang}>{field!.value}</dd>
+            </div>
+          ))}
+          <div>
+            <dt>
+              {showtime
+                ? zh
+                  ? "观影时间"
+                  : "Showtime"
+                : zh
+                  ? "观影日期"
+                  : "Date"}
+            </dt>
+            <dd>
+              <time datetime={day} aria-label={displayTicketDate(date, locale)}>
+                {shortDate}
+              </time>
+              {showtime && <span>{showtime.value}</span>}
+            </dd>
+          </div>
+        </dl>
+        {location && (
+          <p class="ticket-pass__location" lang={lang}>
+            {location}
+          </p>
+        )}
+        <footer class="ticket-pass__foot">
+          {lang !== locale && (
+            <span class="ticket-pass__lang">
+              {lang === "zh-CN" ? "中文" : "English"}
             </span>
+          )}
+          <span class="ticket-pass__open">
+            {zh ? "查看票根" : "View ticket"}
             <svg
-              width="24"
-              height="24"
+              width="14"
+              height="14"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
+              stroke-width="1.6"
               aria-hidden="true"
             >
-              <path d="M3 12h17m-6-6 6 6-6 6" />
+              <path d="M4 12h15m-6-6 6 6-6 6" />
             </svg>
-            <span>{journey.toCode || journey.to || (zh ? "抵达" : "To")}</span>
-          </div>
-        ) : (
-          <dl class="ticket-cover__fields">
-            {coverFields.map(
-              (field) =>
-                field && (
-                  <div>
-                    <dt>{field.label}</dt>
-                    <dd lang={lang}>{field.value}</dd>
-                  </div>
-                ),
-            )}
-          </dl>
-        )
-      }
-      {
-        location && (
-          <p class="ticket-cover__location" lang={lang}>
-            {location}
-          </p>
-        )
-      }
-    </div>
-    <footer class="ticket-cover__stub">
-      <time datetime={day} aria-label={displayTicketDate(date, locale)}
-        ><strong>{day.slice(5).replace("-", ".")}</strong><span
-          >{day.slice(0, 4)}</span
-        ></time
-      >
-      <div class="ticket-cover__stub-end">
-        {number && <span class="ticket-cover__number">No. {number}</span>}<span
-          >{zh ? "查看票根" : "View ticket"}</span
-        >{
-          lang !== locale && (
-            <span>{lang === "zh-CN" ? "中文" : "English"}</span>
-          )
-        }
+          </span>
+        </footer>
       </div>
-    </footer>
-  </div>
-</div>
+    </div>
+  ) : (
+    <div class="ticket-cover" data-type={type}>
+      <div class="ticket-cover__paper">
+        <p class="ticket-cover__category">
+          <span>{typeLabel}</span>
+          {number && <span class="ticket-cover__number">No. {number}</span>}
+          <TicketIcon type={type} />
+        </p>
+        <div class="ticket-cover__art">
+          <TicketArt type={type} uid={uid} />
+        </div>
+        <Heading lang={lang}>{title}</Heading>
+        <div class="ticket-cover__information">
+          {transport && journey ? (
+            <div class="ticket-cover__route" lang={lang}>
+              <span>
+                {journey.fromCode || journey.from || (zh ? "出发" : "From")}
+              </span>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+              >
+                <path d="M3 12h17m-6-6 6 6-6 6" />
+              </svg>
+              <span>
+                {journey.toCode || journey.to || (zh ? "抵达" : "To")}
+              </span>
+            </div>
+          ) : (
+            coverFields.length > 0 && (
+              <dl class="ticket-cover__fields">
+                {coverFields.map(
+                  (field) =>
+                    field && (
+                      <div>
+                        <dt>{field.label}</dt>
+                        <dd lang={lang}>{field.value}</dd>
+                      </div>
+                    ),
+                )}
+              </dl>
+            )
+          )}
+          {location && (
+            <p class="ticket-cover__location" lang={lang}>
+              {location}
+            </p>
+          )}
+        </div>
+        <footer class="ticket-cover__stub">
+          <time datetime={day} aria-label={displayTicketDate(date, locale)}>
+            <strong>{day.slice(5).replace("-", ".")}</strong>
+            <span>{day.slice(0, 4)}</span>
+          </time>
+          <div class="ticket-cover__stub-end">
+            {lang !== locale && (
+              <span>{lang === "zh-CN" ? "中文" : "English"}</span>
+            )}
+            <span class="ticket-cover__open">
+              {zh ? "查看票根" : "View ticket"}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                aria-hidden="true"
+              >
+                <path d="M4 12h15m-6-6 6 6-6 6" />
+              </svg>
+            </span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  )
+}

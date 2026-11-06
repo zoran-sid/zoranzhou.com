@@ -2,19 +2,26 @@
 import WritingArchive from "../../../../../components/WritingArchive.astro";
 import NotesArchive from "../../../../../components/NotesArchive.astro";
 import { getWriting } from "../../../../../lib/writing";
-import { writingFormat } from "../../../../../lib/content-policy";
-import { paginateEntries } from "../../../../../lib/pagination";
+import {
+  WRITING_FORMATS,
+  writingFormat,
+} from "../../../../../lib/content-policy";
+import {
+  ARTICLE_PAGE_SIZE,
+  paginateEntries,
+} from "../../../../../lib/pagination";
 import { locales } from "../../../../../i18n/utils";
 export async function getStaticPaths() {
   const entries = await getWriting();
   return locales.flatMap((locale) =>
-    ["note", "guide", "essay"].flatMap((format) =>
+    WRITING_FORMATS.flatMap((format) =>
       paginateEntries(
         entries.filter(
           (entry) =>
             entry.data.lang === locale && writingFormat(entry) === format,
         ),
         `/blog/formats/${format}`,
+        format === "note" ? undefined : ARTICLE_PAGE_SIZE,
       ).map(({ param, ...props }) => ({
         params: { locale, format, page: param },
         props: { ...props, format },

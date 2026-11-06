@@ -9,8 +9,10 @@ import { writingCategory } from "../lib/content-policy";
 interface Props {
   locale: Locale;
   overview?: boolean;
+  /** Entry paths already shown elsewhere on the page, such as homepage selections. */
+  exclude?: string[];
 }
-const { locale, overview = false } = Astro.props;
+const { locale, overview = false, exclude = [] } = Astro.props;
 const zh = locale === "zh-CN";
 const writing = (await getWriting(locale)).filter(
   (entry) => writingCategory(entry) === "life",
@@ -21,7 +23,9 @@ const journey = writing.find(
     entry.slug === "2025-06-08en" ||
     entry.data.translationKey === "blog-0fbcc334cb5e",
 );
-const journal = writing.filter((entry) => entry !== journey).slice(0, 2);
+const journal = writing
+  .filter((entry) => entry !== journey && !exclude.includes(entryPath(entry)))
+  .slice(0, 2);
 const href = journey ? entryPath(journey) : localizePath("/photos", locale);
 ---
 
@@ -107,7 +111,7 @@ const href = journey ? entryPath(journey) : localizePath("/photos", locale);
         !journey && journal.length === 0 && (
           <a class="text-link" href={localizePath("/photos", locale)}>
             {zh ? "浏览摄影集" : "Browse photographs"}
-            <ArrowIcon direction="up-right" />
+            <ArrowIcon direction="right" />
           </a>
         )
       }
@@ -125,6 +129,6 @@ const href = journey ? entryPath(journey) : localizePath("/photos", locale);
           ? "See the photographs"
           : "More from life"
     }
-    <ArrowIcon direction="up-right" /></a
+    <ArrowIcon direction="right" /></a
   >
 </section>

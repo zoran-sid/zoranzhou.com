@@ -1,8 +1,9 @@
 import { defineCollection, z } from "astro:content";
 import { ticketDay, ticketTypes } from "../lib/ticket-model";
+import { WRITING_FORMATS } from "../lib/content-policy";
 
 const baseSchema = z.object({
-  format: z.enum(["note", "guide", "essay"]).optional(),
+  format: z.enum(WRITING_FORMATS).optional(),
   maturity: z.enum(["seed", "growing", "evergreen"]).optional(),
   publication: z.enum(["draft", "approved"]).optional(),
   title: z.string(),

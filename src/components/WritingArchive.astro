@@ -6,11 +6,17 @@ import { editorial } from "../i18n/editorial";
 import { localizePath, type Locale } from "../i18n/utils";
 import type { WritingEntry } from "../lib/writing";
 import type { PageLinks } from "../lib/pagination";
+import {
+  ARTICLE_FORMATS,
+  writingFormatLabel,
+  type WritingCategory,
+} from "../lib/content-policy";
 interface Props {
   entries: WritingEntry[];
   page: PageLinks;
-  category?: string;
+  category?: WritingCategory | "all";
   format?: string;
+  /** Collection pages such as /essays supply their own heading. */
   title?: string;
   description?: string;
 }
@@ -23,34 +29,80 @@ const {
   description,
 } = Astro.props;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
+const zh = locale === "zh-CN";
 const c = editorial(locale);
-const formatTitles: Record<string, string> =
-  locale === "zh-CN"
-    ? { note: "随记", guide: "指南", essay: "文章与随笔" }
-    : { note: "Notes", guide: "Guides", essay: "Essays" };
-const formatDescriptions: Record<string, string> =
-  locale === "zh-CN"
+const formatDescriptions: Record<string, string> = zh
+  ? {
+      guide: "部署步骤、配置记录，和可以照着做的技术实践。",
+      research: "对安全机制和研究工作的梳理与分析。",
+      essay: "旅行见闻、书评，还有对一段生活的回望。",
+    }
+  : {
+      guide:
+        "Deployment steps, configuration notes and technical practice you can follow.",
+      research: "Close readings of security mechanisms and research work.",
+      essay: "Travel, book reviews, and looking back on stretches of life.",
+    };
+// Earlier subject pages remain reachable at their original URLs.
+const topics: Record<WritingCategory, { title: string; description: string }> =
+  zh
     ? {
-        note: "几句话，一张照片，记下此刻的生活和想法。",
-        guide: "持续整理的技术文档、部署步骤与实践记录。",
-        essay: "技术分析、阅读感想，以及生活中慢慢形成的思考。",
+        technology: {
+          title: "技术实践",
+          description: "技术指南和动手实践的记录。",
+        },
+        research: {
+          title: c.notebook,
+          description: formatDescriptions.research,
+        },
+        life: {
+          title: c.essays,
+          description: "旅行、读书和日常生活里的文字。",
+        },
       }
     : {
-        note: "A few words, a photograph, a moment from everyday life.",
-        guide:
-          "Technical documentation, deployment steps and records of practice.",
-        essay:
-          "Technical analysis, reflections on books and thoughts from everyday life.",
+        technology: {
+          title: c.technology,
+          description: "Technical guides and hands-on practice.",
+        },
+        research: {
+          title: c.notebook,
+          description: formatDescriptions.research,
+        },
+        life: {
+          title: c.essays,
+          description: "Writing about travel, books and everyday life.",
+        },
       };
-const pageTitle = title ?? (format ? formatTitles[format] : c.writingTitle);
+const topic = category === "all" ? undefined : topics[category];
+const pageTitle =
+  title ??
+  (format
+    ? writingFormatLabel(format as (typeof ARTICLE_FORMATS)[number], locale)
+    : (topic?.title ?? c.writingTitle));
 const pageDescription =
-  description ?? (format ? formatDescriptions[format] : c.writingDeck);
+  description ??
+  (format ? formatDescriptions[format] : (topic?.description ?? c.writingDeck));
 const filters = [
-  { key: "all", label: c.all },
-  { key: "technology", label: c.technology },
-  { key: "research", label: c.researchFilter },
-  { key: "life", label: c.essays },
+  { key: "all", label: zh ? "全部" : "All", href: "/blog" },
+  ...ARTICLE_FORMATS.map((key) => ({
+    key,
+    label: writingFormatLabel(key, locale),
+    href: `/blog/formats/${key}`,
+  })),
 ];
+const current = format ?? (category === "all" ? "all" : undefined);
+// Entries arrive newest first; the year becomes the heading for its rows.
+const years = entries.reduce<{ year: number; entries: WritingEntry[] }[]>(
+  (groups, entry) => {
+    const year = entry.data.date.getFullYear();
+    const last = groups.at(-1);
+    if (last?.year === year) last.entries.push(entry);
+    else groups.push({ year, entries: [entry] });
+    return groups;
+  },
+  [],
+);
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription}>
@@ -58,9 +110,7 @@ const filters = [
     <header class="page-intro">
       <div class="archive-heading">
         <div>
-          <h1>{pageTitle.split("\n").map((line) => <span>{line}</span>)}</h1><p>
-            {pageDescription}
-          </p>
+          <h1>{pageTitle}</h1><p>{pageDescription}</p>
         </div>
         <a class="text-link" href={localizePath("/subscribe", locale)}
           >{c.subscribe}</a
@@ -69,81 +119,64 @@ const filters = [
     </header>
     <div class="archive-layout">
       <aside class="archive-navigation">
-        <h2>{locale === "zh-CN" ? "按形式阅读" : "By format"}</h2>
-        <nav
-          class="format-tabs"
-          aria-label={locale === "zh-CN" ? "内容形式" : "Writing format"}
-        >
+        <h2>{zh ? "按类型阅读" : "By type"}</h2>
+        <nav class="format-tabs" aria-label={zh ? "文章类型" : "Writing type"}>
           {
-            [
-              { key: "all", zh: "全部文章", en: "All writing" },
-              { key: "note", zh: "随记", en: "Notes" },
-              { key: "guide", zh: "技术指南", en: "Guides" },
-              { key: "essay", zh: "文章与随笔", en: "Essays" },
-            ].map((item) => (
+            filters.map((item) => (
               <a
-                aria-current={
-                  (format ?? "all") === item.key && category === "all"
-                    ? "page"
-                    : undefined
-                }
-                href={localizePath(
-                  item.key === "all" ? "/blog" : `/blog/formats/${item.key}`,
-                  locale,
-                )}
+                aria-current={current === item.key ? "page" : undefined}
+                href={localizePath(item.href, locale)}
               >
-                {locale === "zh-CN" ? item.zh : item.en}
+                {item.label}
               </a>
             ))
           }
         </nav>
-        <h2>{locale === "zh-CN" ? "按主题浏览" : "By subject"}</h2>
-        <nav class="topic-navigation" aria-label={c.filter}>
-          {
-            filters
-              .filter((filter) => filter.key !== "all")
-              .map((filter) => (
-                <a
-                  aria-current={category === filter.key ? "page" : undefined}
-                  href={localizePath(`/blog/topics/${filter.key}`, locale)}
-                >
-                  {filter.label}
-                </a>
-              ))
-          }
-          <a href={localizePath("/tags", locale)}
-            >{locale === "zh-CN" ? "全部标签" : "All tags"}</a
-          >
-        </nav>
         <p class="archive-hint">
           {
-            locale === "zh-CN"
-              ? "记录可以很短，问题也可以慢慢展开。"
-              : "Some entries begin as a small observation. Others take more room."
-          }
+            zh ? "几句话和照片的日常，在" : "Shorter everyday entries live in "
+          }<a href={localizePath("/blog/formats/note", locale)}
+            >{zh ? "随记" : "Notes"}</a
+          >{zh ? "里按时间连续阅读。" : ", read as a timeline."}
         </p>
+        <a class="archive-tags" href={localizePath("/tags", locale)}
+          >{zh ? "按标签浏览" : "Browse by tag"}</a
+        >
       </aside>
       <div class="archive-records">
         <p class="archive-count">{page.total} {c.results}</p>
         {
-          entries.length > 0 ? (
-            <div class="writing-list">
-              {entries.map((entry) => (
-                <ArticleRow entry={entry} locale={locale} />
-              ))}
-            </div>
+          years.length > 0 ? (
+            years.map((group) => (
+              <section
+                class="archive-year"
+                aria-labelledby={`archive-year-${group.year}`}
+              >
+                <h2
+                  class="archive-year__title"
+                  id={`archive-year-${group.year}`}
+                >
+                  {group.year}
+                </h2>
+                <div class="writing-list">
+                  {group.entries.map((entry) => (
+                    <ArticleRow
+                      entry={entry}
+                      locale={locale}
+                      withinYear
+                      showFormat={!format}
+                      showReadingTime={false}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))
           ) : (
             <div class="empty-note">
               <>
-                <p>
-                  {format === "note"
-                    ? locale === "zh-CN"
-                      ? "还没有公开的随记。写下第一条后，就会按时间出现在这里。"
-                      : "No notes published yet. New notes will appear here, newest first."
-                    : c.empty}
-                </p>
+                <p>{c.empty}</p>
                 <a class="text-link" href={localizePath("/blog", locale)}>
-                  {c.browse} <ArrowIcon direction="up-right" />
+                  {c.browse} <ArrowIcon direction="right" />
                 </a>
               </>
             </div>
@@ -153,12 +186,11 @@ const filters = [
           page.last > 1 && (
             <nav
               class="pagination"
-              aria-label={locale === "zh-CN" ? "文章分页" : "Writing pages"}
+              aria-label={zh ? "文章分页" : "Writing pages"}
             >
               {page.prev ? (
                 <a href={localizePath(page.prev, locale)}>
-                  <ArrowIcon direction="left" />{" "}
-                  {locale === "zh-CN" ? "上一页" : "Previous"}
+                  <ArrowIcon direction="left" /> {zh ? "上一页" : "Previous"}
                 </a>
               ) : (
                 <span />
@@ -168,8 +200,7 @@ const filters = [
               </span>
               {page.next ? (
                 <a href={localizePath(page.next, locale)}>
-                  {locale === "zh-CN" ? "下一页" : "Next"}{" "}
-                  <ArrowIcon direction="right" />
+                  {zh ? "下一页" : "Next"} <ArrowIcon direction="right" />
                 </a>
               ) : (
                 <span />

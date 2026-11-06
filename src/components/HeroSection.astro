@@ -11,37 +11,43 @@ const zh = locale === "zh-CN";
 ---
 
 <section class="garden-hero page-container">
-  <div class="hero-name-stage">
-    <h1 data-hero-title aria-label="Zoran">
-      {
-        "Zoran".split("").map((character, index) => (
-          <span
-            class:list={["hero-name-letter", `hero-letter-${index}`]}
-            aria-hidden="true"
-          >
-            {character === " " ? "\u00a0" : character}
-          </span>
-        ))
-      }
-      <span class="hero-baseline" aria-hidden="true"></span>
-    </h1>
-    <span class="hero-ball" aria-hidden="true"></span>
-  </div>
-  <div class="garden-introduction" data-motion="cover" data-motion-delay="100">
-    <p class="garden-deck">
-      {
-        zh
-          ? "网络工程师、安全从业者、摄影师和户外运动爱好者。"
-          : "Network engineer, security practitioner, photographer, and outdoor enthusiast."
-      }
-    </p>
-    <div class="hero-actions">
-      <a class="button-primary" href={localizePath("/blog", locale)}
-        >{zh ? "阅读文章" : "Read the writing"}</a
-      >
-      <a class="text-link" href={localizePath("/about", locale)}
-        >{zh ? "更多关于我" : "More about me"}</a
-      >
+  <div class="garden-hero__lead">
+    <div class="hero-name-stage">
+      <h1 data-hero-title aria-label="Zoran">
+        {
+          "Zoran".split("").map((character, index) => (
+            <span
+              class:list={["hero-name-letter", `hero-letter-${index}`]}
+              aria-hidden="true"
+            >
+              {character === " " ? "\u00a0" : character}
+            </span>
+          ))
+        }
+        <span class="hero-baseline" aria-hidden="true"></span>
+      </h1>
+      <span class="hero-ball" aria-hidden="true"></span>
+    </div>
+    <div
+      class="garden-introduction"
+      data-motion="cover"
+      data-motion-delay="100"
+    >
+      <p class="garden-deck">
+        {
+          zh
+            ? "我是 Zoran，网络与安全工程师。这里写技术实践和安全研究，也记下读书、旅行和跑步。"
+            : "I'm Zoran, a network and security engineer. I write technical guides and security research here, and keep a record of books, travel and running."
+        }
+      </p>
+      <div class="hero-actions">
+        <a class="button-primary" href="#selected"
+          >{zh ? "从精选文章读起" : "Start with selected writing"}</a
+        >
+        <a class="text-link" href={localizePath("/about", locale)}
+          >{zh ? "关于我" : "About me"}</a
+        >
+      </div>
     </div>
   </div>
   <div class="garden-index">
@@ -49,7 +55,7 @@ const zh = locale === "zh-CN";
       <div class="garden-notes__heading">
         <h2 id="notes-heading">{zh ? "随记" : "Notes"}</h2>
         <a class="text-link" href={localizePath("/blog/formats/note", locale)}
-          >{zh ? "所有随记" : "All notes"}</a
+          >{zh ? "全部随记" : "All notes"}</a
         >
       </div>
       <div class="garden-notes__latest">

@@ -7,8 +7,8 @@ const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const zh = locale === "zh-CN";
 const c = editorial(locale);
 const footerLinks = [
-  { label: "Blog", href: "/blog" },
-  { label: "Essays", href: "/blog/formats/essay" },
+  { label: zh ? "文章" : "Writing", href: "/blog" },
+  { label: zh ? "随笔" : "Essays", href: "/blog/formats/essay" },
   { label: zh ? "随记" : "Notes", href: "/blog/formats/note" },
   { label: zh ? "项目" : "Projects", href: "/projects" },
   { label: "Web3 Lab", href: "/lab" },
@@ -18,8 +18,8 @@ const footerLinks = [
   { label: zh ? "摄影" : "Photography", href: "/photos" },
   { label: zh ? "足迹" : "Journeys", href: "/map" },
   { label: zh ? "影视与游戏" : "Films & games", href: "/media" },
-  { label: "Now", href: "/now" },
-  { label: "About", href: "/about" },
+  { label: zh ? "近况" : "Now", href: "/now" },
+  { label: zh ? "关于我" : "About", href: "/about" },
 ];
 ---
 
@@ -50,9 +50,7 @@ const footerLinks = [
             aria-label={zh ? "社交主页" : "Social profiles"}
           >
             {
-              SOCIAL_LINKS.filter(
-                (link) => link.url !== "#",
-              ).map((link) => (
+              SOCIAL_LINKS.filter((link) => link.url !== "#").map((link) => (
                 <a
                   href={link.url}
                   target={link.url.startsWith("mailto:") ? undefined : "_blank"}

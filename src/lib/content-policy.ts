@@ -7,14 +7,19 @@ export interface ContentRecord {
     lang?: string;
     draft?: boolean;
     publication?: string;
-    format?: "note" | "guide" | "essay";
+    format?: WritingFormat;
     published?: boolean;
     translationKey?: string;
     routeId?: string;
     tags?: string[];
+    categories?: string[];
     status?: string;
   };
 }
+export const WRITING_FORMATS = ["note", "guide", "research", "essay"] as const;
+export type WritingFormat = (typeof WRITING_FORMATS)[number];
+/** Long-form formats share the writing index; notes keep their own timeline. */
+export const ARTICLE_FORMATS = ["guide", "research", "essay"] as const;
 export function isPublicData(data: ContentRecord["data"]): boolean {
   return (
     !data.draft &&
@@ -48,7 +53,14 @@ export function findTranslation<T extends ContentRecord>(
 }
 export type WritingCategory = "technology" | "research" | "life";
 export function writingCategory(entry: ContentRecord): WritingCategory {
-  if (entry.collection === "research") return "research";
+  // Migrated research articles declare themselves through their existing categories.
+  if (
+    entry.collection === "research" ||
+    entry.data.categories?.some((category) =>
+      /^(安全研究|security research)$/i.test(category),
+    )
+  )
+    return "research";
   if (
     entry.collection === "essays" ||
     entry.data.tags?.some((tag) =>
@@ -59,23 +71,26 @@ export function writingCategory(entry: ContentRecord): WritingCategory {
   return "technology";
 }
 
-export function writingFormat(
-  entry: ContentRecord,
-): "note" | "guide" | "essay" {
-  return (
-    entry.data.format ??
-    (entry.collection === "blog" &&
-    writingCategory(entry) === "technology" &&
-    entry.data.translationKey !== "agentshield-deep-analysis"
-      ? "guide"
-      : "essay")
-  );
+export function writingFormat(entry: ContentRecord): WritingFormat {
+  if (entry.data.format) return entry.data.format;
+  const category = writingCategory(entry);
+  if (category === "research") return "research";
+  return entry.collection === "blog" && category === "technology"
+    ? "guide"
+    : "essay";
+}
+const FORMAT_LABELS: Record<"zh-CN" | "en", Record<WritingFormat, string>> = {
+  "zh-CN": {
+    note: "随记",
+    guide: "技术指南",
+    research: "研究分析",
+    essay: "随笔",
+  },
+  en: { note: "Notes", guide: "Guides", research: "Research", essay: "Essays" },
+};
+export function writingFormatLabel(format: WritingFormat, locale: string) {
+  return FORMAT_LABELS[locale === "zh-CN" ? "zh-CN" : "en"][format];
 }
 export function formatLabel(entry: ContentRecord, locale: string): string {
-  const format = writingFormat(entry);
-  return (
-    locale === "zh-CN"
-      ? { note: "随记", guide: "指南", essay: "文章与随笔" }
-      : { note: "Notes", guide: "Guides", essay: "Essays" }
-  )[format];
+  return writingFormatLabel(writingFormat(entry), locale);
 }

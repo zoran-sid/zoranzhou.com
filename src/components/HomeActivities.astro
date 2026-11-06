@@ -47,9 +47,7 @@ const date = new Intl.DateTimeFormat(zh ? "zh-CN" : "en-GB", {
         <header class="section-head">
           <div>
             <>
-              <h2 id="running-heading">
-                {zh ? "在路中去感受" : "Life along the way"}
-              </h2>
+              <h2 id="running-heading">{zh ? "最近的跑步" : "Recent runs"}</h2>
               <p>
                 {zh
                   ? "公园里的日常，也有出发线上的清晨。"
@@ -88,7 +86,7 @@ const date = new Intl.DateTimeFormat(zh ? "zh-CN" : "en-GB", {
         </ol>
         <a class="text-link" href={localizePath("/map", locale)}>
           {zh ? "全部足迹" : "All journeys"}
-          <ArrowIcon direction="up-right" />
+          <ArrowIcon direction="right" />
         </a>
       </section>
     )
@@ -98,16 +96,7 @@ const date = new Intl.DateTimeFormat(zh ? "zh-CN" : "en-GB", {
       <section class="recent-cinema" aria-labelledby="cinema-heading">
         <header class="section-head">
           <div>
-            <>
-              <h2 id="cinema-heading">
-                {zh ? "最近看过" : "Recently watched"}
-              </h2>
-              <p>
-                {zh
-                  ? "银幕落下以后，还记得的那些故事。"
-                  : "Stories that stay with me after the credits roll."}
-              </p>
-            </>
+            <h2 id="cinema-heading">{zh ? "最近看过" : "Recently watched"}</h2>
           </div>
         </header>
         <div class="recent-cinema__grid">
@@ -120,7 +109,7 @@ const date = new Intl.DateTimeFormat(zh ? "zh-CN" : "en-GB", {
           href={`${localizePath("/media", locale)}?category=movies`}
         >
           {zh ? "浏览观影记录" : "Browse the film diary"}
-          <ArrowIcon direction="up-right" />
+          <ArrowIcon direction="right" />
         </a>
       </section>
     )

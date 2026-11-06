@@ -26,13 +26,13 @@ export async function getWriting(locale?: Locale): Promise<WritingEntry[]> {
 export function categoryLabel(entry: WritingEntry, locale: Locale): string {
   const category = writingCategory(entry);
   return locale === "zh-CN"
-    ? { technology: "技术实践", research: "研究笔记", life: "生活与随笔" }[
+    ? { technology: "技术实践", research: "研究分析", life: "生活与阅读" }[
         category
       ]
     : {
         technology: "Engineering",
         research: "Research",
-        life: "Life & essays",
+        life: "Life & reading",
       }[category];
 }
 export function displayDate(date: Date, locale: Locale): string {

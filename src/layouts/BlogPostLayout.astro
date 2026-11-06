@@ -83,10 +83,11 @@ const index = allInCollection.findIndex(
 );
 const older = index >= 0 ? allInCollection[index + 1] : undefined;
 const newer = index > 0 ? allInCollection[index - 1] : undefined;
+// All writing shares one index; the format label in the metadata names its type.
 const labels = {
   blog: c.writing,
-  essays: c.notes,
-  research: c.notebook,
+  essays: c.writing,
+  research: c.writing,
   projects: c.work,
   photos: c.photos,
 };

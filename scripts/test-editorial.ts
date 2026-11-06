@@ -4,7 +4,9 @@ import {
   findTranslation,
   hasReadableBody,
   isPublished,
+  formatLabel,
   writingCategory,
+  writingFormat,
   type ContentRecord,
 } from "../src/lib/content-policy";
 import { paginateEntries } from "../src/lib/pagination";
@@ -78,6 +80,27 @@ test("life filters include essays and travel regardless of their collection", ()
   assert.equal(writingCategory(entry({}, "essays")), "life");
   assert.equal(writingCategory(entry({}, "research")), "research");
   assert.equal(writingCategory(entry({ tags: ["Linux"] })), "technology");
+});
+test("research analysis is classified from its metadata, not as a guide", () => {
+  const analysis = entry({ categories: ["安全研究", "AI安全"] });
+  assert.equal(writingCategory(analysis), "research");
+  assert.equal(writingFormat(analysis), "research");
+  assert.equal(
+    writingFormat(entry({ categories: ["Security Research"] })),
+    "research",
+  );
+  assert.equal(writingFormat(entry({}, "research")), "research");
+  assert.equal(writingFormat(entry({ tags: ["Linux"] })), "guide");
+  assert.equal(writingFormat(entry({ tags: ["Life"] })), "essay");
+  assert.equal(writingFormat(entry({}, "essays")), "essay");
+  // Explicit author choices always win over the fallback.
+  assert.equal(
+    writingFormat(entry({ format: "essay", categories: ["安全研究"] })),
+    "essay",
+  );
+  assert.equal(formatLabel(analysis, "zh-CN"), "研究分析");
+  assert.equal(formatLabel(entry({}, "essays"), "zh-CN"), "随笔");
+  assert.equal(formatLabel(entry({ tags: ["Linux"] }), "en"), "Guides");
 });
 test("filtered pagination preserves all entries and valid return links", () => {
   const entries = Array.from({ length: 23 }, (_, index) => index);

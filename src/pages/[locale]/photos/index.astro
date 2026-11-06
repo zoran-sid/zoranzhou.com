@@ -5,6 +5,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import { getLocalPhotoAlbums } from "../../../lib/photos";
+import { remotePhotoRatio } from "../../../lib/photo-ratio";
 import { getTranslations, type Locale, locales } from "../../../i18n/utils";
 
 export async function getStaticPaths() {
@@ -57,15 +58,21 @@ const albums = [...markdownAlbums, ...localAlbums].sort((a, b) =>
   b.date.localeCompare(a.date),
 );
 
-const photos = albums.flatMap((album) =>
-  album.photos.map((photo) => ({
-    ...photo,
-    albumTitle: album.title,
-    albumDescription: album.description,
-    date: album.date,
-    location: album.location,
-    camera: album.camera,
-  })),
+const photos = await Promise.all(
+  albums.flatMap((album) =>
+    album.photos.map(async (photo) => ({
+      ...photo,
+      albumTitle: album.title,
+      albumDescription: album.description,
+      date: album.date,
+      location: album.location,
+      camera: album.camera,
+      // Each tile takes its photo's own proportions, so nothing is cropped.
+      ratio: photo.image
+        ? photo.image.width / photo.image.height
+        : await remotePhotoRatio(photo.src),
+    })),
+  ),
 );
 
 const copy =
@@ -103,6 +110,9 @@ const copy =
             <button
               type="button"
               class="photo-tile"
+              style={
+                photo.ratio ? `--ratio: ${photo.ratio.toFixed(4)}` : undefined
+              }
               data-photo-button
               data-index={String(index)}
               data-src={photo.src}
@@ -118,8 +128,8 @@ const copy =
                 <Image
                   src={photo.image}
                   alt={photo.alt}
-                  widths={[240, 400, 640]}
-                  sizes="(max-width: 640px) 50vw, 25vw"
+                  widths={[240, 400, 640, 960]}
+                  sizes="(max-width: 720px) 60vw, 30vw"
                   loading={index < 6 ? "eager" : "lazy"}
                   decoding="async"
                 />
@@ -300,19 +310,27 @@ const copy =
     margin: 1.5rem 0 0;
     font-size: clamp(0.95rem, 1.4vw, 1.1rem);
   }
+  /* Justified rows: tiles in a row share one height and keep their own ratio. */
   .photo-grid {
-    display: grid;
+    --row: clamp(10rem, 16vw, 16rem);
+    display: flex;
+    flex-wrap: wrap;
     padding-top: clamp(1.5rem, 3vw, 2.5rem);
     overflow: visible;
     border-radius: 0;
     background: transparent;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
+  }
+  /* The last row keeps natural widths instead of stretching a single photo. */
+  .photo-grid::after {
+    content: "";
+    flex: 999 1 0;
   }
   .photo-tile {
     position: relative;
     display: block;
-    aspect-ratio: 4 / 3;
+    flex: var(--ratio, 1.5) 1 calc(var(--ratio, 1.5) * var(--row));
+    aspect-ratio: var(--ratio, 1.5);
     min-width: 0;
     padding: 0;
     overflow: hidden;
@@ -325,7 +343,8 @@ const copy =
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* Contain is exact for known ratios and keeps the whole frame if one is unknown. */
+    object-fit: contain;
     transform: scale(1.002);
     transition:
       transform 500ms var(--ease-out),
@@ -359,7 +378,7 @@ const copy =
   }
   .photo-tile:hover img {
     filter: saturate(1.08) contrast(1.03);
-    transform: scale(1.055);
+    transform: scale(1.02);
   }
   .photo-tile:hover {
     z-index: 2;
@@ -500,11 +519,6 @@ const copy =
     color: var(--faint);
     text-align: center;
   }
-  @media (max-width: 1100px) {
-    .photo-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
   :global(html.photo-lightbox-open),
   :global(html.photo-lightbox-open body) {
     overflow: hidden;
@@ -521,7 +535,7 @@ const copy =
       right: 1.25rem;
     }
     .photo-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      --row: 6.25rem;
       gap: 8px;
     }
     .photo-tile {

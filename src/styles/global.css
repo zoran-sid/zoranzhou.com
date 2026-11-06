@@ -342,10 +342,10 @@ p {
   white-space: nowrap;
 }
 .site-nav__link:hover,
-.site-nav__link.active {
+.site-nav__link[aria-current="page"] {
   color: var(--ink);
 }
-.site-nav__link.active::after {
+.site-nav__link[aria-current="page"]::after {
   content: "";
   position: absolute;
   bottom: 0.25rem;
@@ -470,7 +470,7 @@ p {
   display: grid;
   grid-template-columns: 9rem minmax(0, 1fr);
   gap: 2rem;
-  padding: 1.8rem 1.4rem;
+  padding: 1.5rem 0;
   border-bottom: 0;
 }
 .writing-row__meta {
@@ -495,18 +495,9 @@ p {
 }
 .writing-row h3 a {
   display: block;
-  padding-right: 2rem;
-  position: relative;
 }
 .writing-row h3 a:hover {
   color: var(--accent);
-}
-.row-arrow {
-  position: absolute;
-  right: 0.15rem;
-  top: 0;
-  color: var(--faint);
-  font-size: 1.1rem;
 }
 .writing-row p {
   font-size: 1rem;
@@ -1077,15 +1068,9 @@ p {
   font-size: 0.8125rem;
 }
 
-/* The index uses a change of paper tone instead of rules between records. */
-.writing-row:nth-child(odd) {
-  background: var(--surface-soft);
-}
-.writing-row {
-  transition: background 180ms ease;
-}
-.writing-row:hover {
-  background: color-mix(in srgb, var(--surface-soft) 75%, var(--accent) 8%);
+/* Hairlines separate records so lists read as an index, not a stack of cards. */
+.writing-row + .writing-row {
+  border-top: 1px solid var(--line);
 }
 .writing-row__meta,
 .reading-time,
@@ -1130,7 +1115,7 @@ select {
     height: 44px;
   }
   .writing-row {
-    padding: 1.4rem 1rem;
+    padding: 1.25rem 0;
   }
   .page-intro h1 {
     font-size: 2.75rem;

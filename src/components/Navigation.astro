@@ -9,24 +9,74 @@ interface Props {
 const { alternateHref } = Astro.props;
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const alternateLocale: Locale = locale === "zh-CN" ? "en" : "zh-CN";
-const section = Astro.url.pathname.split("/").filter(Boolean)[1] ?? "";
 const zh = locale === "zh-CN";
-const gardenItems = [
+const [section = "", sub, leaf] = Astro.url.pathname
+  .split("/")
+  .filter(Boolean)
+  .slice(1);
+type Destination = {
+  key: string;
+  label: string;
+  href: string;
+  description: string;
+};
+// Five direct destinations in the toolbar.
+const items: Destination[] = [
   {
-    label: zh ? "文章" : "Blog",
+    key: "writing",
+    label: zh ? "文章" : "Writing",
     href: "/blog",
     description: zh
-      ? "技术实践、长文与随记"
-      : "Technical writing, essays and short notes",
+      ? "技术指南、研究分析与随笔"
+      : "Technical guides, research and essays",
   },
   {
+    key: "notes",
+    label: zh ? "随记" : "Notes",
+    href: "/blog/formats/note",
+    description: zh ? "几句话和照片的日常" : "Short entries and photographs",
+  },
+  {
+    key: "life",
+    label: zh ? "生活" : "Life",
+    href: "/life",
+    description: zh
+      ? "摄影、书架、观影、足迹与票根"
+      : "Photographs, books, films, journeys and tickets",
+  },
+  {
+    key: "now",
+    label: zh ? "近况" : "Now",
+    href: "/now",
+    description: zh ? "最近在学、在写的东西" : "What I'm learning and writing",
+  },
+  {
+    key: "about",
+    label: zh ? "关于我" : "About",
+    href: "/about",
+    description: zh ? "经历与联系方式" : "Background and contact",
+  },
+];
+// The expand button offers a short, curated set of pages one level deeper.
+const featured: Destination[] = [
+  {
+    key: "essays",
     label: zh ? "随笔" : "Essays",
     href: "/blog/formats/essay",
     description: zh
-      ? "生活随笔、观察与长一点的思考"
-      : "Personal reflections, observations and longer thoughts",
+      ? "旅行见闻、书评与生活里的回望"
+      : "Travel, book reviews and looking back on life",
   },
   {
+    key: "photos",
+    label: zh ? "摄影" : "Photographs",
+    href: "/photos",
+    description: zh
+      ? "旅途和日常里的光影"
+      : "Light and moments from everyday life and travels",
+  },
+  {
+    key: "library",
     label: zh ? "书架" : "Library",
     href: "/library",
     description: zh
@@ -34,18 +84,29 @@ const gardenItems = [
       : "Books read and worlds still to explore",
   },
   {
-    label: zh ? "摄影" : "Photography",
-    href: "/photos",
+    key: "map",
+    label: zh ? "足迹" : "Journeys",
+    href: "/map",
     description: zh
-      ? "旅途和日常里的光影"
-      : "Light and moments from everyday life and travels",
+      ? "在地图上回看走过的路"
+      : "Looking back at the places I've been",
   },
 ];
-const items = [
-  ...gardenItems,
-  { label: zh ? "近况" : "Now", href: "/now" },
-  { label: zh ? "关于我" : "About", href: "/about" },
-];
+const current =
+  section === "blog" && sub === "formats" && leaf === "note"
+    ? "notes"
+    : ["blog", "essays", "research", "tags"].includes(section)
+      ? "writing"
+      : ["life", "photos", "library", "media", "map", "tickets"].includes(
+            section,
+          )
+        ? "life"
+        : section;
+const currentFeature =
+  section === "blog" && sub === "formats" && leaf === "essay"
+    ? "essays"
+    : section;
+const featuredLabel = zh ? "精选页面" : "Featured pages";
 ---
 
 <header class="site-header" data-site-header data-language-cookie={LANG_COOKIE}>
@@ -60,48 +121,41 @@ const items = [
       ><GardenMark /></a
     >
     <div class="site-nav__links">
-      <div class="garden-navigation">
-        <a class="site-nav__link" href={localizePath("/blog", locale)}
-          >{zh ? "花园" : "The Garden"}</a
-        >
-        <details class="garden-disclosure">
-          <summary aria-label={zh ? "展开网站目录" : "Explore the garden"}>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              aria-hidden="true"><path d="m5 9 7 7 7-7"></path></svg
-            >
-          </summary>
-          <div class="garden-dropdown">
-            {
-              gardenItems.map((item) => (
-                <a href={localizePath(item.href, locale)}>
-                  <span>
-                    <>
-                      <strong>{item.label}</strong>
-                      <small>{item.description}</small>
-                    </>
-                  </span>
-                </a>
-              ))
-            }
-          </div>
-        </details>
-      </div>
-      <a
-        class="site-nav__link"
-        href={localizePath("/now", locale)}
-        aria-current={section === "now" ? "page" : undefined}
-        >{zh ? "近况" : "Now"}</a
-      >
-      <a
-        class="site-nav__link"
-        href={localizePath("/about", locale)}
-        aria-current={section === "about" ? "page" : undefined}
-        >{zh ? "关于我" : "About"}</a
-      >
+      {
+        items.map((item) => (
+          <a
+            class="site-nav__link"
+            href={localizePath(item.href, locale)}
+            aria-current={current === item.key ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <details class="garden-disclosure">
+        <summary aria-label={zh ? "展开精选导航" : "Show featured pages"}>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            aria-hidden="true"><path d="m5 9 7 7 7-7"></path></svg
+          >
+        </summary>
+        <nav class="garden-dropdown" aria-label={featuredLabel}>
+          {
+            featured.map((item) => (
+              <a
+                href={localizePath(item.href, locale)}
+                aria-current={currentFeature === item.key ? "page" : undefined}
+              >
+                <strong>{item.label}</strong>
+                <small>{item.description}</small>
+              </a>
+            ))
+          }
+        </nav>
+      </details>
     </div>
     <div class="site-nav__tools">
       <SearchModal locale={locale} /><a
@@ -173,13 +227,38 @@ const items = [
     <div class="garden-mobile__body">
       <nav
         class="garden-mobile__links"
-        aria-label={zh ? "全部栏目" : "All sections"}
+        aria-label={zh ? "主要栏目" : "Main sections"}
       >
         {
           items.map((item) => (
-            <a href={localizePath(item.href, locale)}>{item.label}</a>
+            <a
+              href={localizePath(item.href, locale)}
+              aria-current={current === item.key ? "page" : undefined}
+            >
+              <span>{item.label}</span>
+              <small>{item.description}</small>
+            </a>
           ))
         }
+      </nav>
+      <nav class="garden-mobile__featured" aria-label={featuredLabel}>
+        <h2>{zh ? "精选" : "Featured"}</h2>
+        <ul role="list">
+          {
+            featured.map((item) => (
+              <li>
+                <a
+                  href={localizePath(item.href, locale)}
+                  aria-current={
+                    currentFeature === item.key ? "page" : undefined
+                  }
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </nav>
     </div>
   </dialog>
@@ -302,9 +381,7 @@ const items = [
     ?.querySelectorAll("a")
     .forEach((link) => link.addEventListener("click", () => closeMenu(true)));
   desktop.addEventListener("change", (event) => {
-    if (event.matches) {
-      closeMenu(true);
-    }
+    if (event.matches) closeMenu(true);
     else if (disclosure) disclosure.open = false;
   });
   reducedMotion.addEventListener("change", () => {
