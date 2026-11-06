@@ -178,6 +178,11 @@ summary {
   outline-offset: 5px;
   border-radius: 3px;
 }
+/* After a click or tap, focus that a script moves (dialog open/close) stays unmarked.
+   Important so scoped component rings (e.g. photo tiles) follow the same input state. */
+html[data-input="pointer"] :focus-visible {
+  outline: none !important;
+}
 #main-content:focus {
   outline: none;
 }

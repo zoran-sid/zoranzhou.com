@@ -184,6 +184,25 @@ const alternateHref =
     >
     <script>
       import { scrollProgress } from "../lib/scroll-atmosphere";
+      // Remember whether the visitor last used a pointer or the keyboard, so focus
+      // moved by script after a click or tap (opening/closing a photo viewer) draws
+      // no ring, while keyboard navigation keeps every focus outline.
+      const root = document.documentElement;
+      addEventListener(
+        "pointerdown",
+        () => {
+          root.dataset.input = "pointer";
+        },
+        { capture: true, passive: true },
+      );
+      addEventListener(
+        "keydown",
+        (event) => {
+          if (!event.metaKey && !event.ctrlKey && !event.altKey)
+            root.dataset.input = "keyboard";
+        },
+        { capture: true },
+      );
       const bar = document.getElementById("progress-bar");
       const back = document.getElementById("back-to-top");
       const comet = back?.querySelector<SVGGElement>(
