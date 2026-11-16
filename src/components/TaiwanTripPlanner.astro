@@ -1,5 +1,8 @@
 ---
-import { taiwanPlans as plans } from "../data/taiwan-trip";
+import {
+  taiwanPlans as plans,
+  TAIWAN_BUDGET_RESERVE,
+} from "../data/taiwan-trip";
 import { googleRoute } from "../lib/taiwan-maps";
 const first = plans[0];
 const firstRoute = googleRoute(first.days[0].legs[0].url)!;
@@ -9,6 +12,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
   class="tw-planner"
   data-tw-planner
   data-plans={JSON.stringify(plans)}
+  data-budget-reserve={TAIWAN_BUDGET_RESERVE}
   aria-label="台湾旅行计划"
 >
   <header class="tw-topbar">
@@ -28,7 +32,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
       >{first.nights}</span
     >
     <a
-      href="https://www.google.com/maps/dir/Taiwan+Taoyuan+International+Airport/Taipei+Main+Station/Alishan+National+Forest+Recreation+Area/Tainan+Station/Kaohsiung+Station/Kaohsiung+International+Airport/"
+      href="https://www.google.com/maps/dir/Taiwan+Taoyuan+International+Airport/Taipei+Main+Station/Tainan+Station/Kaohsiung+Station/Kaohsiung+International+Airport/"
       target="_blank"
       rel="noopener noreferrer">全程地点总览 ↗</a
     >
@@ -227,8 +231,8 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
           </p>
         </div>
         <p class="tw-map-caption" data-map-caption>
-          Google Maps 按公共交通规划这一段。出行日期、班次和换乘方案在 Google
-          Maps 中核对；阿里山客运及观日列车另看官方公告。
+          Google Maps按公共交通规划这一段；在Google
+          Maps中核对出行日期、班次和换乘。课程、观景台和汤屋按实际预约时段安排。
         </p>
         <p class="tw-map-selection" data-map-selection aria-live="polite">
           {first.days[0].legs[0].label}
@@ -242,7 +246,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     </p></noscript
   >
   <details class="tw-all-links">
-    <summary>展开两种方案的每日导航链接</summary>{
+    <summary>展开两种出发日期的每日导航链接</summary>{
       plans.map((plan) => (
         <div>
           <>
@@ -276,8 +280,8 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
   <section class="tw-budget" aria-labelledby="tw-budget-title">
     <div>
       <h3 id="tw-budget-title">算一算，这趟要花多少</h3><p>
-        单人私人客房。切换方案会载入对应预算；按你的报价修改，1 港元按 NT$4.2
-        粗算。
+        预算按每人计算，住宿填自己实际承担的金额。切换日期会载入规划预留；1
+        港元按 NT$4.2 粗算。
       </p>
     </div>
     <div class="tw-budget-fields">
@@ -292,7 +296,8 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
         /></label
       >
       <label
-        ><span data-hotel-label>8晚住宿（NT$）</span><input
+        ><span data-hotel-label>{first.days.length - 1}晚住宿／人（NT$）</span
+        ><input
           data-budget="hotel"
           type="number"
           min="0"
@@ -302,7 +307,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
         /></label
       >
       <label
-        ><span data-food-label>9天餐饮（NT$）</span><input
+        ><span data-food-label>{first.days.length}天餐饮／人（NT$）</span><input
           data-budget="food"
           type="number"
           min="0"
@@ -324,9 +329,17 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     </div>
     <div class="tw-budget-total">
       <p>
-        另预留交通 NT$3,000、门票活动 NT$1,600、应急
-        NT$1,500。宅配、计程车与超出部分填入额外开销。这些是规划数值，房价和机票以订单报价为准。
-      </p><output data-total aria-live="polite">约 HK$10,276</output>
+        另预留交通 NT$3,000、门票体验 NT$3,500、应急
+        NT$1,500。计程车、接送与超出部分填入额外开销。这些是规划数值，房价和机票以订单报价为准。
+      </p><output data-total aria-live="polite"
+        >约 HK${
+          Math.round(
+            first.budget.flight +
+              (first.budget.hotel + first.budget.food + TAIWAN_BUDGET_RESERVE) /
+                4.2,
+          ).toLocaleString("en-US")
+        }／人</output
+      >
     </div>
   </section>
 </section>
@@ -336,6 +349,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
   import type { TaiwanPlan } from "../data/taiwan-trip";
   const root = document.querySelector<HTMLElement>("[data-tw-planner]");
   if (root) {
+    const budgetReserve = Number(root.dataset.budgetReserve);
     const plans: TaiwanPlan[] = JSON.parse(root.dataset.plans ?? "[]");
     let plan = plans[0];
     let day = plan.days[0];
@@ -382,7 +396,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
           route.embedUrl,
           route.url,
           leg.label,
-          `Google Maps 按${route.label}规划这一段。出行日期、班次和换乘方案请在 Google Maps 中核对；阿里山客运及观日列车另看官方公告。`,
+          `Google Maps 按${route.label}规划这一段。出行日期、班次和换乘方案请在Google Maps中核对；纪念馆、象山和渡轮另看开放公告，课程与汤屋按预约时段。`,
         );
         selected = true;
       } else if (kind === "stop") {
@@ -393,7 +407,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
           place.embedUrl,
           place.url,
           `${index + 1}. ${stop.name}`,
-          "当前显示地点位置。需要查看实际走法时，选择上方的分段路线；观日列车、步道开放与团队集合点按官方或订单信息确认。",
+          "当前显示地点位置。需要查看实际走法时，选择上方的分段路线；入馆、步道开放和课程报到点按官方或订单信息确认。",
         );
         selected = true;
       }
@@ -545,9 +559,9 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
       const total =
         value("flight") +
         value("extra") +
-        (value("hotel") + value("food") + 6100) / 4.2;
+        (value("hotel") + value("food") + budgetReserve) / 4.2;
       q<HTMLOutputElement>("[data-total]").textContent =
-        `约 HK$${Math.round(total).toLocaleString("en-US")}`;
+        `约 HK$${Math.round(total).toLocaleString("en-US")}／人`;
     }
     qa<HTMLInputElement>("[data-budget]").forEach((input) =>
       input.addEventListener("input", updateBudget),
@@ -570,9 +584,9 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
         q<HTMLElement>("[data-plan-range]").textContent = plan.range;
         q<HTMLElement>("[data-plan-nights]").textContent = plan.nights;
         q<HTMLElement>("[data-hotel-label]").textContent =
-          `${plan.days.length - 1}晚住宿（NT$）`;
+          `${plan.days.length - 1}晚住宿／人（NT$）`;
         q<HTMLElement>("[data-food-label]").textContent =
-          `${plan.days.length}天餐饮（NT$）`;
+          `${plan.days.length}天餐饮／人（NT$）`;
         for (const key of ["flight", "hotel", "food"] as const)
           q<HTMLInputElement>(`[data-budget="${key}"]`).value = String(
             plan.budget[key],
