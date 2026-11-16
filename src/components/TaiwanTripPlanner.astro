@@ -1,6 +1,8 @@
 ---
 import { taiwanPlans as plans } from "../data/taiwan-trip";
+import { googleRoute } from "../lib/taiwan-maps";
 const first = plans[0];
+const firstRoute = googleRoute(first.days[0].legs[0].url)!;
 ---
 
 <section
@@ -126,6 +128,15 @@ const first = plans[0];
                   <ul>
                     {day.legs.map((leg) => (
                       <li>
+                        {googleRoute(leg.url) && (
+                          <button
+                            type="button"
+                            class="tw-show-route"
+                            data-map-leg={day.legs.indexOf(leg)}
+                          >
+                            在地图查看
+                          </button>
+                        )}
                         <a
                           href={leg.url}
                           target="_blank"
@@ -165,29 +176,62 @@ const first = plans[0];
         )
       }
     </div>
-    <aside class="tw-map-column" aria-label="当天路线地图">
+    <aside class="tw-map-column" aria-label="Google Maps 分段路线">
       <div class="tw-map-sticky">
         <div class="tw-map-heading">
-          <strong data-map-title>D1 · 抵达与入住</strong><button
-            type="button"
-            data-fit-map>查看全日地点</button
+          <strong data-map-title>D1 · 抵达与入住</strong><a
+            data-map-external
+            href={firstRoute.url}
+            target="_blank"
+            rel="noopener noreferrer">打开 Google Maps ↗</a
           >
         </div>
-        <div class="tw-map-wrap">
-          <div data-tw-map class="tw-map" aria-label="当天地点交互地图"></div><p
-            class="tw-map-loading"
-            data-map-loading
+        <label class="tw-map-route-label" for="tw-map-route"
+          >选择路线或地点</label
+        >
+        <select id="tw-map-route" data-map-route>
+          <optgroup label="分段路线"
+            >{
+              first.days[0].legs.map(
+                (leg, index) =>
+                  googleRoute(leg.url) && (
+                    <option value={`leg:${index}`}>{leg.label}</option>
+                  ),
+              )
+            }</optgroup
           >
-            正在载入地图…
-          </p><p class="tw-map-error" data-map-error hidden>
-            地图暂时无法载入。请使用行程中的分段导航链接。
+          <optgroup label="地点位置"
+            >{
+              first.days[0].stops.map((stop, index) => (
+                <option value={`stop:${index}`}>
+                  {index + 1}. {stop.name}
+                </option>
+              ))
+            }</optgroup
+          >
+        </select>
+        <div class="tw-map-wrap">
+          <iframe
+            data-tw-map
+            class="tw-map"
+            src={firstRoute.embedUrl}
+            title={`Google Maps：${first.days[0].legs[0].label}`}
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+          <p class="tw-map-loading" data-map-loading hidden>
+            正在载入 Google Maps…
+          </p>
+          <p class="tw-map-error" data-map-error hidden>
+            地图载入较慢，可以用上方链接打开 Google Maps。
           </p>
         </div>
-        <p class="tw-map-caption">
-          编号对应左侧地点。虚线只表示游览顺序，坐标为规划示意；乘车、步行请打开分段导航，山上列车另查官方公告。
+        <p class="tw-map-caption" data-map-caption>
+          Google Maps 按公共交通规划这一段。出行日期、班次和换乘方案在 Google
+          Maps 中核对；阿里山客运及观日列车另看官方公告。
         </p>
         <p class="tw-map-selection" data-map-selection aria-live="polite">
-          选择地点编号，可在地图定位。
+          {first.days[0].legs[0].label}
         </p>
       </div>
     </aside>
@@ -288,85 +332,127 @@ const first = plans[0];
 </section>
 
 <script>
-  import maplibregl from "maplibre-gl";
-  import "maplibre-gl/dist/maplibre-gl.css";
+  import { googleRoute, googlePlace } from "../lib/taiwan-maps";
   import type { TaiwanPlan } from "../data/taiwan-trip";
   const root = document.querySelector<HTMLElement>("[data-tw-planner]");
   if (root) {
     const plans: TaiwanPlan[] = JSON.parse(root.dataset.plans ?? "[]");
     let plan = plans[0];
     let day = plan.days[0];
-    let map: maplibregl.Map | undefined;
-    let ready = false;
-    let markers: maplibregl.Marker[] = [];
-    const q = <T extends Element>(s: string) => root.querySelector<T>(s)!;
-    const qa = <T extends Element>(s: string) =>
-      Array.from(root.querySelectorAll<T>(s));
-    const motion = () =>
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 450;
+    const q = <T extends Element>(selector: string) =>
+      root.querySelector<T>(selector)!;
+    const qa = <T extends Element>(selector: string) =>
+      Array.from(root.querySelectorAll<T>(selector));
     const panel = () => q<HTMLElement>(`#tw-panel-${plan.id}-${day.id}`);
-    function focusStop(index: number, move = true) {
-      const stop = day.stops[index];
-      if (!stop) return;
+    const frame = q<HTMLIFrameElement>("[data-tw-map]");
+    let loadTimer: ReturnType<typeof setTimeout> | undefined;
+    function setMap(
+      embedUrl: string,
+      url: string,
+      title: string,
+      caption: string,
+    ) {
+      if (frame.src !== embedUrl) {
+        clearTimeout(loadTimer);
+        q<HTMLElement>("[data-map-loading]").hidden = false;
+        q<HTMLElement>("[data-map-error]").hidden = true;
+        loadTimer = setTimeout(() => {
+          q<HTMLElement>("[data-map-loading]").hidden = true;
+          q<HTMLElement>("[data-map-error]").hidden = false;
+        }, 18000);
+        frame.classList.add("is-loading");
+        frame.setAttribute("aria-busy", "true");
+        frame.src = embedUrl;
+      }
+      frame.title = `Google Maps：${title}`;
+      q<HTMLAnchorElement>("[data-map-external]").href = url;
+      q<HTMLElement>("[data-map-caption]").textContent = caption;
+      q<HTMLElement>("[data-map-selection]").textContent = title;
+    }
+    function selectMap(value: string) {
+      const [kind, rawIndex] = value.split(":");
+      const index = Number(rawIndex);
+      if (!Number.isInteger(index) || index < 0) return;
+      let selected = false;
+      if (kind === "leg") {
+        const leg = day.legs[index];
+        const route = leg && googleRoute(leg.url);
+        if (!route) return;
+        setMap(
+          route.embedUrl,
+          route.url,
+          leg.label,
+          `Google Maps 按${route.label}规划这一段。出行日期、班次和换乘方案请在 Google Maps 中核对；阿里山客运及观日列车另看官方公告。`,
+        );
+        selected = true;
+      } else if (kind === "stop") {
+        const stop = day.stops[index];
+        if (!stop) return;
+        const place = googlePlace(stop);
+        setMap(
+          place.embedUrl,
+          place.url,
+          `${index + 1}. ${stop.name}`,
+          "当前显示地点位置。需要查看实际走法时，选择上方的分段路线；观日列车、步道开放与团队集合点按官方或订单信息确认。",
+        );
+        selected = true;
+      }
+      if (!selected) return;
+      q<HTMLSelectElement>("[data-map-route]").value = value;
       panel()
         .querySelectorAll<HTMLElement>("[data-stop-row]")
         .forEach((row) =>
           row.classList.toggle(
             "is-active",
-            Number(row.dataset.stopRow) === index,
+            kind === "stop" && Number(row.dataset.stopRow) === index,
           ),
         );
-      markers.forEach((marker, n) => {
-        marker.getElement().classList.toggle("is-active", n === index);
-        if (n !== index) marker.getPopup()?.remove();
-      });
-      q<HTMLElement>("[data-map-selection]").textContent =
-        `${index + 1}. ${stop.name}`;
-      if (map && ready) {
-        if (move)
-          map.easeTo({
-            center: stop.xy,
-            zoom: Math.max(map.getZoom(), 13),
-            duration: motion(),
-          });
-        if (!markers[index].getPopup()?.isOpen()) markers[index].togglePopup();
-      }
-    }
-    function fitDay() {
-      if (!map || !ready) return;
-      const bounds = new maplibregl.LngLatBounds();
-      day.stops.forEach((stop) => bounds.extend(stop.xy));
-      map.fitBounds(bounds, { padding: 55, maxZoom: 13, duration: motion() });
-    }
-    function drawDay() {
-      if (!map || !ready) return;
-      (map.getSource("tw-route") as maplibregl.GeoJSONSource).setData({
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: day.stops.map((stop) => stop.xy),
-        },
-      });
-      markers.forEach((marker) => marker.remove());
-      markers = day.stops.map((stop, index) => {
-        const dot = document.createElement("button");
-        dot.type = "button";
-        dot.className = "tw-map-pin";
-        dot.textContent = String(index + 1);
-        dot.setAttribute("aria-label", `${index + 1}. ${stop.name}`);
-        const marker = new maplibregl.Marker({ element: dot })
-          .setLngLat(stop.xy)
-          .setPopup(new maplibregl.Popup({ offset: 22 }).setText(stop.name))
-          .addTo(map!);
-        // MapLibre toggles the popup on marker click; let that event run before synchronising the list.
-        dot.addEventListener("click", () =>
-          requestAnimationFrame(() => focusStop(index, false)),
+      panel()
+        .querySelectorAll<HTMLButtonElement>("[data-map-leg]")
+        .forEach((button) =>
+          button.setAttribute(
+            "aria-pressed",
+            String(kind === "leg" && Number(button.dataset.mapLeg) === index),
+          ),
         );
-        return marker;
-      });
-      fitDay();
     }
+    function loadDayMap() {
+      const select = q<HTMLSelectElement>("[data-map-route]");
+      const routeGroup = document.createElement("optgroup");
+      routeGroup.label = "分段路线";
+      day.legs.forEach((leg, index) => {
+        if (googleRoute(leg.url))
+          routeGroup.append(new Option(leg.label, `leg:${index}`));
+      });
+      const placeGroup = document.createElement("optgroup");
+      placeGroup.label = "地点位置";
+      day.stops.forEach((stop, index) =>
+        placeGroup.append(
+          new Option(`${index + 1}. ${stop.name}`, `stop:${index}`),
+        ),
+      );
+      select.replaceChildren(routeGroup, placeGroup);
+      selectMap(
+        routeGroup.firstElementChild?.getAttribute("value") ?? "stop:0",
+      );
+    }
+    frame.addEventListener("load", () => {
+      frame.classList.remove("is-loading");
+      frame.setAttribute("aria-busy", "false");
+      clearTimeout(loadTimer);
+      q<HTMLElement>("[data-map-loading]").hidden = true;
+      q<HTMLElement>("[data-map-error]").hidden = true;
+    });
+    frame.addEventListener("error", () => {
+      frame.setAttribute("aria-busy", "false");
+      clearTimeout(loadTimer);
+      q<HTMLElement>("[data-map-loading]").hidden = true;
+      q<HTMLElement>("[data-map-error]").hidden = false;
+    });
+    q<HTMLSelectElement>("[data-map-route]").addEventListener(
+      "change",
+      (event) => selectMap((event.currentTarget as HTMLSelectElement).value),
+    );
     function selectDay(id: number) {
       day = plan.days.find((item) => item.id === id) ?? plan.days[0];
       qa<HTMLButtonElement>(`[data-plan-rail="${plan.id}"] [data-day]`).forEach(
@@ -387,9 +473,7 @@ const first = plans[0];
       );
       q<HTMLElement>("[data-map-title]").textContent =
         `D${day.id} · ${day.name}`;
-      q<HTMLElement>("[data-map-selection]").textContent =
-        "选择地点编号，可在地图定位。";
-      drawDay();
+      loadDayMap();
     }
     qa<HTMLButtonElement>("[data-day]").forEach((button) => {
       button.addEventListener("click", () =>
@@ -426,9 +510,30 @@ const first = plans[0];
         selectDay(Number(buttons[next].dataset.day));
       });
     });
+    function showMap(value: string) {
+      selectMap(value);
+      if (window.matchMedia("(max-width: 680px)").matches) {
+        q<HTMLElement>("[data-workspace]").dataset.view = "map";
+        qa<HTMLButtonElement>("button[data-view]").forEach((button) =>
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.view === "map"),
+          ),
+        );
+        q<HTMLElement>(".tw-mobile-view").scrollIntoView({
+          block: "start",
+          behavior: "instant",
+        });
+      }
+    }
     qa<HTMLButtonElement>("[data-stop]").forEach((button) =>
       button.addEventListener("click", () =>
-        focusStop(Number(button.dataset.stop)),
+        showMap(`stop:${button.dataset.stop}`),
+      ),
+    );
+    qa<HTMLButtonElement>("[data-map-leg]").forEach((button) =>
+      button.addEventListener("click", () =>
+        showMap(`leg:${button.dataset.mapLeg}`),
       ),
     );
     function updateBudget() {
@@ -483,61 +588,10 @@ const first = plans[0];
         qa<HTMLButtonElement>("button[data-view]").forEach((item) =>
           item.setAttribute("aria-pressed", String(item === button)),
         );
-        requestAnimationFrame(() => {
-          map?.resize();
-          fitDay();
-        });
       }),
     );
-    q<HTMLButtonElement>("[data-fit-map]").addEventListener("click", fitDay);
-    const showError = () => {
-      q<HTMLElement>("[data-map-loading]").hidden = true;
-      q<HTMLElement>("[data-map-error]").hidden = false;
-    };
-    try {
-      map = new maplibregl.Map({
-        container: q<HTMLElement>("[data-tw-map]"),
-        style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
-        center: [121.519, 25.052],
-        zoom: 10,
-        attributionControl: {},
-      });
-      map.addControl(
-        new maplibregl.NavigationControl({ showCompass: false }),
-        "top-right",
-      );
-      map.on("load", () => {
-        if (!map) return;
-        map.addSource("tw-route", {
-          type: "geojson",
-          data: { type: "FeatureCollection", features: [] },
-        });
-        map.addLayer({
-          id: "tw-route-line",
-          type: "line",
-          source: "tw-route",
-          paint: {
-            "line-color": "#aa4b30",
-            "line-width": 2.5,
-            "line-dasharray": [2, 1.5],
-          },
-        });
-        ready = true;
-        q<HTMLElement>("[data-map-loading]").hidden = true;
-        q<HTMLElement>("[data-map-error]").hidden = true;
-        drawDay();
-      });
-      map.on("error", showError);
-    } catch {
-      showError();
-    }
     updateBudget();
-    // The map starts hidden in the mobile list view; resize when the viewport changes.
-    const observer = new ResizeObserver(() => {
-      map?.resize();
-      fitDay();
-    });
-    observer.observe(q<HTMLElement>("[data-tw-map]"));
+    loadDayMap();
   }
 </script>
 
@@ -567,14 +621,14 @@ const first = plans[0];
     margin: 0;
     padding: 0;
   }
-  .tw-planner :is(button, input) {
+  .tw-planner :is(button, input, select) {
     font: inherit;
   }
   .tw-planner button {
     cursor: pointer;
     color: inherit;
   }
-  .tw-planner :is(button, a, input, summary):focus-visible {
+  .tw-planner :is(button, a, input, select, summary):focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 4px;
   }
@@ -795,6 +849,43 @@ const first = plans[0];
     font-weight: 600;
     margin-bottom: 10px;
   }
+  .tw-legs li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .tw-show-route {
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    font-size: 11px !important;
+    white-space: nowrap;
+    min-height: 44px;
+    padding: 8px 0;
+  }
+  .tw-show-route[aria-pressed="true"] {
+    color: var(--accent);
+    border-color: currentColor;
+  }
+  .tw-map-route-label {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .tw-planner select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
   .tw-legs li a {
     display: block;
     padding: 8px 0;
@@ -840,7 +931,9 @@ const first = plans[0];
     font-size: 13px;
     font-weight: 500;
   }
-  .tw-map-heading button {
+  .tw-map-heading a {
+    display: inline-flex;
+    align-items: center;
     min-height: 44px;
     border: 0;
     border-bottom: 1px solid var(--line);
@@ -853,6 +946,9 @@ const first = plans[0];
     position: relative;
   }
   .tw-map {
+    width: 100%;
+    display: block;
+    border: 0;
     height: min(62vh, 640px);
     min-height: 390px;
     background: color-mix(in srgb, var(--ink) 9%, var(--surface));
@@ -870,6 +966,14 @@ const first = plans[0];
     font-size: 12px;
     min-height: 21px;
   }
+  .tw-map.is-loading {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .tw-map-wrap {
+    background: var(--tw-soft);
+    border-radius: 10px;
+  }
   .tw-map-error,
   .tw-map-loading {
     position: absolute;
@@ -880,36 +984,6 @@ const first = plans[0];
     background: var(--surface);
     font-size: 13px;
     border-radius: 7px;
-  }
-  .tw-map-pin {
-    width: 29px;
-    height: 29px;
-    border: 2px solid #fff;
-    background: #a0442b;
-    color: #fff !important;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: 600;
-    box-shadow: 0 2px 7px #0003;
-  }
-  .tw-map-pin:hover,
-  .tw-map-pin.is-active {
-    background: #263c4a;
-  }
-  .tw-planner .maplibregl-popup-content {
-    color: #20303b;
-    font: 13px/1.7 sans-serif;
-    padding: 12px;
-  }
-  .tw-planner .maplibregl-popup-close-button {
-    width: 24px;
-    height: 24px;
-  }
-  .tw-planner .maplibregl-ctrl-attrib {
-    font: 10px/1.5 sans-serif;
-  }
-  .tw-planner .maplibregl-ctrl-attrib a {
-    color: #333;
   }
   .tw-all-links {
     padding: 18px 28px;
@@ -990,6 +1064,7 @@ const first = plans[0];
     white-space: nowrap;
   }
   .tw-mobile-view {
+    scroll-margin-top: 100px;
     display: none;
   }
   .tw-nojs {
@@ -1079,6 +1154,9 @@ const first = plans[0];
       position: static;
     }
     .tw-map {
+      width: 100%;
+      display: block;
+      border: 0;
       height: 55vh;
       min-height: 320px;
     }

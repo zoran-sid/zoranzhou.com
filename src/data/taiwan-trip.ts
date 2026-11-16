@@ -1,5 +1,6 @@
 export interface TaiwanStop {
   name: string;
+  mapQuery: string;
   xy: [number, number];
   kind: string;
   detail: string;
@@ -48,7 +49,7 @@ export const taiwanPlans: TaiwanPlan[] = [
         base: "台北",
         name: "抵达与入住",
         route: "桃园机场 → A1 → 开封街酒店 → 宁夏夜市",
-        note: "入住与晚餐为主，夜市只选两三样；图中车站点为区域示意，找出口使用步行导航。",
+        note: "入住与晚餐为主，夜市只选两三样。机场捷运、台北捷运出口编号不同，到店使用A1的5号出口分段导航。",
         stops: [
           {
             name: "桃园国际机场",
@@ -56,6 +57,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "抵达",
             detail: "下午抵达后先处理入境、现金和交通卡，出站时间留出弹性。",
             period: "抵达后",
+            mapQuery: "桃園國際機場",
           },
           {
             name: "台北车站区域",
@@ -64,14 +66,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "A1、捷运与高铁出口编号不同；机场捷运到店使用A1的5号出口链接。",
             period: "换乘",
+            mapQuery: "桃園機場捷運A1台北車站",
           },
           {
-            name: "天云开封分馆（位置示意）",
+            name: "天雲旅棧台北開封分館",
             xy: [121.5126, 25.0462],
             kind: "住宿",
-            detail:
-              "开封街一段33号。先放好行李；本点位只示意街区，到店认门牌。",
+            detail: "开封街一段33号。先放好行李；到店认分馆名与门牌。",
             period: "先入住",
+            mapQuery: "台北市中正區開封街一段33號",
           },
           {
             name: "宁夏夜市",
@@ -79,6 +82,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "美食",
             detail: "晚餐先选两三样，热门摊位售完时换附近店。",
             period: "晚餐可选",
+            mapQuery: "寧夏夜市 台北市",
           },
         ],
         previewUrl:
@@ -117,11 +121,12 @@ export const taiwanPlans: TaiwanPlan[] = [
         note: "中山或101登顶可删一项；夜市后搭红线返回台北车站。",
         stops: [
           {
-            name: "天云开封分馆（位置示意）",
+            name: "天雲旅棧台北開封分館",
             xy: [121.5126, 25.0462],
             kind: "住宿",
             detail: "在酒店或附近吃早餐，先去故宫，不额外排热门早餐店。",
             period: "早餐后出门",
+            mapQuery: "台北市中正區開封街一段33號",
           },
           {
             name: "故宫",
@@ -130,6 +135,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "选重点展厅，不把所有展馆都塞进一个上午。早餐在酒店周边解决。",
             period: "上午",
+            mapQuery: "國立故宮博物院 台北市",
           },
           {
             name: "中山／赤峰街",
@@ -137,6 +143,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "街区",
             detail: "午餐、咖啡与小店留作休息段，体力不足时缩短。",
             period: "午后",
+            mapQuery: "赤峰街 台北市",
           },
           {
             name: "台北101",
@@ -144,6 +151,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "城市",
             detail: "观景台可选；能见度差时只在周边散步。",
             period: "傍晚可选",
+            mapQuery: "台北101",
           },
           {
             name: "临江街夜市",
@@ -151,13 +159,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "美食",
             detail: "留在信义、大安一侧吃晚饭，再搭红线回台北车站。",
             period: "晚餐",
+            mapQuery: "臨江街觀光夜市 台北市",
           },
           {
-            name: "天云开封分馆（位置示意）",
+            name: "天雲旅棧台北開封分館",
             xy: [121.5126, 25.0462],
             kind: "住宿",
             detail: "夜市后搭红线回台北车站，再步行回开封街一段33号。",
             period: "晚间回酒店",
+            mapQuery: "台北市中正區開封街一段33號",
           },
         ],
         previewUrl:
@@ -166,6 +176,14 @@ export const taiwanPlans: TaiwanPlan[] = [
           {
             label: "酒店 → 故宫公共交通",
             url: "https://www.google.com/maps/dir/?api=1&origin=%E5%8F%B0%E5%8C%97%E5%B8%82%E4%B8%AD%E6%AD%A3%E5%8D%80%E9%96%8B%E5%B0%81%E8%A1%97%E4%B8%80%E6%AE%B533%E8%99%9F&destination=%E5%9C%8B%E7%AB%8B%E6%95%85%E5%AE%AE%E5%8D%9A%E7%89%A9%E9%99%A2+%E5%8F%B0%E5%8C%97&travelmode=transit",
+          },
+          {
+            label: "故宫 → 中山／赤峰街",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E5%9C%8B%E7%AB%8B%E6%95%85%E5%AE%AE%E5%8D%9A%E7%89%A9%E9%99%A2+%E5%8F%B0%E5%8C%97%E5%B8%82&destination=%E6%8D%B7%E9%81%8B%E4%B8%AD%E5%B1%B1%E7%AB%99+%E5%8F%B0%E5%8C%97%E5%B8%82&travelmode=transit",
+          },
+          {
+            label: "中山／赤峰街 → 101",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E6%8D%B7%E9%81%8B%E4%B8%AD%E5%B1%B1%E7%AB%99+%E5%8F%B0%E5%8C%97%E5%B8%82&destination=%E5%8F%B0%E5%8C%97101&travelmode=transit",
           },
           {
             label: "101 → 临江街夜市步行",
@@ -202,6 +220,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "点位只示意台北车站区域；一日团集合位置、时刻以自己的订单为准。",
             period: "早上",
+            mapQuery: "台北車站",
           },
           {
             name: "野柳",
@@ -209,6 +228,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "自然",
             detail: "暴雨、强风时删除，跟团时先确认取消和换日条件。",
             period: "随团时段",
+            mapQuery: "野柳地質公園",
           },
           {
             name: "十分",
@@ -216,6 +236,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "街区",
             detail: "老街和瀑布按交通时间取舍；天灯是自选活动。",
             period: "随团时段",
+            mapQuery: "十分老街 新北市",
           },
           {
             name: "九份",
@@ -223,6 +244,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "文化",
             detail: "基山街进、竖崎路看石阶和茶馆，回程记住原集合点。",
             period: "傍晚",
+            mapQuery: "九份老街 新北市",
           },
           {
             name: "台北车站区域（返城示意）",
@@ -230,11 +252,28 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "按一日团实际解散位置回酒店；自助游另查末班铁路与公车。",
             period: "返城后",
+            mapQuery: "台北車站",
           },
         ],
         previewUrl:
           "https://www.google.com/maps/dir/Taipei+Main+Station/Yehliu+Geopark/Shifen+Old+Street/Jiufen+Old+Street/Taipei+Main+Station/",
         legs: [
+          {
+            label: "台北 → 野柳（自助交通查询）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E5%8F%B0%E5%8C%97%E8%BB%8A%E7%AB%99&destination=%E9%87%8E%E6%9F%B3%E5%9C%B0%E8%B3%AA%E5%85%AC%E5%9C%92&travelmode=transit",
+          },
+          {
+            label: "野柳 → 十分（自助交通查询）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E9%87%8E%E6%9F%B3%E5%9C%B0%E8%B3%AA%E5%85%AC%E5%9C%92&destination=%E5%8D%81%E5%88%86%E8%80%81%E8%A1%97+%E6%96%B0%E5%8C%97%E5%B8%82&travelmode=transit",
+          },
+          {
+            label: "十分 → 九份（需换乘）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E5%8D%81%E5%88%86%E8%80%81%E8%A1%97+%E6%96%B0%E5%8C%97%E5%B8%82&destination=%E4%B9%9D%E4%BB%BD%E8%80%81%E8%A1%97+%E6%96%B0%E5%8C%97%E5%B8%82&travelmode=transit",
+          },
+          {
+            label: "九份 → 台北（返程查询）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E4%B9%9D%E4%BB%BD%E8%80%81%E8%A1%97+%E6%96%B0%E5%8C%97%E5%B8%82&destination=%E5%8F%B0%E5%8C%97%E8%BB%8A%E7%AB%99&travelmode=transit",
+          },
           {
             label: "台北 → 瑞芳（雨备）",
             url: "https://www.google.com/maps/dir/?api=1&origin=%E5%8F%B0%E5%8C%97%E8%BB%8A%E7%AB%99&destination=%E7%91%9E%E8%8A%B3%E8%BB%8A%E7%AB%99&travelmode=transit",
@@ -274,6 +313,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "从酒店前往高铁站，核对车次月台；按嘉义客运时间倒推高铁抵达时间。",
             period: "早上",
+            mapQuery: "高鐵台北站",
           },
           {
             name: "高铁嘉义站",
@@ -281,6 +321,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "2号出口查阿里山线候车点，按票券核对月台与班次。",
             period: "预订车次",
+            mapQuery: "高鐵嘉義站",
           },
           {
             name: "阿里山转运站",
@@ -288,6 +329,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "这里是客运到达点，与森林铁路车站不同；住宿仍待确认。",
             period: "午后抵达",
+            mapQuery: "阿里山轉運站",
           },
         ],
         previewUrl:
@@ -327,6 +369,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "自然",
             detail: "发车时间前一天下午公告，网上订票另有中午截止时间。",
             period: "按观日公告",
+            mapQuery: "祝山觀日平台 阿里山",
           },
           {
             name: "阿里山车站／住宿区域",
@@ -334,6 +377,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "休息",
             detail: "观日回来早餐和补眠；下午按天气与开放情况走短步道。",
             period: "留在山上",
+            mapQuery: "阿里山森林鐵路阿里山車站",
           },
         ],
         previewUrl:
@@ -374,6 +418,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "预留退房、到候车处和验票时间，确认下山目的地是台铁嘉义站。",
             period: "退房后候车",
+            mapQuery: "阿里山轉運站",
           },
           {
             name: "台铁嘉义站",
@@ -381,6 +426,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "下山到的是市区台铁站，按实际到站情况接台南方向列车。",
             period: "山路后留缓冲",
+            mapQuery: "臺鐵嘉義站",
           },
           {
             name: "台铁台南站",
@@ -388,13 +434,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "去民权路二段97号，拖箱或疲劳时可改搭车。",
             period: "到站后",
+            mapQuery: "臺鐵臺南站",
           },
           {
-            name: "赤崁楼馆（位置示意）",
+            name: "康桥台南赤崁楼馆",
             xy: [120.2028, 22.9963],
             kind: "住宿",
             detail: "民权路二段97号。先放行李，确认早餐、晚点心和代收箱安排。",
             period: "先休息",
+            mapQuery: "臺南市中西區民權路二段97號",
           },
           {
             name: "神农街",
@@ -402,6 +450,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "街区",
             detail: "看街屋和灯笼，留意住宅与营业店面的区别。",
             period: "傍晚／夜间",
+            mapQuery: "神農街 臺南市",
           },
           {
             name: "花园夜市（可选）",
@@ -409,6 +458,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "美食",
             detail: "与神农街散步二选一；营业日和天气出发前再确认。",
             period: "替代晚餐",
+            mapQuery: "花園夜市 臺南市",
           },
         ],
         previewUrl:
@@ -455,11 +505,12 @@ export const taiwanPlans: TaiwanPlan[] = [
         note: "今天继续住赤崁楼馆。早点吃日间小吃，午后选一小片街区；室内场馆先查周一休馆，不把博物馆设为必去。",
         stops: [
           {
-            name: "赤崁楼馆（位置示意）",
+            name: "康桥台南赤崁楼馆",
             xy: [120.2028, 22.9963],
             kind: "住宿",
             detail: "民权路二段97号。先放行李，确认早餐、晚点心和代收箱安排。",
             period: "先休息",
+            mapQuery: "臺南市中西區民權路二段97號",
           },
           {
             name: "国华街／永乐市场",
@@ -467,6 +518,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "美食",
             detail: "早点吃日间小吃，逐家查营业；选两三家即可。",
             period: "早午餐",
+            mapQuery: "永樂市場 國華街三段 臺南市",
           },
           {
             name: "神农街",
@@ -474,6 +526,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "街区",
             detail: "看街屋和灯笼，留意住宅与营业店面的区别。",
             period: "傍晚／夜间",
+            mapQuery: "神農街 臺南市",
           },
           {
             name: "赤崁楼馆（回住宿）",
@@ -481,6 +534,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "休息",
             detail: "同一住处再住一晚，下午可以随时回房间休息。",
             period: "弹性",
+            mapQuery: "臺南市中西區民權路二段97號",
           },
         ],
         previewUrl:
@@ -522,15 +576,17 @@ export const taiwanPlans: TaiwanPlan[] = [
             name: "台铁台南站",
             xy: [120.2129, 22.9971],
             kind: "换乘",
-            detail: "去民权路二段97号，拖箱或疲劳时可改搭车。",
+            detail: "早餐后前往市区台铁台南站，核对南下高雄的列车与月台。",
             period: "到站后",
+            mapQuery: "臺鐵臺南站",
           },
           {
-            name: "高雄车站／站前馆方向",
+            name: "康桥高雄站前馆",
             xy: [120.3021, 22.6396],
             kind: "换乘",
             detail: "先到建国二路295号寄箱，再去港区，不等正式入住。",
             period: "寄存／返站",
+            mapQuery: "高雄市三民區建國二路295號",
           },
           {
             name: "鼓山渡轮站",
@@ -538,6 +594,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "渡轮",
             detail: "先查天气与轮渡运行，把排队计入港区时间。",
             period: "先查轮渡",
+            mapQuery: "鼓山輪渡站 高雄市",
           },
           {
             name: "旗津海岸",
@@ -545,6 +602,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "自然",
             detail: "海岸散步为主，不把冬季日落当成必达打卡。",
             period: "日间优先",
+            mapQuery: "旗津海岸公園",
           },
           {
             name: "鼓山渡轮站",
@@ -552,6 +610,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "渡轮",
             detail: "先查天气与轮渡运行，把排队计入港区时间。",
             period: "先查轮渡",
+            mapQuery: "鼓山輪渡站 高雄市",
           },
           {
             name: "驳二（可删）",
@@ -559,13 +618,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "文化",
             detail: "旧港仓库和公共艺术可单独逛，疲劳或晚到就删。",
             period: "回程可选",
+            mapQuery: "駁二藝術特區 高雄市",
           },
           {
-            name: "高雄车站／站前馆方向",
+            name: "康桥高雄站前馆",
             xy: [120.3021, 22.6396],
             kind: "换乘",
-            detail: "先到建国二路295号寄箱，再去港区，不等正式入住。",
-            period: "寄存／返站",
+            detail: "结束港区活动后回建国二路295号酒店办理入住。",
+            period: "晚间回酒店",
+            mapQuery: "高雄市三民區建國二路295號",
           },
         ],
         previewUrl:
@@ -584,12 +645,28 @@ export const taiwanPlans: TaiwanPlan[] = [
             url: "https://www.google.com/maps/dir/?api=1&origin=%E9%AB%98%E9%9B%84%E5%B8%82%E4%B8%89%E6%B0%91%E5%8D%80%E5%BB%BA%E5%9C%8B%E4%BA%8C%E8%B7%AF295%E8%99%9F&destination=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99&travelmode=transit",
           },
           {
-            label: "鼓山 → 旗津（含渡轮）",
-            url: "https://www.google.com/maps/dir/?api=1&origin=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99&destination=%E6%97%97%E6%B4%A5%E6%B5%B7%E5%B2%B8%E5%85%AC%E5%9C%92&travelmode=transit",
+            label: "鼓山渡轮站 → 旗津渡轮站（查渡轮）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&destination=%E6%97%97%E6%B4%A5%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&travelmode=transit",
+          },
+          {
+            label: "旗津码头 → 海岸步行",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E6%97%97%E6%B4%A5%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&destination=%E6%97%97%E6%B4%A5%E6%B5%B7%E5%B2%B8%E5%85%AC%E5%9C%92&travelmode=walking",
+          },
+          {
+            label: "海岸 → 旗津码头步行",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E6%97%97%E6%B4%A5%E6%B5%B7%E5%B2%B8%E5%85%AC%E5%9C%92&destination=%E6%97%97%E6%B4%A5%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&travelmode=walking",
+          },
+          {
+            label: "旗津渡轮站 → 鼓山渡轮站（返程）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E6%97%97%E6%B4%A5%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&destination=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&travelmode=transit",
           },
           {
             label: "鼓山 → 驳二（可删）",
             url: "https://www.google.com/maps/dir/?api=1&origin=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99&destination=%E9%A7%81%E4%BA%8C%E8%97%9D%E8%A1%93%E7%89%B9%E5%8D%80&travelmode=walking",
+          },
+          {
+            label: "驳二 → 站前馆（回酒店）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E9%A7%81%E4%BA%8C%E8%97%9D%E8%A1%93%E7%89%B9%E5%8D%80+%E9%AB%98%E9%9B%84%E5%B8%82&destination=%E9%AB%98%E9%9B%84%E5%B8%82%E4%B8%89%E6%B0%91%E5%8D%80%E5%BB%BA%E5%9C%8B%E4%BA%8C%E8%B7%AF295%E8%99%9F&travelmode=transit",
           },
         ],
         culture: {
@@ -612,11 +689,12 @@ export const taiwanPlans: TaiwanPlan[] = [
         note: "参考下午航班；若改早班机，先倒推报到时间，不强求吃07:00开始的酒店早餐。",
         stops: [
           {
-            name: "高雄车站／站前馆方向",
+            name: "康桥高雄站前馆",
             xy: [120.3021, 22.6396],
             kind: "换乘",
             detail: "先到建国二路295号寄箱，再去港区，不等正式入住。",
             period: "寄存／返站",
+            mapQuery: "高雄市三民區建國二路295號",
           },
           {
             name: "高雄国际机场",
@@ -624,6 +702,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "返程",
             detail: "按实际航班报到要求倒推，行李加购和退改在出票前确认。",
             period: "按航班倒推",
+            mapQuery: "高雄國際機場",
           },
         ],
         previewUrl:
@@ -669,7 +748,7 @@ export const taiwanPlans: TaiwanPlan[] = [
         base: "台北",
         name: "抵达与入住",
         route: "桃园机场 → A1 → 开封街酒店 → 宁夏夜市",
-        note: "入住与晚餐为主，夜市只选两三样；图中车站点为区域示意，找出口使用步行导航。",
+        note: "入住与晚餐为主，夜市只选两三样。机场捷运、台北捷运出口编号不同，到店使用A1的5号出口分段导航。",
         stops: [
           {
             name: "桃园国际机场",
@@ -677,6 +756,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "抵达",
             detail: "下午抵达后先处理入境、现金和交通卡，出站时间留出弹性。",
             period: "抵达后",
+            mapQuery: "桃園國際機場",
           },
           {
             name: "台北车站区域",
@@ -685,14 +765,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "A1、捷运与高铁出口编号不同；机场捷运到店使用A1的5号出口链接。",
             period: "换乘",
+            mapQuery: "桃園機場捷運A1台北車站",
           },
           {
-            name: "天云开封分馆（位置示意）",
+            name: "天雲旅棧台北開封分館",
             xy: [121.5126, 25.0462],
             kind: "住宿",
-            detail:
-              "开封街一段33号。先放好行李；本点位只示意街区，到店认门牌。",
+            detail: "开封街一段33号。先放好行李；到店认分馆名与门牌。",
             period: "先入住",
+            mapQuery: "台北市中正區開封街一段33號",
           },
           {
             name: "宁夏夜市",
@@ -700,6 +781,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "美食",
             detail: "晚餐先选两三样，热门摊位售完时换附近店。",
             period: "晚餐可选",
+            mapQuery: "寧夏夜市 台北市",
           },
         ],
         previewUrl:
@@ -738,11 +820,12 @@ export const taiwanPlans: TaiwanPlan[] = [
         note: "中山或101登顶可删一项；夜市后搭红线返回台北车站。",
         stops: [
           {
-            name: "天云开封分馆（位置示意）",
+            name: "天雲旅棧台北開封分館",
             xy: [121.5126, 25.0462],
             kind: "住宿",
             detail: "在酒店或附近吃早餐，先去故宫，不额外排热门早餐店。",
             period: "早餐后出门",
+            mapQuery: "台北市中正區開封街一段33號",
           },
           {
             name: "故宫",
@@ -751,6 +834,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "选重点展厅，不把所有展馆都塞进一个上午。早餐在酒店周边解决。",
             period: "上午",
+            mapQuery: "國立故宮博物院 台北市",
           },
           {
             name: "中山／赤峰街",
@@ -758,6 +842,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "街区",
             detail: "午餐、咖啡与小店留作休息段，体力不足时缩短。",
             period: "午后",
+            mapQuery: "赤峰街 台北市",
           },
           {
             name: "台北101",
@@ -765,6 +850,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "城市",
             detail: "观景台可选；能见度差时只在周边散步。",
             period: "傍晚可选",
+            mapQuery: "台北101",
           },
           {
             name: "临江街夜市",
@@ -772,13 +858,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "美食",
             detail: "留在信义、大安一侧吃晚饭，再搭红线回台北车站。",
             period: "晚餐",
+            mapQuery: "臨江街觀光夜市 台北市",
           },
           {
-            name: "天云开封分馆（位置示意）",
+            name: "天雲旅棧台北開封分館",
             xy: [121.5126, 25.0462],
             kind: "住宿",
             detail: "夜市后搭红线回台北车站，再步行回开封街一段33号。",
             period: "晚间回酒店",
+            mapQuery: "台北市中正區開封街一段33號",
           },
         ],
         previewUrl:
@@ -787,6 +875,14 @@ export const taiwanPlans: TaiwanPlan[] = [
           {
             label: "酒店 → 故宫公共交通",
             url: "https://www.google.com/maps/dir/?api=1&origin=%E5%8F%B0%E5%8C%97%E5%B8%82%E4%B8%AD%E6%AD%A3%E5%8D%80%E9%96%8B%E5%B0%81%E8%A1%97%E4%B8%80%E6%AE%B533%E8%99%9F&destination=%E5%9C%8B%E7%AB%8B%E6%95%85%E5%AE%AE%E5%8D%9A%E7%89%A9%E9%99%A2+%E5%8F%B0%E5%8C%97&travelmode=transit",
+          },
+          {
+            label: "故宫 → 中山／赤峰街",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E5%9C%8B%E7%AB%8B%E6%95%85%E5%AE%AE%E5%8D%9A%E7%89%A9%E9%99%A2+%E5%8F%B0%E5%8C%97%E5%B8%82&destination=%E6%8D%B7%E9%81%8B%E4%B8%AD%E5%B1%B1%E7%AB%99+%E5%8F%B0%E5%8C%97%E5%B8%82&travelmode=transit",
+          },
+          {
+            label: "中山／赤峰街 → 101",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E6%8D%B7%E9%81%8B%E4%B8%AD%E5%B1%B1%E7%AB%99+%E5%8F%B0%E5%8C%97%E5%B8%82&destination=%E5%8F%B0%E5%8C%97101&travelmode=transit",
           },
           {
             label: "101 → 临江街夜市步行",
@@ -823,6 +919,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "点位只示意台北车站区域；一日团集合位置、时刻以自己的订单为准。",
             period: "早上",
+            mapQuery: "台北車站",
           },
           {
             name: "野柳",
@@ -830,6 +927,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "自然",
             detail: "暴雨、强风时删除，跟团时先确认取消和换日条件。",
             period: "随团时段",
+            mapQuery: "野柳地質公園",
           },
           {
             name: "十分",
@@ -837,6 +935,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "街区",
             detail: "老街和瀑布按交通时间取舍；天灯是自选活动。",
             period: "随团时段",
+            mapQuery: "十分老街 新北市",
           },
           {
             name: "九份",
@@ -844,6 +943,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "文化",
             detail: "基山街进、竖崎路看石阶和茶馆，回程记住原集合点。",
             period: "傍晚",
+            mapQuery: "九份老街 新北市",
           },
           {
             name: "台北车站区域（返城示意）",
@@ -851,11 +951,28 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "按一日团实际解散位置回酒店；自助游另查末班铁路与公车。",
             period: "返城后",
+            mapQuery: "台北車站",
           },
         ],
         previewUrl:
           "https://www.google.com/maps/dir/Taipei+Main+Station/Yehliu+Geopark/Shifen+Old+Street/Jiufen+Old+Street/Taipei+Main+Station/",
         legs: [
+          {
+            label: "台北 → 野柳（自助交通查询）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E5%8F%B0%E5%8C%97%E8%BB%8A%E7%AB%99&destination=%E9%87%8E%E6%9F%B3%E5%9C%B0%E8%B3%AA%E5%85%AC%E5%9C%92&travelmode=transit",
+          },
+          {
+            label: "野柳 → 十分（自助交通查询）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E9%87%8E%E6%9F%B3%E5%9C%B0%E8%B3%AA%E5%85%AC%E5%9C%92&destination=%E5%8D%81%E5%88%86%E8%80%81%E8%A1%97+%E6%96%B0%E5%8C%97%E5%B8%82&travelmode=transit",
+          },
+          {
+            label: "十分 → 九份（需换乘）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E5%8D%81%E5%88%86%E8%80%81%E8%A1%97+%E6%96%B0%E5%8C%97%E5%B8%82&destination=%E4%B9%9D%E4%BB%BD%E8%80%81%E8%A1%97+%E6%96%B0%E5%8C%97%E5%B8%82&travelmode=transit",
+          },
+          {
+            label: "九份 → 台北（返程查询）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E4%B9%9D%E4%BB%BD%E8%80%81%E8%A1%97+%E6%96%B0%E5%8C%97%E5%B8%82&destination=%E5%8F%B0%E5%8C%97%E8%BB%8A%E7%AB%99&travelmode=transit",
+          },
           {
             label: "台北 → 瑞芳（雨备）",
             url: "https://www.google.com/maps/dir/?api=1&origin=%E5%8F%B0%E5%8C%97%E8%BB%8A%E7%AB%99&destination=%E7%91%9E%E8%8A%B3%E8%BB%8A%E7%AB%99&travelmode=transit",
@@ -895,6 +1012,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             detail:
               "从酒店前往高铁站，核对车次月台；按嘉义客运时间倒推高铁抵达时间。",
             period: "早上",
+            mapQuery: "高鐵台北站",
           },
           {
             name: "高铁嘉义站",
@@ -902,6 +1020,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "2号出口查阿里山线候车点，按票券核对月台与班次。",
             period: "预订车次",
+            mapQuery: "高鐵嘉義站",
           },
           {
             name: "阿里山转运站",
@@ -909,6 +1028,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "这里是客运到达点，与森林铁路车站不同；住宿仍待确认。",
             period: "午后抵达",
+            mapQuery: "阿里山轉運站",
           },
         ],
         previewUrl:
@@ -948,6 +1068,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "自然",
             detail: "发车时间前一天下午公告，网上订票另有中午截止时间。",
             period: "按观日公告",
+            mapQuery: "祝山觀日平台 阿里山",
           },
           {
             name: "阿里山转运站",
@@ -955,6 +1076,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "这里是客运到达点，与森林铁路车站不同；住宿仍待确认。",
             period: "到达后",
+            mapQuery: "阿里山轉運站",
           },
           {
             name: "台铁嘉义站",
@@ -962,6 +1084,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "下山到的是市区台铁站，按实际到站情况接台南方向列车。",
             period: "山路后留缓冲",
+            mapQuery: "臺鐵嘉義站",
           },
           {
             name: "台铁台南站",
@@ -969,13 +1092,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "去民权路二段97号，拖箱或疲劳时可改搭车。",
             period: "到站后",
+            mapQuery: "臺鐵臺南站",
           },
           {
-            name: "赤崁楼馆（位置示意）",
+            name: "康桥台南赤崁楼馆",
             xy: [120.2028, 22.9963],
             kind: "住宿",
             detail: "民权路二段97号。先放行李，确认早餐、晚点心和代收箱安排。",
             period: "先休息",
+            mapQuery: "臺南市中西區民權路二段97號",
           },
           {
             name: "神农街",
@@ -983,6 +1108,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "街区",
             detail: "看街屋和灯笼，留意住宅与营业店面的区别。",
             period: "傍晚／夜间",
+            mapQuery: "神農街 臺南市",
           },
           {
             name: "花园夜市（可选）",
@@ -990,6 +1116,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "美食",
             detail: "与神农街散步二选一；营业日和天气出发前再确认。",
             period: "替代晚餐",
+            mapQuery: "花園夜市 臺南市",
           },
         ],
         previewUrl:
@@ -1041,11 +1168,12 @@ export const taiwanPlans: TaiwanPlan[] = [
         note: "以12:30前搭车南下、15:30前到鼓山候船为目标；不等酒店入住。晚到删旗津日落，驳二可删。",
         stops: [
           {
-            name: "赤崁楼馆（位置示意）",
+            name: "康桥台南赤崁楼馆",
             xy: [120.2028, 22.9963],
             kind: "住宿",
             detail: "民权路二段97号。先放行李，确认早餐、晚点心和代收箱安排。",
             period: "先休息",
+            mapQuery: "臺南市中西區民權路二段97號",
           },
           {
             name: "国华街／永乐市场",
@@ -1053,6 +1181,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "美食",
             detail: "早点吃日间小吃，逐家查营业；选两三家即可。",
             period: "早午餐",
+            mapQuery: "永樂市場 國華街三段 臺南市",
           },
           {
             name: "台铁台南站",
@@ -1060,13 +1189,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "换乘",
             detail: "去民权路二段97号，拖箱或疲劳时可改搭车。",
             period: "到站后",
+            mapQuery: "臺鐵臺南站",
           },
           {
-            name: "高雄车站／站前馆方向",
+            name: "康桥高雄站前馆",
             xy: [120.3021, 22.6396],
             kind: "换乘",
             detail: "先到建国二路295号寄箱，再去港区，不等正式入住。",
             period: "寄存／返站",
+            mapQuery: "高雄市三民區建國二路295號",
           },
           {
             name: "鼓山渡轮站",
@@ -1074,6 +1205,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "渡轮",
             detail: "先查天气与轮渡运行，把排队计入港区时间。",
             period: "先查轮渡",
+            mapQuery: "鼓山輪渡站 高雄市",
           },
           {
             name: "旗津海岸",
@@ -1081,6 +1213,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "自然",
             detail: "海岸散步为主，不把冬季日落当成必达打卡。",
             period: "日间优先",
+            mapQuery: "旗津海岸公園",
           },
           {
             name: "鼓山渡轮站",
@@ -1088,6 +1221,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "渡轮",
             detail: "先查天气与轮渡运行，把排队计入港区时间。",
             period: "先查轮渡",
+            mapQuery: "鼓山輪渡站 高雄市",
           },
           {
             name: "驳二（可删）",
@@ -1095,13 +1229,15 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "文化",
             detail: "旧港仓库和公共艺术可单独逛，疲劳或晚到就删。",
             period: "回程可选",
+            mapQuery: "駁二藝術特區 高雄市",
           },
           {
-            name: "高雄车站／站前馆方向",
+            name: "康桥高雄站前馆",
             xy: [120.3021, 22.6396],
             kind: "换乘",
-            detail: "先到建国二路295号寄箱，再去港区，不等正式入住。",
-            period: "寄存／返站",
+            detail: "结束港区活动后回建国二路295号酒店办理入住。",
+            period: "晚间回酒店",
+            mapQuery: "高雄市三民區建國二路295號",
           },
         ],
         previewUrl:
@@ -1124,12 +1260,28 @@ export const taiwanPlans: TaiwanPlan[] = [
             url: "https://www.google.com/maps/dir/?api=1&origin=%E9%AB%98%E9%9B%84%E5%B8%82%E4%B8%89%E6%B0%91%E5%8D%80%E5%BB%BA%E5%9C%8B%E4%BA%8C%E8%B7%AF295%E8%99%9F&destination=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99&travelmode=transit",
           },
           {
-            label: "鼓山 → 旗津（含渡轮）",
-            url: "https://www.google.com/maps/dir/?api=1&origin=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99&destination=%E6%97%97%E6%B4%A5%E6%B5%B7%E5%B2%B8%E5%85%AC%E5%9C%92&travelmode=transit",
+            label: "鼓山渡轮站 → 旗津渡轮站（查渡轮）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&destination=%E6%97%97%E6%B4%A5%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&travelmode=transit",
+          },
+          {
+            label: "旗津码头 → 海岸步行",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E6%97%97%E6%B4%A5%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&destination=%E6%97%97%E6%B4%A5%E6%B5%B7%E5%B2%B8%E5%85%AC%E5%9C%92&travelmode=walking",
+          },
+          {
+            label: "海岸 → 旗津码头步行",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E6%97%97%E6%B4%A5%E6%B5%B7%E5%B2%B8%E5%85%AC%E5%9C%92&destination=%E6%97%97%E6%B4%A5%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&travelmode=walking",
+          },
+          {
+            label: "旗津渡轮站 → 鼓山渡轮站（返程）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E6%97%97%E6%B4%A5%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&destination=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99+%E9%AB%98%E9%9B%84%E5%B8%82&travelmode=transit",
           },
           {
             label: "鼓山 → 驳二（可删）",
             url: "https://www.google.com/maps/dir/?api=1&origin=%E9%BC%93%E5%B1%B1%E8%BC%AA%E6%B8%A1%E7%AB%99&destination=%E9%A7%81%E4%BA%8C%E8%97%9D%E8%A1%93%E7%89%B9%E5%8D%80&travelmode=walking",
+          },
+          {
+            label: "驳二 → 站前馆（回酒店）",
+            url: "https://www.google.com/maps/dir/?api=1&origin=%E9%A7%81%E4%BA%8C%E8%97%9D%E8%A1%93%E7%89%B9%E5%8D%80+%E9%AB%98%E9%9B%84%E5%B8%82&destination=%E9%AB%98%E9%9B%84%E5%B8%82%E4%B8%89%E6%B0%91%E5%8D%80%E5%BB%BA%E5%9C%8B%E4%BA%8C%E8%B7%AF295%E8%99%9F&travelmode=transit",
           },
         ],
         culture: {
@@ -1152,11 +1304,12 @@ export const taiwanPlans: TaiwanPlan[] = [
         note: "参考下午航班；若改早班机，先倒推报到时间，不强求吃07:00开始的酒店早餐。",
         stops: [
           {
-            name: "高雄车站／站前馆方向",
+            name: "康桥高雄站前馆",
             xy: [120.3021, 22.6396],
             kind: "换乘",
             detail: "先到建国二路295号寄箱，再去港区，不等正式入住。",
             period: "寄存／返站",
+            mapQuery: "高雄市三民區建國二路295號",
           },
           {
             name: "高雄国际机场",
@@ -1164,6 +1317,7 @@ export const taiwanPlans: TaiwanPlan[] = [
             kind: "返程",
             detail: "按实际航班报到要求倒推，行李加购和退改在出票前确认。",
             period: "按航班倒推",
+            mapQuery: "高雄國際機場",
           },
         ],
         previewUrl:
