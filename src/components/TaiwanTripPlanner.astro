@@ -1,598 +1,1114 @@
 ---
-import { taiwanDays as days } from "../data/taiwan-trip";
+import { taiwanPlans as plans } from "../data/taiwan-trip";
+const first = plans[0];
 ---
 
 <section
   class="tw-planner"
   data-tw-planner
-  data-days={JSON.stringify(days)}
-  aria-labelledby="tw-trip-title"
+  data-plans={JSON.stringify(plans)}
+  aria-label="台湾旅行计划"
 >
-  <header class="tw-planner__intro">
-    <div>
-      <h2 id="tw-trip-title">七天路线，点开看每一天</h2>
-      <p>
-        台北进 ·
-        高雄出。切换日期查看当天地点、顺序与分段导航；时间目标见每一天的备注。
-      </p>
+  <header class="tw-topbar">
+    <div><h2>把路线摊开来看</h2><p data-plan-summary>{first.summary}</p></div>
+    <div class="tw-plan-switch" role="group" aria-label="选择旅行方案">
+      {
+        plans.map((plan, i) => (
+          <button type="button" data-plan={plan.id} aria-pressed={i === 0}>
+            {plan.label}
+          </button>
+        ))
+      }
     </div>
+  </header>
+  <div class="tw-trip-meta">
+    <span data-plan-range>{first.range}</span><span data-plan-nights
+      >{first.nights}</span
+    >
     <a
       href="https://www.google.com/maps/dir/Taiwan+Taoyuan+International+Airport/Taipei+Main+Station/Alishan+National+Forest+Recreation+Area/Tainan+Station/Kaohsiung+Station/Kaohsiung+International+Airport/"
       target="_blank"
-      rel="noopener noreferrer">七天地点总览 ↗</a
+      rel="noopener noreferrer">全程地点总览 ↗</a
     >
-  </header>
-  <div class="tw-planner__tabs" role="tablist" aria-label="选择行程日期">
-    {
-      days.map((day, i) => (
-        <button
-          id={`tw-day-${day.id}`}
-          type="button"
-          class:list={["tw-planner__tab", { "is-selected": i === 0 }]}
-          role="tab"
-          aria-selected={i === 0}
-          aria-controls="tw-day-panel"
-          tabindex={i === 0 ? 0 : -1}
-          data-day={day.id}
-        >
-          <span class="tw-planner__tab-date">
-            D{day.id} · {day.date}
-          </span>
-          <strong>{day.base}</strong>
-        </button>
+  </div>
+  <div class="tw-mobile-view" role="group" aria-label="切换行程或地图">
+    <button type="button" data-view="list" aria-pressed="true">查看行程</button
+    ><button type="button" data-view="map" aria-pressed="false">查看地图</button
+    >
+  </div>
+  <div class="tw-workspace" data-workspace data-view="list">
+    <nav class="tw-day-rail" aria-label="按天查看路线">
+      {
+        plans.map((plan, p) => (
+          <div
+            data-plan-rail={plan.id}
+            hidden={p !== 0}
+            role="tablist"
+            aria-label={`${plan.label}日期`}
+          >
+            {plan.days.map((day, i) => (
+              <button
+                type="button"
+                id={`tw-tab-${plan.id}-${day.id}`}
+                data-day={day.id}
+                role="tab"
+                aria-selected={i === 0}
+                aria-controls={`tw-panel-${plan.id}-${day.id}`}
+                tabindex={i === 0 ? 0 : -1}
+              >
+                <span>
+                  D{day.id}
+                  <small>{day.date}</small>
+                </span>
+                <strong>{day.base}</strong>
+              </button>
+            ))}
+          </div>
+        ))
+      }
+    </nav>
+    <div class="tw-day-content" data-day-content>
+      {
+        plans.map((plan, p) =>
+          plan.days.map((day, i) => (
+            <section
+              class="tw-day-panel"
+              id={`tw-panel-${plan.id}-${day.id}`}
+              data-panel-plan={plan.id}
+              data-panel-day={day.id}
+              role="tabpanel"
+              aria-labelledby={`tw-tab-${plan.id}-${day.id}`}
+              hidden={p !== 0 || i !== 0}
+              tabindex="0"
+            >
+              <header class="tw-day-heading">
+                <>
+                  <p class="tw-day-date">
+                    {day.date} · {day.pace}
+                  </p>
+                  <h3>{day.name}</h3>
+                  <p>{day.route}</p>
+                </>
+              </header>
+              <p class="tw-day-note">{day.note}</p>
+              <ol class="tw-stops" aria-label="当天地点顺序">
+                {day.stops.map((stop, n) => (
+                  <li data-stop-row={n}>
+                    <button
+                      class="tw-stop-number"
+                      type="button"
+                      data-stop={n}
+                      aria-label={`在地图定位：${stop.name}`}
+                      title="在地图定位"
+                    >
+                      {n + 1}
+                    </button>
+                    <div>
+                      <div class="tw-stop-meta">
+                        <span>{stop.kind}</span>
+                        <span>{stop.period}</span>
+                      </div>
+                      <h4>{stop.name}</h4>
+                      <p>{stop.detail}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <div class="tw-stay">
+                <>
+                  <span>今晚住哪</span>
+                  <strong>{day.stay}</strong>
+                </>
+              </div>
+              <div class="tw-legs">
+                <>
+                  <h4>分段导航与票务</h4>
+                  <ul>
+                    {day.legs.map((leg) => (
+                      <li>
+                        <a
+                          href={leg.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {leg.label}
+                          <span aria-hidden="true"> ↗</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    class="tw-preview"
+                    href={day.previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Google Maps 地点顺序预览 ↗
+                  </a>
+                </>
+              </div>
+              <aside class="tw-culture">
+                <>
+                  <h4>{day.culture.title}</h4>
+                  <p>{day.culture.body}</p>
+                  <a
+                    href={day.culture.source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {day.culture.source.title} ↗
+                  </a>
+                </>
+              </aside>
+            </section>
+          )),
+        )
+      }
+    </div>
+    <aside class="tw-map-column" aria-label="当天路线地图">
+      <div class="tw-map-sticky">
+        <div class="tw-map-heading">
+          <strong data-map-title>D1 · 抵达与入住</strong><button
+            type="button"
+            data-fit-map>查看全日地点</button
+          >
+        </div>
+        <div class="tw-map-wrap">
+          <div data-tw-map class="tw-map" aria-label="当天地点交互地图"></div><p
+            class="tw-map-loading"
+            data-map-loading
+          >
+            正在载入地图…
+          </p><p class="tw-map-error" data-map-error hidden>
+            地图暂时无法载入。请使用行程中的分段导航链接。
+          </p>
+        </div>
+        <p class="tw-map-caption">
+          编号对应左侧地点。虚线只表示游览顺序，坐标为规划示意；乘车、步行请打开分段导航，山上列车另查官方公告。
+        </p>
+        <p class="tw-map-selection" data-map-selection aria-live="polite">
+          选择地点编号，可在地图定位。
+        </p>
+      </div>
+    </aside>
+  </div>
+  <noscript
+    ><p class="tw-nojs">
+      启用 JavaScript 可切换每日行程与地图；所有日期的导航链接也可在下方展开。
+    </p></noscript
+  >
+  <details class="tw-all-links">
+    <summary>展开两种方案的每日导航链接</summary>{
+      plans.map((plan) => (
+        <div>
+          <>
+            <h3>{plan.label}</h3>
+            <ul>
+              {plan.days.map((day) => (
+                <li>
+                  <strong>
+                    D{day.id} · {day.date} · {day.name}
+                  </strong>
+                  <a
+                    href={day.previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    地点预览 ↗
+                  </a>
+                  {day.legs.map((leg) => (
+                    <a href={leg.url} target="_blank" rel="noopener noreferrer">
+                      {leg.label} ↗
+                    </a>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          </>
+        </div>
       ))
     }
-  </div>
-  <div
-    class="tw-planner__detail"
-    id="tw-day-panel"
-    role="tabpanel"
-    aria-labelledby="tw-day-1"
-    tabindex="0"
-  >
-    <div class="tw-planner__detail-head">
-      <span data-selected-day>D1 · 12/15</span><h3 data-selected-title>
-        {days[0].name}
-      </h3>
-    </div>
-    <p class="tw-planner__route" data-selected-route>{days[0].route}</p>
-    <p data-selected-note>{days[0].note}</p>
-    <a
-      href={days[0].previewUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-selected-link>当天地点顺序预览 ↗</a
-    >
-    <ul class="tw-planner__legs" data-selected-legs aria-label="当天分段导航">
-      {
-        days[0].legs.map((leg) => (
-          <li>
-            <a href={leg.url} target="_blank" rel="noopener noreferrer">
-              {leg.label} ↗
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </div>
-  <div class="tw-planner__map-wrap">
-    <div
-      class="tw-planner__map"
-      data-tw-map
-      role="region"
-      aria-label="台湾七日游交互地图：依次为桃园、台北、野柳、十分、九份、嘉义、阿里山、台南、高雄"
-    >
-    </div>
-    <div class="tw-planner__map-fallback" data-tw-map-error hidden>
-      在线地图暂时无法载入。上方每日路线和 Google 地图链接仍可使用。
-    </div>
-  </div>
-  <p class="tw-planner__footnote">
-    地点坐标为规划示意，橙色虚线表示当天顺序，含标注的可选点；它不是实际道路或铁路。整天链接仅作地点预览，实际乘车、步行请用分段导航并核对班次。
-  </p>
-  <details class="tw-planner__detail">
-    <summary>七天 Google Maps 地点预览</summary>
-    <p>
-      这些链接用于查看地点顺序。铁路、客运、渡轮与步行请用每天的分段入口；观日列车按官方公告，不能按驾车路线进山。
-    </p>
-    <ul class="tw-planner__legs">
-      {
-        days.map((day) => (
-          <li>
-            <a href={day.previewUrl} target="_blank" rel="noopener noreferrer">
-              D{day.id} · {day.date} · {day.name} ↗
-            </a>
-          </li>
-        ))
-      }
-    </ul>
   </details>
-  <div class="tw-planner__calc">
-    <div class="tw-planner__calc-intro">
-      <h3>自己算一次预算</h3>
-      <p>
-        单人、6 晚私人客房；交通与门票用规划预留值，汇率按 1 HKD ≈ NT$4.2 粗算。
+  <section class="tw-budget" aria-labelledby="tw-budget-title">
+    <div>
+      <h3 id="tw-budget-title">算一算，这趟要花多少</h3><p>
+        单人私人客房。切换方案会载入对应预算；按你的报价修改，1 港元按 NT$4.2
+        粗算。
       </p>
     </div>
-    <div class="tw-planner__calc-grid">
+    <div class="tw-budget-fields">
       <label
-        >机票合计 <output data-flight-output>HK$1,800</output><input
-          data-flight
-          type="range"
-          min="1200"
-          max="3400"
+        >往返机票（HK$）<input
+          data-budget="flight"
+          type="number"
+          min="0"
           step="100"
-          value="1800"
+          value={first.budget.flight}
+          inputmode="decimal"
         /></label
       >
       <label
-        >6 晚住宿 <output data-hotel-output>NT$15,000</output><input
-          data-hotel
-          type="range"
-          min="8500"
-          max="24000"
+        ><span data-hotel-label>8晚住宿（NT$）</span><input
+          data-budget="hotel"
+          type="number"
+          min="0"
           step="500"
-          value="15000"
+          value={first.budget.hotel}
+          inputmode="decimal"
         /></label
       >
       <label
-        >7 天餐饮 <output data-food-output>NT$3,500</output><input
-          data-food
-          type="range"
-          min="2200"
-          max="7000"
+        ><span data-food-label>9天餐饮（NT$）</span><input
+          data-budget="food"
+          type="number"
+          min="0"
           step="100"
-          value="3500"
+          value={first.budget.food}
+          inputmode="decimal"
+        /></label
+      >
+      <label
+        >额外开销（HK$）<input
+          data-budget="extra"
+          type="number"
+          min="0"
+          step="100"
+          value="0"
+          inputmode="decimal"
         /></label
       >
     </div>
-    <div class="tw-planner__total" aria-live="polite">
-      <div><span>估算总花费</span><strong data-total>HK$7,657</strong></div><p>
-        另固定预留 NT$6,100：台湾交通 3,000 / 景点及活动 1,600 / 应急
-        1,500。行李宅配与额外叫车另计。
-      </p>
+    <div class="tw-budget-total">
+      <p>
+        另预留交通 NT$3,000、门票活动 NT$1,600、应急
+        NT$1,500。宅配、计程车与超出部分填入额外开销。这些是规划数值，房价和机票以订单报价为准。
+      </p><output data-total aria-live="polite">约 HK$10,276</output>
     </div>
-  </div>
+  </section>
 </section>
 
 <script>
   import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import type { TaiwanDay } from "../data/taiwan-trip";
+  import type { TaiwanPlan } from "../data/taiwan-trip";
   const root = document.querySelector<HTMLElement>("[data-tw-planner]");
   if (root) {
-    const days = JSON.parse(root.dataset.days!) as TaiwanDay[];
-    const query = <T extends Element>(selector: string) =>
-      root.querySelector<T>(selector);
+    const plans: TaiwanPlan[] = JSON.parse(root.dataset.plans ?? "[]");
+    let plan = plans[0];
+    let day = plan.days[0];
     let map: maplibregl.Map | undefined;
     let ready = false;
-    let selectedDay = days[0];
     let markers: maplibregl.Marker[] = [];
-    const buttons = Array.from(
-      root.querySelectorAll<HTMLButtonElement>("[data-day]"),
-    );
+    const q = <T extends Element>(s: string) => root.querySelector<T>(s)!;
+    const qa = <T extends Element>(s: string) =>
+      Array.from(root.querySelectorAll<T>(s));
+    const motion = () =>
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 450;
+    const panel = () => q<HTMLElement>(`#tw-panel-${plan.id}-${day.id}`);
+    function focusStop(index: number, move = true) {
+      const stop = day.stops[index];
+      if (!stop) return;
+      panel()
+        .querySelectorAll<HTMLElement>("[data-stop-row]")
+        .forEach((row) =>
+          row.classList.toggle(
+            "is-active",
+            Number(row.dataset.stopRow) === index,
+          ),
+        );
+      markers.forEach((marker, n) => {
+        marker.getElement().classList.toggle("is-active", n === index);
+        if (n !== index) marker.getPopup()?.remove();
+      });
+      q<HTMLElement>("[data-map-selection]").textContent =
+        `${index + 1}. ${stop.name}`;
+      if (map && ready) {
+        if (move)
+          map.easeTo({
+            center: stop.xy,
+            zoom: Math.max(map.getZoom(), 13),
+            duration: motion(),
+          });
+        if (!markers[index].getPopup()?.isOpen()) markers[index].togglePopup();
+      }
+    }
+    function fitDay() {
+      if (!map || !ready) return;
+      const bounds = new maplibregl.LngLatBounds();
+      day.stops.forEach((stop) => bounds.extend(stop.xy));
+      map.fitBounds(bounds, { padding: 55, maxZoom: 13, duration: motion() });
+    }
     function drawDay() {
       if (!map || !ready) return;
-      const coordinates = selectedDay.stops.map((stop) => stop.xy);
       (map.getSource("tw-route") as maplibregl.GeoJSONSource).setData({
         type: "Feature",
         properties: {},
-        geometry: { type: "LineString", coordinates },
+        geometry: {
+          type: "LineString",
+          coordinates: day.stops.map((stop) => stop.xy),
+        },
       });
       markers.forEach((marker) => marker.remove());
-      markers = selectedDay.stops.map((stop, index) => {
+      markers = day.stops.map((stop, index) => {
         const dot = document.createElement("button");
         dot.type = "button";
-        dot.className = "tw-planner__pin";
+        dot.className = "tw-map-pin";
+        dot.textContent = String(index + 1);
         dot.setAttribute("aria-label", `${index + 1}. ${stop.name}`);
-        dot.title = `${index + 1}. ${stop.name}`;
-        return new maplibregl.Marker({ element: dot })
+        const marker = new maplibregl.Marker({ element: dot })
           .setLngLat(stop.xy)
-          .setPopup(
-            new maplibregl.Popup({ offset: 18 }).setText(
-              `${index + 1}. ${stop.name}`,
-            ),
-          )
+          .setPopup(new maplibregl.Popup({ offset: 22 }).setText(stop.name))
           .addTo(map!);
+        // MapLibre toggles the popup on marker click; let that event run before synchronising the list.
+        dot.addEventListener("click", () =>
+          requestAnimationFrame(() => focusStop(index, false)),
+        );
+        return marker;
       });
-      const bounds = new maplibregl.LngLatBounds();
-      coordinates.forEach((point) => bounds.extend(point));
-      map.fitBounds(bounds, {
-        padding: 45,
-        maxZoom: 13,
-        duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? 0
-          : 650,
-      });
+      fitDay();
     }
     function selectDay(id: number) {
-      selectedDay = days.find((day) => day.id === id) ?? days[0];
-      const day = selectedDay;
-      buttons.forEach((button) => {
-        const active = Number(button.dataset.day) === day.id;
-        button.classList.toggle("is-selected", active);
-        button.setAttribute("aria-selected", String(active));
-        button.tabIndex = active ? 0 : -1;
-      });
-      query<HTMLElement>("[data-selected-day]")!.textContent =
-        `D${day.id} · ${day.date}`;
-      query<HTMLElement>("[data-selected-title]")!.textContent = day.name;
-      query<HTMLElement>("[data-selected-route]")!.textContent = day.route;
-      query<HTMLElement>("[data-selected-note]")!.textContent = day.note;
-      query<HTMLAnchorElement>("[data-selected-link]")!.href = day.previewUrl;
-      query<HTMLElement>("#tw-day-panel")!.setAttribute(
-        "aria-labelledby",
-        `tw-day-${day.id}`,
+      day = plan.days.find((item) => item.id === id) ?? plan.days[0];
+      qa<HTMLButtonElement>(`[data-plan-rail="${plan.id}"] [data-day]`).forEach(
+        (button) => {
+          const active = Number(button.dataset.day) === day.id;
+          button.setAttribute("aria-selected", String(active));
+          button.tabIndex = active ? 0 : -1;
+        },
       );
-      const list = query<HTMLElement>("[data-selected-legs]")!;
-      list.replaceChildren(
-        ...day.legs.map((leg) => {
-          const item = document.createElement("li");
-          const link = document.createElement("a");
-          link.href = leg.url;
-          link.textContent = `${leg.label} ↗`;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          item.append(link);
-          return item;
-        }),
+      qa<HTMLElement>("[data-panel-plan]").forEach(
+        (item) =>
+          (item.hidden =
+            item.dataset.panelPlan !== plan.id ||
+            Number(item.dataset.panelDay) !== day.id),
       );
+      qa<HTMLElement>("[data-stop-row]").forEach((item) =>
+        item.classList.remove("is-active"),
+      );
+      q<HTMLElement>("[data-map-title]").textContent =
+        `D${day.id} · ${day.name}`;
+      q<HTMLElement>("[data-map-selection]").textContent =
+        "选择地点编号，可在地图定位。";
       drawDay();
     }
-    buttons.forEach((button, index) => {
+    qa<HTMLButtonElement>("[data-day]").forEach((button) => {
       button.addEventListener("click", () =>
         selectDay(Number(button.dataset.day)),
       );
       button.addEventListener("keydown", (event) => {
-        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
+        if (
+          ![
+            "ArrowLeft",
+            "ArrowRight",
+            "ArrowUp",
+            "ArrowDown",
+            "Home",
+            "End",
+          ].includes(event.key)
+        )
           return;
         event.preventDefault();
+        const buttons = qa<HTMLButtonElement>(
+          `[data-plan-rail="${plan.id}"] [data-day]`,
+        );
+        const index = buttons.indexOf(button);
         const next =
           event.key === "Home"
             ? 0
             : event.key === "End"
               ? buttons.length - 1
-              : event.key === "ArrowRight"
-                ? (index + 1) % buttons.length
-                : (index + buttons.length - 1) % buttons.length;
+              : (index +
+                  (["ArrowRight", "ArrowDown"].includes(event.key)
+                    ? 1
+                    : buttons.length - 1)) %
+                buttons.length;
         buttons[next].focus();
         selectDay(Number(buttons[next].dataset.day));
       });
     });
-    const flight = query<HTMLInputElement>("[data-flight]")!,
-      hotel = query<HTMLInputElement>("[data-hotel]")!,
-      food = query<HTMLInputElement>("[data-food]")!;
-    const fmt = (value: number) => Math.round(value).toLocaleString("en-US");
+    qa<HTMLButtonElement>("[data-stop]").forEach((button) =>
+      button.addEventListener("click", () =>
+        focusStop(Number(button.dataset.stop)),
+      ),
+    );
     function updateBudget() {
-      const f = Number(flight.value),
-        h = Number(hotel.value),
-        d = Number(food.value);
-      query<HTMLElement>("[data-flight-output]")!.textContent = "HK$" + fmt(f);
-      query<HTMLElement>("[data-hotel-output]")!.textContent = "NT$" + fmt(h);
-      query<HTMLElement>("[data-food-output]")!.textContent = "NT$" + fmt(d);
-      query<HTMLElement>("[data-total]")!.textContent =
-        "HK$" + fmt(f + (h + d + 6100) / 4.2);
+      const value = (key: string) =>
+        Math.max(
+          0,
+          Number(q<HTMLInputElement>(`[data-budget="${key}"]`).value) || 0,
+        );
+      const total =
+        value("flight") +
+        value("extra") +
+        (value("hotel") + value("food") + 6100) / 4.2;
+      q<HTMLOutputElement>("[data-total]").textContent =
+        `约 HK$${Math.round(total).toLocaleString("en-US")}`;
     }
-    [flight, hotel, food].forEach((input) =>
+    qa<HTMLInputElement>("[data-budget]").forEach((input) =>
       input.addEventListener("input", updateBudget),
     );
-    updateBudget();
-    const mapEl = query<HTMLElement>("[data-tw-map]");
-    if (mapEl) {
-      try {
-        map = new maplibregl.Map({
-          container: mapEl,
-          style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
-          center: [121.519, 25.052],
-          zoom: 10,
-          attributionControl: {},
-        });
-        map.addControl(
-          new maplibregl.NavigationControl({ showCompass: false }),
-          "top-right",
+    qa<HTMLButtonElement>("[data-plan]").forEach((button) =>
+      button.addEventListener("click", () => {
+        const next = plans.find((item) => item.id === button.dataset.plan);
+        if (!next || next.id === plan.id) return;
+        plan = next;
+        qa<HTMLButtonElement>("[data-plan]").forEach((item) =>
+          item.setAttribute(
+            "aria-pressed",
+            String(item.dataset.plan === plan.id),
+          ),
         );
-        map.on("load", () => {
-          if (!map) return;
-          map.addSource("tw-route", {
-            type: "geojson",
-            data: { type: "FeatureCollection", features: [] },
-          });
-          map.addLayer({
-            id: "tw-route-line",
-            type: "line",
-            source: "tw-route",
-            paint: {
-              "line-color": "#b96335",
-              "line-width": 2.6,
-              "line-dasharray": [2, 1.5],
-            },
-          });
-          ready = true;
-          drawDay();
+        qa<HTMLElement>("[data-plan-rail]").forEach(
+          (item) => (item.hidden = item.dataset.planRail !== plan.id),
+        );
+        q<HTMLElement>("[data-plan-summary]").textContent = plan.summary;
+        q<HTMLElement>("[data-plan-range]").textContent = plan.range;
+        q<HTMLElement>("[data-plan-nights]").textContent = plan.nights;
+        q<HTMLElement>("[data-hotel-label]").textContent =
+          `${plan.days.length - 1}晚住宿（NT$）`;
+        q<HTMLElement>("[data-food-label]").textContent =
+          `${plan.days.length}天餐饮（NT$）`;
+        for (const key of ["flight", "hotel", "food"] as const)
+          q<HTMLInputElement>(`[data-budget="${key}"]`).value = String(
+            plan.budget[key],
+          );
+        q<HTMLInputElement>('[data-budget="extra"]').value = "0";
+        updateBudget();
+        selectDay(1);
+      }),
+    );
+    qa<HTMLButtonElement>("button[data-view]").forEach((button) =>
+      button.addEventListener("click", () => {
+        q<HTMLElement>("[data-workspace]").dataset.view = button.dataset.view;
+        qa<HTMLButtonElement>("button[data-view]").forEach((item) =>
+          item.setAttribute("aria-pressed", String(item === button)),
+        );
+        requestAnimationFrame(() => {
+          map?.resize();
+          fitDay();
         });
-        map.on("error", () => {
-          query<HTMLElement>("[data-tw-map-error]")!.hidden = false;
+      }),
+    );
+    q<HTMLButtonElement>("[data-fit-map]").addEventListener("click", fitDay);
+    const showError = () => {
+      q<HTMLElement>("[data-map-loading]").hidden = true;
+      q<HTMLElement>("[data-map-error]").hidden = false;
+    };
+    try {
+      map = new maplibregl.Map({
+        container: q<HTMLElement>("[data-tw-map]"),
+        style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+        center: [121.519, 25.052],
+        zoom: 10,
+        attributionControl: {},
+      });
+      map.addControl(
+        new maplibregl.NavigationControl({ showCompass: false }),
+        "top-right",
+      );
+      map.on("load", () => {
+        if (!map) return;
+        map.addSource("tw-route", {
+          type: "geojson",
+          data: { type: "FeatureCollection", features: [] },
         });
-      } catch {
-        query<HTMLElement>("[data-tw-map-error]")!.hidden = false;
-      }
+        map.addLayer({
+          id: "tw-route-line",
+          type: "line",
+          source: "tw-route",
+          paint: {
+            "line-color": "#aa4b30",
+            "line-width": 2.5,
+            "line-dasharray": [2, 1.5],
+          },
+        });
+        ready = true;
+        q<HTMLElement>("[data-map-loading]").hidden = true;
+        q<HTMLElement>("[data-map-error]").hidden = true;
+        drawDay();
+      });
+      map.on("error", showError);
+    } catch {
+      showError();
     }
+    updateBudget();
+    // The map starts hidden in the mobile list view; resize when the viewport changes.
+    const observer = new ResizeObserver(() => {
+      map?.resize();
+      fitDay();
+    });
+    observer.observe(q<HTMLElement>("[data-tw-map]"));
   }
 </script>
 
-<style>
+<style is:global>
   .tw-planner {
-    margin: 2.25rem 0 2.75rem;
-    color: var(--ink, #25314a);
-    border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-    border-radius: 16px;
-    overflow: hidden;
-    background: var(--surface, #fff);
-    font-family: inherit;
+    scroll-margin-top: 100px;
+    --tw-accent: #a0442b;
+    --tw-soft: color-mix(in srgb, var(--ink) 5%, var(--surface));
+    color: var(--ink);
+    margin: 2rem 0 3.5rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: clip;
+    font-family: var(--font-body, sans-serif);
+    font-size: 15px;
+    line-height: 1.7;
   }
-  .tw-planner__intro {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 1.5rem 1.5rem 0.8rem;
-  }
-  .tw-planner h2,
-  .tw-planner h3,
-  .tw-planner p {
+  .tw-planner :is(h2, h3, h4, p, ol, ul) {
     margin: 0;
   }
-  .tw-planner h2 {
-    font-size: 1.36rem;
-    font-weight: 600;
+  .tw-planner :is(ol, ul) {
+    padding: 0;
+    list-style: none;
   }
-  .tw-planner__intro p,
-  .tw-planner__calc-intro p {
-    margin-top: 0.35rem;
-    color: var(--muted, #566079);
-    font-size: 0.92rem;
-    line-height: 1.65;
+  .tw-planner :is(li, li + li) {
+    margin: 0;
+    padding: 0;
+  }
+  .tw-planner :is(button, input) {
+    font: inherit;
+  }
+  .tw-planner button {
+    cursor: pointer;
+    color: inherit;
+  }
+  .tw-planner :is(button, a, input, summary):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+  .tw-planner [hidden] {
+    display: none !important;
   }
   .tw-planner a {
-    color: var(--accent, #3e50a0);
-    text-underline-offset: 3px;
+    color: var(--accent);
+    text-underline-offset: 4px;
   }
-  .tw-planner__intro > a {
-    font-size: 0.86rem;
-    white-space: nowrap;
-  }
-  .tw-planner__tabs {
+  .tw-topbar {
     display: flex;
-    overflow-x: auto;
-    padding: 0.45rem 1.5rem 0.65rem;
-    gap: 0.35rem;
-    scrollbar-width: thin;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 28px 14px;
   }
-  .tw-planner__tab {
-    min-width: 87px;
+  .tw-topbar h2 {
+    border: 0;
+    padding: 0;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+  }
+  .tw-topbar p {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .tw-plan-switch {
+    display: flex;
+    flex-shrink: 0;
+    padding: 4px;
+    background: var(--tw-soft);
+    border-radius: 9px;
+  }
+  .tw-plan-switch button,
+  .tw-mobile-view button {
+    min-height: 44px;
+    border: 0;
+    background: transparent;
+    padding: 8px 13px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  .tw-plan-switch button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--surface);
+  }
+  .tw-plan-switch button:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .tw-trip-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    padding: 0 28px 22px;
+    color: var(--muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .tw-workspace {
+    display: grid;
+    grid-template-columns: 110px minmax(300px, 0.9fr) minmax(360px, 1.1fr);
+    border-block: 1px solid var(--line);
+    align-items: start;
+  }
+  .tw-day-rail {
+    padding: 12px 8px;
+    position: sticky;
+    top: 88px;
+  }
+  .tw-day-rail button {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.15rem;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    background: transparent;
-    padding: 0.6rem 0.7rem;
-    color: inherit;
-    cursor: pointer;
-    white-space: nowrap;
-    transition:
-      background 0.2s ease,
-      border-color 0.2s ease;
-  }
-  .tw-planner__tab:hover {
-    background: color-mix(in srgb, currentColor 6%, transparent);
-  }
-  .tw-planner__tab.is-selected {
-    background: color-mix(in srgb, var(--accent, #3e50a0) 10%, transparent);
-    border-color: color-mix(in srgb, var(--accent, #3e50a0) 38%, transparent);
-  }
-  .tw-planner__tab-date {
-    font-size: 0.76rem;
-    color: var(--muted, #566079);
-  }
-  .tw-planner__tab strong {
-    font-size: 0.95rem;
-  }
-  .tw-planner button:focus-visible,
-  .tw-planner a:focus-visible,
-  .tw-planner input:focus-visible {
-    outline: 3px solid var(--accent, #3e50a0);
-    outline-offset: 3px;
-  }
-  .tw-planner__detail {
-    margin: 0.25rem 1.5rem 1rem;
-    padding: 1rem 1.15rem;
-    background: color-mix(
-      in srgb,
-      var(--accent, #3e50a0) 5%,
-      var(--surface, #fff)
-    );
-    border-radius: 10px;
-  }
-  .tw-planner__detail-head {
-    display: flex;
-    gap: 0.75rem;
-    align-items: baseline;
-    flex-wrap: wrap;
-  }
-  .tw-planner__detail-head span {
-    color: var(--muted, #566079);
-    font-size: 0.8rem;
-  }
-  .tw-planner__detail h3 {
-    font-size: 1.18rem;
-    font-weight: 600;
-  }
-  .tw-planner__detail p {
-    font-size: 0.91rem;
-    line-height: 1.65;
-    margin-top: 0.45rem;
-  }
-  .tw-planner__route {
-    font-weight: 600;
-  }
-  .tw-planner__detail > a {
-    font-size: 0.85rem;
-    display: inline-block;
-    margin-top: 0.6rem;
-  }
-  .tw-planner__map-wrap {
-    position: relative;
-    margin: 0 1.5rem;
-  }
-  .tw-planner__map {
+    gap: 3px;
     width: 100%;
-    height: 410px;
-    border-radius: 12px;
-    background: #e7edee;
+    border: 0;
+    background: transparent;
+    padding: 10px 12px;
+    border-radius: 7px;
+    text-align: left;
+    margin: 2px 0;
   }
-  .tw-planner__map-fallback {
-    position: absolute;
-    bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
-    padding: 0.85rem 1rem;
-    background: #fff;
-    color: #334155;
-    border-radius: 10px;
-    font-size: 0.87rem;
-    box-shadow: 0 8px 20px #0002;
-  }
-  .tw-planner__footnote {
-    padding: 0.55rem 1.5rem 1.3rem;
-    color: var(--muted, #566079);
-    font-size: 0.78rem;
-    line-height: 1.6;
-  }
-  .tw-planner__calc {
-    border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-    padding: 1.35rem 1.5rem 1.5rem;
-  }
-  .tw-planner__calc h3 {
-    font-size: 1.2rem;
+  .tw-day-rail button > span {
+    font-size: 14px;
     font-weight: 600;
-  }
-  .tw-planner__calc-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin-top: 1.25rem;
-  }
-  .tw-planner__calc label {
-    display: block;
-    font-size: 0.83rem;
-    line-height: 1.5;
-  }
-  .tw-planner__calc output {
-    font-weight: 650;
-    display: block;
-    margin: 0.2rem 0 0.45rem;
     font-variant-numeric: tabular-nums;
   }
-  .tw-planner__calc input {
-    display: block;
-    width: 100%;
-    accent-color: var(--accent, #3e50a0);
-    cursor: pointer;
+  .tw-day-rail small {
+    margin-left: 6px;
+    font-size: 11px;
+    font-weight: 400;
   }
-  .tw-planner__total {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 1.25rem;
-    border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-    margin-top: 1.1rem;
-    padding-top: 1rem;
+  .tw-day-rail strong {
+    color: inherit;
+    font-size: 12px;
+    font-weight: 400;
   }
-  .tw-planner__total > div {
+  .tw-day-rail button[aria-selected="true"] {
+    background: var(--ink);
+    color: var(--surface);
+  }
+  .tw-day-rail button:hover:not([aria-selected="true"]) {
+    background: var(--tw-soft);
+  }
+  .tw-day-content {
+    border-inline: 1px solid var(--line);
+    min-width: 0;
+  }
+  .tw-day-panel {
+    padding: 28px 24px;
+  }
+  .tw-day-date {
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .tw-day-heading h3 {
+    font-size: 25px;
+    line-height: 1.4;
+    margin: 9px 0;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .tw-day-heading > p:last-child {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .tw-planner .tw-day-note {
+    margin: 20px 0 26px;
+    font-size: 14px;
+    line-height: 1.85;
+  }
+  .tw-stops {
+    counter-reset: stops;
+  }
+  .tw-planner .tw-stops li {
     display: grid;
-    gap: 0.3rem;
+    grid-template-columns: 30px 1fr;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 28px;
+  }
+  .tw-stops li:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: 30px;
+    bottom: 0;
+    left: 14px;
+    width: 1px;
+    background: var(--line);
+  }
+  .tw-stop-number {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 50%;
+    font-size: 13px !important;
+    font-variant-numeric: tabular-nums;
+  }
+  .tw-stop-number::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+  }
+  .tw-stop-number:hover,
+  .tw-stops .is-active .tw-stop-number {
+    background: var(--tw-accent);
+    border-color: var(--tw-accent);
+    color: #fff;
+  }
+  .tw-stop-meta {
+    display: flex;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  .tw-stops h4 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 5px;
+  }
+  .tw-stops p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.85;
+  }
+  .tw-stay {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 16px 0;
+    border-block: 1px solid var(--line);
+  }
+  .tw-stay span {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .tw-stay strong {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .tw-legs {
+    padding: 22px 0;
+  }
+  .tw-planner .tw-legs h4,
+  .tw-culture h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .tw-legs li a {
+    display: block;
+    padding: 8px 0;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .tw-preview {
+    display: inline-block;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  .tw-culture {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+  }
+  .tw-culture p {
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  .tw-culture a {
+    display: inline-block;
+    font-size: 11px;
+    margin-top: 12px;
+  }
+  .tw-map-column {
+    padding: 20px;
+    align-self: stretch;
+    min-width: 0;
+    background: var(--tw-soft);
+  }
+  .tw-map-sticky {
+    position: sticky;
+    top: 100px;
+  }
+  .tw-map-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .tw-map-heading strong {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .tw-map-heading button {
+    min-height: 44px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 4px 0;
+    background: transparent;
+    font-size: 11px;
     flex-shrink: 0;
   }
-  .tw-planner__total span {
-    font-size: 0.78rem;
-    color: var(--muted, #566079);
+  .tw-map-wrap {
+    position: relative;
   }
-  .tw-planner__total strong {
-    font-size: 1.85rem;
-    letter-spacing: -0.025em;
-    font-weight: 650;
-    font-variant-numeric: tabular-nums;
+  .tw-map {
+    height: min(62vh, 640px);
+    min-height: 390px;
+    background: color-mix(in srgb, var(--ink) 9%, var(--surface));
+    border-radius: 10px;
+    overflow: hidden;
   }
-  .tw-planner__total p {
-    font-size: 0.78rem;
-    color: var(--muted, #566079);
-    max-width: 17rem;
-    line-height: 1.55;
+  .tw-planner .tw-map-caption {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.8;
   }
-  .tw-planner__legs {
-    display: grid;
-    gap: 0.45rem;
-    padding-left: 1.1rem;
-    margin: 0.75rem 0 0;
-    font-size: 0.85rem;
-    overflow-wrap: anywhere;
+  .tw-planner .tw-map-selection {
+    margin-top: 12px;
+    font-size: 12px;
+    min-height: 21px;
   }
-  :global(.tw-planner__pin) {
-    display: block;
-    width: 12px;
-    height: 12px;
-    border-radius: 100%;
-    background: #a5512d;
+  .tw-map-error,
+  .tw-map-loading {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 16px;
+    padding: 14px;
+    background: var(--surface);
+    font-size: 13px;
+    border-radius: 7px;
+  }
+  .tw-map-pin {
+    width: 29px;
+    height: 29px;
     border: 2px solid #fff;
-    box-shadow: 0 2px 7px #0005;
+    background: #a0442b;
+    color: #fff !important;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 7px #0003;
+  }
+  .tw-map-pin:hover,
+  .tw-map-pin.is-active {
+    background: #263c4a;
+  }
+  .tw-planner .maplibregl-popup-content {
+    color: #20303b;
+    font: 13px/1.7 sans-serif;
+    padding: 12px;
+  }
+  .tw-planner .maplibregl-popup-close-button {
+    width: 24px;
+    height: 24px;
+  }
+  .tw-planner .maplibregl-ctrl-attrib {
+    font: 10px/1.5 sans-serif;
+  }
+  .tw-planner .maplibregl-ctrl-attrib a {
+    color: #333;
+  }
+  .tw-all-links {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .tw-all-links summary {
     cursor: pointer;
   }
-  @media (max-width: 650px) {
-    .tw-planner__intro {
-      display: block;
-      padding: 1.1rem 1rem 0.5rem;
-    }
-    .tw-planner__intro > a {
-      display: inline-block;
-      margin-top: 0.65rem;
-    }
-    .tw-planner__tabs {
-      padding: 0.4rem 1rem 0.55rem;
-    }
-    .tw-planner__detail {
-      margin: 0.2rem 1rem 0.85rem;
-      padding: 0.85rem;
-    }
-    .tw-planner__map-wrap {
-      margin: 0 1rem;
-    }
-    .tw-planner__map {
-      height: 335px;
-    }
-    .tw-planner__footnote {
-      padding: 0.5rem 1rem 1rem;
-    }
-    .tw-planner__calc {
-      padding: 1rem;
-    }
-    .tw-planner__calc-grid {
-      grid-template-columns: 1fr;
-      gap: 0.9rem;
-    }
-    .tw-planner__total {
-      align-items: start;
-      flex-direction: column;
-      gap: 0.45rem;
-    }
-    .tw-planner__total strong {
-      font-size: 1.65rem;
+  .tw-all-links h3 {
+    font-size: 17px;
+    margin: 24px 0 12px;
+  }
+  .tw-all-links li {
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+  }
+  .tw-all-links strong {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .tw-all-links a {
+    display: block;
+    padding: 4px 0;
+  }
+  .tw-budget {
+    padding: 28px;
+  }
+  .tw-budget h3 {
+    font-size: 22px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  .tw-budget p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .tw-budget-fields {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin: 24px 0;
+  }
+  .tw-budget label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .tw-budget input {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 5px;
+    padding: 10px 12px;
+    font-size: 17px;
+    font-variant-numeric: tabular-nums;
+    caret-color: var(--accent);
+  }
+  .tw-budget-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  .tw-budget-total p {
+    max-width: 70ch;
+  }
+  .tw-budget-total output {
+    font-size: 28px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .tw-mobile-view {
+    display: none;
+  }
+  .tw-nojs {
+    padding: 18px 28px;
+  }
+  @media (min-width: 1500px) {
+    .tw-day-panel {
+      padding: 32px;
     }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .tw-planner__tab {
-      transition: none;
+  @media (max-width: 1000px) {
+    .tw-workspace {
+      grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr);
     }
+    .tw-day-rail {
+      grid-column: 1/-1;
+      position: static;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .tw-day-rail > [role="tablist"] {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--muted) transparent;
+      gap: 4px;
+    }
+    .tw-day-rail button {
+      flex: 0 0 88px;
+      padding: 9px;
+    }
+    .tw-day-content {
+      border-left: 0;
+    }
+    .tw-map-column {
+      padding: 14px;
+    }
+    .tw-map-heading {
+      flex-wrap: wrap;
+    }
+    .tw-topbar {
+      align-items: flex-start;
+    }
+  }
+  @media (max-width: 680px) {
+    .tw-topbar {
+      padding: 20px 18px 14px;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .tw-topbar h2 {
+      border: 0;
+      padding: 0;
+      font-size: 23px;
+    }
+    .tw-trip-meta {
+      padding: 0 18px 18px;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+    .tw-mobile-view {
+      display: flex;
+      gap: 8px;
+      padding: 0 18px 14px;
+    }
+    .tw-mobile-view button {
+      border: 1px solid var(--line);
+    }
+    .tw-mobile-view button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--surface);
+    }
+    .tw-workspace {
+      display: block;
+    }
+    .tw-workspace[data-view="list"] .tw-map-column {
+      display: none;
+    }
+    .tw-workspace[data-view="map"] .tw-day-content {
+      display: none;
+    }
+    .tw-map-column {
+      padding: 18px;
+    }
+    .tw-map-sticky {
+      position: static;
+    }
+    .tw-map {
+      height: 55vh;
+      min-height: 320px;
+    }
+    .tw-day-content {
+      border: 0;
+    }
+    .tw-day-panel {
+      padding: 24px 18px;
+    }
+    .tw-day-heading h3 {
+      font-size: 24px;
+    }
+    .tw-all-links,
+    .tw-budget {
+      padding: 20px 18px;
+    }
+    .tw-budget-fields {
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 12px;
+    }
+    .tw-budget-total {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .tw-budget-total output {
+      font-size: 26px;
+    }
+  }
+  .dark .tw-planner {
+    --tw-accent: #b75b3d;
   }
 </style>

@@ -14,4 +14,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 ---
 
-<BlogPostLayout entry={entry} />
+<BlogPostLayout
+  entry={entry}
+  variant={entry.slug === "taiwan-seven-days-2026" ? "itinerary" : "article"}
+/>

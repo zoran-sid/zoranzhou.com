@@ -22,8 +22,10 @@ import {
 type ContentCollection = "blog" | "essays" | "research" | "projects" | "photos";
 interface Props {
   entry: CollectionEntry<ContentCollection>;
+  variant?: "article" | "itinerary";
 }
-const { entry } = Astro.props;
+const { entry, variant = "article" } = Astro.props;
+const itinerary = variant === "itinerary";
 const { Content, headings } = await entry.render();
 const locale = (Astro.currentLocale ?? "zh-CN") as Locale;
 const t = getTranslations(locale);
@@ -43,7 +45,7 @@ const noteCover =
   !notePreview(entry.body, 0, entry.data.cover).coverIsInline
     ? entry.data.cover
     : undefined;
-const tocItems = (isNote ? [] : headings).filter(
+const tocItems = (isNote || itinerary ? [] : headings).filter(
   (h) => h.depth === 2 || h.depth === 3,
 );
 const allWriting = await getWriting(locale);
@@ -149,7 +151,10 @@ const toc = tocItems.map((h) => {
 >
   {Astro.slots.has("pre-content") && <slot name="pre-content" />}
   <div
-    class:list={["article-shell", { "article-shell--note": isNote }]}
+    class:list={[
+      "article-shell",
+      { "article-shell--note": isNote, "article-shell--itinerary": itinerary },
+    ]}
     data-reading-format={writingFormat(entry)}
     data-reading-category={writingCategory(entry)}
   >
@@ -487,3 +492,40 @@ const toc = tocItems.map((h) => {
     headings.forEach((heading) => observer.observe(heading));
   </script>
 </BaseLayout>
+
+<style is:global>
+  .article-shell.article-shell--itinerary {
+    max-width: 1440px;
+    width: calc(100% - 64px);
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .article-shell--itinerary .article-header {
+    max-width: 800px;
+    margin-inline: auto;
+  }
+  .article-shell--itinerary .article-prose {
+    max-width: none;
+  }
+  .article-shell--itinerary .article-prose > :not(.tw-planner) {
+    max-width: 760px;
+    margin-inline: auto;
+  }
+  .article-shell--itinerary .article-prose > :is(h2, h3) {
+    margin-top: 2.8rem;
+  }
+  .article-shell--itinerary .article-prose > figure img {
+    max-height: 760px;
+    width: auto;
+    margin-inline: auto;
+  }
+  .article-shell--itinerary
+    :is(.article-footer, .article-related, .article-pagination) {
+    max-width: 800px;
+    margin-inline: auto;
+  }
+  @media (max-width: 680px) {
+    .article-shell.article-shell--itinerary {
+      width: calc(100% - 32px);
+    }
+  }
+</style>
