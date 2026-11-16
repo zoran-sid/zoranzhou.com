@@ -1,0 +1,132 @@
+---
+/** An interactive companion to the Taiwan guide; all times are planning references. */
+const days = [
+  { id: 1, date: '12/15', base: '台北', name: '抵达与夜市', route: '桃园机场 → 台北车站 → 西门町 / 宁夏夜市', note: '下午抵达，优先入境、交通卡、入住。晚上安排一条夜市路线即可。', center: [121.519, 25.052], zoom: 11.3, search: '台北車站' },
+  { id: 2, date: '12/16', base: '台北', name: '故宫与城市', route: '故宫 → 中山 / 赤峰街 → 101 → 饶河夜市', note: '故宫预留三小时；台北 101 选傍晚，沿捷运方向移动。', center: [121.557, 25.070], zoom: 11.1, search: '國立故宮博物院' },
+  { id: 3, date: '12/17', base: '台北', name: '北海岸山城', route: '野柳 → 十分 → 九份 → 台北', note: '多点换乘的一天，推荐带九份傍晚时段的小团；下雨时和 D2 调换。', center: [121.77, 25.112], zoom: 10.3, search: '九份老街' },
+  { id: 4, date: '12/18', base: '阿里山', name: '坐上山线', route: '台北高铁 → 嘉义高铁 → 7329 客运 → 阿里山', note: '参考衔接：08:01 高铁台北出发 / 10:10 嘉义高铁站发车的山线客运。', center: [120.802, 23.507], zoom: 11.2, search: '阿里山國家森林遊樂區' },
+  { id: 5, date: '12/19', base: '台南', name: '日出与老城', route: '祝山日出 → 阿里山下山 → 嘉义台铁 → 台南', note: '祝山观日列车发车时间在前一天下午公告；下山 7322C 参考 12:40 班次。', center: [120.204, 22.999], zoom: 11.6, search: '台南國華街' },
+  { id: 6, date: '12/20', base: '高雄', name: '古街与港口', route: '台南中西区 → 台铁高雄 → 驳二 → 旗津', note: '上午给台南小吃和老街；下午到高雄港边，日落留给旗津。', center: [120.279, 22.625], zoom: 11.2, search: '駁二藝術特區' },
+  { id: 7, date: '12/21', base: '返港', name: '留余裕回程', route: '三多商圈 → 高雄机场 → 香港', note: '参考回程航班 14:55 起飞；至少预留航空公司规定的登机报到时间。', center: [120.350, 22.576], zoom: 11.7, search: '高雄國際機場' },
+];
+---
+
+<section class="tw-planner" data-tw-planner aria-labelledby="tw-trip-title">
+  <header class="tw-planner__intro">
+    <div>
+      <h2 id="tw-trip-title">七天路线，点开看每一天</h2>
+      <p>台北进 · 高雄出。切换日期，地图会移动到当天的主要活动区域。</p>
+    </div>
+    <a href="https://www.google.com/maps/dir/Taipei+Station/Alishan+National+Forest+Recreation+Area/Tainan+Station/Pier-2+Art+Center/Kaohsiung+International+Airport/" target="_blank" rel="noopener noreferrer">在 Google 地图查看 ↗</a>
+  </header>
+  <div class="tw-planner__tabs" role="tablist" aria-label="选择行程日期">
+    {days.map((day, i) => <button id={`tw-day-${day.id}`} type="button" class:list={['tw-planner__tab', {'is-selected': i === 0}]} role="tab" aria-selected={i === 0} aria-controls="tw-day-panel" tabindex={i === 0 ? 0 : -1} data-day={day.id}>
+      <span class="tw-planner__tab-date">D{day.id} · {day.date}</span>
+      <strong>{day.base}</strong>
+    </button>)}
+  </div>
+  <div class="tw-planner__detail" id="tw-day-panel" role="tabpanel" aria-labelledby="tw-day-1" tabindex="0">
+    <div class="tw-planner__detail-head"><span data-selected-day>D1 · 12/15</span><h3 data-selected-title>抵达与夜市</h3></div>
+    <p class="tw-planner__route" data-selected-route>桃园机场 → 台北车站 → 西门町 / 宁夏夜市</p>
+    <p data-selected-note>下午抵达，优先入境、交通卡、入住。晚上安排一条夜市路线即可。</p>
+    <a href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E5%8C%97%E8%BB%8A%E7%AB%99" target="_blank" rel="noopener noreferrer" data-selected-link>打开当天地图 ↗</a>
+  </div>
+  <div class="tw-planner__map-wrap">
+    <div class="tw-planner__map" data-tw-map role="img" aria-label="台湾七日游交互地图：依次为桃园、台北、野柳、十分、九份、嘉义、阿里山、台南、高雄"></div>
+    <div class="tw-planner__map-fallback" data-tw-map-error hidden>在线地图暂时无法载入。上方每日路线和 Google 地图链接仍可使用。</div>
+  </div>
+  <p class="tw-planner__footnote">地图橙色线仅表示游览顺序，非实际铁路线或公路导航。城市间交通细节请看正文。</p>
+  <div class="tw-planner__calc">
+    <div class="tw-planner__calc-intro">
+      <h3>自己算一次预算</h3>
+      <p>单人、6 晚私人客房；交通与门票用规划预留值，汇率按 1 HKD ≈ NT$4.2 粗算。</p>
+    </div>
+    <div class="tw-planner__calc-grid">
+      <label>机票合计 <output data-flight-output>HK$1,800</output><input data-flight type="range" min="1200" max="3400" step="100" value="1800" /></label>
+      <label>6 晚住宿 <output data-hotel-output>NT$15,000</output><input data-hotel type="range" min="8500" max="24000" step="500" value="15000" /></label>
+      <label>7 天餐饮 <output data-food-output>NT$3,500</output><input data-food type="range" min="2200" max="7000" step="100" value="3500" /></label>
+    </div>
+    <div class="tw-planner__total" aria-live="polite"><div><span>估算总花费</span><strong data-total>HK$7,657</strong></div><p>另固定预留 NT$6,100：台湾交通 3,000 / 景点及活动 1,600 / 应急 1,500。</p></div>
+  </div>
+</section>
+
+<script>
+  import maplibregl from 'maplibre-gl';
+  import 'maplibre-gl/dist/maplibre-gl.css';
+  type Day = {id:number;date:string;base:string;name:string;route:string;note:string;center:[number,number];zoom:number;search:string};
+  const days: Day[] = [
+    {id:1,date:'12/15',base:'台北',name:'抵达与夜市',route:'桃园机场 → 台北车站 → 西门町 / 宁夏夜市',note:'下午抵达，优先入境、交通卡、入住。晚上安排一条夜市路线即可。',center:[121.519,25.052],zoom:11.3,search:'台北車站'},
+    {id:2,date:'12/16',base:'台北',name:'故宫与城市',route:'故宫 → 中山 / 赤峰街 → 101 → 饶河夜市',note:'故宫预留三小时；台北 101 选傍晚，沿捷运方向移动。',center:[121.557,25.070],zoom:11.1,search:'國立故宮博物院'},
+    {id:3,date:'12/17',base:'台北',name:'北海岸山城',route:'野柳 → 十分 → 九份 → 台北',note:'多点换乘的一天，推荐带九份傍晚时段的小团；下雨时和 D2 调换。',center:[121.77,25.112],zoom:10.3,search:'九份老街'},
+    {id:4,date:'12/18',base:'阿里山',name:'坐上山线',route:'台北高铁 → 嘉义高铁 → 7329 客运 → 阿里山',note:'参考衔接：08:01 高铁台北出发 / 10:10 嘉义高铁站发车的山线客运。',center:[120.802,23.507],zoom:11.2,search:'阿里山國家森林遊樂區'},
+    {id:5,date:'12/19',base:'台南',name:'日出与老城',route:'祝山日出 → 阿里山下山 → 嘉义台铁 → 台南',note:'祝山观日列车发车时间在前一天下午公告；下山 7322C 参考 12:40 班次。',center:[120.204,22.999],zoom:11.6,search:'台南國華街'},
+    {id:6,date:'12/20',base:'高雄',name:'古街与港口',route:'台南中西区 → 台铁高雄 → 驳二 → 旗津',note:'上午给台南小吃和老街；下午到高雄港边，日落留给旗津。',center:[120.279,22.625],zoom:11.2,search:'駁二藝術特區'},
+    {id:7,date:'12/21',base:'返港',name:'留余裕回程',route:'三多商圈 → 高雄机场 → 香港',note:'参考回程航班 14:55 起飞；至少预留航空公司规定的登机报到时间。',center:[120.350,22.576],zoom:11.7,search:'高雄國際機場'},
+  ];
+  const nodes: Array<{name:string;xy:[number,number]}> = [
+    {name:'桃园机场',xy:[121.2328,25.0777]}, {name:'台北',xy:[121.517,25.048]},
+    {name:'野柳',xy:[121.6904,25.2045]}, {name:'十分',xy:[121.7769,25.0422]},
+    {name:'九份',xy:[121.845,25.109]}, {name:'嘉义高铁',xy:[120.3238,23.4599]},
+    {name:'阿里山',xy:[120.802,23.508]}, {name:'台南',xy:[120.197,22.995]},
+    {name:'高雄',xy:[120.280,22.621]}, {name:'高雄机场',xy:[120.35,22.576]}
+  ];
+  const root = document.querySelector<HTMLElement>('[data-tw-planner]');
+  if (root) {
+    const query = <T extends Element>(selector:string)=>root.querySelector<T>(selector);
+    let map: maplibregl.Map | undefined;
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-day]'));
+    function selectDay(id:number) {
+      const day = days.find(d=>d.id===id) ?? days[0];
+      buttons.forEach(b=>{const active=Number(b.dataset.day)===id;b.classList.toggle('is-selected',active);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;});
+      query<HTMLElement>('[data-selected-day]')!.textContent='D'+day.id+' · '+day.date;
+      query<HTMLElement>('[data-selected-title]')!.textContent=day.name;
+      query<HTMLElement>('[data-selected-route]')!.textContent=day.route;
+      query<HTMLElement>('[data-selected-note]')!.textContent=day.note;
+      const link=query<HTMLAnchorElement>('[data-selected-link]')!;
+      link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(day.search);
+      query<HTMLElement>('#tw-day-panel')!.setAttribute('aria-labelledby','tw-day-'+day.id);
+      if(map) map.easeTo({center:day.center,zoom:day.zoom,duration:750});
+    }
+    buttons.forEach((b,index)=>{
+      b.addEventListener('click',()=>selectDay(Number(b.dataset.day)));
+      b.addEventListener('keydown',(e)=>{if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight'&&e.key!=='Home'&&e.key!=='End')return;e.preventDefault(); const next=e.key==='Home'?0:e.key==='End'?buttons.length-1:e.key==='ArrowRight'?(index+1)%buttons.length:(index+buttons.length-1)%buttons.length;buttons[next].focus();selectDay(Number(buttons[next].dataset.day));});
+    });
+    const flight=query<HTMLInputElement>('[data-flight]')!, hotel=query<HTMLInputElement>('[data-hotel]')!, food=query<HTMLInputElement>('[data-food]')!;
+    const fmt=(value:number)=>Math.round(value).toLocaleString('en-US');
+    function updateBudget(){const f=Number(flight.value), h=Number(hotel.value), d=Number(food.value);query<HTMLElement>('[data-flight-output]')!.textContent='HK$'+fmt(f);query<HTMLElement>('[data-hotel-output]')!.textContent='NT$'+fmt(h);query<HTMLElement>('[data-food-output]')!.textContent='NT$'+fmt(d);query<HTMLElement>('[data-total]')!.textContent='HK$'+fmt(f+(h+d+6100)/4.2);}
+    [flight,hotel,food].forEach(el=>el.addEventListener('input',updateBudget));updateBudget();
+    const mapEl=query<HTMLElement>('[data-tw-map]');
+    if(mapEl){
+      try {
+        map = new maplibregl.Map({container:mapEl, style:'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json', center:[121.04,24.1],zoom:7,attributionControl:{}});
+        map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+        map.on('load',()=>{
+          if(!map)return;
+          map.addSource('tw-route',{type:'geojson',data:{type:'Feature',properties:{},geometry:{type:'LineString',coordinates:nodes.map(n=>n.xy)}}});
+          map.addLayer({id:'tw-route-glow',type:'line',source:'tw-route',paint:{'line-color':'#d4905f','line-width':7,'line-opacity':0.18}});
+          map.addLayer({id:'tw-route-line',type:'line',source:'tw-route',paint:{'line-color':'#b96335','line-width':2.6,'line-dasharray':[2,1.5]}});
+          nodes.forEach((node)=>{const dot=document.createElement('span');dot.className='tw-planner__pin';dot.title=node.name;new maplibregl.Marker({element:dot}).setLngLat(node.xy).setPopup(new maplibregl.Popup({offset:18}).setText(node.name)).addTo(map!);});
+        });
+        map.on('error',()=>{query<HTMLElement>('[data-tw-map-error]')!.hidden=false;});
+      } catch {query<HTMLElement>('[data-tw-map-error]')!.hidden=false;}
+    }
+  }
+</script>
+
+<style>
+  .tw-planner{margin:2.25rem 0 2.75rem;color:var(--ink,#25314a);border:1px solid color-mix(in srgb,currentColor 14%,transparent);border-radius:16px;overflow:hidden;background:var(--surface,#fff);font-family:inherit}
+  .tw-planner__intro{display:flex;justify-content:space-between;align-items:center;gap:1.25rem;padding:1.5rem 1.5rem .8rem}
+  .tw-planner h2,.tw-planner h3,.tw-planner p{margin:0}.tw-planner h2{font-size:1.36rem;font-weight:600}.tw-planner__intro p,.tw-planner__calc-intro p{margin-top:.35rem;color:var(--muted,#566079);font-size:.92rem;line-height:1.65}
+  .tw-planner a{color:var(--accent,#3e50a0);text-underline-offset:3px}.tw-planner__intro>a{font-size:.86rem;white-space:nowrap}
+  .tw-planner__tabs{display:flex;overflow-x:auto;padding:.45rem 1.5rem .65rem;gap:.35rem;scrollbar-width:thin}
+  .tw-planner__tab{min-width:87px;display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;border:1px solid transparent;border-radius:10px;background:transparent;padding:.6rem .7rem;color:inherit;cursor:pointer;white-space:nowrap;transition:background .2s ease,border-color .2s ease}
+  .tw-planner__tab:hover{background:color-mix(in srgb,currentColor 6%,transparent)}.tw-planner__tab.is-selected{background:color-mix(in srgb,var(--accent,#3e50a0) 10%,transparent);border-color:color-mix(in srgb,var(--accent,#3e50a0) 38%,transparent)}
+  .tw-planner__tab-date{font-size:.76rem;color:var(--muted,#566079)}.tw-planner__tab strong{font-size:.95rem}.tw-planner button:focus-visible,.tw-planner a:focus-visible,.tw-planner input:focus-visible{outline:3px solid var(--accent,#3e50a0);outline-offset:3px}
+  .tw-planner__detail{margin:.25rem 1.5rem 1rem;padding:1rem 1.15rem;background:color-mix(in srgb,var(--accent,#3e50a0) 5%,var(--surface,#fff));border-radius:10px}.tw-planner__detail-head{display:flex;gap:.75rem;align-items:baseline;flex-wrap:wrap}.tw-planner__detail-head span{color:var(--muted,#566079);font-size:.8rem}.tw-planner__detail h3{font-size:1.18rem;font-weight:600}.tw-planner__detail p{font-size:.91rem;line-height:1.65;margin-top:.45rem}.tw-planner__route{font-weight:600}.tw-planner__detail>a{font-size:.85rem;display:inline-block;margin-top:.6rem}
+  .tw-planner__map-wrap{position:relative;margin:0 1.5rem}.tw-planner__map{width:100%;height:410px;border-radius:12px;background:#e7edee}.tw-planner__map-fallback{position:absolute;bottom:1rem;left:1rem;right:1rem;padding:.85rem 1rem;background:#fff;color:#334155;border-radius:10px;font-size:.87rem;box-shadow:0 8px 20px #0002}
+  .tw-planner__footnote{padding:.55rem 1.5rem 1.3rem;color:var(--muted,#566079);font-size:.78rem;line-height:1.6}
+  .tw-planner__calc{border-top:1px solid color-mix(in srgb,currentColor 12%,transparent);padding:1.35rem 1.5rem 1.5rem}.tw-planner__calc h3{font-size:1.2rem;font-weight:600}.tw-planner__calc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.25rem}.tw-planner__calc label{display:block;font-size:.83rem;line-height:1.5}.tw-planner__calc output{font-weight:650;display:block;margin:.2rem 0 .45rem;font-variant-numeric:tabular-nums}.tw-planner__calc input{display:block;width:100%;accent-color:var(--accent,#3e50a0);cursor:pointer}.tw-planner__total{display:flex;align-items:end;justify-content:space-between;gap:1.25rem;border-top:1px solid color-mix(in srgb,currentColor 10%,transparent);margin-top:1.1rem;padding-top:1rem}.tw-planner__total>div{display:grid;gap:.3rem;flex-shrink:0}.tw-planner__total span{font-size:.78rem;color:var(--muted,#566079)}.tw-planner__total strong{font-size:1.85rem;letter-spacing:-.025em;font-weight:650;font-variant-numeric:tabular-nums}.tw-planner__total p{font-size:.78rem;color:var(--muted,#566079);max-width:17rem;line-height:1.55}
+  :global(.tw-planner__pin){display:block;width:12px;height:12px;border-radius:100%;background:#a5512d;border:2px solid #fff;box-shadow:0 2px 7px #0005;cursor:pointer}
+  @media(max-width:650px){.tw-planner__intro{display:block;padding:1.1rem 1rem .5rem}.tw-planner__intro>a{display:inline-block;margin-top:.65rem}.tw-planner__tabs{padding:.4rem 1rem .55rem}.tw-planner__detail{margin:.2rem 1rem .85rem;padding:.85rem}.tw-planner__map-wrap{margin:0 1rem}.tw-planner__map{height:335px}.tw-planner__footnote{padding:.5rem 1rem 1rem}.tw-planner__calc{padding:1rem}.tw-planner__calc-grid{grid-template-columns:1fr;gap:.9rem}.tw-planner__total{align-items:start;flex-direction:column;gap:.45rem}.tw-planner__total strong{font-size:1.65rem}}
+  @media(prefers-reduced-motion:reduce){.tw-planner__tab{transition:none}}
+</style>
