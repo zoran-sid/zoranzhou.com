@@ -55,7 +55,7 @@ test("west route retains 4/2/1 nights and all requested Taipei experiences", () 
       "龙虎塔",
     ])
       assert.ok(names.includes(name), `${plan.id}: ${name}`);
-    assert.match(text(plan.days[4]), /泡汤/);
+    assert.ok(!plan.days[4].stops.some((s) => /汤屋/.test(s.name)));
     assert.match(text(plan.days[4]), /高铁板桥/);
   }
 });
@@ -226,4 +226,67 @@ test("article ends at interactive planner; no duplicate itinerary below D8", () 
     component.indexOf("data-shared-budget") <
       component.indexOf('class="tw-map-column"'),
   );
+});
+
+test("arrival only settles in and browses Ningxia, without Dihua/temple detours", () => {
+  for (const p of taiwanPlans) {
+    const d = p.days[0];
+    assert.equal(d.stops.length, 3);
+    assert.match(d.stops[2].name, /宁夏/);
+    assert.ok(!d.stops.some((s) => /迪化|城隍|码头/.test(s.name)));
+  }
+});
+test("Taipei dates keep palace off Monday and the north outing ends in a night bath", () => {
+  for (const p of west) {
+    const museum = p.days.find((d) =>
+      d.stops.some((s) => s.name.includes("故宫")),
+    )!;
+    assert.notEqual(weekday(museum.date), 1);
+    const north = p.days.find((d) =>
+      d.stops.some((s) => s.name.includes("北投夜间")),
+    )!;
+    assert.equal(north.id, p.departure === "10" ? 3 : 4);
+    assert.match(north.stops.at(-1)!.name, /北投夜间/);
+    assert.match(
+      north.stops.find((s) => s.name.includes("双连"))!.mapQuery,
+      /民生西路45巷/,
+    );
+    assert.match(
+      north.stops.find((s) => s.name.includes("文化阿给"))!.mapQuery,
+      /中正路138號/,
+    );
+    assert.ok(north.legs.some((l) => /淡水站.*北投/.test(l.label)));
+    const d2 = p.days[1];
+    const idx = (n: string) => d2.stops.findIndex((s) => s.name.includes(n));
+    assert.ok(idx("101登顶") < idx("虎林"));
+    assert.ok(idx("虎林") < idx("象山"));
+    assert.ok(idx("象山") < idx("竹村"));
+    assert.equal(d2.stops[idx("象山")].priority, "optional");
+  }
+});
+test("Kaohsiung dinner is a candidate outdoor reservation, not a claimed booking", () => {
+  for (const p of taiwanPlans) {
+    const d = p.days[6];
+    const dinner = d.stops.find((s) => s.name.includes("永心浮岛"))!;
+    assert.match(dinner.detail, /尚未订位/);
+    assert.match(dinner.detail, /户外港景/);
+    assert.ok(d.legs.some((l) => /官方菜单与订位/.test(l.label)));
+  }
+});
+
+test("Acai is explicitly scheduled once per plan and avoids uncertain Wednesday service", () => {
+  for (const p of taiwanPlans) {
+    const days = p.days.filter((d) =>
+      d.stops.some((s) => s.name.includes("阿财")),
+    );
+    assert.equal(days.length, 1);
+    assert.notEqual(weekday(days[0].date), 3);
+    assert.match(
+      days[0].stops.find((s) => s.name.includes("阿财"))!.mapQuery,
+      /古堡街5號/,
+    );
+    assert.ok(days[0].legs.some((l) => l.label.includes("阿财")));
+  }
+  assert.ok(west[0].days[5].stops.some((s) => s.name.includes("阿财")));
+  assert.ok(west[1].days[4].stops.some((s) => s.name.includes("阿财")));
 });

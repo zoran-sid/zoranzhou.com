@@ -10,7 +10,7 @@ export const taiwanFood = [
     id: "noodles",
     name: "大肠／蚵仔面线",
     group: "夜市主食与炸物",
-    areas: ["东三水早市", "饶河夜市"],
+    areas: ["双连早市", "饶河夜市"],
     note: "早餐或夜市小碗垫肚，配料按当摊供应选。",
   },
   {
@@ -45,14 +45,14 @@ export const taiwanFood = [
     id: "fried-chicken",
     name: "盐酥鸡",
     group: "夜市主食与炸物",
-    areas: ["饶河夜市", "捷运沿线"],
+    areas: ["虎林黄昏市场", "饶河夜市", "捷运沿线"],
     note: "可与鸡排二选一，点一点九层塔香气的炸物。",
   },
   {
     id: "cutlet",
     name: "鸡排",
     group: "夜市主食与炸物",
-    areas: ["宁夏夜市", "饶河夜市", "捷运沿线"],
+    areas: ["虎林黄昏市场", "宁夏夜市", "饶河夜市", "捷运沿线"],
     note: "一份体积大，两人分着吃，给下一摊留余地。",
   },
   {
@@ -66,7 +66,7 @@ export const taiwanFood = [
     id: "spring-roll",
     name: "润饼",
     group: "古早味与点心",
-    areas: ["东三水早市", "大稻埕"],
+    areas: ["双连早市", "大稻埕"],
     note: "早市顺手买一卷，蔬菜与花生粉的口感适合当早餐。",
   },
   {
@@ -122,7 +122,7 @@ export const taiwanFood = [
     id: "scallion",
     name: "葱油饼加蛋",
     group: "日常餐食",
-    areas: ["东三水早市", "捷运沿线"],
+    areas: ["双连早市", "虎林黄昏市场", "捷运沿线"],
     note: "找街头现煎摊，热饼加蛋，边走边吃前先找个不挡路的地方。",
   },
   {
