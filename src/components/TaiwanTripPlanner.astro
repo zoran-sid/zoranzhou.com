@@ -6,6 +6,10 @@ import {
 } from "../data/taiwan-trip";
 import TaiwanFoodChecklist from "./TaiwanFoodChecklist.astro";
 import { googleRoute } from "../lib/taiwan-maps";
+const overviewUrl =
+  "https://www.google.com/maps/d/viewer?mid=1Ec_1onClYPemjfsmEu9-msAGLCEMI1c";
+const overviewEmbed =
+  "https://www.google.com/maps/d/u/0/embed?mid=1Ec_1onClYPemjfsmEu9-msAGLCEMI1c&ehbc=2E312F&ll=23.85%2C121.0&z=7";
 const first = plans[0];
 const firstRoute = googleRoute(first.days[0].legs[0].url)!;
 ---
@@ -43,13 +47,33 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     <span data-plan-range>{first.range}</span><span data-plan-nights
       >{first.nights}</span
     >
-    <a
-      href="https://www.google.com/maps/dir/Taiwan+Taoyuan+International+Airport/Taipei+Main+Station/Tainan+Station/Kaohsiung+Station/Kaohsiung+International+Airport/"
-      data-trip-overview
-      target="_blank"
-      rel="noopener noreferrer">全程地点总览 ↗</a
-    >
+    <a href="#tw-overview" data-trip-overview>查看地点总览 ↓</a>
   </div>
+  <section
+    class="tw-overview"
+    id="tw-overview"
+    aria-labelledby="tw-overview-heading"
+  >
+    <div class="tw-overview-heading">
+      <h3 id="tw-overview-heading">行程地点总览</h3>
+      <a href={overviewUrl} target="_blank" rel="noopener noreferrer"
+        >在 Google 地图中打开 ↗</a
+      >
+    </div>
+    <p id="tw-overview-help">
+      台北、台南和高雄的计划地点与可选支线都标在这里。拖动、放大看街区，点标记看地点；具体走法用下方的分段导航。
+    </p>
+    <iframe
+      src={overviewEmbed}
+      title="台湾八天自由行地点总览 · 可拖动和缩放的 Google 地图"
+      aria-describedby="tw-overview-help"
+      width="1200"
+      height="560"
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+      data-overview-map></iframe>
+  </section>
   <div class="tw-mobile-view" role="group" aria-label="切换行程或地图">
     <button type="button" data-view="list" aria-pressed="true">查看行程</button
     ><button type="button" data-view="map" aria-pressed="false">查看地图</button
@@ -729,26 +753,6 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
       q<HTMLElement>("[data-plan-summary]").textContent = plan.summary;
       q<HTMLElement>("[data-plan-range]").textContent = plan.range;
       q<HTMLElement>("[data-plan-nights]").textContent = plan.nights;
-      const overview = q<HTMLAnchorElement>("[data-trip-overview]");
-      const hubs =
-        plan.journey === "west"
-          ? [
-              "桃園國際機場",
-              "臺北車站",
-              "臺南車站",
-              "高鐵左營站",
-              "高雄國際機場",
-            ]
-          : [
-              "桃園國際機場",
-              "臺北車站",
-              "花蓮車站",
-              "臺東車站",
-              "枋寮車站",
-              "臺南車站",
-              "高雄國際機場",
-            ];
-      overview.href = `https://www.google.com/maps/dir/${hubs.map(encodeURIComponent).join("/")}/`;
       q<HTMLElement>(`[data-budget-slot="${plan.id}"]`).append(
         q<HTMLElement>("[data-shared-budget]"),
       );
@@ -1099,6 +1103,38 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     color: var(--muted);
     font-size: 13px;
     font-variant-numeric: tabular-nums;
+  }
+  .tw-overview {
+    margin: 0 28px 28px;
+    scroll-margin-top: 100px;
+  }
+  .tw-overview-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+  .tw-overview h3 {
+    margin: 0;
+    font-size: 21px;
+    line-height: 1.5;
+  }
+  .tw-overview-heading a {
+    font-size: 14px;
+  }
+  .tw-overview p {
+    margin: 8px 0 16px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .tw-overview iframe {
+    display: block;
+    width: 100%;
+    height: 560px;
+    border: 1px solid var(--line);
+    background: var(--tw-soft);
   }
   .tw-workspace {
     display: grid;
@@ -1528,6 +1564,13 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
       border: 0;
       padding: 0;
       font-size: 23px;
+    }
+    .tw-overview {
+      margin-inline: 16px;
+      margin-bottom: 24px;
+    }
+    .tw-overview iframe {
+      height: 500px;
     }
     .tw-trip-meta {
       padding: 0 18px 18px;
