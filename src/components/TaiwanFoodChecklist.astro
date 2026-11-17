@@ -1,0 +1,43 @@
+---
+import { taiwanFood, taiwanFoodAreas } from "../data/taiwan-food";
+const { prefix } = Astro.props;
+---
+
+<details class="tw-extra tw-food" data-food-root>
+  <summary>台北地道美食与小吃清单 <span data-food-count>0 / 19</span></summary>
+  <p>
+    遇见就吃，不必刻意跨区排队。19项是候选，勾选只记录想吃或吃过的项目，不用全部完成。
+  </p>
+  <label class="tw-food-filter" for={`${prefix}-food-area`}
+    >按街区顺路找
+    <select id={`${prefix}-food-area`} data-food-filter>
+      <option value="all">全部街区</option>
+      {taiwanFoodAreas.map((area) => <option value={area}>{area}</option>)}
+    </select>
+  </label>
+  <ul class="tw-food-list">
+    {
+      taiwanFood.map((item) => (
+        <li data-food-areas={JSON.stringify(item.areas)}>
+          <label>
+            <>
+              <input type="checkbox" data-food-id={item.id} />
+              <span>
+                <>
+                  <strong>{item.name}</strong>
+                  <small>
+                    {item.group} · {item.areas.join(" / ")}
+                  </small>
+                  <span>{item.note}</span>
+                </>
+              </span>
+            </>
+          </label>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="tw-food-storage" data-food-storage>
+    勾选保存在当前浏览器，可跨日期方案保留。
+  </p>
+</details>

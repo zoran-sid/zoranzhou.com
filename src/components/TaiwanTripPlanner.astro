@@ -2,7 +2,9 @@
 import {
   taiwanPlans as plans,
   TAIWAN_BUDGET_RESERVE,
+  taiwanRailNotes,
 } from "../data/taiwan-trip";
+import TaiwanFoodChecklist from "./TaiwanFoodChecklist.astro";
 import { googleRoute } from "../lib/taiwan-maps";
 const first = plans[0];
 const firstRoute = googleRoute(first.days[0].legs[0].url)!;
@@ -17,14 +19,24 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
 >
   <header class="tw-topbar">
     <div><h2>把路线摊开来看</h2><p data-plan-summary>{first.summary}</p></div>
-    <div class="tw-plan-switch" role="group" aria-label="选择旅行方案">
-      {
-        plans.map((plan, i) => (
-          <button type="button" data-plan={plan.id} aria-pressed={i === 0}>
-            {plan.label}
-          </button>
-        ))
-      }
+    <div class="tw-switches">
+      <div class="tw-plan-switch" role="group" aria-label="选择出发日期">
+        {
+          ["10", "11"].map((date) => (
+            <button type="button" data-date={date} aria-pressed={date === "10"}>
+              12/{date}出发
+            </button>
+          ))
+        }
+      </div>
+      <div class="tw-plan-switch" role="group" aria-label="选择路线">
+        <button type="button" data-journey="west" aria-pressed="true"
+          >西线慢游</button
+        >
+        <button type="button" data-journey="east" aria-pressed="false"
+          >半环岛候补</button
+        >
+      </div>
     </div>
   </header>
   <div class="tw-trip-meta">
@@ -33,6 +45,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     >
     <a
       href="https://www.google.com/maps/dir/Taiwan+Taoyuan+International+Airport/Taipei+Main+Station/Tainan+Station/Kaohsiung+Station/Kaohsiung+International+Airport/"
+      data-trip-overview
       target="_blank"
       rel="noopener noreferrer">全程地点总览 ↗</a
     >
@@ -76,7 +89,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     <div class="tw-day-content" data-day-content>
       {
         plans.map((plan, p) =>
-          plan.days.map((day, i) => (
+          plan.days.map((day) => (
             <section
               class="tw-day-panel"
               id={`tw-panel-${plan.id}-${day.id}`}
@@ -84,7 +97,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
               data-panel-day={day.id}
               role="tabpanel"
               aria-labelledby={`tw-tab-${plan.id}-${day.id}`}
-              hidden={p !== 0 || i !== 0}
+              hidden={p !== 0}
               tabindex="0"
             >
               <header class="tw-day-heading">
@@ -111,10 +124,19 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
                     </button>
                     <div>
                       <div class="tw-stop-meta">
+                        <span
+                          class:list={[
+                            "tw-priority",
+                            { "is-core": stop.priority === "core" },
+                          ]}
+                        >
+                          {stop.priority === "core" ? "核心必去" : "顺路可选"}
+                        </span>
                         <span>{stop.kind}</span>
                         <span>{stop.period}</span>
                       </div>
                       <h4>{stop.name}</h4>
+                      <p class="tw-approach">{stop.approach}</p>
                       <p>{stop.detail}</p>
                     </div>
                   </li>
@@ -158,10 +180,223 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Google Maps 地点顺序预览 ↗
+                    地点总览（含可选支线，交通请逐段查看）↗
                   </a>
                 </>
               </div>
+              {day.sections.map((item) =>
+                item.collapsible ? (
+                  <details class="tw-extra">
+                    <summary>{item.title}</summary>
+                    {item.paragraphs.map((text) => (
+                      <p>{text}</p>
+                    ))}
+                    {item.links && (
+                      <ul class="tw-extra-links">
+                        {item.links.map((l) => (
+                          <li>
+                            <a
+                              href={l.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {l.label} ↗
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </details>
+                ) : (
+                  <section class="tw-day-detail">
+                    <h4>{item.title}</h4>
+                    {item.paragraphs.map((text) => (
+                      <p>{text}</p>
+                    ))}
+                    {item.links && (
+                      <ul class="tw-extra-links">
+                        {item.links.map((l) => (
+                          <li>
+                            <a
+                              href={l.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {l.label} ↗
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
+                ),
+              )}
+              {day.id === 1 && (
+                <>
+                  <TaiwanFoodChecklist prefix={plan.id} />
+                  <details class="tw-extra tw-rail-plan">
+                    <summary>{taiwanRailNotes.title}</summary>
+                    {taiwanRailNotes.paragraphs.map((text) => (
+                      <p>{text}</p>
+                    ))}
+                    <ul class="tw-extra-links">
+                      {taiwanRailNotes.links.map((l) => (
+                        <li>
+                          <a
+                            href={l.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {l.label} ↗
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      class="tw-action"
+                      type="button"
+                      data-open-journey={
+                        plan.journey === "west" ? "east" : "west"
+                      }
+                    >
+                      {plan.journey === "west"
+                        ? "查看半环岛 D1—D8"
+                        : "回到西线慢游 D1—D8"}
+                    </button>
+                  </details>
+                  <div data-budget-slot={plan.id}>
+                    {p === 0 && (
+                      <details class="tw-extra tw-budget" data-shared-budget>
+                        <summary>预算与花费预留</summary>
+                        <div>
+                          <p>
+                            预算按每人计算，住宿填自己实际承担的金额。切换日期会载入规划预留；1
+                            港元按 NT$4.2 粗算。
+                          </p>
+                        </div>
+                        <div class="tw-budget-fields">
+                          <label>
+                            往返机票（HK$）
+                            <input
+                              data-budget="flight"
+                              type="number"
+                              min="0"
+                              step="100"
+                              value={first.budget.flight}
+                              inputmode="decimal"
+                            />
+                          </label>
+                          <label>
+                            <span data-hotel-label>
+                              {first.days.length - 1}晚住宿／人（NT$）
+                            </span>
+                            <input
+                              data-budget="hotel"
+                              type="number"
+                              min="0"
+                              step="500"
+                              value={first.budget.hotel}
+                              inputmode="decimal"
+                            />
+                          </label>
+                          <label>
+                            <span data-food-label>
+                              {first.days.length}天餐饮／人（NT$）
+                            </span>
+                            <input
+                              data-budget="food"
+                              type="number"
+                              min="0"
+                              step="100"
+                              value={first.budget.food}
+                              inputmode="decimal"
+                            />
+                          </label>
+                          <label>
+                            额外开销（HK$）
+                            <input
+                              data-budget="extra"
+                              type="number"
+                              min="0"
+                              step="100"
+                              value="0"
+                              inputmode="decimal"
+                            />
+                          </label>
+                        </div>
+                        <div class="tw-budget-total">
+                          <p>
+                            另预留交通 NT$3,000、门票体验 NT$3,500、应急
+                            NT$1,500。半环岛车票、计程车、接送与超出部分填入额外开销。这些是规划数值，房价和机票以订单报价为准。
+                          </p>
+                          <output data-total aria-live="polite">
+                            约 HK$
+                            {Math.round(
+                              first.budget.flight +
+                                (first.budget.hotel +
+                                  first.budget.food +
+                                  TAIWAN_BUDGET_RESERVE) /
+                                  4.2,
+                            ).toLocaleString("en-US")}
+                            ／人
+                          </output>
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                  {p === 0 && (
+                    <>
+                      {" "}
+                      <noscript>
+                        <p class="tw-nojs">
+                          当前显示主方案全文；启用 JavaScript
+                          可切换日期和候补路线，所有导航也可在D1展开。
+                        </p>
+                      </noscript>
+                      <details class="tw-all-links">
+                        <summary>全部日期与候补路线 · 纯链接导航</summary>
+                        {plans.map((plan) => (
+                          <div>
+                            <>
+                              <h3>
+                                {plan.journey === "west"
+                                  ? "西线慢游"
+                                  : "半环岛候补"}{" "}
+                                · {plan.label}
+                              </h3>
+                              <ul>
+                                {plan.days.map((day) => (
+                                  <li>
+                                    <strong>
+                                      D{day.id} · {day.date} · {day.name}
+                                    </strong>
+                                    <a
+                                      href={day.previewUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      地点预览 ↗
+                                    </a>
+                                    {day.legs.map((leg) => (
+                                      <a
+                                        href={leg.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        {leg.label} ↗
+                                      </a>
+                                    ))}
+                                  </li>
+                                ))}
+                              </ul>
+                            </>
+                          </div>
+                        ))}
+                      </details>
+                    </>
+                  )}
+                </>
+              )}
               <aside class="tw-culture">
                 <>
                   <h4>{day.culture.title}</h4>
@@ -183,7 +418,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     <aside class="tw-map-column" aria-label="Google Maps 分段路线">
       <div class="tw-map-sticky">
         <div class="tw-map-heading">
-          <strong data-map-title>D1 · 抵达与入住</strong><a
+          <strong data-map-title>{first.days[0].name}</strong><a
             data-map-external
             href={firstRoute.url}
             target="_blank"
@@ -240,108 +475,6 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
       </div>
     </aside>
   </div>
-  <noscript
-    ><p class="tw-nojs">
-      启用 JavaScript 可切换每日行程与地图；所有日期的导航链接也可在下方展开。
-    </p></noscript
-  >
-  <details class="tw-all-links">
-    <summary>展开两种出发日期的每日导航链接</summary>{
-      plans.map((plan) => (
-        <div>
-          <>
-            <h3>{plan.label}</h3>
-            <ul>
-              {plan.days.map((day) => (
-                <li>
-                  <strong>
-                    D{day.id} · {day.date} · {day.name}
-                  </strong>
-                  <a
-                    href={day.previewUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    地点预览 ↗
-                  </a>
-                  {day.legs.map((leg) => (
-                    <a href={leg.url} target="_blank" rel="noopener noreferrer">
-                      {leg.label} ↗
-                    </a>
-                  ))}
-                </li>
-              ))}
-            </ul>
-          </>
-        </div>
-      ))
-    }
-  </details>
-  <section class="tw-budget" aria-labelledby="tw-budget-title">
-    <div>
-      <h3 id="tw-budget-title">算一算，这趟要花多少</h3><p>
-        预算按每人计算，住宿填自己实际承担的金额。切换日期会载入规划预留；1
-        港元按 NT$4.2 粗算。
-      </p>
-    </div>
-    <div class="tw-budget-fields">
-      <label
-        >往返机票（HK$）<input
-          data-budget="flight"
-          type="number"
-          min="0"
-          step="100"
-          value={first.budget.flight}
-          inputmode="decimal"
-        /></label
-      >
-      <label
-        ><span data-hotel-label>{first.days.length - 1}晚住宿／人（NT$）</span
-        ><input
-          data-budget="hotel"
-          type="number"
-          min="0"
-          step="500"
-          value={first.budget.hotel}
-          inputmode="decimal"
-        /></label
-      >
-      <label
-        ><span data-food-label>{first.days.length}天餐饮／人（NT$）</span><input
-          data-budget="food"
-          type="number"
-          min="0"
-          step="100"
-          value={first.budget.food}
-          inputmode="decimal"
-        /></label
-      >
-      <label
-        >额外开销（HK$）<input
-          data-budget="extra"
-          type="number"
-          min="0"
-          step="100"
-          value="0"
-          inputmode="decimal"
-        /></label
-      >
-    </div>
-    <div class="tw-budget-total">
-      <p>
-        另预留交通 NT$3,000、门票体验 NT$3,500、应急
-        NT$1,500。计程车、接送与超出部分填入额外开销。这些是规划数值，房价和机票以订单报价为准。
-      </p><output data-total aria-live="polite"
-        >约 HK${
-          Math.round(
-            first.budget.flight +
-              (first.budget.hotel + first.budget.food + TAIWAN_BUDGET_RESERVE) /
-                4.2,
-          ).toLocaleString("en-US")
-        }／人</output
-      >
-    </div>
-  </section>
 </section>
 
 <script>
@@ -469,6 +602,13 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     );
     function selectDay(id: number) {
       day = plan.days.find((item) => item.id === id) ?? plan.days[0];
+      q<HTMLElement>("[data-workspace]").dataset.view = "list";
+      qa<HTMLButtonElement>("button[data-view]").forEach((button) =>
+        button.setAttribute(
+          "aria-pressed",
+          String(button.dataset.view === "list"),
+        ),
+      );
       qa<HTMLButtonElement>(`[data-plan-rail="${plan.id}"] [data-day]`).forEach(
         (button) => {
           const active = Number(button.dataset.day) === day.id;
@@ -485,8 +625,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
       qa<HTMLElement>("[data-stop-row]").forEach((item) =>
         item.classList.remove("is-active"),
       );
-      q<HTMLElement>("[data-map-title]").textContent =
-        `D${day.id} · ${day.name}`;
+      q<HTMLElement>("[data-map-title]").textContent = day.name;
       loadDayMap();
     }
     qa<HTMLButtonElement>("[data-day]").forEach((button) => {
@@ -566,36 +705,137 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     qa<HTMLInputElement>("[data-budget]").forEach((input) =>
       input.addEventListener("input", updateBudget),
     );
-    qa<HTMLButtonElement>("[data-plan]").forEach((button) =>
-      button.addEventListener("click", () => {
-        const next = plans.find((item) => item.id === button.dataset.plan);
-        if (!next || next.id === plan.id) return;
-        plan = next;
-        qa<HTMLButtonElement>("[data-plan]").forEach((item) =>
-          item.setAttribute(
-            "aria-pressed",
-            String(item.dataset.plan === plan.id),
+    function changePlan(departure: string, journey: string) {
+      const next = plans.find(
+        (item) => item.departure === departure && item.journey === journey,
+      );
+      if (!next || next.id === plan.id) return;
+      plan = next;
+      qa<HTMLButtonElement>("[data-date]").forEach((item) =>
+        item.setAttribute(
+          "aria-pressed",
+          String(item.dataset.date === plan.departure),
+        ),
+      );
+      qa<HTMLButtonElement>("[data-journey]").forEach((item) =>
+        item.setAttribute(
+          "aria-pressed",
+          String(item.dataset.journey === plan.journey),
+        ),
+      );
+      qa<HTMLElement>("[data-plan-rail]").forEach(
+        (item) => (item.hidden = item.dataset.planRail !== plan.id),
+      );
+      q<HTMLElement>("[data-plan-summary]").textContent = plan.summary;
+      q<HTMLElement>("[data-plan-range]").textContent = plan.range;
+      q<HTMLElement>("[data-plan-nights]").textContent = plan.nights;
+      const overview = q<HTMLAnchorElement>("[data-trip-overview]");
+      const hubs =
+        plan.journey === "west"
+          ? [
+              "桃園國際機場",
+              "臺北車站",
+              "臺南車站",
+              "高鐵左營站",
+              "高雄國際機場",
+            ]
+          : [
+              "桃園國際機場",
+              "臺北車站",
+              "花蓮車站",
+              "臺東車站",
+              "枋寮車站",
+              "臺南車站",
+              "高雄國際機場",
+            ];
+      overview.href = `https://www.google.com/maps/dir/${hubs.map(encodeURIComponent).join("/")}/`;
+      q<HTMLElement>(`[data-budget-slot="${plan.id}"]`).append(
+        q<HTMLElement>("[data-shared-budget]"),
+      );
+      for (const key of ["flight", "hotel", "food"] as const)
+        q<HTMLInputElement>(`[data-budget="${key}"]`).value = String(
+          plan.budget[key],
+        );
+      q<HTMLInputElement>('[data-budget="extra"]').value = "0";
+      updateBudget();
+      selectDay(1);
+    }
+    qa<HTMLButtonElement>("[data-date]").forEach((button) =>
+      button.addEventListener("click", () =>
+        changePlan(button.dataset.date!, plan.journey),
+      ),
+    );
+    qa<HTMLButtonElement>("[data-journey], [data-open-journey]").forEach(
+      (button) =>
+        button.addEventListener("click", () => {
+          changePlan(
+            plan.departure,
+            button.dataset.journey ?? button.dataset.openJourney!,
+          );
+          if (button.dataset.openJourney)
+            q<HTMLButtonElement>(
+              `[data-plan-rail="${plan.id}"] [data-day="1"]`,
+            ).focus();
+        }),
+    );
+    const foodKey = "zoran-taiwan-food-v1";
+    const foodIds = new Set(
+      qa<HTMLInputElement>("[data-food-id]").map(
+        (input) => input.dataset.foodId!,
+      ),
+    );
+    let checked = new Set<string>();
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem(foodKey) ?? "[]");
+      if (Array.isArray(saved))
+        checked = new Set(
+          saved.filter(
+            (id): id is string => typeof id === "string" && foodIds.has(id),
           ),
         );
-        qa<HTMLElement>("[data-plan-rail]").forEach(
-          (item) => (item.hidden = item.dataset.planRail !== plan.id),
-        );
-        q<HTMLElement>("[data-plan-summary]").textContent = plan.summary;
-        q<HTMLElement>("[data-plan-range]").textContent = plan.range;
-        q<HTMLElement>("[data-plan-nights]").textContent = plan.nights;
-        q<HTMLElement>("[data-hotel-label]").textContent =
-          `${plan.days.length - 1}晚住宿／人（NT$）`;
-        q<HTMLElement>("[data-food-label]").textContent =
-          `${plan.days.length}天餐饮／人（NT$）`;
-        for (const key of ["flight", "hotel", "food"] as const)
-          q<HTMLInputElement>(`[data-budget="${key}"]`).value = String(
-            plan.budget[key],
+    } catch {
+      /* Checklist still works without browser storage. */
+    }
+    function syncFood() {
+      qa<HTMLInputElement>("[data-food-id]").forEach(
+        (input) => (input.checked = checked.has(input.dataset.foodId!)),
+      );
+      qa<HTMLElement>("[data-food-count]").forEach(
+        (counter) =>
+          (counter.textContent = `${checked.size} / ${foodIds.size}`),
+      );
+    }
+    qa<HTMLInputElement>("[data-food-id]").forEach((input) =>
+      input.addEventListener("change", () => {
+        const id = input.dataset.foodId!;
+        if (input.checked) checked.add(id);
+        else checked.delete(id);
+        syncFood();
+        try {
+          localStorage.setItem(foodKey, JSON.stringify([...checked]));
+        } catch {
+          qa<HTMLElement>("[data-food-storage]").forEach(
+            (message) =>
+              (message.textContent =
+                "浏览器未开放保存，勾选仅在本次页面内保留。"),
           );
-        q<HTMLInputElement>('[data-budget="extra"]').value = "0";
-        updateBudget();
-        selectDay(1);
+        }
       }),
     );
+    qa<HTMLSelectElement>("[data-food-filter]").forEach((select) =>
+      select.addEventListener("change", () => {
+        select
+          .closest("[data-food-root]")!
+          .querySelectorAll<HTMLElement>("[data-food-areas]")
+          .forEach(
+            (row) =>
+              (row.hidden =
+                select.value !== "all" &&
+                !JSON.parse(row.dataset.foodAreas!).includes(select.value)),
+          );
+      }),
+    );
+    syncFood();
     qa<HTMLButtonElement>("button[data-view]").forEach((button) =>
       button.addEventListener("click", () => {
         q<HTMLElement>("[data-workspace]").dataset.view = button.dataset.view;
@@ -605,11 +845,165 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
       }),
     );
     updateBudget();
-    loadDayMap();
+    selectDay(1);
+    root.dataset.enhanced = "true";
   }
 </script>
 
 <style is:global>
+  html
+    .tw-planner:not([data-enhanced])
+    :is(
+      .tw-day-rail,
+      .tw-switches,
+      .tw-mobile-view,
+      .tw-map-column,
+      .tw-stop-number,
+      .tw-show-route,
+      .tw-action
+    ) {
+    display: none;
+  }
+  html .tw-planner:not([data-enhanced]) .tw-workspace {
+    display: block;
+  }
+  .tw-extra {
+    scroll-margin-top: 100px;
+  }
+  .tw-switches {
+    display: grid;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .tw-planner .tw-priority {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .tw-planner .tw-priority.is-core {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .tw-planner .tw-approach {
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .tw-extra,
+  .tw-day-detail {
+    border-top: 1px solid var(--line);
+    margin-top: 28px;
+    padding-top: 20px;
+  }
+  .tw-extra summary {
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 1.7;
+    min-height: 44px;
+    padding: 8px 0;
+  }
+  .tw-extra summary::marker {
+    color: var(--muted);
+  }
+  .tw-planner :is(.tw-extra, .tw-day-detail) p {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+  .tw-planner .tw-day-detail h4 {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .tw-planner .tw-extra-links {
+    margin-top: 14px;
+  }
+  .tw-extra-links a {
+    display: inline-block;
+    font-size: 13px;
+    padding: 7px 0;
+  }
+  .tw-planner .tw-action {
+    margin-top: 16px;
+    padding: 9px 14px;
+    background: var(--ink);
+    color: var(--surface);
+    border: 0;
+    border-radius: 5px;
+    min-height: 44px;
+  }
+  .tw-food summary span {
+    color: var(--muted);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .tw-food-filter {
+    display: grid;
+    gap: 6px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .tw-food-filter select {
+    width: 100%;
+    padding: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    min-height: 44px;
+  }
+  .tw-food-list li {
+    border-top: 1px solid var(--line);
+  }
+  .tw-food-list label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px 0;
+    cursor: pointer;
+  }
+  .tw-food-list input {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 5px;
+    accent-color: var(--accent);
+  }
+  .tw-food-list label > span {
+    display: grid;
+    gap: 4px;
+  }
+  .tw-food-list strong {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .tw-food-list small {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .tw-food-list span span {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .tw-food-list input:checked + span strong {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .tw-planner .tw-budget {
+    padding: 20px 0 0;
+  }
+  .tw-planner .tw-all-links {
+    padding: 20px 0;
+    margin-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  @media (max-width: 1000px) {
+    .tw-switches {
+      width: 100%;
+      max-width: 360px;
+    }
+    .tw-topbar {
+      flex-wrap: wrap;
+    }
+  }
   .tw-planner {
     scroll-margin-top: 100px;
     --tw-accent: #a0442b;
@@ -1039,7 +1433,7 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
   }
   .tw-budget-fields {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
     margin: 24px 0;
   }
@@ -1062,10 +1456,11 @@ const firstRoute = googleRoute(first.days[0].legs[0].url)!;
     caret-color: var(--accent);
   }
   .tw-budget-total {
+    flex-direction: column;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 28px;
+    gap: 16px;
     padding-top: 18px;
     border-top: 1px solid var(--line);
   }

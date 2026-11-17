@@ -1,93 +1,48 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { googleRoute, googlePlace } from "../src/lib/taiwan-maps";
 import { taiwanPlans } from "../src/data/taiwan-trip";
+import { taiwanFood } from "../src/data/taiwan-food";
 
-test("route embeds retain the transport mode and full addresses from navigation", () => {
-  const day = taiwanPlans[0].days[0];
-  const walking = googleRoute(day.legs[1].url)!;
-  const walkingUrl = new URL(walking.embedUrl);
-  assert.equal(walkingUrl.searchParams.get("dirflg"), "w");
+const west = taiwanPlans.filter((plan) => plan.journey === "west");
+const text = (value: unknown) => JSON.stringify(value);
+const weekday = (date: string) =>
+  new Date(`2026/${date} 12:00:00 GMT`).getUTCDay();
+
+test("every journey/date combination has eight consecutive days and seven nights", () => {
   assert.equal(
-    walkingUrl.searchParams.get("daddr"),
-    "台北市中正區開封街一段33號",
+    new Set(taiwanPlans.map((p) => `${p.journey}-${p.departure}`)).size,
+    4,
   );
-  assert.equal(
-    new URL(googleRoute(day.legs[0].url)!.embedUrl).searchParams.get("dirflg"),
-    "r",
-  );
-  assert.equal(walkingUrl.searchParams.get("output"), "embed");
-});
-
-test("ticket pages, untyped previews and invalid URLs never become driving directions", () => {
-  for (const url of [
-    "invalid",
-    "https://afrts.forest.gov.tw/",
-    "https://example.com/maps/dir/?api=1&origin=A&destination=B&travelmode=walking",
-    "https://www.google.com/maps/dir/?api=1&origin=A&destination=B",
-    taiwanPlans[0].days[0].previewUrl,
-  ]) {
-    assert.equal(googleRoute(url), undefined);
-  }
-});
-
-test("hotel map searches use verified addresses, not approximate planning coordinates", () => {
-  const hotel = taiwanPlans[0].days[0].stops[2];
-  assert.equal(
-    new URL(googlePlace(hotel).embedUrl).searchParams.get("q"),
-    "台北市中正區開封街一段33號",
-  );
-  const kaohsiung = taiwanPlans[0].days
-    .flatMap((day) => day.stops)
-    .find((stop) => stop.mapQuery === "高雄市三民區建國二路295號")!;
-  assert.equal(
-    new URL(googlePlace(kaohsiung).url).searchParams.get("query"),
-    "高雄市三民區建國二路295號",
-  );
-});
-
-test("ferries are queried between the two piers, with separate walking legs", () => {
-  for (const plan of taiwanPlans) {
-    const day = plan.days.find((day) =>
-      day.legs.some((leg) => leg.label.includes("查渡轮")),
-    )!;
-    const ferry = new URL(
-      day.legs.find((leg) => leg.label.includes("查渡轮"))!.url,
-    );
-    assert.equal(ferry.searchParams.get("origin"), "鼓山輪渡站 高雄市");
-    assert.equal(ferry.searchParams.get("destination"), "旗津輪渡站 高雄市");
-    assert.equal(ferry.searchParams.get("travelmode"), "transit");
-    assert.ok(
-      day.legs.some(
-        (leg) =>
-          leg.label === "旗津码头 → 海岸步行" &&
-          googleRoute(leg.url)?.mode === "walking",
-      ),
-    );
-  }
-});
-
-test("both plans provide a real map query for each stop and supported modes for each route", () => {
-  for (const plan of taiwanPlans)
-    for (const day of plan.days) {
-      for (const stop of day.stops) assert.ok(stop.mapQuery.trim());
-      for (const leg of day.legs)
-        if (leg.url.startsWith("https://www.google.com/maps/dir/?")) {
-          assert.ok(
-            googleRoute(leg.url),
-            `${plan.id} D${day.id}: ${leg.label}`,
-          );
-        }
-    }
-});
-
-test("both departure dates keep the confirmed experiences within eight days", () => {
   for (const plan of taiwanPlans) {
     assert.equal(plan.days.length, 8);
+    assert.match(plan.days[0].date, new RegExp(`12/${plan.departure}$`));
+    assert.equal(plan.days.filter((d) => !d.stay.startsWith("返程")).length, 7);
+    for (let i = 1; i < 8; i++)
+      assert.equal(
+        new Date(`2026/${plan.days[i].date} GMT`).getTime() -
+          new Date(`2026/${plan.days[i - 1].date} GMT`).getTime(),
+        86400000,
+      );
+  }
+});
+
+test("west route retains 4/2/1 nights and all requested Taipei experiences", () => {
+  for (const plan of west) {
+    for (const [city, nights] of [
+      ["台北", 4],
+      ["台南", 2],
+      ["高雄", 1],
+    ] as const)
+      assert.equal(
+        plan.days.filter((d) => d.stay.startsWith(city)).length,
+        nights,
+      );
     const names = plan.days
-      .flatMap((day) => day.stops.map((stop) => stop.name))
+      .flatMap((d) => d.stops.map((s) => s.name))
       .join(" ");
-    for (const expected of [
+    for (const name of [
       "故宫",
       "凤梨酥",
       "101",
@@ -96,79 +51,179 @@ test("both departure dates keep the confirmed experiences within eight days", ()
       "独立汤屋",
       "龙山寺",
       "市场",
+      "小潘",
+      "龙虎塔",
     ])
-      assert.ok(names.includes(expected), `${plan.id}: ${expected}`);
-    assert.equal(
-      plan.days.filter((day) => day.stay.startsWith("台北")).length,
-      4,
-    );
-    assert.equal(
-      plan.days.filter((day) => day.stay.startsWith("台南")).length,
-      2,
-    );
-    assert.equal(
-      plan.days.filter((day) => day.stay.startsWith("高雄")).length,
-      1,
-    );
-    assert.ok(
-      !plan.days
-        .flatMap((day) => day.legs)
-        .some((leg) => /阿里山|7329|7322/.test(leg.label)),
-    );
+      assert.ok(names.includes(name), `${plan.id}: ${name}`);
+    assert.match(text(plan.days[4]), /泡汤/);
+    assert.match(text(plan.days[4]), /高铁板桥/);
   }
 });
 
-test("date variants respect the Presidential Office weekday window and Thermal Valley Monday closure", () => {
+test("Presidential Office is always on a weekday; Thermal Valley never on Monday", () => {
   for (const plan of taiwanPlans) {
-    const officeDay = plan.days.find((day) =>
-      day.stops.some((stop) => stop.mapQuery.includes("總統府")),
-    )!;
-    const officeWeekday = new Date(
-      `2026/${officeDay.date} 12:00:00 GMT`,
-    ).getUTCDay();
-    assert.ok(officeWeekday >= 1 && officeWeekday <= 5);
-    const valleyDay = plan.days.find((day) =>
-      day.stops.some((stop) => stop.name === "地热谷"),
+    const office = plan.days.find((d) =>
+      d.stops.some((s) => s.mapQuery.includes("總統府")),
     );
-    if (valleyDay)
-      assert.notEqual(
-        new Date(`2026/${valleyDay.date} 12:00:00 GMT`).getUTCDay(),
-        1,
-      );
-    for (let index = 1; index < plan.days.length; index++) {
-      assert.equal(
-        new Date(`2026/${plan.days[index].date} GMT`).getTime() -
-          new Date(`2026/${plan.days[index - 1].date} GMT`).getTime(),
-        86400000,
-      );
+    assert.ok(office, plan.id);
+    assert.ok(
+      weekday(office.date) >= 1 && weekday(office.date) <= 5,
+      `${plan.id}: ${office.date}`,
+    );
+    for (const d of plan.days)
+      if (d.stops.some((s) => s.name === "地热谷"))
+        assert.notEqual(weekday(d.date), 1);
+  }
+});
+
+test("both journeys switch D6 night market automatically for Wednesday", () => {
+  for (const plan of taiwanPlans) {
+    const d6 = plan.days[5];
+    if (weekday(d6.date) === 3) {
+      assert.ok(d6.stops.some((s) => s.name.includes("武圣")));
+      assert.ok(!d6.stops.some((s) => s.mapQuery.includes("大東")));
+      assert.match(text(d6), /大东休市|大东.*今晚休市/);
+    } else {
+      assert.ok(d6.stops.some((s) => s.name.includes("大东")));
+      assert.equal(weekday(d6.date), 2);
     }
   }
 });
 
-test("southbound transfer distinguishes HSR Tainan, Shalun and downtown Tainan", () => {
-  for (const plan of taiwanPlans) {
-    const routes = plan.days[4].legs.map((leg) => {
-      try {
-        return new URL(leg.url);
-      } catch {
-        return undefined;
+test("all stops have an approach and explicit priority without binding hotels", () => {
+  assert.doesNotMatch(
+    text(taiwanPlans),
+    /天雲|天云|康桥|康橋|開封街一段33號|建國二路295號/,
+  );
+  for (const p of taiwanPlans)
+    for (const d of p.days)
+      for (const s of d.stops) {
+        assert.ok(s.approach.trim());
+        assert.ok(["core", "optional"].includes(s.priority));
+        assert.equal(
+          new URL(googlePlace(s).embedUrl).searchParams.get("q"),
+          s.mapQuery,
+        );
       }
-    });
+});
+
+test("route embeds keep public-transport/walking modes and exact named endpoints", () => {
+  for (const plan of taiwanPlans)
+    for (const day of plan.days)
+      for (const leg of day.legs) {
+        if (!leg.url.startsWith("https://www.google.com/maps/dir/?")) continue;
+        const route = googleRoute(leg.url);
+        assert.ok(route, `${plan.id} D${day.id}: ${leg.label}`);
+        const external = new URL(leg.url),
+          embed = new URL(route.embedUrl);
+        assert.equal(
+          embed.searchParams.get("saddr"),
+          external.searchParams.get("origin"),
+        );
+        assert.equal(
+          embed.searchParams.get("daddr"),
+          external.searchParams.get("destination"),
+        );
+        assert.equal(
+          embed.searchParams.get("dirflg"),
+          route.mode === "walking" ? "w" : "r",
+        );
+      }
+  for (const url of [
+    "invalid",
+    "https://example.com/maps/dir/?api=1&origin=A&destination=B&travelmode=walking",
+    "https://www.google.com/maps/dir/?api=1&origin=A&destination=B",
+    taiwanPlans[0].days[0].previewUrl,
+  ])
+    assert.equal(googleRoute(url), undefined);
+});
+
+test("Cijin ferry connects piers, with walking separately to the coast", () => {
+  for (const plan of taiwanPlans) {
+    const day = plan.days[6];
+    const ferry = new URL(
+      day.legs.find((l) => l.label.includes("查渡轮"))!.url,
+    );
+    assert.equal(ferry.searchParams.get("origin"), "鼓山輪渡站 高雄市");
+    assert.equal(ferry.searchParams.get("destination"), "旗津輪渡站 高雄市");
+    assert.equal(ferry.searchParams.get("travelmode"), "transit");
+    assert.equal(
+      googleRoute(day.legs.find((l) => l.label === "旗津码头 → 海岸步行")!.url)
+        ?.mode,
+      "walking",
+    );
+  }
+});
+
+test("west southbound transfer distinguishes HSR Tainan, Shalun, downtown station", () => {
+  for (const plan of west) {
+    const routes = plan.days[4].legs.map((l) => new URL(l.url));
     assert.ok(
       routes.some(
-        (url) =>
-          url?.searchParams.get("origin") === "高鐵台南站" &&
-          url.searchParams.get("destination") === "沙崙車站" &&
-          url.searchParams.get("travelmode") === "walking",
+        (u) =>
+          u.searchParams.get("origin") === "高鐵台南站" &&
+          u.searchParams.get("destination") === "沙崙車站" &&
+          u.searchParams.get("travelmode") === "walking",
       ),
     );
     assert.ok(
       routes.some(
-        (url) =>
-          url?.searchParams.get("origin") === "沙崙車站" &&
-          url.searchParams.get("destination") === "臺鐵臺南站" &&
-          url.searchParams.get("travelmode") === "transit",
+        (u) =>
+          u.searchParams.get("origin") === "沙崙車站" &&
+          u.searchParams.get("destination") === "臺鐵臺南站",
       ),
     );
   }
+});
+
+test("all nineteen foods are distinct, filterable, and include required preparations", () => {
+  assert.equal(taiwanFood.length, 19);
+  assert.equal(new Set(taiwanFood.map((f) => f.id)).size, 19);
+  for (const food of taiwanFood) assert.ok(food.areas.length);
+  assert.match(
+    taiwanFood.find((f) => f.id === "blood-cake")!.note,
+    /加香菜与花生粉/,
+  );
+  assert.match(
+    taiwanFood.find((f) => f.id === "bread")!.note,
+    /葱花、肉松、菠萝/,
+  );
+  assert.match(
+    taiwanFood.find((f) => f.id === "teppan")!.note,
+    /高丽菜、豆芽菜/,
+  );
+});
+
+test("east alternative preserves museum/workshop day and gates Blue train/airport detour", () => {
+  for (const plan of taiwanPlans.filter((p) => p.journey === "east")) {
+    assert.deepEqual(
+      plan.days.slice(3, 7).map((d) => d.stay.split(" · ")[0]),
+      ["花莲", "台东", "台南", "高雄"],
+    );
+    assert.equal(
+      plan.days[2].stops.filter((s) => s.priority === "core").length,
+      2,
+    );
+    assert.match(plan.days[5].note, /默认上午搭台铁南回线常规班次/);
+    assert.match(text(plan.days[5].sections), /通常安排在午后/);
+    assert.match(text(plan.days[7].sections), /晚班机/);
+    assert.match(text(plan.days[7].sections), /去回两班/);
+  }
+});
+
+test("article ends at interactive planner; no duplicate itinerary below D8", () => {
+  const article = readFileSync(
+    new URL("../src/content/blog/taiwan-seven-days-2026.mdx", import.meta.url),
+    "utf8",
+  );
+  assert.ok(article.trimEnd().endsWith("<TaiwanTripPlanner />"));
+  assert.doesNotMatch(article, /八天怎么走，先把重点留住|## D[1-8]/);
+  const component = readFileSync(
+    new URL("../src/components/TaiwanTripPlanner.astro", import.meta.url),
+    "utf8",
+  );
+  assert.ok(
+    component.indexOf("data-shared-budget") <
+      component.indexOf('class="tw-map-column"'),
+  );
 });
