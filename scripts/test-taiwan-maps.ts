@@ -49,7 +49,6 @@ test("west route retains 4/2/1 nights and all requested Taipei experiences", () 
       "国父纪念馆",
       "象山",
       "独立汤屋",
-      "龙山寺",
       "市场",
       "小潘",
       "龙虎塔",
@@ -200,10 +199,12 @@ test("east alternative preserves museum/workshop day and gates Blue train/airpor
       plan.days.slice(3, 7).map((d) => d.stay.split(" · ")[0]),
       ["花莲", "台东", "台南", "高雄"],
     );
-    assert.equal(
-      plan.days[2].stops.filter((s) => s.priority === "core").length,
-      2,
-    );
+    for (const term of ["故宫", "DIY"])
+      assert.ok(
+        plan.days[2].stops.some(
+          (s) => s.name.includes(term) && s.priority === "core",
+        ),
+      );
     assert.match(plan.days[5].note, /默认上午搭台铁南回线常规班次/);
     assert.match(text(plan.days[5].sections), /通常安排在午后/);
     assert.match(text(plan.days[7].sections), /晚班机/);
@@ -236,32 +237,47 @@ test("arrival only settles in and browses Ningxia, without Dihua/temple detours"
     assert.ok(!d.stops.some((s) => /迪化|城隍|码头/.test(s.name)));
   }
 });
-test("Taipei dates keep palace off Monday and the north outing ends in a night bath", () => {
+test("north outing uses a budget afternoon bath before Tamsui, without Longshan", () => {
   for (const p of west) {
     const museum = p.days.find((d) =>
       d.stops.some((s) => s.name.includes("故宫")),
     )!;
     assert.notEqual(weekday(museum.date), 1);
     const north = p.days.find((d) =>
-      d.stops.some((s) => s.name.includes("北投夜间")),
+      d.stops.some((s) => s.name.includes("瀧乃汤")),
     )!;
     assert.equal(north.id, p.departure === "10" ? 3 : 4);
-    assert.match(north.stops.at(-1)!.name, /北投夜间/);
+    assert.doesNotMatch(text(north), /龙山|龙门|龍山|丽禧|麗禧|幽雅路/);
+    const bath = north.stops.findIndex((s) => s.name.includes("瀧乃汤"));
+    const tamsui = north.stops.findIndex((s) => s.name.includes("文化阿给"));
+    assert.ok(bath >= 0 && bath < tamsui);
+    assert.match(north.stops[bath].detail, /400.*两人.*60分钟/);
+    assert.match(north.stops[bath].period, /午后/);
     assert.match(
       north.stops.find((s) => s.name.includes("双连"))!.mapQuery,
       /民生西路45巷/,
     );
-    assert.match(
-      north.stops.find((s) => s.name.includes("文化阿给"))!.mapQuery,
-      /中正路138號/,
-    );
-    assert.ok(north.legs.some((l) => /淡水站.*北投/.test(l.label)));
+    assert.match(north.stops[tamsui].mapQuery, /中正路138號/);
+    assert.ok(north.legs.some((l) => /新北投.*淡水站/.test(l.label)));
+    assert.ok(north.stops.some((s) => /夜逛/.test(s.name)));
     const d2 = p.days[1];
     const idx = (n: string) => d2.stops.findIndex((s) => s.name.includes(n));
     assert.ok(idx("101登顶") < idx("虎林"));
     assert.ok(idx("虎林") < idx("象山"));
     assert.ok(idx("象山") < idx("竹村"));
     assert.equal(d2.stops[idx("象山")].priority, "optional");
+  }
+});
+test("museum/workshop days continue to Raohe, riverside and optional nightlife", () => {
+  for (const p of taiwanPlans) {
+    const d = p.days.find((d) => d.stops.some((s) => s.name.includes("故宫")))!;
+    const idx = (n: string) => d.stops.findIndex((s) => s.name.includes(n));
+    assert.ok(idx("DIY") < idx("饶河街"));
+    assert.ok(idx("饶河街") < idx("彩虹桥"));
+    assert.ok(idx("中山街区夜逛") >= 0);
+    assert.ok(idx("士林夜市") >= 0);
+    assert.ok(d.legs.some((l) => /郭元益.*饶河/.test(l.label)));
+    assert.doesNotMatch(d.culture.body, /吃顿饭.*收尾/);
   }
 });
 test("Kaohsiung dinner is a candidate outdoor reservation, not a claimed booking", () => {
