@@ -43,13 +43,14 @@ export interface TaiwanPlan {
   days: TaiwanDay[];
   budget: { flight: number; hotel: number; food: number };
 }
-// Planning estimates per person. No hotel or flight has been booked.
+// Budget estimates per person for the public itinerary.
 export const TAIWAN_BUDGET_RESERVE = 8000;
 const place = {
   airport: "桃園國際機場",
   a1: "桃園機場捷運 A1台北車站",
   taipei: "臺北車站",
   zhongshan: "捷運中山站 臺北市",
+  minquan: "捷運民權西路站 臺北市",
   market: "東三水街市場 臺北市萬華區三水街",
   longshan: "艋舺龍山寺 臺北市廣州街211號",
   office: "總統府三號門 寶慶路 博愛路 臺北市",
@@ -97,6 +98,7 @@ const place = {
   spring: "蓮池潭春秋閣 高雄市",
   formosa: "捷運美麗島站 高雄市",
   pier2: "駁二藝術特區 高雄市",
+  pierDayi: "輕軌駁二大義站 C12 高雄市",
   hamasen: "哈瑪星 高雄市",
   sizihwan: "西子灣觀景平台 高雄市",
   gushan: "鼓山輪渡站 高雄市",
@@ -163,6 +165,25 @@ const sources = {
   weather: "https://climate.cwa.gov.tw/SeasonalClimate?subpage=Winter",
   ferry: "https://kcs.kcg.gov.tw/",
   hsr: "https://www.thsrc.com.tw/",
+  hsrBooking: "https://irs.thsrc.com.tw/IMINT/",
+  hsrTimetable:
+    "https://www.thsrc.com.tw/ArticleContent/a3b630bb-1066-4352-a1ef-58c7b4e8ef7c",
+  hsrEarlyBird:
+    "https://www.thsrc.com.tw/ArticleContent/7039d17d-1463-4c14-ad93-4d491dedcad5",
+  hsrTainanTransfer:
+    "https://www.thsrc.com.tw/ArticleContent/9c5ac6ca-ec89-48f8-aab0-41b738cb1814",
+  palaceFare: "https://www.npm.gov.tw/Articles.aspx?l=1&sno=02007004",
+  hsrPass: "https://pass.thsrc.com.tw/oatsb2c/home.do",
+  hsrPairOffer:
+    "https://www.kkday.com/zh-hk/product/100299-foreigners-only-taiwan-high-speed-rail-ticket-taiwan",
+  airportRail:
+    "https://www.tymetro.com.tw/tymetro-new/tw/_pages/travel-guide/road.php",
+  bathCalendar:
+    "https://www.longnice.com.tw/modules/news/article.php?storyid=75",
+  baliFerry:
+    "https://www.traffic.ntpc.gov.tw/userfiles/1130901/files/%281150518%E6%9B%B4%E6%96%B0%E5%B1%80%E7%B6%B2%29%E8%97%8D%E8%89%B2%E5%85%AC%E8%B7%AF%E5%9F%BA%E6%9C%AC%E8%B3%87%E8%A8%8A.pdf",
+  flagFerry:
+    "https://kcs.kcg.gov.tw/Content_List.aspx?Create=1&n=2EDF685BBC9D2857",
 };
 function stop(
   key: P,
@@ -282,16 +303,16 @@ const arrival = (start: number) =>
         "桃园机场 → A1 台北车站",
         "抵达后",
         "入境与换乘",
-        "办入境、取行李，再按航厦标识去机场捷运。直达车与普通车停站不同，买票时看清终点。",
+        "入境取箱后，从第一航厦 A12 或第二航厦 A13 搭往 A1 台北车站。紫色直达车停站较少，普通车也能到 A1。机捷单程 NT$160，可用悠游卡。",
         "跟随机场捷运指示进站，搭往台北方向至A1。机场捷运A1与台铁／高铁台北站不是同一处站厅，出站后按实际住宿地址选出口。",
       ),
       stop(
         "taipei",
-        "台北车站／中山站周边安顿",
+        "台北车站／中山／民权西路周边安顿",
         "抵达后",
         "住宿参考区",
-        "台北连住四晚，订房后把这一参考点换成实际地址；先放行李再散步。",
-        "住台北车站周边可从A1步行接续；住中山一带则依地址步行或转捷运，不预设某个酒店出口。",
+        "先到住处放行李，再出门吃饭。台北车站是换乘参考点。",
+        "住台北车站附近可从 A1 步行。住民权西路附近，就跟着台北捷运指示接红线，往淡水方向坐到 R13 民权西路，按实际地址选出口。",
       ),
       stop(
         "ningxia",
@@ -306,22 +327,33 @@ const arrival = (start: number) =>
     [
       nav("桃园机场 → A1 机场捷运", "airport", "a1"),
       nav("A1 → 台北车站周边步行", "a1", "taipei", "walking"),
+      nav("A1 → 民权西路站", "a1", "minquan"),
       nav("台北车站 → 中山站周边", "taipei", "zhongshan", "walking"),
       nav("台北车站 → 宁夏夜市", "taipei", "ningxia", "walking"),
       nav("宁夏夜市 → 中山站", "ningxia", "zhongshan", "walking"),
     ],
-    "台北 · 第1晚（车站／中山周边待选）",
+    "台北 · 第1晚",
     [
       section(
         "先订哪些，哪些可以到了再说",
         [
-          "两人同行，台北有朋友陪同。先确认香港至桃园、高雄返港航班，再订同一区域连住的房间、郭元益手作课和101门票。三座城市的酒店都还没定，导航统一用车站或街区作为参考。",
+          "先核对航厦和航空公司的报到截止时间，再按换城日订高铁。郭元益手作课按订单报到，景点的公共导航以车站和街区为起点。",
           "日期均为2026年。主方案12/10—12/17，备选12/11—12/18；切换日期后，总统府会移到工作日上午，台南夜市也随星期更换。一般景点只分上午、午后和傍晚。",
           "选了顺路可选的支线，就给它留时间。每天把核心体验走完，剩下的看天气和脚力；当天导航列表也包含支线，按实际选择打开对应的一段。",
         ],
         [
-          link("台湾高铁订票", sources.hsr),
+          link("台湾高铁官方订票", sources.hsrBooking),
           link("台铁时刻与订票", sources.tra),
+        ],
+        true,
+      ),
+      section(
+        "落地先把悠游卡准备好",
+        [
+          "一人一张悠游卡，先把余额补到约 NT$500。机捷、捷运、公车、可刷卡的台铁区间车和旗鼓渡轮按次扣款，高铁另订。准备买两馆实体联票的话，先确认抵达时有顺路开门的领卡点；领完卡直接储值。",
+        ],
+        [
+          link("桃园机场捷运路线与车种", sources.airportRail),
         ],
         true,
       ),
@@ -430,8 +462,8 @@ const museumDay = (id: number, start: number) =>
         "国立故宫博物院",
         "上午／依课程调整",
         "核心看展",
-        "挑几个真正想看的展厅慢慢看。热门文物轮换展出，出发前查当期展览，不把某一件文物当成必定能见。",
-        "从台北车站或中山搭淡水信义线到士林站，再转往故宫的公交；认至善路二段221号北部院区。",
+        "第一展览馆常规周二至周日 09:00—17:00，16:30 停售及兑换。用史博馆当年票根可到人工窗口买八折票。超过 A3 的背包或手提袋先寄存，展品按当期展览挑重点。",
+        "搭红线到士林站 1 号出口，步行到中正路转红30等往故宫的公交，认至善路二段221号北部院区。",
       ),
       stop(
         "shilin",
@@ -447,7 +479,7 @@ const museumDay = (id: number, start: number) =>
         "郭元益凤梨酥 DIY · 士林馆",
         "预约时段",
         "需要预约",
-        "文林路546号4楼。两位参与者按课程规则各自订位；课程日期、时长和报到要求以订单为准。自己做的留一份带走。",
+        "文林路546号4楼。馆方常规下午场为 14:00—16:00，带订单画面或编号，预留 15 分钟到场报到。午餐与返程公交都要留出余量，以所订场次为准。",
         "从士林站周边沿文林路前往546号，认郭元益糕饼博物馆士林馆，再按现场指示上楼。它与故宫同在士林区，仍需搭车接驳。",
       ),
       stop(
@@ -504,6 +536,15 @@ const museumDay = (id: number, start: number) =>
         "https://www.travel.taipei/zh-tw/pictorial/article/67603",
       ),
       link("故宫展览与参观", sources.palace),
+      link("故宫票价与史博馆票根八折", sources.palaceFare),
+      link(
+        "故宫展厅、摄影与寄存规定",
+        "https://www.npm.gov.tw/Articles.aspx?sno=02007005",
+      ),
+      link(
+        "故宫公交接驳",
+        "https://www.npm.gov.tw/Articles.aspx?l=1&sno=03009216",
+      ),
       link("郭元益 DIY 课程与预约", sources.diy),
     ],
     `台北 · 第${id}晚`,
@@ -654,7 +695,7 @@ const tainanDay = (start: number) =>
         "安平树屋",
         "上午",
         "历史与自然",
-        "先看榕树与旧仓库交织的空间。树屋、古堡和老街相邻，上午只走这一片。",
+        "安平树屋常规 08:30—17:30，成人 NT$70，入口在德记洋行旁。树屋、古堡和老街相邻，上午只走这一片。",
         "从中西区搭公交或计程车到安平树屋，按入口购票；从台南站出发也使用下方分段导航。",
       ),
       stop(
@@ -662,7 +703,7 @@ const tainanDay = (start: number) =>
         "安平古堡",
         "上午",
         "历史街区",
-        "走古堡与庭院，认识港口贸易和城防的层次。与树屋分别依票务规定入场。",
+        "古堡成人 NT$70，与树屋分别买票。2026 年古迹漫游券公告销售至 8/31，这趟按现场单买两处 NT$140／人。",
         "从树屋沿古堡街方向步行到古堡入口，路口按人行道走。",
       ),
       stop(
@@ -781,7 +822,7 @@ const portStops = () => [
     "旗津渡轮与海岸",
     "午后至傍晚",
     "港边主线",
-    "先看船班与风浪再渡海；留一段看海时间，晚餐前回本岛。当天若安排莲池潭，旗津就只走码头与近处海岸。",
+    "走鼓山与旗津之间的旗鼓航线，每人各刷一张电子票证。先看停航公告，晚餐前为候船、返航和步行留时间。当天若安排莲池潭，旗津就只走码头与近处海岸。",
     "从哈玛星走到鼓山轮渡站，搭船到旗津轮渡站，再走向海岸；回程原路搭船，给餐厅订位留余量。",
   ),
   stop(
@@ -789,7 +830,7 @@ const portStops = () => [
     "永心浮岛 · 户外港景座位",
     "傍晚／预约时段",
     "两人晚餐候选",
-    "想坐外面，就在官方订位渠道备注两人、户外港景席，并向店家确认能否安排。尚未订位，备注不等于保证座位；风雨大时询问是否能改室内或调整日期。",
+    "想坐外面，就在官方订位渠道备注两人、户外港景席，并向店家确认能否安排。尚未订位时，可先请店家确认户外座位。风雨大时按预订条款向店家询问能否换到室内。",
     "旗津回鼓山后，搭车或沿哈玛星、港区步道往大港仓七库。认蓬莱路6之6号永心浮岛；大港桥旋转管制时按开放通路绕行，别把到店时间卡在船班上。",
   ),
   stop(
@@ -867,7 +908,7 @@ const kaohsiungDay = (start: number) =>
         "取箱 → 美丽岛／市区安顿",
         "午后",
         "住宿参考区",
-        "回新左营取箱，红线进市区。酒店待订，以美丽岛或高雄车站周边接续；住左营也可寄存后再轻装进港区。",
+        "回新左营取箱，红线进市区。住美丽岛周边可用红线进城，住驳二周边则在美丽岛转橘线往盐埕埔；住左营可寄存后再轻装进港区。",
         "从新左营共构站转捷运红线，按实际订房地址下车。先放箱再出门，路线以美丽岛作为市区起点参考。",
       ),
       ...portStops(),
@@ -883,14 +924,21 @@ const kaohsiungDay = (start: number) =>
       ...portLegs(),
       link("渡轮航线与停航公告", sources.ferry),
     ],
-    "高雄 · 第1晚（美丽岛／左营等交通节点待选）",
+    "高雄 · 第1晚",
     [
       section(
         "今天删哪一段最轻松",
         [
-          "台南出发晚了，就缩短春秋阁或缩短港区展览，保住旗津与晚餐余量；若到新左营后寄物不便，也可直接进城放行李。塔内、展馆与渡轮各有开放限制，港边本身不必走成一条赶场清单。",
+          "若订了 19:00 的永心浮岛，建议约 18:00 前回到鼓山码头，留出步行或搭车与找入口的时间。候船队伍长就少走一段旗津海岸。台南出发晚、寄物不便时，可直接进城放箱，把午后交给港边。",
         ],
-        [link("莲池潭景区与交通", sources.lotus)],
+        [
+          link("莲池潭景区与交通", sources.lotus),
+          link("旗鼓渡轮票价、班次及刷卡规则", sources.flagFerry),
+          link(
+            "大港桥旋转与开放",
+            "https://khh.travel/zh-tw/attractions/detail/1147/",
+          ),
+        ],
         true,
       ),
     ],
@@ -939,12 +987,14 @@ const departure = (start: number) =>
         "按航班倒推",
         "返程",
         "搭捷运红线往小港方向，在高雄国际机场站下车，跟随国际航厦标识。报到截止与到机场时间按航空公司要求。",
-        "美丽岛可直搭红线至机场；住左营则从R16搭同线南下。大件行李多或时间不顺时搭计程车。",
+        "住驳二可从盐埕埔 O2 搭橘线，经美丽岛转红线往小港。靠近港边 C12 驳二大义，也可坐轻轨往 C11 方向到 C3 前镇之星，步行转 R6 凯旋，再搭红线到 R4 高雄国际机场。大件行李多或早班机可直接搭计程车。",
       ),
     ],
     [
       nav("美丽岛站 → 高雄国际机场", "formosa", "khh"),
+      nav("驳二大义站 → 高雄国际机场", "pierDayi", "khh"),
       nav("左营站 → 高雄国际机场（住宿备选）", "zuoying", "khh"),
+      link("前镇之星 C3 与凯旋 R6 换乘", "https://www.krtc.com.tw/Service/faq_more?id=dadec737e1d14ac6931194ab8a2d755d"),
     ],
     "返程 · 不再住宿",
     [seaA1],
@@ -1416,12 +1466,18 @@ function cityAndNorth(id: number, start: number, office: boolean) {
       section(
         "平价汤屋与河口怎么衔接",
         [
-          "这次选瀧乃汤，按目前双人独立汤屋NT$400、60分钟规划。店家只接当日预约，早上先确认午后名额，再决定老城各站停留多久；毛巾等备品自备或另购。",
+          "双人独立汤屋 NT$400／两位成人，使用 60 分钟。营业日 12:00—18:00，17:00 最后入场，周三常休。营业当天 06:30 起电话 02-2891-2236 或现场预约，迟到超过 10 分钟会取消。先确认名额再安排去北投的时间。",
           "含候车、步行与换乘，市区到瀧乃汤先粗留60—75分钟，汤屋到淡水老街约45—60分钟，泡汤按60分钟。八里来回另留1—1.5小时，想完整看两岸就少逛一点上午的店。交通时间是规划余量，实际按当天导航。",
-          "先泡汤再逛河口，既符合平价汤屋的午后时段，也不用在晚上把温泉当成收尾期限。西门或中山留作回城后的续场，D5仍直接准备南下。",
+          "自带饮水、毛巾与洗浴用品。青磺泉偏酸，先冲洗身体、调妥水温，分段短泡，每次以 10—15 分钟为原则，觉得不适就起身休息。酒后不入浴，避免空腹或刚吃饱就泡，有伤口或皮肤敏感时按馆方规定安排。淡水到八里的船班受潮汐和天气影响，登船前问同一家船商的回程末班。",
         ],
         [
           link("瀧乃汤双人独立汤屋", sources.bath),
+          link("瀧乃汤 2026 年 12 月营业公告", sources.bathCalendar),
+          link(
+            "台北市卫生局 · 泡汤须知",
+            "https://health.gov.taipei/News_Content.aspx?n=BB5A41BA1E6CA260&s=BD3BBFD7FC8E7BE6&sms=72544237BBE4C5F6",
+          ),
+          link("淡水与八里渡船航线及末班", sources.baliFerry),
           link(
             "双连露天市集资料",
             "https://www.tcma.gov.taipei/News_Content.aspx?n=FAC14AD2DE4E01A4&s=64409AADB4FA491D&sms=32F7BA052C5CA548",
@@ -1476,7 +1532,7 @@ function newSkyline(start: number) {
         "国父纪念馆园区与外观",
         "午后顺路",
         "原有保留项目",
-        "馆体整修，按开放园区和建筑外观短走，入馆以最新公告为准。",
+        "馆体整修，按开放园区和建筑外观安排，中山文化园区可散步。",
         "从城南搭车到纪念馆开放入口，短走后往101；若预约时段靠前，可先101再看园区。",
       ),
       stop(
@@ -1484,8 +1540,8 @@ function newSkyline(start: number) {
         "台北101登顶 · 观景台",
         "午后／预约时段",
         "白天俯瞰城市",
-        "先看白天城市，夜景留给竹村机位。登顶指票种允许的观景台楼层，户外层看天气与票种。",
-        "从园区往101观景台入口，按订单报到、搭电梯；逛完再去虎林街，不为同时看两次日落挤压市场。",
+        "标准全票 NT$600，包含 88、89 楼。想去 101 楼，官网列每人加价 NT$380，现场确认票种与时段。户外层依天气开放，去之前看能见度。",
+        "从国父纪念馆园区走到 101 办公大楼 1 楼，按楼下观景台临时入口指引报到。想赶上虎林黄昏市场，主日期可优先考虑 13:30—14:30 之间的观景时段。",
       ),
       stop(
         "hulin",
@@ -1500,7 +1556,7 @@ function newSkyline(start: number) {
         "象山开放步道（看体力再走）",
         "傍晚可选",
         "登山支线",
-        "市场逛完还有脚力、路面干燥才走开放段；今天已经跨区，默认允许直接跳过爬山。部分路段施工按公告折返，下山亮度不足就不用追高点。",
+        "象山部分步道施工公告列至 2027/04/13。按当日开放图及围挡走，天黑、湿滑或时间紧就留在山下拍竹村夜景。",
         "从虎林市场搭车到灵云宫登山口，沿开放步道短走；下山回街面后再去竹村。若不爬山，就从市场直接搭车去竹村机位。",
         true,
       ),
@@ -1535,6 +1591,10 @@ function newSkyline(start: number) {
         "https://www-ws.gov.taipei/001/Upload/407/relfile/20232/9434655/efbcd1a3-9b27-4edf-b12f-d9f7ce5d139c.pdf",
       ),
       link("象山施工公告", sources.hill),
+      link(
+        "台北101楼层与票价",
+        "https://www.taipei-101.com.tw/en/observatory/ticket/information",
+      ),
     ],
     "台北 · 第2晚",
     [
@@ -1562,7 +1622,7 @@ function newSouthbound(start: number) {
     nav("板桥站 → 小潘中正店", "banqiao", "bakery", "walking"),
     nav("小潘 → 高铁板桥站", "bakery", "hsrBanqiao", "walking"),
     nav("高铁板桥 → 高铁台南", "hsrBanqiao", "hsrTainan"),
-    nav("高铁台北 → 高铁台南（九份返城后）", "taipei", "hsrTainan"),
+    nav("高铁台北 → 高铁台南", "taipei", "hsrTainan"),
     nav("高铁台南 → 沙仑站步行", "hsrTainan", "shalun", "walking"),
     nav("沙仑 → 台铁台南站", "shalun", "tainan"),
     nav("台南站 → 中西区参考点", "tainan", "oldtown"),
@@ -1626,8 +1686,28 @@ function newSouthbound(start: number) {
       nav("瑞芳 → 台北取箱", "ruifang", "taipei"),
       ...transfer,
     ],
-    "台南 · 第1晚（中西区待选）",
+    "台南 · 第1晚（中西区）",
     [
+      section(
+        "高铁怎么订，到了台南怎么接",
+        [
+          start === 10
+            ? "12/14 按高铁官方指定日期查询，首选 0633 台北 11:46 → 台南 13:32，备选 0637 台北 12:21 → 台南 14:06。若确定走九份，再查午后车次，0657 为 15:46 → 17:32，后面还有转车和入住。"
+            : "12/15 建议订台北约 11:30—12:30 出发、明确停靠高铁台南的班次。若上午去板桥采购，订票时把出发站选为板桥，选班后再倒推取箱时间。",
+          "台湾高铁标准车厢对号座原价为台北到台南 NT$1,350、板桥到台南 NT$1,320。两人都符合短期入境旅客资格时，可先看 KKday 同区间的同行买一送一。商家公告至 2026/12/31，台南属于适用到达站，限量且须用指定优惠码。以结账价为准，买到兑换码后还要到高铁周游券官网预约两张同车座位。",
+          "同行优惠用不了，就比较高铁官网同车的 6.5／8／9 折早鸟，以及符合资格时的境外旅客 8.5 折单程。按能确认的车次、总价与取票方式选。兑换票请带有效旅行证件与入境证明，到站留 25—35 分钟取票和进站。",
+          "从高铁台南站二楼通廊走到台铁沙仑站，刷卡搭往台南市区方向的区间车。高铁下车到台南站按约 45—60 分钟留候车和步行余量。行李多时可从高铁站直接搭计程车到中西区。",
+        ],
+        [
+          link("台湾高铁官方购票", sources.hsrBooking),
+          link("高铁日期、车次与票价查询", sources.hsrTimetable),
+          link("早鸟适用车次、证件与变更规定", sources.hsrEarlyBird),
+          link("境外旅客 85 折单程及兑换划位", sources.hsrPass),
+          link("KKday 两人同行优惠与资格", sources.hsrPairOffer),
+          link("高铁台南站 · 沙仑线与接驳", sources.hsrTainanTransfer),
+          link("台铁沙仑线时刻", sources.tra),
+        ],
+      ),
       section(
         "九份需要留出的交通余量",
         [
